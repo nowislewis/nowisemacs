@@ -1,3 +1,18 @@
 [submodule "site-lisp/extensions/emacs-doom-themes"]
 	path = site-lisp/extensions/emacs-doom-themes
 	url = https://github.com/hlissner/emacs-doom-themes.git
+[submodule "site-lisp/extensions/site-cache-path-from-shell"]
+	path = site-lisp/extensions/site-cache-path-from-shell
+	url = https://github.com/manateelazycat/cache-path-from-shell.git
+[submodule "site-lisp/extensions/lazy-load"]
+	path = site-lisp/extensions/lazy-load
+	url = https://github.com/manateelazycat/lazy-load.git
+[submodule "site-lisp/extensions/one-key"]
+	path = site-lisp/extensions/one-key
+	url = https://github.com/manateelazycat/one-key.git
+[submodule "site-lisp/extensions/awesome-pair"]
+	path = site-lisp/extensions/awesome-pair
+	url = https://github.com/manateelazycat/awesome-pair.git
+[submodule "site-lisp/extensions/elisp-tree-sitter"]
+	path = site-lisp/extensions/elisp-tree-sitter
+	url = https://github.com/emacs-tree-sitter/elisp-tree-sitter.git

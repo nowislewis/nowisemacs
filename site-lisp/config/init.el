@@ -33,9 +33,9 @@
 
 
   ;; 定义一些启动目录，方便下次迁移修改
-  (defvar init-nowisemacs-root-dir (file-truename "~/nowisemacs/site-lisp"))
-  (defvar init-nowisemacs-config-dir (concat nowisemacs-root-dir "/config"))
-  (defvar init-nowisemacs-extension-dir (concat nowisemacs-root-dir "/extensions"))
+  (defvar nowisemacs-root-dir (file-truename "~/nowisemacs/site-lisp"))
+  (defvar nowisemacs-config-dir (concat nowisemacs-root-dir "/config"))
+  (defvar nowisemacs-extension-dir (concat nowisemacs-root-dir "/extensions"))
   (with-temp-message "";抹掉插件启动的输出
     ;;(require 'benchmark-init-modes)
     ;;(require 'benchmark-init)
@@ -44,6 +44,22 @@
     (require 'init-fullscreen)
     (require 'init-generic)
     (require 'init-theme)
+    (when (featurep 'cocoa)
+      (require 'cache-path-from-shell))
+    (require 'lazy-load)
+    (require 'one-key)
+    ;;;; 可能不用－－－－－－－－－－－－－－－－
+    (require 'awesome-pair)
+    (require 'display-line-numbers)
+    (require 'basic-toolkit)
+    (require 'redo)
+    (require 'hightlight-parentheses)
+    ;;;; －－－－－－－－－－－－－－－－－－－－
+    (require 'init-tree-sitter)
+
+
+
+    (require 'init-key)
     )
   )
 
