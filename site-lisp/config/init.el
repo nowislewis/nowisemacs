@@ -36,7 +36,7 @@
   (defvar nowisemacs-root-dir (file-truename "~/nowisemacs/site-lisp"))
   (defvar nowisemacs-config-dir (concat nowisemacs-root-dir "/config"))
   (defvar nowisemacs-extension-dir (concat nowisemacs-root-dir "/extensions"))
-  (with-temp-message "";抹掉插件启动的输出
+  (with-temp-message ""                 ;抹掉插件启动的输出
     ;;(require 'benchmark-init-modes)
     ;;(require 'benchmark-init)
     ;;(benchmark-init/activate)
@@ -44,24 +44,43 @@
     (require 'init-fullscreen)
     (require 'init-generic)
     (require 'init-theme)
-    (when (featurep 'cocoa)
-      (require 'cache-path-from-shell))
+    ;; (when (featurep 'cocoa)
+    ;;   (require 'cache-path-from-shell))
     (require 'lazy-load)
-    (require 'one-key)
-    ;;;; 可能不用－－－－－－－－－－－－－－－－
+    ;; (require 'one-key)
+;;;; 可能不用－－－－－－－－－－－－－－－－
     (require 'awesome-pair)
     (require 'display-line-numbers)
-    (require 'basic-toolkit)
-    (require 'redo)
-    (require 'hightlight-parentheses)
-    ;;;; －－－－－－－－－－－－－－－－－－－－
-    (require 'init-tree-sitter)
+    ;; (require 'basic-toolkit)
+    ;; (require 'redo)
+    ;; (require 'highlight-parentheses)
+;;;; －－－－－－－－－－－－－－－－－－－－
+    (when (eq system-type 'gnu/linux)
+      (require 'init-tree-sitter))
+    (require 'init-awesome-tray)
+    (require 'init-awesome-tab)
+    (require 'init-backup)
+    (require 'init-line-number)
+    (require 'init-auto-save)
+    (require 'init-mode)
+    (require 'init-awesome-pair)
+    (require 'init-indent)
+    ;; (require 'init-one-key)
 
-
-
+    (require 'init-meow)
     (require 'init-key)
-    )
-  )
+
+    (require 'init-isearch-mb)
+    (require 'init-performance)
+    ;; (require 'init-tempbuf)
+    (require 'init-company-mode)
+
+
+    ;; 可以延后加载的
+    (run-with-idle-timer 1 nil #'(lambda ()
+
+                                   ;; (require 'init-key)
+                                   ))))
 
 (provide 'init)
 ;;; init.el ends here

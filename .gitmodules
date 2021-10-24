@@ -7,12 +7,45 @@
 [submodule "site-lisp/extensions/lazy-load"]
 	path = site-lisp/extensions/lazy-load
 	url = https://github.com/manateelazycat/lazy-load.git
-[submodule "site-lisp/extensions/one-key"]
-	path = site-lisp/extensions/one-key
-	url = https://github.com/manateelazycat/one-key.git
 [submodule "site-lisp/extensions/awesome-pair"]
 	path = site-lisp/extensions/awesome-pair
 	url = https://github.com/manateelazycat/awesome-pair.git
 [submodule "site-lisp/extensions/elisp-tree-sitter"]
 	path = site-lisp/extensions/elisp-tree-sitter
 	url = https://github.com/emacs-tree-sitter/elisp-tree-sitter.git
+[submodule "site-lisp/extensions/awesome-tray"]
+	path = site-lisp/extensions/awesome-tray
+	url = https://github.com/manateelazycat/awesome-tray.git
+[submodule "site-lisp/extensions/awesome-tab"]
+	path = site-lisp/extensions/awesome-tab
+	url = https://github.com/manateelazycat/awesome-tab.git
+[submodule "site-lisp/extensions/el"]
+	path = site-lisp/extensions/el
+	url = https://github.com/domtronn/all-the-icons.el.git
+[submodule "site-lisp/extensions/auto-save"]
+	path = site-lisp/extensions/auto-save
+	url = https://github.com/manateelazycat/auto-save.git
+[submodule "site-lisp/extensions/meow"]
+	path = site-lisp/extensions/meow
+	url = https://github.com/meow-edit/meow.git
+[submodule "site-lisp/extensions/dash"]
+	path = site-lisp/extensions/dash
+	url = https://github.com/magnars/dash.el.git
+[submodule "site-lisp/extensions/s-el"]
+	path = site-lisp/extensions/s-el
+	url = https://github.com/magnars/s.el.git
+[submodule "site-lisp/extensions/isearch-mb"]
+	path = site-lisp/extensions/isearch-mb
+	url = https://github.com/astoff/isearch-mb.git
+[submodule "site-lisp/extensions/company-mode"]
+	path = site-lisp/extensions/company-mode
+	url = https://github.com/company-mode/company-mode.git
+[submodule "site-lisp/extensions/company-tabnine"]
+	path = site-lisp/extensions/company-tabnine
+	url = https://github.com/TommyX12/company-tabnine.git
+[submodule "site-lisp/extensions/unicode-escape"]
+	path = site-lisp/extensions/unicode-escape
+	url = https://github.com/kosh04/unicode-escape.el.git
+[submodule "site-lisp/extensions/names"]
+	path = site-lisp/extensions/names
+	url = https://github.com/Malabarba/names.git
