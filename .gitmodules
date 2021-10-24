@@ -1,0 +1,3 @@
+[submodule "site-lisp/extensions/emacs-doom-themes"]
+	path = site-lisp/extensions/emacs-doom-themes
+	url = https://github.com/hlissner/emacs-doom-themes.git
