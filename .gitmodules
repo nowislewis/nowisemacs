@@ -49,3 +49,15 @@
 [submodule "site-lisp/extensions/names"]
 	path = site-lisp/extensions/names
 	url = https://github.com/Malabarba/names.git
+[submodule "site-lisp/extensions/emacs-which-key"]
+	path = site-lisp/extensions/emacs-which-key
+	url = https://github.com/justbur/emacs-which-key.git
+[submodule "site-lisp/extensions/magit"]
+	path = site-lisp/extensions/magit
+	url = https://hub.fastgit.org/magit/magit.git
+[submodule "site-lisp/extensions/with-editor"]
+	path = site-lisp/extensions/with-editor
+	url = https://github.com/magit/with-editor.git
+[submodule "site-lisp/extensions/vertico"]
+	path = site-lisp/extensions/vertico
+	url = https://github.com/minad/vertico.git

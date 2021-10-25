@@ -26,7 +26,7 @@
 
 
 ;;; 导出相关的设置
-(after! org
+(with-eval-after-load 'org
      (setq org-latex-pdf-process
      '("xelatex -interaction nonstopmode %f"
        "bibtex %b"
@@ -47,7 +47,6 @@
 
 ;;; org TODO 设置
 
-(after! org
 (setq-default org-todo-keywords
       (quote ((sequence "TODO(t)" "NEXT(n)" "|" "DONE(d)")
               (sequence "WAITING(w@/!)" "HOLD(h@/!)" "|" "CANCELLED(c@/!)" "PHONE" "MEETING"))))
@@ -61,7 +60,6 @@
               ("CANCELLED" :foreground "forest green" :weight bold)
               ("MEETING" :foreground "forest green" :weight bold)
               ("PHONE" :foreground "forest green" :weight bold))))
-)
 
 ;;; 美化
 (setq org-hide-emphasis-markers t)
@@ -71,6 +69,7 @@
                                        ("#+end_src" . "Ⅎ")))
 (add-hook 'org-mode-hook 'prettify-symbols-mode)
 
+)
 
 (provide 'init-org)
 ;;; init-org.el ends here

@@ -66,21 +66,31 @@
     (require 'init-awesome-pair)
     (require 'init-indent)
     ;; (require 'init-one-key)
-
     (require 'init-meow)
     (require 'init-key)
-
+    (require 'init-which-key)
     (require 'init-isearch-mb)
     (require 'init-performance)
     ;; (require 'init-tempbuf)
-    (require 'init-company-mode)
+
 
 
     ;; 可以延后加载的
     (run-with-idle-timer 1 nil #'(lambda ()
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;; complete
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+                                   (require 'init-company-mode)
+                                   (require 'init-vertico)
 
-                                   ;; (require 'init-key)
-                                   ))))
+
+                                   (require 'init-magit)
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;; org mode
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+                                   (require 'init-org)
+                                   (require 'init-org-roam)))))
 
 (provide 'init)
 ;;; init.el ends here
