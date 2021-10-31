@@ -1,0 +1,1065 @@
+#+TITLE: Emacs Configuration
+#+PROPERTY: header-args:elisp :tangle ~/my-emacs/init.el
+* 启动优化
+** UI 加速
+#+begin_src elisp
+  ;; -*- lexical-binding: t; -*-
+(tool-bar-mode -1)                      ;禁用工具栏
+;; (menu-bar-mode -1)                      ;禁用菜单栏
+(scroll-bar-mode -1)                    ;禁用滚动条
+(setq
+ ;; 不要缩放frame.
+ frame-inhibit-implied-resize t
+ ;; 默认用最简单的模式
+ initial-major-mode 'fundamental-mode
+ ;; 不要自动启用package
+ package-enable-at-startup nil package--init-file-ensured t)
+#+end_src
+** Startup Performance
+#+begin_src elisp
+  ;; Profile emacs startup
+  (add-hook 'emacs-startup-hook
+            (lambda ()
+              (message "*** Emacs loaded in %s seconds with %d garbage collections."
+                       (emacs-init-time "%.2f")
+                       gcs-done)))
+
+(let (
+      ;; 加载的时候临时增大`gc-cons-threshold'以加速启动速度。
+      (gc-cons-threshold most-positive-fixnum)
+      (gc-cons-percentage 0.6)
+      ;; 清空避免加载远程文件的时候分析文件。
+      (file-name-handler-alist nil))
+
+  ;; 定义一些启动目录，方便下次迁移修改
+  (defvar nowisemacs-root-dir (file-truename "~/nowisemacs/site-lisp"))
+  (defvar nowisemacs-config-dir (concat nowisemacs-root-dir "/config"))
+  (defvar nowisemacs-extension-dir (concat nowisemacs-root-dir "/extensions")))
+
+#+end_src
+** 启动全屏幕
+#+begin_src elisp :tangle no
+(if (featurep 'cocoa)
+    (progn
+      ;; 在Mac平台, Emacs不能进入Mac原生的全屏模式,否则会导致 `make-frame' 创建时也集成原生全屏属性后造成白屏和左右滑动现象.
+      ;; 所以先设置 `ns-use-native-fullscreen' 和 `ns-use-fullscreen-animation' 禁止Emacs使用Mac原生的全屏模式.
+      ;; 而是采用传统的全屏模式, 传统的全屏模式, 只会在当前工作区全屏,而不是切换到Mac那种单独的全屏工作区,
+      ;; 这样执行 `make-frame' 先关代码或插件时,就不会因为Mac单独工作区左右滑动产生的bug.
+      ;;
+      ;; Mac平台下,不能直接使用 `set-frame-parameter' 和 `fullboth' 来设置全屏,
+      ;; 那样也会导致Mac窗口管理器直接把Emacs窗口扔到单独的工作区, 从而对 `make-frame' 产生同样的Bug.
+      ;; 所以, 启动的时候通过 `set-frame-parameter' 和 `maximized' 先设置Emacs为最大化窗口状态, 启动5秒以后再设置成全屏状态,
+      ;; Mac就不会移动Emacs窗口到单独的工作区, 最终解决Mac平台下原生全屏窗口导致 `make-frame' 左右滑动闪烁的问题.
+      (setq ns-use-native-fullscreen nil)
+      (setq ns-use-fullscreen-animation nil)
+
+      ;; 默认先最大化。
+      (set-frame-parameter (selected-frame) 'fullscreen 'maximized)
+
+      (run-at-time "2sec" nil
+                   (lambda ()
+                     (toggle-frame-fullscreen)
+                     ))
+      )
+
+  ;; 非Mac平台直接全屏
+  (require 'fullscreen)
+  (fullscreen))
+#+end_src
+** Native Compilation
+#+begin_src elisp :tangle no
+
+  ;; Silence compiler warnings as they can be pretty disruptive
+  (setq native-comp-async-report-warnings-errors nil)
+
+  ;; Set the right directory to store the native comp cache
+  (add-to-list 'native-comp-eln-load-path (expand-file-name "eln-cache/" user-emacs-directory))
+
+#+end_src
+** generic
+#+begin_src elisp :tangle no
+;; Restore emacs session.
+(setq initial-buffer-choice t)
+(run-with-timer 1 nil #'(lambda () (bury-buffer)))
+
+;; 增加长行处理性能
+(setq bidi-inhibit-bpa t)
+(setq-default bidi-paragraph-direction 'left-to-right)
+
+;; 增加IO性能
+(setq process-adaptive-read-buffering nil)
+(setq read-process-output-max (* 1024 1024))
+
+(fset 'yes-or-no-p 'y-or-n-p)           ;以 y/n代表 yes/no
+(blink-cursor-mode -1)                  ;指针不闪动
+(transient-mark-mode 1)                 ;标记高亮
+(global-subword-mode 1)                 ;Word移动支持 FooBar 的格式
+(setq use-dialog-box nil)               ;never pop dialog
+(setq inhibit-startup-screen t)         ;inhibit start screen
+(setq initial-scratch-message "") ;关闭启动空白buffer, 这个buffer会干扰session恢复
+(setq-default comment-style 'indent)    ;设定自动缩进的注释风格
+(setq ring-bell-function 'ignore)       ;关闭烦人的出错时的提示声
+(setq default-major-mode 'text-mode)    ;设置默认地主模式为TEXT模式
+(setq mouse-yank-at-point t)            ;粘贴于光标处,而不是鼠标指针处
+(setq x-select-enable-clipboard t)      ;支持emacs和外部程序的粘贴
+(setq split-width-threshold nil)        ;分屏的时候使用上下分屏
+(setq inhibit-compacting-font-caches t) ;使用字体缓存，避免卡顿
+(setq confirm-kill-processes nil)       ;退出自动杀掉进程
+(setq async-bytecomp-allowed-packages nil) ;避免magit报错
+(setq word-wrap-by-category t)             ;按照中文折行
+(setq profiler-report-cpu-line-format ;让 profiler-report 第一列宽一点
+      '((100 left)
+        (24 right ((19 right)
+                   (5 right)))))
+(setq profiler-report-memory-line-format
+      '((100 left)
+        (19 right ((14 right profiler-format-number)
+                   (5 right)))))
+
+;; (add-hook 'find-file-hook 'highlight-parentheses-mode t) ;增强的括号高亮
+
+(setq ad-redefinition-action 'accept)   ;不要烦人的 redefine warning
+(setq frame-resize-pixelwise t) ;设置缩放的模式,避免Mac平台最大化窗口以后右边和下边有空隙
+
+;; 平滑地进行半屏滚动，避免滚动后recenter操作
+(setq scroll-step 1
+      scroll-conservatively 10000)
+
+
+#+end_src
+
+* Package Management
+
+#+begin_src elisp
+
+  (unless (featurep 'straight)
+    ;; Bootstrap straight.el
+    (defvar bootstrap-version)
+    (let ((bootstrap-file
+           (expand-file-name "straight/repos/straight.el/bootstrap.el" user-emacs-directory))
+          (bootstrap-version 5))
+      (unless (file-exists-p bootstrap-file)
+        (with-current-buffer
+            (url-retrieve-synchronously
+             "https://raw.githubusercontent.com/raxod502/straight.el/develop/install.el"
+             'silent 'inhibit-cookies)
+          (goto-char (point-max))
+          (eval-print-last-sexp)))
+      (load bootstrap-file nil 'nomessage)))
+(setq straight-vc-git-default-clone-depth 1)
+  ;; Use straight.el for use-package expressions
+  ;; (straight-use-package 'use-package)
+
+#+end_src
+
+Sometimes it's good to clean up unused repositories if I've removed packages from my configuration.  Use =straight-remove-unused-repos= for this purpose.
+
+** Streamlined Configuration with setup.el
+#+begin_src elisp
+  (straight-use-package '(setup :type git :host nil :repo "https://git.sr.ht/~pkal/setup"))
+  (require 'setup)
+#+end_src
+
+*** :straight
+#+begin_src elisp
+(setup-define :straight
+  (lambda (recipe)
+    `(unless (straight-use-package ',recipe)
+       ,(setup-quit)))
+  :documentation
+  "Install RECIPE with `straight-use-package'.
+This macro can be used as HEAD, and will replace itself with the
+first RECIPE's package."
+  :repeatable t
+  :shorthand (lambda (sexp)
+               (let ((recipe (cadr sexp)))
+                 (if (consp recipe)
+                     (car recipe)
+                   recipe))))
+#+end_src
+*** :pkg
+#+begin_src elisp
+;; Recipe is always a list
+;; Install via Guix if length == 1 or :guix t is present
+
+(defvar dw/guix-emacs-packages '()
+  "Contains a list of all Emacs package names that must be
+installed via Guix.")
+
+(defun dw/filter-straight-recipe (recipe)
+  (let* ((plist (cdr recipe))
+         (name (plist-get plist
+                          :straight)))
+    (cons (if (and name
+                   (not (equal name t))) name (car recipe))
+          (plist-put plist
+                     :straight nil))))
+
+(setup-define :pkg (lambda
+                     (&rest
+                      recipe)
+                     `(add-to-list 'dw/guix-emacs-packages ,(or (plist-get recipe
+                                                                           :guix)
+                                                                (concat "emacs-" (symbol-name (car
+                                                                                               recipe)))))
+                     `(straight-use-package ',(dw/filter-straight-recipe recipe)))
+              :documentation "Install RECIPE via Guix or straight.el"
+              :shorthand #'cadr)
+#+end_src
+*** :delay
+
+#+begin_src elisp
+
+  (setup-define :delay
+     (lambda (&rest time)
+       `(run-with-idle-timer ,(or time 1)
+                             nil ;; Don't repeat
+                             (lambda () (require ',(setup-get 'feature)))))
+     :documentation "Delay loading the feature until a certain amount of idle time has passed.")
+
+#+end_src
+
+*** :disabled
+
+Used to disable a package configuration, similar to =:disabled= in =use-package=.
+
+#+begin_src elisp
+
+  (setup-define :disabled
+    (lambda ()
+      `,(setup-quit))
+    :documentation "Always stop evaluating the body.")
+
+#+end_src
+
+*** :load-after
+This keyword causes a body to be executed after other packages/features are loaded:
+#+begin_src elisp
+(setup-define :load-after
+    (lambda (&rest features)
+      (let ((body `(require ',(setup-get 'feature))))
+        (dolist (feature (nreverse features))
+          (setq body `(with-eval-after-load ',feature ,body)))
+        body))
+  :documentation "Load the current feature after FEATURES.")
+#+end_src
+*** :autoload
+#+begin_src elisp
+(setup-define :autoload
+    (lambda (name &rest funcs)
+      (let ((body '()))
+         (dolist (single-func (nreverse funcs))
+            (add-to-list 'body `(autoload ',single-func ,name nil t)))
+         (add-to-list 'body 'progn)
+        body))
+  :documentation "Load the current feature after FEATURES.")
+
+  ;; (setup (:pkg company-english-helper :host github
+  ;;            :repo "manateelazycat/company-english-helper")
+  ;;        (:autoload "company-english-helper" toggle-english-helper))
+
+#+end_src
+
+* Default Coding System
+
+Avoid constant errors on Windows about the coding system by setting the default to UTF-8.
+
+#+begin_src elisp
+
+  (set-default-coding-systems 'utf-8)
+
+#+end_src
+
+* Keyboard Bindings
+** meow
+#+begin_src elisp
+(setup
+ (:pkg meow)
+ (require 'meow)
+ (defun meow-setup()
+                 (setq meow-cheatsheet-layout meow-cheatsheet-layout-qwerty)
+                 (meow-motion-overwrite-define-key '("j" . meow-next)
+                                                   '("k" . meow-prev))
+                 (meow-leader-define-key
+                  ;; SPC j/k will run the original command in MOTION state.
+                  '("j" . meow-motion-origin-command)
+                  '("k" . meow-motion-origin-command)
+                  ;; Use SPC (0-9) for digit arguments.
+                  '("1" . meow-digit-argument)
+                  '("2" . meow-digit-argument)
+                  '("3" . meow-digit-argument)
+                  '("4" . meow-digit-argument)
+                  '("5" . meow-digit-argument)
+                  '("6" . meow-digit-argument)
+                  '("7" . meow-digit-argument)
+                  '("8" . meow-digit-argument)
+                  '("9" . meow-digit-argument)
+                  '("0" . meow-digit-argument)
+                  '("/" . meow-keypad-describe-key)
+                  '("?" . meow-cheatsheet))
+                 (meow-normal-define-key '("0" . meow-expand-0)
+                                         '("9" . meow-expand-9)
+                                         '("8" . meow-expand-8)
+                                         '("7" . meow-expand-7)
+                                         '("6" . meow-expand-6)
+                                         '("5" . meow-expand-5)
+                                         '("4" . meow-expand-4)
+                                         '("3" . meow-expand-3)
+                                         '("2" . meow-expand-2)
+                                         '("1" . meow-expand-1)
+                                         '("a" . meow-append)
+                                         ;;'("A" . meow-open-below)
+                                         '("b" . meow-back-word)
+                                         '("B" . meow-back-symbol)
+                                         '("c" . meow-change)
+                                         '("C" . meow-change-save)
+                                         '("d" . meow-clipboard-kill)
+                                         '("e" . meow-next-word)
+                                         '("E" . meow-next-symbol)
+                                         '("f" . meow-find)
+                                         '("F" . meow-find-expand)
+                                         ;; (cons "g" (concat doom-leader-alt-key " c"))
+                                         '("G" . meow-grab)
+                                         '("h" . meow-left)
+                                         '("H" . meow-left-expand)
+                                         '("i" . meow-insert)
+                                         '("I" . meow-open-above)
+                                         '("j" . meow-next)
+                                         '("J" . meow-next-expand)
+                                         '("k" . meow-prev)
+                                         '("K" . meow-prev-expand)
+                                         '("l" . meow-right)
+                                         '("L" . meow-right-expand)
+                                         '("m" . meow-mark-word)
+                                         '("M" . meow-mark-symbol)
+                                         '("n" . meow-search)
+                                         '("N" . meow-pop-search)
+                                         '("o" . meow-open-below)
+                                         '("O" . meow-open-above)
+                                         '("p" . meow-yank)
+                                         '("P" . meow-yank-pop)
+                                         '("q" . meow-quit)
+                                         '("Q" . meow-goto-line)
+                                         '("r" . meow-replace)
+                                         '("R" . meow-swap-grab)
+                                         '("s" . meow-line)
+                                         '("S" . meow-kmacro-lines)
+                                         '("t" . meow-till)
+                                         '("T" . meow-till-expand)
+                                         '("u" . meow-undo)
+                                         '("U" . undo-tree-redo)
+                                         '("v" . meow-visit)
+                                         '("V" . meow-kmacro-matches)
+                                         '("w" . meow-block)
+                                         '("W" . meow-block-expand)
+                                         '("x" . meow-C-d)
+                                         '("X" . meow-backward-delete)
+                                         '("y" . meow-save)
+                                         '("Y" . meow-sync-grab)
+                                         '("z" . meow-pop-selection)
+                                         '("Z" . meow-pop-all-selection)
+                                         '("&" . meow-query-replace)
+                                         '("%" . meow-query-replace-regexp)
+                                         '("-" . negative-argument)
+                                         '(";" . meow-reverse)
+                                         '("{" . meow-inner-of-thing)
+                                         '("}" . meow-bounds-of-thing)
+                                         '("[" . meow-beginning-of-thing)
+                                         '("]" . meow-end-of-thing)
+                                         '("." . repeat)
+                                         '("," . meow-join)
+                                         '("\\" . quoted-insert)
+                                         '("<escape>" . meow-cancel)
+                                         '("!" . meow-start-kmacro-or-insert-counter)
+                                         '("@" . meow-end-or-call-kmacro)
+                                         '("'" . meow-comment)
+                                         '("/" . meow-last-buffer)))
+  ;; (setq doom-leader-alt-key "M-SPC")
+  (meow-global-mode 1)
+
+  ;; (custom-set-default meow-cursor-type-normal '(box 4))
+
+  ;; meow-setup 用于自定义按键绑定，可以直接使用下文中的示例
+  (meow-setup)
+  ;; 如果你需要在 NORMAL 下使用相对行号（基于 display-line-numbers-mode）
+  ;; (meow-setup-line-number)
+  ;; 如果你需要自动的 mode-line 设置（如果需要自定义见下文对 `meow-indicator' 说明）
+  ;; (meow-setup-indicator)
+  (setq which-key-show-transient-maps t)
+  (setq meow-use-keypad-when-execute-kbd nil)
+  (setq meow-expand-exclude-mode-list nil)
+  (setq meow-use-clipboard t)
+  (setq meow-cursor-type-normal '(bar . 5))
+  (setq meow-cursor-type-insert '(bar . 1))
+  (setq meow-replace-state-name-list '((normal . "N")
+                                       (motion . "M")
+                                       (keypad . "K")
+                                       (insert . "I")))
+  )
+#+end_src
+** undo-tree
+#+begin_src elisp :tangle no
+  (setup (:pkg undo-tree)
+    (setq undo-tree-auto-save-history nil)
+    (global-undo-tree-mode 1))
+#+end_src
+
+** which-key
+#+begin_src elisp
+  (setup (:pkg which-key)
+    ;; (diminish 'which-key-mode)
+    (which-key-mode)
+    (setq which-key-idle-delay 0.1))
+#+end_src
+
+** lewis-define-key
+#+begin_src elisp
+  ;; (defun lewis/define-local-key (key-alist &optional key-prefix)
+  ;;   "the real order: meow-leader key-prefix key"
+  ;;   (if key-prefix
+  ;;       (setq key-prefix (concat key-prefix " "))
+  ;;     (setq key-prefix ""))
+  ;;   (dolist (element key-alist)
+  ;;     (setq key (car element))
+  ;;     (setq def (cdr element))
+  ;;     (cond ((stringp key)
+  ;;            (meow-leader-define-key (cons (concat key-prefix key) def)))
+  ;;           ((t
+  ;;             (signal
+  ;;              'wrong-type-argument
+  ;;              (list 'array key)))))))
+
+
+  (defun lewis/define-leader-local-key (key-alist &optional key-prefix)
+    (let (key def)
+      (setq keymap meow-leader-keymap)
+      (if key-prefix
+	  (setq key-prefix (concat key-prefix " "))
+	(setq key-prefix ""))
+      (dolist (element key-alist)
+	(setq key (car element))
+	(setq def (cdr element))
+	(cond ((stringp key) (setq key (read-kbd-macro (concat key-prefix key))))
+	      ((vectorp key) nil)
+	      (t (signal 'wrong-type-argument (list 'array key))))
+	(define-key keymap key def))))
+  ;; (defmacro bar(name &rest funcs)
+  ;;       (let ((body '()))
+  ;;          (dolist (single-func (nreverse funcs))
+  ;;             (add-to-list 'body `(autoload ',single-func ,name nil t)))
+  ;;          (add-to-list 'body 'progn)
+  ;;         body))
+
+  ;; (defun lewis/define-leader-lazy-key (key-alist filename &optional key-prefix)
+  ;;   (lewis/define-leader-local-key key-alist key-prefix)
+  ;;   (dolist (element key-alist)
+  ;;     (setq fun (cdr element))
+  ;;     (autoload fun filename nil t)))
+  ;; (lewis/define-locak-key '("youdao" . '(("p". youda-dictory)))
+  ;;                         '("e" . lewisliu))
+#+end_src
+
+** keybinding
+#+begin_src elisp
+(lewis/define-leader-local-key
+                        '(;; youdao
+                          ("y p" . youdao-dictionary-search-at-point-posframe)
+                          ("y s" . youdao-dictionary-search)
+                          ("y i" . youdao-dictionary-search-from-input)
+                          ("y r" . youdao-dictionary-search-and-replace)
+                          ;; citre
+                          ("c a" . citre-ace-peek)
+                          ("c j" . citre-jump)
+                          ("c p" . citre-peek)
+                          ("c J" . citre-jump-back)
+                          ("c u" . citre-update-this-tags-file)
+                          ("c r" . citre-peek-restore)
+                          ("c s" . citre-peek-save-session)
+                          ("c l" . citre-peek-load-session)
+                          ;; aweshell
+                          ("a a" . aweshell-toggle)
+                          ("a a" . aweshell-toggle)
+                          ("a d" . aweshell-dedicated-toggle)
+                          ("a b" . aweshell-switch-buffer)
+                          ("a s" . aweshell-search-history)
+                          ;; insert-translated
+                          ("i i" . insert-translated-name-insert)
+                          ("i r" . insert-translated-name-replace)
+                          ;;leader: lewisliu
+                          ) "e")
+#+end_src
+
+* General Configuration
+** line-number
+#+begin_src elisp
+;; Line numbers are not displayed when large files are used.
+(setq line-number-display-limit large-file-warning-threshold)
+(setq line-number-display-limit-width 1000)
+
+(dolist (hook (list
+               'c-mode-common-hook
+               'c-mode-hook
+               'elisp-mode-hook
+               'lisp-interaction-mode-hook
+               'lisp-mode-hook
+               'java-mode-hook
+               'asm-mode-hook
+               'haskell-mode-hook
+               'rcirc-mode-hook
+               'erc-mode-hook
+               'sh-mode-hook
+               'makefile-gmake-mode-hook
+               'python-mode-hook
+               'js-mode-hook
+               'html-mode-hook
+               'css-mode-hook
+               'tuareg-mode-hook
+               'go-mode-hook
+               'coffee-mode-hook
+               'qml-mode-hook
+               'markdown-mode-hook
+               'slime-repl-mode-hook
+               'package-menu-mode-hook
+               'cmake-mode-hook
+               'php-mode-hook
+               'web-mode-hook
+               'coffee-mode-hook
+               'sws-mode-hook
+               'jade-mode-hook
+               'vala-mode-hook
+               'rust-mode-hook
+               'ruby-mode-hook
+               'qmake-mode-hook
+               'lua-mode-hook
+               'swift-mode-hook
+               'llvm-mode-hook
+               'conf-toml-mode-hook
+               'nxml-mode-hook
+               'nim-mode-hook
+               ))
+  (add-hook hook (lambda () (display-line-numbers-mode))))
+#+end_src
+** Theme
+#+begin_src elisp
+
+(setup (:pkg doom-themes)
+  ;; Global settings (defaults)
+  (setq doom-themes-enable-bold t    ; if nil, bold is universally disabled
+        doom-themes-enable-italic t) ; if nil, italics is universally disabled
+  (load-theme 'doom-one t)
+  )
+#+end_src
+
+** Font
+*** Set the font
+Different platforms need different default font sizes, and [[https://mozilla.github.io/Fira/][Fira Mono]] is currently my favorite face.
+
+#+begin_src elisp
+(let ((emacs-font-size 14)
+      emacs-font-name)
+  (cond
+   ((featurep 'cocoa)
+    (setq emacs-font-name "Monaco"))
+   ((string-equal system-type "gnu/linux")
+    (setq emacs-font-name "Inconsolata")))
+  (when (display-grayscale-p)
+    (set-frame-font (format "%s-%s" (eval emacs-font-name) (eval emacs-font-size)))
+    (set-fontset-font (frame-parameter nil 'font) 'unicode (eval emacs-font-name))
+    ))
+#+end_src
+
+** awesome-tray
+#+begin_src elisp
+  (setup
+   (:pkg awesome-tray
+    :host github
+    :repo "manateelazycat/awesome-tray")
+   (require 'awesome-tray)
+   (defun pyim-awesome-tray()
+     (concat current-input-method-title))
+    (add-to-list 'awesome-tray-module-alist '("meow" . (meow-indicator awesome-tray-module-evil-face)))
+    (add-to-list 'awesome-tray-module-alist '("pyim" . (pyim-awesome-tray awesome-tray-module-evil-face)))
+   (setq awesome-tray-active-modules (list "meow" "pyim" "location" "buffer-name" "mode-name" "git"))
+   (awesome-tray-mode 1))
+#+end_src
+** sort-tab
+#+begin_src elisp
+(setup (:pkg sort-tab
+          :host github
+  :repo "manateelazycat/sort-tab")
+       (require 'sort-tab)
+       (sort-tab-mode 1)
+)
+#+end_src
+** backup
+#+begin_src elisp
+  ;; 不要自动备份，auto-save.el 就挺好用
+  (setq make-backup-files nil)
+  (setq auto-save-default nil)
+
+  (setup (:pkg super-save)
+	 (super-save-mode 1)
+       (setq super-save-auto-save-when-idle t)
+
+  )
+#+end_src
+** mode 绑定
+#+begin_src elisp :tangle no
+;;; ### auto-mode-alist ###
+;;; --- 绑定扩展名到特定的模式
+(defun add-to-alist (alist-var elt-cons &optional no-replace)
+  "Add to the value of ALIST-VAR an element ELT-CONS if it isn't there yet.
+If an element with the same car as the car of ELT-CONS is already present,
+replace it with ELT-CONS unless NO-REPLACE is non-nil; if a matching
+element is not already present, add ELT-CONS to the front of the alist.
+The test for presence of the car of ELT-CONS is done with `equal'."
+  (let ((existing-element (assoc (car elt-cons) (symbol-value alist-var))))
+    (if existing-element
+        (or no-replace
+            (rplacd existing-element (cdr elt-cons)))
+      (set alist-var (cons elt-cons (symbol-value alist-var)))))
+  (symbol-value alist-var))
+
+(dolist (elt-cons '(
+                    ("\\.markdown" . markdown-mode)
+                    ("\\.md" . markdown-mode)
+                    ("\\.coffee$" . coffee-mode)
+                    ("\\.iced$" . coffee-mode)
+                    ("Cakefile" . coffee-mode)
+                    ("\\.stumpwmrc\\'" . lisp-mode)
+                    ("\\.[hg]s\\'" . haskell-mode)
+                    ("\\.hi\\'" . haskell-mode)
+                    ("\\.hs-boot\\'" . haskell-mode)
+                    ("\\.chs\\'" . haskell-mode)
+                    ("\\.l[hg]s\\'" . literate-haskell-mode)
+                    ("\\.inc\\'" . asm-mode)
+                    ("\\.max\\'" . maxima-mode)
+                    ("\\.org\\'" . org-mode)
+                    ("\\.cron\\(tab\\)?\\'" . crontab-mode)
+                    ("cron\\(tab\\)?\\." . crontab-mode)
+                    ("\\.a90\\'" . intel-hex-mode)
+                    ("\\.hex\\'" . intel-hex-mode)
+                    ("\\.py$" . python-mode)
+                    ("SConstruct". python-mode)
+                    ("\\.ml\\'" . tuareg-mode)
+                    ("\\.mli\\'" . tuareg-mode)
+                    ("\\.mly\\'" . tuareg-mode)
+                    ("\\.mll\\'" . tuareg-mode)
+                    ("\\.mlp\\'" . tuareg-mode)
+                    ("\\.qml\\'" . qml-mode)
+                    ("\\.jl\\'" . lisp-mode)
+                    ("\\.asdf\\'" . lisp-mode)
+                    ("CMakeLists\\.txt\\'" . cmake-mode)
+                    ("\\.cmake\\'" . cmake-mode)
+                    ("\\.php\\'" . php-mode)
+                    ("\\.vue" . web-mode)
+                    ("\\.wxml" . web-mode)
+                    ("\\.blade\\.php\\'" . web-mode)
+                    ("\\.phtml\\'" . web-mode)
+                    ("\\.tpl\\.php\\'" . web-mode)
+                    ("\\.jsp\\'" . web-mode)
+                    ("\\.as[cp]x\\'" . web-mode)
+                    ("\\.erb\\'" . web-mode)
+                    ("\\.mustache\\'" . web-mode)
+                    ("\\.djhtml\\'" . web-mode)
+                    ("\\.html?\\'" . web-mode)
+                    ("\\.coffee\\'" . coffee-mode)
+                    ("\\.coffee.erb\\'" . coffee-mode)
+                    ("\\.js.erb\\'" . js-mode)
+                    ("\\.iced\\'" . coffee-mode)
+                    ("\\.css\\'" . css-mode)
+                    ("\\.wxss\\'" . css-mode)
+                    ("Cakefile\\'" . coffee-mode)
+                    ("\\.styl$" . sws-mode)
+                    ("\\.jade" . jade-mode)
+                    ("\\.go$" . go-mode)
+                    ("\\.vala$" . vala-mode)
+                    ("\\.vapi$" . vala-mode)
+                    ("\\.rs$" . rust-mode)
+                    ("\\.pro$" . qmake-mode)
+                    ("\\.js$" . js-mode)
+                    ("\\.wxs$" . js-mode)
+                    ("\\.jsx$" . web-mode)
+                    ("\\.lua$" . lua-mode)
+                    ("\\.swift$" . swift-mode)
+                    ("\\.l$" . flex-mode)
+                    ("\\.y$" . bison-mode)
+                    ("\\.pdf$" . pdf-view-mode)
+                    ("\\.cpp$" . c++-mode)
+                    ("\\.h$" . c++-mode)
+                    ("\\.ll$" . llvm-mode)
+                    ("\\.bc$" . hexl-mode)
+                    ("\\.nim$" . nim-mode)
+                    ("\\.nims$" . nim-mode)
+                    ("\\.nimble$" . nim-mode)
+                    ("\\.nim.cfg$" . nim-mode)
+                    ))
+  (add-to-alist 'auto-mode-alist elt-cons))
+
+(add-to-list 'interpreter-mode-alist '("coffee" . coffee-mode))
+
+;;; ### Auto-fill ###
+;;; --- 自动换行
+(setq default-fill-column 100)          ;默认显示 100列就换行
+(dolist (hook (list
+               'after-text-mode-hook
+               'message-mode-hook
+               ))
+  (add-hook hook #'(lambda () (auto-fill-mode 1))))
+#+end_src
+** indent
+#+begin_src elisp :tangle no
+(setq-default indent-tabs-mode nil)
+(setq-default tab-width 4)
+
+(defun adjust-languages-indent (n)
+  (setq-local c-basic-offset n)
+
+  (setq-local coffee-tab-width n)
+  (setq-local javascript-indent-level n)
+  (setq-local js-indent-level n)
+  (setq-local js2-basic-offset n)
+
+  (setq-local web-mode-attr-indent-offset n)
+  (setq-local web-mode-attr-value-indent-offset n)
+  (setq-local web-mode-code-indent-offset n)
+  (setq-local web-mode-css-indent-offset n)
+  (setq-local web-mode-markup-indent-offset n)
+  (setq-local web-mode-sql-indent-offset n)
+
+  (setq-local css-indent-offset n))
+
+(dolist (hook (list
+               'c-mode-hook
+               'c++-mode-hook
+               'java-mode-hook
+               'haskell-mode-hook
+               'asm-mode-hook
+               'sh-mode-hook
+               'haskell-cabal-mode-hook
+               'ruby-mode-hook
+               'qml-mode-hook
+               'scss-mode-hook
+               'coffee-mode-hook
+               ))
+  (add-hook hook #'(lambda ()
+                     (setq indent-tabs-mode nil)
+                     (adjust-languages-indent 4)
+                     )))
+
+(dolist (hook (list
+               'web-mode-hook
+               'js-mode-hook
+               ))
+  (add-hook hook #'(lambda ()
+                     (setq indent-tabs-mode nil)
+                     (adjust-languages-indent 2)
+                     )))
+
+;;; init-indent.el ends here
+
+#+end_src
+
+** TRAMP
+#+begin_src elisp
+  ;; Set default connection mode to SSH
+  (setq tramp-default-method "ssh")
+#+end_src
+* Editing Configuration
+** Automatically clean whitespace
+#+begin_src elisp :tangle no
+  (setup (:pkg ws-butler)
+    (:hook-into text-mode prog-mode))
+#+end_src
+* Completion System
+** Completions with Vertico
+#+begin_src elisp
+  (setup (:pkg vertico)
+    (vertico-mode)
+    (:option vertico-cycle t))
+#+end_src
+** Orderless
+#+begin_src elisp
+  (setup (:pkg orderless)
+    (require 'orderless)
+    (setq completion-styles '(orderless)
+          completion-category-defaults nil
+          completion-category-overrides '((file (styles . (partial-completion))))))
+#+end_src
+** savehist
+#+begin_src elisp
+(setup savehist
+       (savehist-mode))
+#+end_src
+** Completions in Regions with Corfu
+
+#+begin_src elisp :tangle no
+
+  (setup (:pkg corfu :host github :repo "minad/corfu")
+    ;; (:with-map corfu-map
+    ;;   (:bind "C-j" corfu-next
+    ;;          "C-k" corfu-previous
+    ;;          "TAB" corfu-insert
+    ;;          "C-f" corfu-insert))
+    (:option corfu-cycle t)
+    (corfu-global-mode))
+
+#+end_src
+
+** Consult Commands
+#+begin_src elisp
+  (setup (:pkg consult)
+;; Optionally configure the register formatting. This improves the register
+  ;; preview for `consult-register', `consult-register-load',
+  ;; `consult-register-store' and the Emacs built-ins.
+  (setq register-preview-delay 0
+        register-preview-function #'consult-register-format)
+    ;; Optionally replace `completing-read-multiple' with an enhanced version.
+  (advice-add #'completing-read-multiple :override #'consult-completing-read-multiple)
+  ;; Use Consult to select xref locations with preview
+  (setq xref-show-xrefs-function #'consult-xref
+        xref-show-definitions-function #'consult-xref)
+
+    ;; Optionally configure a function which returns the project root directory.
+  ;; There are multiple reasonable alternatives to chose from.
+  ;;;; 1. project.el (project-roots)
+  (setq consult-project-root-function
+        (lambda ()
+          (when-let (project (project-current))
+            (car (project-roots project)))))
+  )
+#+end_src
+** Completion Annotations with Marginalia
+
+Marginalia provides helpful annotations for various types of minibuffer completions.  You can think of it as a replacement of =ivy-rich=.
+
+#+begin_src elisp
+
+  (setup (:pkg marginalia)
+    (:option marginalia-annotators '(marginalia-annotators-heavy
+                                     marginalia-annotators-light
+                                     nil))
+    (marginalia-mode))
+
+#+end_src
+** company
+#+begin_src elisp
+(setup
+ (:pkg company))
+(setup (:pkg company-tabnine))
+(add-hook 'prog-mode-hook
+          #'(lambda ()
+              (require 'company)
+              (require 'company-yasnippet)
+              (require 'company-dabbrev)
+              (require 'company-files)
+              (require 'company-tng)
+              (require 'company-tabnine)
+
+              ;; Config for company mode.
+              (setq company-minimum-prefix-length 1) ; pop up a completion menu by tapping a character
+              (setq company-show-numbers t) ; number the candidates (use M-1, M-2 etc to select completions).
+              (setq company-require-match nil) ; allow input string that do not match candidate words
+              (setq company-idle-delay 0) ; trigger completion immediately.
+
+              ;; Don't downcase the returned candidates.
+              (setq company-dabbrev-downcase nil)
+              (setq company-dabbrev-ignore-case t)
+
+              ;; Customize company backends.
+              (setq company-backends
+                    '(
+                      (company-tabnine company-dabbrev company-keywords company-files company-capf)
+                      ))
+
+              ;; Add yasnippet support for all company backends.
+              (defvar company-mode/enable-yas t
+                "Enable yasnippet for all backends.")
+
+              (defun company-mode/backend-with-yas (backend)
+                (if (or (not company-mode/enable-yas) (and (listp backend) (member 'company-yasnippet backend)))
+                    backend
+                  (append (if (consp backend) backend (list backend))
+                          '(:with company-yasnippet))))
+
+              (setq company-backends (mapcar #'company-mode/backend-with-yas company-backends))
+
+              ;; Remove duplicate candidate.
+              (add-to-list 'company-transformers #'delete-dups)
+
+              ;; Add `company-elisp' backend for elisp.
+              (add-hook 'emacs-lisp-mode-hook
+                        #'(lambda ()
+                            (require 'company-elisp)
+                            (push 'company-elisp company-backends)))
+
+              ;; Enable global.
+              (global-company-mode)
+              ))
+
+;; The free version of TabNine is good enough,
+;; and below code is recommended that TabNine not always
+;; prompt me to purchase a paid version in a large project.
+(defadvice company-echo-show (around disable-tabnine-upgrade-message activate)
+  (let ((company-message-func (ad-get-arg 0)))
+    (when (and company-message-func
+               (stringp (funcall company-message-func)))
+      (unless (string-match "The free version of TabNine only indexes up to" (funcall company-message-func))
+        ad-do-it))))
+
+
+#+end_src
+
+* Window Management
+* 输入与阅读
+** pyim
+只在linux平台使用
+#+begin_src elisp
+      (setup (:pkg posframe))
+    
+  (defun lewis/pyim-config()
+	(setq pyim-default-scheme 'quanpin)
+	(setq pyim-punctuation-translate-p
+	      '(auto yes no))
+	(progn
+	  (set-default 'pyim-punctuation-half-width-functions
+		       '(pyim-probe-punctuation-line-beginning pyim-probe-punctuation-after-punctuation)))
+	(pyim-isearch-mode 1)
+	(defalias 'pyim-probe-meow-normal-mode
+	  #'(lambda nil
+	      (meow-normal-mode-p)))
+	(progn
+	  (set-default 'pyim-english-input-switch-functions
+		       '(pyim-probe-auto-english pyim-probe-isearch-mode pyim-probe-program-mode pyim-probe-org-structure-template pyim-probe-org-latex-mode pyim-probe-meow-normal-mode)))
+	(setq pyim-page-tooltip 'posframe)
+	(setq pyim-page-length 5)
+	(setq ivy-re-builders-alist
+	      '((t . pyim-cregexp-ivy)))
+	(defalias 'my-orderless-regexp
+	  #'(lambda
+	      (orig_func component)
+	      (let
+		  ((result
+		    (funcall orig_func component)))
+		(pyim-cregexp-build result))))
+	(advice-add 'orderless-regexp :around #'my-orderless-regexp)
+
+    )
+  (setup (:pkg pyim)
+	(:option pyim-dicts
+	   '((:name "lewis_pyim_dict" :file "~/Documents/emacs/pyim-dict/lewis_pyim_dict.pyim")
+	     (:name "lewis_big_dict" :file "~/Documents/emacs/pyim-dict/pyim-bigdict.pyim.gz")))
+	(:delay)
+	(:hook lewis/pyim-config)
+	(setq default-input-method "pyim")
+	)
+#+end_src
+
+** good-scroll
+#+begin_src elisp
+(setup (:pkg good-scroll))
+#+end_src
+* File Browsing
+* 编程
+** magit
+#+begin_src elisp
+  (setup (:pkg magit))
+#+end_src
+** flycheck
+** elisp
+** tree-sitter
+** eglot
+* 翻译
+** 有道词典
+#+begin_src elisp
+(setup (:pkg youdao-dictionary)
+  )
+#+end_src
+** english-teacher
+自动翻译当前buffer 的句子，在下方显示，按键和 company-teacher-helper-mode 在一起
+#+begin_src elisp
+(setup (:pkg english-teacher :host github
+           :repo "loyalpartner/english-teacher.el")
+  )
+#+end_src
+** insert-translated-name
+#+begin_src elisp
+(setup (:pkg insert-translated-name :host github
+           :repo "manateelazycat/insert-translated-name"))
+#+end_src
+** company-english-helper
+在输入英文的时候，自动提示单词
+#+begin_src elisp
+(setup (:pkg company-english-helper :host github
+           :repo "manateelazycat/company-english-helper")
+       (:autoload english-teacher-follow-mode))
+(lewis/define-leader-local-key '(
+                          ("e h c" . toggle-company-english-helper)
+                          ("e h f" . english-teacher-follow-mode)
+                          ))
+#+end_src
+* Org Mode
+** 杂项设置
+#+begin_src elisp
+  (setup (:pkg org :type built-in)
+	 )
+
+    (setup (:pkg org-contrib :host github :repo "emacsmirror/org-contrib")
+	   )
+    (setq org-directory "~/Documents/emacs/orgmode/")
+
+    (setq-default fill-column 120)
+    ;; (add-hook 'visual-line-mode-hook #'visual-fill-column-mode)
+    ;; (add-hook 'visual-line-mode-hook #'(lambda () (setq word-wrap nil)))
+#+end_src
+** imenu-list
+#+begin_src elisp
+  (setup (:pkg imenu-list)
+    (:autoload "imenu-list" imenu-list-smart-toggle)
+    (:option imenu-list-focus-after-activate t
+	     imenu-list-auto-resize t
+	     imenu-list-position 'left
+	     )
+    )
+
+#+end_src
+
+** beauty
+#+begin_src elisp
+  (setup (:pkg org-superstar)
+    (:hook-into org-mode)
+    (:option org-superstar-leading-bullet ?\s
+	     org-superstar-leading-fallback ?\s
+	     org-hide-leading-stars nil
+	     org-superstar-todo-bullet-alist
+	'(("TODO" . 9744)
+	  ("[ ]"  . 9744)
+	  ("DONE" . 9745)
+	  ("[X]"  . 9745))))
+(setq org-superstar-headline-bullets-list '("①" "②" "③"
+                                "④" "⑤" "⑥" "⑦"
+                                "⑧" "⑨" "⑩" "⑪"
+                                "⑫" "⑬" "⑭"
+                                "⑮" "⑯" "⑰"
+                                "⑱" "⑲" "⑳"))
+;;"⓪"
+
+(setq org-hide-emphasis-markers t)
+(setq-default prettify-symbols-alist '(("#+BEGIN_SRC" . "ℱ")
+                                       ("#+END_SRC" . "Ⅎ")
+                                       ("#+begin_src" . "ℱ")
+                                       ("#+end_src" . "Ⅎ")))
+(add-hook 'org-mode-hook 'prettify-symbols-mode)
+
+#+end_src
+* Runtime Performance
+
+Dial the GC threshold back down so that garbage collection happens more frequently but in less time.
+
+#+begin_src elisp
+
+  ;; Make gc pauses faster by decreasing the threshold.
+  (setq gc-cons-threshold (* 2 1000 1000))
+
+#+end_src
+
