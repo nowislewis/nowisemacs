@@ -1,5 +1,6 @@
 #+TITLE: Emacs Configuration
 #+PROPERTY: header-args:elisp :tangle ~/my-emacs/init.el
+
 * 启动优化
 ** UI 加速
 #+begin_src elisp
