@@ -69,10 +69,7 @@
   (fullscreen))
 #+end_src
 ** Native Compilation
-#+begin_src elisp
-
-  ;; Silence compiler warnings as they can be pretty disruptive
-  (setq native-comp-async-report-warnings-errors nil)
+#+begin_src elisp :tangle no
 
   ;; Set the right directory to store the native comp cache
   (add-to-list 'native-comp-eln-load-path (expand-file-name "eln-cache/" user-emacs-directory))
@@ -130,8 +127,6 @@
 ;; 平滑地进行半屏滚动，避免滚动后recenter操作
 (setq scroll-step 1
       scroll-conservatively 10000)
-
-
 #+end_src
 
 * Package Management
@@ -213,31 +208,24 @@ installed via Guix.")
               :shorthand #'cadr)
 #+end_src
 *** :delay
-
 #+begin_src elisp
-
   (setup-define :delay
      (lambda (&rest time)
        `(run-with-idle-timer ,(or time 1)
                              nil ;; Don't repeat
                              (lambda () (require ',(setup-get 'feature)))))
      :documentation "Delay loading the feature until a certain amount of idle time has passed.")
-
 #+end_src
-
 *** :disabled
 
 Used to disable a package configuration, similar to =:disabled= in =use-package=.
 
 #+begin_src elisp
-
   (setup-define :disabled
     (lambda ()
       `,(setup-quit))
     :documentation "Always stop evaluating the body.")
-
 #+end_src
-
 *** :load-after
 This keyword causes a body to be executed after other packages/features are loaded:
 #+begin_src elisp
@@ -263,7 +251,6 @@ This keyword causes a body to be executed after other packages/features are load
   ;; (setup (:pkg company-english-helper :host github
   ;;            :repo "manateelazycat/company-english-helper")
   ;;        (:autoload "company-english-helper" toggle-english-helper))
-
 #+end_src
 
 * Default Coding System
@@ -271,9 +258,7 @@ This keyword causes a body to be executed after other packages/features are load
 Avoid constant errors on Windows about the coding system by setting the default to UTF-8.
 
 #+begin_src elisp
-
   (set-default-coding-systems 'utf-8)
-
 #+end_src
 
 * Keyboard Bindings
@@ -283,103 +268,105 @@ Avoid constant errors on Windows about the coding system by setting the default 
    (:pkg meow)
    (require 'meow)
    (defun meow-setup()
-		   (setq meow-cheatsheet-layout meow-cheatsheet-layout-qwerty)
-		   (meow-motion-overwrite-define-key '("j" . meow-next)
-						     '("k" . meow-prev))
-		   (meow-leader-define-key
-		    ;; SPC j/k will run the original command in MOTION state.
-		    '("j" . meow-motion-origin-command)
-		    '("k" . meow-motion-origin-command)
-		    ;; Use SPC (0-9) for digit arguments.
-		    '("1" . meow-digit-argument)
-		    '("2" . meow-digit-argument)
-		    '("3" . meow-digit-argument)
-		    '("4" . meow-digit-argument)
-		    '("5" . meow-digit-argument)
-		    '("6" . meow-digit-argument)
-		    '("7" . meow-digit-argument)
-		    '("8" . meow-digit-argument)
-		    '("9" . meow-digit-argument)
-		    '("0" . meow-digit-argument)
-		    '("/" . meow-keypad-describe-key)
-		    '("?" . meow-cheatsheet))
-		   (meow-normal-define-key '("0" . meow-expand-0)
-					   '("9" . meow-expand-9)
-					   '("8" . meow-expand-8)
-					   '("7" . meow-expand-7)
-					   '("6" . meow-expand-6)
-					   '("5" . meow-expand-5)
-					   '("4" . meow-expand-4)
-					   '("3" . meow-expand-3)
-					   '("2" . meow-expand-2)
-					   '("1" . meow-expand-1)
-					   '("a" . meow-append)
-					   ;;'("A" . meow-open-below)
-					   '("b" . meow-back-word)
-					   '("B" . meow-back-symbol)
-					   '("c" . meow-change)
-					   '("C" . meow-change-save)
-					   '("d" . meow-clipboard-kill)
-					   '("e" . meow-next-word)
-					   '("E" . meow-next-symbol)
-					   '("f" . meow-find)
-					   '("F" . meow-find-expand)
-					   ;; (cons "g" (concat doom-leader-alt-key " c"))
-					   '("G" . meow-grab)
-					   '("h" . meow-left)
-					   '("H" . meow-left-expand)
-					   '("i" . meow-insert)
-					   '("I" . meow-open-above)
-					   '("j" . meow-next)
-					   '("J" . meow-next-expand)
-					   '("k" . meow-prev)
-					   '("K" . meow-prev-expand)
-					   '("l" . meow-right)
-					   '("L" . meow-right-expand)
-					   '("m" . meow-mark-word)
-					   '("M" . meow-mark-symbol)
-					   '("n" . meow-search)
-					   '("N" . meow-pop-search)
-					   '("o" . meow-open-below)
-					   '("O" . meow-open-above)
-					   '("p" . meow-yank)
-					   '("P" . meow-yank-pop)
-					   '("q" . meow-quit)
-					   '("Q" . meow-goto-line)
-					   '("r" . meow-replace)
-					   '("R" . meow-swap-grab)
-					   '("s" . meow-line)
-					   '("S" . meow-kmacro-lines)
-					   '("t" . meow-till)
-					   '("T" . meow-till-expand)
-					   '("u" . meow-undo)
-					   '("U" . undo-tree-redo)
-					   '("v" . meow-visit)
-					   '("V" . meow-kmacro-matches)
-					   '("w" . meow-block)
-					   '("W" . meow-block-expand)
-					   '("x" . meow-C-d)
-					   '("X" . meow-backward-delete)
-					   '("y" . meow-save)
-					   '("Y" . meow-sync-grab)
-					   '("z" . meow-pop-selection)
-					   '("Z" . meow-pop-all-selection)
-					   '("&" . meow-query-replace)
-					   '("%" . meow-query-replace-regexp)
-					   '("-" . negative-argument)
-					   '(";" . meow-reverse)
-					   '("{" . meow-inner-of-thing)
-					   '("}" . meow-bounds-of-thing)
-					   '("[" . meow-beginning-of-thing)
-					   '("]" . meow-end-of-thing)
-					   '("." . repeat)
-					   '("," . meow-join)
-					   '("\\" . quoted-insert)
-					   '("<escape>" . meow-cancel)
-					   '("!" . meow-start-kmacro-or-insert-counter)
-					   '("@" . meow-end-or-call-kmacro)
-					   '("'" . meow-comment)
-					   '("/" . meow-last-buffer)))
+                   (setq meow-cheatsheet-layout meow-cheatsheet-layout-qwerty)
+                   (meow-motion-overwrite-define-key '("j" . meow-next)
+                                                     '("k" . meow-prev))
+                   (meow-leader-define-key
+                    ;; SPC j/k will run the original command in MOTION state.
+                    '("j" . meow-motion-origin-command)
+                    '("k" . meow-motion-origin-command)
+                    ;; Use SPC (0-9) for digit arguments.
+                    '("1" . meow-digit-argument)
+                    '("2" . meow-digit-argument)
+                    '("3" . meow-digit-argument)
+                    '("4" . meow-digit-argument)
+                    '("5" . meow-digit-argument)
+                    '("6" . meow-digit-argument)
+                    '("7" . meow-digit-argument)
+                    '("8" . meow-digit-argument)
+                    '("9" . meow-digit-argument)
+                    '("0" . meow-digit-argument)
+                    '("/" . meow-keypad-describe-key)
+                    '("?" . meow-cheatsheet))
+                   (meow-normal-define-key '("0" . meow-expand-0)
+                                           '("9" . meow-expand-9)
+                                           '("8" . meow-expand-8)
+                                           '("7" . meow-expand-7)
+                                           '("6" . meow-expand-6)
+                                           '("5" . meow-expand-5)
+                                           '("4" . meow-expand-4)
+                                           '("3" . meow-expand-3)
+                                           '("2" . meow-expand-2)
+                                           '("1" . meow-expand-1)
+                                           '("a" . meow-append)
+                                           ;;'("A" . meow-open-below)
+                                           '("b" . meow-back-word)
+                                           '("B" . meow-back-symbol)
+                                           '("c" . meow-change)
+                                           '("C" . meow-change-save)
+                                           '("d" . meow-clipboard-kill)
+                                           '("e" . meow-next-word)
+                                           '("E" . meow-next-symbol)
+                                           '("f" . meow-find)
+                                           '("F" . meow-find-expand)
+                                           ;; (cons "g" (concat doom-leader-alt-key " c"))
+                                           '("G" . meow-grab)
+                                           '("h" . meow-left)
+                                           '("H" . meow-left-expand)
+                                           '("i" . meow-insert)
+                                           '("I" . meow-open-above)
+                                           '("j" . meow-next)
+                                           '("J" . meow-next-expand)
+                                           '("k" . meow-prev)
+                                           '("K" . meow-prev-expand)
+                                           '("l" . meow-right)
+                                           '("L" . meow-right-expand)
+                                           '("m" . meow-mark-word)
+                                           '("M" . meow-mark-symbol)
+                                           '("n" . meow-search)
+                                           '("N" . meow-pop-search)
+                                           '("o" . meow-open-below)
+                                           '("O" . meow-open-above)
+                                           '("p" . meow-yank)
+                                           '("P" . meow-yank-pop)
+                                           '("q" . meow-quit)
+                                           '("Q" . meow-goto-line)
+                                           '("r" . meow-replace)
+                                           '("R" . meow-swap-grab)
+                                           '("s" . meow-line)
+                                           '("S" . meow-kmacro-lines)
+                                           '("t" . meow-till)
+                                           '("T" . meow-till-expand)
+                                           '("u" . meow-undo)
+                                           '("U" . undo-tree-redo)
+                                           '("v" . meow-visit)
+                                           '("V" . meow-kmacro-matches)
+                                           '("w" . meow-block)
+                                           '("W" . meow-block-expand)
+                                           '("x" . meow-C-d)
+                                           '("X" . meow-backward-delete)
+                                           '("y" . meow-save)
+                                           '("Y" . meow-sync-grab)
+                                           '("z" . meow-pop-selection)
+                                           '("Z" . meow-pop-all-selection)
+                                           '("&" . meow-query-replace)
+                                           '("%" . meow-query-replace-regexp)
+                                           '("-" . negative-argument)
+                                           '(";" . meow-reverse)
+                                           '("{" . meow-inner-of-thing)
+                                           '("}" . meow-bounds-of-thing)
+                                           '("[" . meow-beginning-of-thing)
+                                           '("]" . meow-end-of-thing)
+                                           '("<" . sort-tab-select-first-tab)
+                                           '(">" . sort-tab-select-next-tab)
+                                           '("." . repeat)
+                                           '("," . meow-join)
+                                           '("\\" . quoted-insert)
+                                           '("<escape>" . meow-cancel)
+                                           '("!" . meow-start-kmacro-or-insert-counter)
+                                           '("@" . meow-end-or-call-kmacro)
+                                           '("'" . meow-comment)
+                                           '("/" . meow-last-buffer)))
     ;; (setq doom-leader-alt-key "M-SPC")
     (meow-global-mode 1)
 
@@ -398,9 +385,9 @@ Avoid constant errors on Windows about the coding system by setting the default 
     (setq meow-cursor-type-normal '(bar . 5))
     (setq meow-cursor-type-insert '(bar . 1))
     (setq meow-replace-state-name-list '((normal . "N")
-					 (motion . "M")
-					 (keypad . "K")
-					 (insert . "I")))
+                                         (motion . "M")
+                                         (keypad . "K")
+                                         (insert . "I")))
     )
 #+end_src
 ** undo-tree
@@ -413,14 +400,12 @@ Avoid constant errors on Windows about the coding system by setting the default 
 ** which-key
 #+begin_src elisp
   (setup (:pkg which-key)
-    ;; (diminish 'which-key-mode)
     (which-key-mode)
     (setq which-key-idle-delay 0.1))
 #+end_src
 
 ** lewis-define-key
 #+begin_src elisp
-
   (defun lewis/define-leader-key (key-alist &optional key-prefix)
     (let (key def)
       (setq keymap meow-leader-keymap)
@@ -456,7 +441,6 @@ Avoid constant errors on Windows about the coding system by setting the default 
 			    ("c l" . citre-peek-load-session)
 			    ;; aweshell
 			    ("a a" . aweshell-toggle)
-			    ("a a" . aweshell-toggle)
 			    ("a d" . aweshell-dedicated-toggle)
 			    ("a b" . aweshell-switch-buffer)
 			    ("a s" . aweshell-search-history)
@@ -467,7 +451,6 @@ Avoid constant errors on Windows about the coding system by setting the default 
 			    ;; imenu-list
 			    ("l" . imenu-list-smart-toggle)
 			    ;; search
-			    ("s s" . consult-line)
 			    ;;leader: lewisliu
 			    ) "e")
 #+end_src
@@ -482,7 +465,7 @@ Avoid constant errors on Windows about the coding system by setting the default 
 			     ("r" . consult-recent-file)
 			     ) "f")
 #+end_src
-* General Configuration
+* UI
 ** line-number
 #+begin_src elisp
   ;; Line numbers are not displayed when large files are used.
@@ -542,7 +525,6 @@ Avoid constant errors on Windows about the coding system by setting the default 
   (load-theme 'doom-one t)
   )
 #+end_src
-
 ** Font
 *** Set the font
 Different platforms need different default font sizes, and [[https://mozilla.github.io/Fira/][Fira Mono]] is currently my favorite face.
@@ -560,7 +542,7 @@ Different platforms need different default font sizes, and [[https://mozilla.git
     (set-fontset-font (frame-parameter nil 'font) 'unicode (eval emacs-font-name))
     ))
 #+end_src
-
+* General Configuration
 ** awesome-tray
 #+begin_src elisp
   (setup
@@ -568,21 +550,28 @@ Different platforms need different default font sizes, and [[https://mozilla.git
     :host github
     :repo "manateelazycat/awesome-tray")
    (require 'awesome-tray)
+
    (defun pyim-awesome-tray()
      (concat current-input-method-title))
+
+   (defun conda-awesome-tray()
+     (concat conda-env-current-name))
+
     (add-to-list 'awesome-tray-module-alist '("meow" . (meow-indicator awesome-tray-module-evil-face)))
     (add-to-list 'awesome-tray-module-alist '("pyim" . (pyim-awesome-tray awesome-tray-module-evil-face)))
-   (setq awesome-tray-active-modules (list "meow" "pyim" "location" "buffer-name" "mode-name" "git"))
+    (add-to-list 'awesome-tray-module-alist '("conda" . (conda-awesome-tray awesome-tray-module-evil-face)))
+
+   (setq awesome-tray-active-modules (list "meow" "pyim" "conda" "location" "buffer-name" "mode-name" "git"))
    (awesome-tray-mode 1))
 #+end_src
 ** sort-tab
 #+begin_src elisp
-(setup (:pkg sort-tab
-          :host github
-  :repo "manateelazycat/sort-tab")
-       (require 'sort-tab)
-       (sort-tab-mode 1)
-)
+  (setup (:pkg sort-tab
+	    :host github
+    :repo "manateelazycat/sort-tab")
+	 (require 'sort-tab)
+	 (sort-tab-mode 1)
+  )
 #+end_src
 ** backup
 #+begin_src elisp
@@ -924,6 +913,17 @@ Marginalia provides helpful annotations for various types of minibuffer completi
 
 
 #+end_src
+** company-box
+#+begin_src elisp
+  (setup (:pkg company-box)
+    (:hook-into company-mode))
+#+end_src
+** yasnippet
+#+begin_src elisp
+  (setup (:pkg yasnippet)
+    (require 'yasnippet)
+    (yas-global-mode 1))
+#+end_src
 
 * Window Management
 * 输入与阅读
@@ -975,6 +975,13 @@ Marginalia provides helpful annotations for various types of minibuffer completi
 (setup (:pkg good-scroll))
 #+end_src
 * File Browsing
+* shell
+** aweshell
+#+begin_src elisp
+      (setup (:pkg aweshell :host github :repo "manateelazycat/aweshell")
+	(:autoload "aweshell" aweshell-toggle)
+	(:autoload "aweshell" aweshell-dedicated-toggle))
+#+end_src
 * 编程
 ** magit
 #+begin_src elisp
@@ -1000,12 +1007,49 @@ Marginalia provides helpful annotations for various types of minibuffer completi
 #+end_src
 *** elispfl
 #+begin_src elisp
-      (setup (:pkg elispfl :host github :repo "cireu/elispfl")
-	(:hook-into emacs-lisp-mode ielm)
-	)
+(setup (:pkg elispfl :host github :repo "cireu/elispfl")
+       (:hook-into emacs-lisp-mode ielm)
+       )
 #+end_src
 ** tree-sitter
+** lsp-mode
+#+begin_src elisp
+  (setup (:pkg lsp-mode)
+    (:hook lsp-enable-which-key-integration)
+      (setq lsp-keymap-prefix "C-c l"))
+#+end_src
 ** eglot
+#+begin_src elisp :tangle no
+    (setup (:pkg eglot)
+      (:hook-into foo-mode))
+#+end_src
+** conda
+#+begin_src elisp
+  (setup (:pkg conda)
+    (:when-loaded
+      (when (eq system-type 'darwin)
+	(custom-set-variables '(conda-anaconda-home "/Users/liuyi/miniforge3"))
+	(setq conda-env-home-directory (expand-file-name "~/miniforge3/"))
+	)
+      (when (eq system-type 'gnu/linux)
+	;; 要用绝对路径
+	(custom-set-variables '(conda-anaconda-home "/home/lewisliu/miniconda3"))
+	(setq conda-env-home-directory (expand-file-name "/home/lewisliu/miniconda3/"))
+	)
+      ;; interactivate shell support
+      (conda-env-initialize-interactive-shells)
+      ;; eshell support
+      (conda-env-initialize-eshell)
+
+      ;; 自动显示 modeline
+      ;; (add-to-list 'global-mode-string
+      ;; 		 '(conda-env-current-name (" conda:" conda-env-current-name " "))
+      ;; 		 'append)
+      ;; auto-activation
+      (conda-env-autoactivate-mode t)
+      )
+    )
+#+end_src
 * 翻译
 ** 有道词典
 #+begin_src elisp
@@ -1039,15 +1083,28 @@ Marginalia provides helpful annotations for various types of minibuffer completi
 ** 杂项设置
 #+begin_src elisp
   (setup (:pkg org :type built-in)
-	 )
+    (:when-loaded
+      (setq-default org-todo-keywords
+                    (quote ((sequence "TODO(t)" "NEXT(n)" "|" "DONE(d)")
+                            (sequence "WAITING(w@/!)" "HOLD(h@/!)" "|" "CANCELLED(c@/!)" "PHONE" "MEETING"))))
+      (setq-default org-todo-keyword-faces
+                    (quote (("TODO" :foreground "red" :weight bold)
+                            ("NEXT" :foreground "blue" :weight bold)
+                            ("DONE" :foreground "forest green" :weight bold)
+                            ("WAITING" :foreground "orange" :weight bold)
+                            ("HOLD" :foreground "magenta" :weight bold)
+                            ("CANCELLED" :foreground "forest green" :weight bold)
+                            ("MEETING" :foreground "forest green" :weight bold)
+                            ("PHONE" :foreground "forest green" :weight bold))))
+      (org-indent-mode t)
+      (setq org-directory "~/Documents/emacs/orgmode/")
+      (setq-default fill-column 120)
+      ))
 
-    (setup (:pkg org-contrib :host github :repo "emacsmirror/org-contrib")
-	   )
-    (setq org-directory "~/Documents/emacs/orgmode/")
+  (setup (:pkg org-contrib :host github :repo "emacsmirror/org-contrib"))
 
-    (setq-default fill-column 120)
-    ;; (add-hook 'visual-line-mode-hook #'visual-fill-column-mode)
-    ;; (add-hook 'visual-line-mode-hook #'(lambda () (setq word-wrap nil)))
+  ;; (add-hook 'visual-line-mode-hook #'visual-fill-column-mode)
+  ;; (add-hook 'visual-line-mode-hook #'(lambda () (setq word-wrap nil)))
 #+end_src
 ** imenu-list
 #+begin_src elisp
