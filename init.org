@@ -1,3 +1,4 @@
+
 #+TITLE: Emacs Configuration
 #+PROPERTY: header-args:elisp :tangle ~/my-emacs/init.el
 
@@ -68,7 +69,7 @@
   (fullscreen))
 #+end_src
 ** Native Compilation
-#+begin_src elisp :tangle no
+#+begin_src elisp
 
   ;; Silence compiler warnings as they can be pretty disruptive
   (setq native-comp-async-report-warnings-errors nil)
@@ -76,6 +77,10 @@
   ;; Set the right directory to store the native comp cache
   (add-to-list 'native-comp-eln-load-path (expand-file-name "eln-cache/" user-emacs-directory))
 
+#+end_src
+** recentf
+#+begin_src elisp
+  (recentf-mode t)
 #+end_src
 ** generic
 #+begin_src elisp :tangle no
@@ -415,23 +420,8 @@ Avoid constant errors on Windows about the coding system by setting the default 
 
 ** lewis-define-key
 #+begin_src elisp
-  ;; (defun lewis/define-local-key (key-alist &optional key-prefix)
-  ;;   "the real order: meow-leader key-prefix key"
-  ;;   (if key-prefix
-  ;;       (setq key-prefix (concat key-prefix " "))
-  ;;     (setq key-prefix ""))
-  ;;   (dolist (element key-alist)
-  ;;     (setq key (car element))
-  ;;     (setq def (cdr element))
-  ;;     (cond ((stringp key)
-  ;;            (meow-leader-define-key (cons (concat key-prefix key) def)))
-  ;;           ((t
-  ;;             (signal
-  ;;              'wrong-type-argument
-  ;;              (list 'array key)))))))
 
-
-  (defun lewis/define-leader-local-key (key-alist &optional key-prefix)
+  (defun lewis/define-leader-key (key-alist &optional key-prefix)
     (let (key def)
       (setq keymap meow-leader-keymap)
       (if key-prefix
@@ -444,105 +434,107 @@ Avoid constant errors on Windows about the coding system by setting the default 
 	      ((vectorp key) nil)
 	      (t (signal 'wrong-type-argument (list 'array key))))
 	(define-key keymap key def))))
-  ;; (defmacro bar(name &rest funcs)
-  ;;       (let ((body '()))
-  ;;          (dolist (single-func (nreverse funcs))
-  ;;             (add-to-list 'body `(autoload ',single-func ,name nil t)))
-  ;;          (add-to-list 'body 'progn)
-  ;;         body))
-
-  ;; (defun lewis/define-leader-lazy-key (key-alist filename &optional key-prefix)
-  ;;   (lewis/define-leader-local-key key-alist key-prefix)
-  ;;   (dolist (element key-alist)
-  ;;     (setq fun (cdr element))
-  ;;     (autoload fun filename nil t)))
-  ;; (lewis/define-locak-key '("youdao" . '(("p". youda-dictory)))
-  ;;                         '("e" . lewisliu))
 #+end_src
 
 ** keybinding
+*** lewis
 #+begin_src elisp
-(lewis/define-leader-local-key
-                        '(;; youdao
-                          ("y p" . youdao-dictionary-search-at-point-posframe)
-                          ("y s" . youdao-dictionary-search)
-                          ("y i" . youdao-dictionary-search-from-input)
-                          ("y r" . youdao-dictionary-search-and-replace)
-                          ;; citre
-                          ("c a" . citre-ace-peek)
-                          ("c j" . citre-jump)
-                          ("c p" . citre-peek)
-                          ("c J" . citre-jump-back)
-                          ("c u" . citre-update-this-tags-file)
-                          ("c r" . citre-peek-restore)
-                          ("c s" . citre-peek-save-session)
-                          ("c l" . citre-peek-load-session)
-                          ;; aweshell
-                          ("a a" . aweshell-toggle)
-                          ("a a" . aweshell-toggle)
-                          ("a d" . aweshell-dedicated-toggle)
-                          ("a b" . aweshell-switch-buffer)
-                          ("a s" . aweshell-search-history)
-                          ;; insert-translated
-                          ("i i" . insert-translated-name-insert)
-                          ("i r" . insert-translated-name-replace)
-                          ;;leader: lewisliu
-                          ) "e")
-#+end_src
+  (lewis/define-leader-key
+			  '(;; youdao
+			    ("y p" . youdao-dictionary-search-at-point-posframe)
+			    ("y s" . youdao-dictionary-search)
+			    ("y i" . youdao-dictionary-search-from-input)
+			    ("y r" . youdao-dictionary-search-and-replace)
+			    ;; citre
+			    ("c a" . citre-ace-peek)
+			    ("c j" . citre-jump)
+			    ("c p" . citre-peek)
+			    ("c J" . citre-jump-back)
+			    ("c u" . citre-update-this-tags-file)
+			    ("c r" . citre-peek-restore)
+			    ("c s" . citre-peek-save-session)
+			    ("c l" . citre-peek-load-session)
+			    ;; aweshell
+			    ("a a" . aweshell-toggle)
+			    ("a a" . aweshell-toggle)
+			    ("a d" . aweshell-dedicated-toggle)
+			    ("a b" . aweshell-switch-buffer)
+			    ("a s" . aweshell-search-history)
+			    ;; insert-translated
+			    ("i i" . insert-translated-name-insert)
+			    ("i r" . insert-translated-name-replace)
 
+			    ;; imenu-list
+			    ("l" . imenu-list-smart-toggle)
+			    ;; search
+			    ("s s" . consult-line)
+			    ;;leader: lewisliu
+			    ) "e")
+#+end_src
+*** search
+#+begin_src elisp
+  (lewis/define-leader-key '(
+			     ("s" . consult-line)
+			     ("b" . consult-buffer)
+			     ) "s")
+
+  (lewis/define-leader-key '(
+			     ("r" . consult-recent-file)
+			     ) "f")
+#+end_src
 * General Configuration
 ** line-number
 #+begin_src elisp
-;; Line numbers are not displayed when large files are used.
-(setq line-number-display-limit large-file-warning-threshold)
-(setq line-number-display-limit-width 1000)
+  ;; Line numbers are not displayed when large files are used.
+  (setq line-number-display-limit large-file-warning-threshold)
+  (setq line-number-display-limit-width 1000)
 
-(dolist (hook (list
-               'c-mode-common-hook
-               'c-mode-hook
-               'elisp-mode-hook
-               'lisp-interaction-mode-hook
-               'lisp-mode-hook
-               'java-mode-hook
-               'asm-mode-hook
-               'haskell-mode-hook
-               'rcirc-mode-hook
-               'erc-mode-hook
-               'sh-mode-hook
-               'makefile-gmake-mode-hook
-               'python-mode-hook
-               'js-mode-hook
-               'html-mode-hook
-               'css-mode-hook
-               'tuareg-mode-hook
-               'go-mode-hook
-               'coffee-mode-hook
-               'qml-mode-hook
-               'markdown-mode-hook
-               'slime-repl-mode-hook
-               'package-menu-mode-hook
-               'cmake-mode-hook
-               'php-mode-hook
-               'web-mode-hook
-               'coffee-mode-hook
-               'sws-mode-hook
-               'jade-mode-hook
-               'vala-mode-hook
-               'rust-mode-hook
-               'ruby-mode-hook
-               'qmake-mode-hook
-               'lua-mode-hook
-               'swift-mode-hook
-               'llvm-mode-hook
-               'conf-toml-mode-hook
-               'nxml-mode-hook
-               'nim-mode-hook
-               ))
-  (add-hook hook (lambda () (display-line-numbers-mode))))
+  (dolist (hook (list
+		 'c-mode-common-hook
+		 'c-mode-hook
+		 'elisp-mode-hook
+		 'lisp-interaction-mode-hook
+		 'lisp-mode-hook
+		 'java-mode-hook
+		 'asm-mode-hook
+		 'haskell-mode-hook
+		 'rcirc-mode-hook
+		 'erc-mode-hook
+		 'sh-mode-hook
+		 'makefile-gmake-mode-hook
+		 'python-mode-hook
+		 'js-mode-hook
+		 'html-mode-hook
+		 'css-mode-hook
+		 'tuareg-mode-hook
+		 'go-mode-hook
+		 'coffee-mode-hook
+		 'qml-mode-hook
+		 'markdown-mode-hook
+		 'slime-repl-mode-hook
+		 'package-menu-mode-hook
+		 'cmake-mode-hook
+		 'php-mode-hook
+		 'web-mode-hook
+		 'coffee-mode-hook
+		 'sws-mode-hook
+		 'jade-mode-hook
+		 'vala-mode-hook
+		 'rust-mode-hook
+		 'ruby-mode-hook
+		 'qmake-mode-hook
+		 'lua-mode-hook
+		 'swift-mode-hook
+		 'llvm-mode-hook
+		 'conf-toml-mode-hook
+		 'nxml-mode-hook
+		 'nim-mode-hook
+		 'org-mode-hook
+		 ))
+    (add-hook hook (lambda () (display-line-numbers-mode))))
 #+end_src
 ** Theme
 #+begin_src elisp
-
 (setup (:pkg doom-themes)
   ;; Global settings (defaults)
   (setq doom-themes-enable-bold t    ; if nil, bold is universally disabled
@@ -768,7 +760,7 @@ The test for presence of the car of ELT-CONS is done with `equal'."
 #+end_src
 * Editing Configuration
 ** Automatically clean whitespace
-#+begin_src elisp :tangle no
+#+begin_src elisp
   (setup (:pkg ws-butler)
     (:hook-into text-mode prog-mode))
 #+end_src
@@ -808,27 +800,34 @@ The test for presence of the car of ELT-CONS is done with `equal'."
 #+end_src
 
 ** Consult Commands
+*** consult
 #+begin_src elisp
-  (setup (:pkg consult)
-;; Optionally configure the register formatting. This improves the register
-  ;; preview for `consult-register', `consult-register-load',
-  ;; `consult-register-store' and the Emacs built-ins.
-  (setq register-preview-delay 0
-        register-preview-function #'consult-register-format)
-    ;; Optionally replace `completing-read-multiple' with an enhanced version.
-  (advice-add #'completing-read-multiple :override #'consult-completing-read-multiple)
-  ;; Use Consult to select xref locations with preview
-  (setq xref-show-xrefs-function #'consult-xref
-        xref-show-definitions-function #'consult-xref)
+    (setup (:pkg consult)
+        (:with-map minibuffer-local-map
+    (:bind "C-r" consult-history))
+  ;; Optionally configure the register formatting. This improves the register
+    ;; preview for `consult-register', `consult-register-load',
+    ;; `consult-register-store' and the Emacs built-ins.
+    (setq register-preview-delay 0
+	  register-preview-function #'consult-register-format)
+      ;; Optionally replace `completing-read-multiple' with an enhanced version.
+    (advice-add #'completing-read-multiple :override #'consult-completing-read-multiple)
+    ;; Use Consult to select xref locations with preview
+    (setq xref-show-xrefs-function #'consult-xref
+	  xref-show-definitions-function #'consult-xref)
 
-    ;; Optionally configure a function which returns the project root directory.
-  ;; There are multiple reasonable alternatives to chose from.
-  ;;;; 1. project.el (project-roots)
-  (setq consult-project-root-function
-        (lambda ()
-          (when-let (project (project-current))
-            (car (project-roots project)))))
-  )
+      ;; Optionally configure a function which returns the project root directory.
+    ;; There are multiple reasonable alternatives to chose from.
+    ;;;; 1. project.el (project-roots)
+    (setq consult-project-root-function
+	  (lambda ()
+	    (when-let (project (project-current))
+	      (car (project-roots project)))))
+    )
+#+end_src
+*** consult-dir
+#+begin_src elisp
+  (setup (:pkg consult-dir))
 #+end_src
 ** Completion Annotations with Marginalia
 
@@ -842,6 +841,21 @@ Marginalia provides helpful annotations for various types of minibuffer completi
                                      nil))
     (marginalia-mode))
 
+#+end_src
+** embark
+#+begin_src elisp
+  (setup (:pkg embark-consult))
+  (setup (:pkg embark)
+    (:also-load embark-consult)
+    (:with-map minibuffer-local-map
+      (:bind "C-d" embark-act)
+      )
+    ;; Show Embark actions via which-key
+    (setq embark-action-indicator
+	  (lambda (map)
+	    (which-key--show-keymap "Embark" map nil nil 'no-paging)
+	    #'which-key--hide-popup-ignore-command)
+	  embark-become-indicator embark-action-indicator))
 #+end_src
 ** company
 #+begin_src elisp
@@ -994,7 +1008,7 @@ Marginalia provides helpful annotations for various types of minibuffer completi
 (setup (:pkg company-english-helper :host github
            :repo "manateelazycat/company-english-helper")
        (:autoload english-teacher-follow-mode))
-(lewis/define-leader-local-key '(
+(lewis/define-leader-key '(
                           ("e h c" . toggle-company-english-helper)
                           ("e h f" . english-teacher-follow-mode)
                           ))
@@ -1022,7 +1036,6 @@ Marginalia provides helpful annotations for various types of minibuffer completi
 	     imenu-list-position 'left
 	     )
     )
-
 #+end_src
 
 ** beauty
