@@ -542,6 +542,10 @@ Different platforms need different default font sizes, and [[https://mozilla.git
     (set-fontset-font (frame-parameter nil 'font) 'unicode (eval emacs-font-name))
     ))
 #+end_src
+** all-the-icons
+#+begin_src elisp
+  (setup (:pkg all-the-icons))
+#+end_src
 * General Configuration
 ** awesome-tray
 #+begin_src elisp
@@ -916,8 +920,12 @@ Marginalia provides helpful annotations for various types of minibuffer completi
 ** company-box
 #+begin_src elisp
   (setup (:pkg company-box)
-    (:hook-into company-mode))
+    (:hook-into company-mode)
+    (:options company-box-doc-delay 0.1
+	      company-box-icons-alist 'company-box-icons-all)
+    )
 #+end_src
+** company-dict
 ** yasnippet
 #+begin_src elisp
   (setup (:pkg yasnippet)
