@@ -425,34 +425,35 @@ Avoid constant errors on Windows about the coding system by setting the default 
 *** lewis
 #+begin_src elisp
   (lewis/define-leader-key
-			  '(;; youdao
-			    ("y p" . youdao-dictionary-search-at-point-posframe)
-			    ("y s" . youdao-dictionary-search)
-			    ("y i" . youdao-dictionary-search-from-input)
-			    ("y r" . youdao-dictionary-search-and-replace)
-			    ;; citre
-			    ("c a" . citre-ace-peek)
-			    ("c j" . citre-jump)
-			    ("c p" . citre-peek)
-			    ("c J" . citre-jump-back)
-			    ("c u" . citre-update-this-tags-file)
-			    ("c r" . citre-peek-restore)
-			    ("c s" . citre-peek-save-session)
-			    ("c l" . citre-peek-load-session)
-			    ;; aweshell
-			    ("a a" . aweshell-toggle)
-			    ("a d" . aweshell-dedicated-toggle)
-			    ("a b" . aweshell-switch-buffer)
-			    ("a s" . aweshell-search-history)
-			    ;; insert-translated
-			    ("i i" . insert-translated-name-insert)
-			    ("i r" . insert-translated-name-replace)
+                          '(;; youdao
+                            ("y p" . youdao-dictionary-search-at-point-posframe)
+                            ("y s" . youdao-dictionary-search)
+                            ("y i" . youdao-dictionary-search-from-input)
+                            ("y r" . youdao-dictionary-search-and-replace)
+                            ;; citre
+                            ("c a" . citre-ace-peek)
+                            ("c j" . citre-jump)
+                            ("c p" . citre-peek)
+                            ("c J" . citre-jump-back)
+                            ("c u" . citre-update-this-tags-file)
+                            ("c r" . citre-peek-restore)
+                            ("c s" . citre-peek-save-session)
+                            ("c l" . citre-peek-load-session)
+                            ;; aweshell
+                            ("a a" . aweshell-toggle)
+                            ("a d" . aweshell-dedicated-toggle)
+                            ("a b" . aweshell-switch-buffer)
+                            ("a s" . aweshell-search-history)
+                            ;; insert-translated
+                            ("i i" . insert-translated-name-insert)
+                            ("i r" . insert-translated-name-replace)
 
-			    ;; imenu-list
-			    ("l" . imenu-list-smart-toggle)
-			    ;; search
-			    ;;leader: lewisliu
-			    ) "e")
+                            ;; imenu-list
+                            ("l" . imenu-list-smart-toggle)
+                            ;; org-download
+                            ("d" . org-download-screenshot)
+                            ;;leader: lewisliu
+                            ) "e")
 #+end_src
 *** search
 #+begin_src elisp
@@ -1091,6 +1092,9 @@ Marginalia provides helpful annotations for various types of minibuffer completi
 ** 杂项设置
 #+begin_src elisp
   (setup (:pkg org :type built-in)
+    (org-indent-mode t)
+    (setq org-directory "~/Documents/emacs/orgmode/")
+    (setq-default fill-column 120)
     (:when-loaded
       (setq-default org-todo-keywords
                     (quote ((sequence "TODO(t)" "NEXT(n)" "|" "DONE(d)")
@@ -1104,9 +1108,8 @@ Marginalia provides helpful annotations for various types of minibuffer completi
                             ("CANCELLED" :foreground "forest green" :weight bold)
                             ("MEETING" :foreground "forest green" :weight bold)
                             ("PHONE" :foreground "forest green" :weight bold))))
-      (org-indent-mode t)
-      (setq org-directory "~/Documents/emacs/orgmode/")
-      (setq-default fill-column 120)
+
+
       ))
 
   (setup (:pkg org-contrib :host github :repo "emacsmirror/org-contrib"))
@@ -1124,7 +1127,6 @@ Marginalia provides helpful annotations for various types of minibuffer completi
 	     )
     )
 #+end_src
-
 ** beauty
 #+begin_src elisp
   (setup (:pkg org-superstar)
@@ -1152,6 +1154,31 @@ Marginalia provides helpful annotations for various types of minibuffer completi
                                        ("#+end_src" . "Ⅎ")))
 (add-hook 'org-mode-hook 'prettify-symbols-mode)
 
+#+end_src
+
+** org-download
+#+begin_src elisp
+  (setup (:pkg org-download)
+    (:option org-download-method 'directory
+              org-download-screenshot-basename "screenshot.jpg"
+              org-download-image-dir "~/Documents/emacs/orgmode/PicturesForAll/org_download_images")
+    (:when-loaded
+      (when (eq system-type 'gnu/linux)
+        (setq-default org-download-screenshot-method "spectacle"))
+      (when (eq system-type 'darwin)
+        (setq org-download-screenshot-method "screencapture -i %s")))
+    (:autoload "org-download" org-download-screenshot)
+    )
+#+end_src
+
+** org-roam
+#+begin_src elisp
+  (setup (:pkg org-roam))
+#+end_src
+** org-roam-ui
+#+begin_src elisp
+  (setup (:pkg websocket))
+  (setup (:pkg org-roam-ui :host github :repo "org-roam/org-roam-ui"))
 #+end_src
 * Runtime Performance
 
