@@ -1,4 +1,3 @@
-
 #+TITLE: Emacs Configuration
 #+PROPERTY: header-args:elisp :tangle ~/my-emacs/init.el
 
@@ -27,7 +26,7 @@
                        gcs-done)))
 
 (let (
-      ;; 加载的时候临时增大`gc-cons-threshold'以加速启动速度。
+      ;; 加载的时候临时增大`gc-cons-threshold'以加速启动速度。
       (gc-cons-threshold most-positive-fixnum)
       (gc-cons-percentage 0.6)
       ;; 清空避免加载远程文件的时候分析文件。
@@ -70,10 +69,8 @@
 #+end_src
 ** Native Compilation
 #+begin_src elisp :tangle no
-
   ;; Set the right directory to store the native comp cache
   (add-to-list 'native-comp-eln-load-path (expand-file-name "eln-cache/" user-emacs-directory))
-
 #+end_src
 ** recentf
 #+begin_src elisp
@@ -81,52 +78,52 @@
 #+end_src
 ** generic
 #+begin_src elisp :tangle no
-;; Restore emacs session.
-(setq initial-buffer-choice t)
-(run-with-timer 1 nil #'(lambda () (bury-buffer)))
+  ;; Restore emacs session.
+  (setq initial-buffer-choice t)
+  (run-with-timer 1 nil #'(lambda () (bury-buffer)))
 
-;; 增加长行处理性能
-(setq bidi-inhibit-bpa t)
-(setq-default bidi-paragraph-direction 'left-to-right)
+  ;; 增加长行处理性能
+  (setq bidi-inhibit-bpa t)
+  (setq-default bidi-paragraph-direction 'left-to-right)
 
-;; 增加IO性能
-(setq process-adaptive-read-buffering nil)
-(setq read-process-output-max (* 1024 1024))
+  ;; 增加IO性能
+  (setq process-adaptive-read-buffering nil)
+  (setq read-process-output-max (* 1024 1024))
 
-(fset 'yes-or-no-p 'y-or-n-p)           ;以 y/n代表 yes/no
-(blink-cursor-mode -1)                  ;指针不闪动
-(transient-mark-mode 1)                 ;标记高亮
-(global-subword-mode 1)                 ;Word移动支持 FooBar 的格式
-(setq use-dialog-box nil)               ;never pop dialog
-(setq inhibit-startup-screen t)         ;inhibit start screen
-(setq initial-scratch-message "") ;关闭启动空白buffer, 这个buffer会干扰session恢复
-(setq-default comment-style 'indent)    ;设定自动缩进的注释风格
-(setq ring-bell-function 'ignore)       ;关闭烦人的出错时的提示声
-(setq default-major-mode 'text-mode)    ;设置默认地主模式为TEXT模式
-(setq mouse-yank-at-point t)            ;粘贴于光标处,而不是鼠标指针处
-(setq x-select-enable-clipboard t)      ;支持emacs和外部程序的粘贴
-(setq split-width-threshold nil)        ;分屏的时候使用上下分屏
-(setq inhibit-compacting-font-caches t) ;使用字体缓存，避免卡顿
-(setq confirm-kill-processes nil)       ;退出自动杀掉进程
-(setq async-bytecomp-allowed-packages nil) ;避免magit报错
-(setq word-wrap-by-category t)             ;按照中文折行
-(setq profiler-report-cpu-line-format ;让 profiler-report 第一列宽一点
-      '((100 left)
-        (24 right ((19 right)
-                   (5 right)))))
-(setq profiler-report-memory-line-format
-      '((100 left)
-        (19 right ((14 right profiler-format-number)
-                   (5 right)))))
+  (fset 'yes-or-no-p 'y-or-n-p)           ;以 y/n代表 yes/no
+  (blink-cursor-mode -1)                  ;指针不闪动
+  (transient-mark-mode 1)                 ;标记高亮
+  (global-subword-mode 1)                 ;Word移动支持 FooBar 的格式
+  (setq use-dialog-box nil)               ;never pop dialog
+  (setq inhibit-startup-screen t)         ;inhibit start screen
+  (setq initial-scratch-message "") ;关闭启动空白buffer, 这个buffer会干扰session恢复
+  (setq-default comment-style 'indent)    ;设定自动缩进的注释风格
+  (setq ring-bell-function 'ignore)       ;关闭烦人的出错时的提示声
+  (setq default-major-mode 'text-mode)    ;设置默认地主模式为TEXT模式
+  (setq mouse-yank-at-point t)            ;粘贴于光标处,而不是鼠标指针处
+  (setq x-select-enable-clipboard t)      ;支持emacs和外部程序的粘贴
+  (setq split-width-threshold nil)        ;分屏的时候使用上下分屏
+  (setq inhibit-compacting-font-caches t) ;使用字体缓存，避免卡顿
+  (setq confirm-kill-processes nil)       ;退出自动杀掉进程
+  (setq async-bytecomp-allowed-packages nil) ;避免magit报错
+  (setq word-wrap-by-category t)             ;按照中文折行
+  (setq profiler-report-cpu-line-format ;让 profiler-report 第一列宽一点
+        '((100 left)
+          (24 right ((19 right)
+                     (5 right)))))
+  (setq profiler-report-memory-line-format
+        '((100 left)
+          (19 right ((14 right profiler-format-number)
+                     (5 right)))))
 
-;; (add-hook 'find-file-hook 'highlight-parentheses-mode t) ;增强的括号高亮
+  ;; (add-hook 'find-file-hook 'highlight-parentheses-mode t) ;增强的括号高亮
 
-(setq ad-redefinition-action 'accept)   ;不要烦人的 redefine warning
-(setq frame-resize-pixelwise t) ;设置缩放的模式,避免Mac平台最大化窗口以后右边和下边有空隙
+  (setq ad-redefinition-action 'accept)   ;不要烦人的 redefine warning
+  (setq frame-resize-pixelwise t) ;设置缩放的模式,避免Mac平台最大化窗口以后右边和下边有空隙
 
-;; 平滑地进行半屏滚动，避免滚动后recenter操作
-(setq scroll-step 1
-      scroll-conservatively 10000)
+  ;; 平滑地进行半屏滚动，避免滚动后recenter操作
+  (setq scroll-step 1
+        scroll-conservatively 10000)
 #+end_src
 
 * Package Management
@@ -696,54 +693,55 @@ The test for presence of the car of ELT-CONS is done with `equal'."
 #+end_src
 ** indent
 #+begin_src elisp :tangle no
-(setq-default indent-tabs-mode nil)
-(setq-default tab-width 4)
+    (setq-default fill-column 120)
+  (setq-default indent-tabs-mode nil)
+  (setq-default tab-width 4)
 
-(defun adjust-languages-indent (n)
-  (setq-local c-basic-offset n)
+  (defun adjust-languages-indent (n)
+    (setq-local c-basic-offset n)
 
-  (setq-local coffee-tab-width n)
-  (setq-local javascript-indent-level n)
-  (setq-local js-indent-level n)
-  (setq-local js2-basic-offset n)
+    (setq-local coffee-tab-width n)
+    (setq-local javascript-indent-level n)
+    (setq-local js-indent-level n)
+    (setq-local js2-basic-offset n)
 
-  (setq-local web-mode-attr-indent-offset n)
-  (setq-local web-mode-attr-value-indent-offset n)
-  (setq-local web-mode-code-indent-offset n)
-  (setq-local web-mode-css-indent-offset n)
-  (setq-local web-mode-markup-indent-offset n)
-  (setq-local web-mode-sql-indent-offset n)
+    (setq-local web-mode-attr-indent-offset n)
+    (setq-local web-mode-attr-value-indent-offset n)
+    (setq-local web-mode-code-indent-offset n)
+    (setq-local web-mode-css-indent-offset n)
+    (setq-local web-mode-markup-indent-offset n)
+    (setq-local web-mode-sql-indent-offset n)
 
-  (setq-local css-indent-offset n))
+    (setq-local css-indent-offset n))
 
-(dolist (hook (list
-               'c-mode-hook
-               'c++-mode-hook
-               'java-mode-hook
-               'haskell-mode-hook
-               'asm-mode-hook
-               'sh-mode-hook
-               'haskell-cabal-mode-hook
-               'ruby-mode-hook
-               'qml-mode-hook
-               'scss-mode-hook
-               'coffee-mode-hook
-               ))
-  (add-hook hook #'(lambda ()
-                     (setq indent-tabs-mode nil)
-                     (adjust-languages-indent 4)
-                     )))
+  (dolist (hook (list
+		 'c-mode-hook
+		 'c++-mode-hook
+		 'java-mode-hook
+		 'haskell-mode-hook
+		 'asm-mode-hook
+		 'sh-mode-hook
+		 'haskell-cabal-mode-hook
+		 'ruby-mode-hook
+		 'qml-mode-hook
+		 'scss-mode-hook
+		 'coffee-mode-hook
+		 ))
+    (add-hook hook #'(lambda ()
+		       (setq indent-tabs-mode nil)
+		       (adjust-languages-indent 4)
+		       )))
 
-(dolist (hook (list
-               'web-mode-hook
-               'js-mode-hook
-               ))
-  (add-hook hook #'(lambda ()
-                     (setq indent-tabs-mode nil)
-                     (adjust-languages-indent 2)
-                     )))
+  (dolist (hook (list
+		 'web-mode-hook
+		 'js-mode-hook
+		 ))
+    (add-hook hook #'(lambda ()
+		       (setq indent-tabs-mode nil)
+		       (adjust-languages-indent 2)
+		       )))
 
-;;; init-indent.el ends here
+  ;;; init-indent.el ends here
 
 #+end_src
 
@@ -922,7 +920,7 @@ Marginalia provides helpful annotations for various types of minibuffer completi
 #+begin_src elisp
   (setup (:pkg company-box)
     (:hook-into company-mode)
-    (:options company-box-doc-delay 0.1
+    (:option company-box-doc-delay 0.1
 	      company-box-icons-alist 'company-box-icons-all)
     )
 #+end_src
@@ -1092,22 +1090,22 @@ Marginalia provides helpful annotations for various types of minibuffer completi
 ** 杂项设置
 #+begin_src elisp
   (setup (:pkg org :type built-in)
-    (org-indent-mode t)
     (setq org-directory "~/Documents/emacs/orgmode/")
-    (setq-default fill-column 120)
+
     (:when-loaded
+      (org-indent-mode t)
       (setq-default org-todo-keywords
-                    (quote ((sequence "TODO(t)" "NEXT(n)" "|" "DONE(d)")
-                            (sequence "WAITING(w@/!)" "HOLD(h@/!)" "|" "CANCELLED(c@/!)" "PHONE" "MEETING"))))
+		    (quote ((sequence "TODO(t)" "NEXT(n)" "|" "DONE(d)")
+			    (sequence "WAITING(w@/!)" "HOLD(h@/!)" "|" "CANCELLED(c@/!)" "PHONE" "MEETING"))))
       (setq-default org-todo-keyword-faces
-                    (quote (("TODO" :foreground "red" :weight bold)
-                            ("NEXT" :foreground "blue" :weight bold)
-                            ("DONE" :foreground "forest green" :weight bold)
-                            ("WAITING" :foreground "orange" :weight bold)
-                            ("HOLD" :foreground "magenta" :weight bold)
-                            ("CANCELLED" :foreground "forest green" :weight bold)
-                            ("MEETING" :foreground "forest green" :weight bold)
-                            ("PHONE" :foreground "forest green" :weight bold))))
+		    (quote (("TODO" :foreground "red" :weight bold)
+			    ("NEXT" :foreground "blue" :weight bold)
+			    ("DONE" :foreground "forest green" :weight bold)
+			    ("WAITING" :foreground "orange" :weight bold)
+			    ("HOLD" :foreground "magenta" :weight bold)
+			    ("CANCELLED" :foreground "forest green" :weight bold)
+			    ("MEETING" :foreground "forest green" :weight bold)
+			    ("PHONE" :foreground "forest green" :weight bold))))
 
 
       ))
@@ -1173,7 +1171,30 @@ Marginalia provides helpful annotations for various types of minibuffer completi
 
 ** org-roam
 #+begin_src elisp
-  (setup (:pkg org-roam))
+  (setq org-roam-v2-ack t)
+  (setq org-roam-directory "~/Documents/emacs/orgmode/roam/")
+  (setq org-roam-dailies-directory "~/Documents/emacs/orgmode/roam")
+  (setup (:pkg org-roam)
+    (:when-loaded
+      (org-roam-db-autosync-mode)
+      (:option org-roam-mode-section-functions
+               (list #'org-roam-backlinks-section
+                     #'org-roam-reflinks-section
+                     ;; #'org-roam-unlinked-references-section
+                     )
+               org-roam-completion-everywhere t
+               org-roam-db-gc-threshold most-positive-fixnum
+               )
+      (add-to-list 'display-buffer-alist
+                   '("\\*org-roam\\*"
+                     (display-buffer-in-side-window)
+                     (side . right)
+                     (slot . 0)
+                     (window-width . 0.25)
+                     (window-parameters . ((no-other-window . t)
+                                           (no-delete-other-windows . t)))))
+
+      ))
 #+end_src
 ** org-roam-ui
 #+begin_src elisp
@@ -1181,9 +1202,7 @@ Marginalia provides helpful annotations for various types of minibuffer completi
   (setup (:pkg org-roam-ui :host github :repo "org-roam/org-roam-ui"))
 #+end_src
 * Runtime Performance
-
 Dial the GC threshold back down so that garbage collection happens more frequently but in less time.
-
 #+begin_src elisp
 
   ;; Make gc pauses faster by decreasing the threshold.
