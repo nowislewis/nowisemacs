@@ -33,8 +33,8 @@
       (file-name-handler-alist nil))
 
   ;; 定义一些启动目录，方便下次迁移修改
-  (defvar nowisemacs-root-dir (file-truename "~/nowisemacs/site-lisp"))
-  (defvar nowisemacs-config-dir (concat nowisemacs-root-dir "/config"))
+  (defvar nowisemacs-root-dir (file-truename "~/nowisemacs/"))
+  (defvar nowisemacs-config-dir (concat nowisemacs-root-dir "init.org"))
   (defvar nowisemacs-extension-dir (concat nowisemacs-root-dir "/extensions")))
 
 #+end_src
@@ -236,18 +236,19 @@ This keyword causes a body to be executed after other packages/features are load
 #+end_src
 *** :autoload
 #+begin_src elisp
-(setup-define :autoload
-    (lambda (name &rest funcs)
-      (let ((body '()))
-         (dolist (single-func (nreverse funcs))
-            (add-to-list 'body `(autoload ',single-func ,name nil t)))
-         (add-to-list 'body 'progn)
-        body))
-  :documentation "Load the current feature after FEATURES.")
+      (setup-define :autoload
+        (lambda (&rest funcs)
+          (let ((body '())
+                (feature-string (symbol-name (setup-get 'feature))))
+            (dolist (single-func (nreverse funcs))
+              (add-to-list 'body `(autoload ',single-func ,feature-string nil t))
+              (add-to-list 'body 'progn))
+              body))
+          :documentation "Load the current feature after FEATURES.")
 
-  ;; (setup (:pkg company-english-helper :host github
-  ;;            :repo "manateelazycat/company-english-helper")
-  ;;        (:autoload "company-english-helper" toggle-english-helper))
+        ;; (setup (:pkg company-english-helper :host github
+        ;;            :repo "manateelazycat/company-english-helper")
+        ;;        (:autoload "company-english-helper" toggle-english-helper))
 #+end_src
 
 * Default Coding System
@@ -455,13 +456,53 @@ Avoid constant errors on Windows about the coding system by setting the default 
 *** search
 #+begin_src elisp
   (lewis/define-leader-key '(
-			     ("s" . consult-line)
-			     ("b" . consult-buffer)
-			     ) "s")
+                             ("s" . consult-line)
+                             ("b" . consult-buffer)
+                             ) "s")
 
+  (defun find-config-file()
+    (interactive)
+       (find-file nowisemacs-config-dir))
   (lewis/define-leader-key '(
-			     ("r" . consult-recent-file)
-			     ) "f")
+                             ("r" . consult-recent-file)
+                             ("p" . find-config-file)
+                             ) "f")
+#+end_src
+*** note
+#+begin_src elisp
+  (lewis/define-leader-key '(
+			     ("D" . org-roam-demote-entire-buffer)
+			     ("f" . org-roam-node-find)
+			     ("F" . org-roam-ref-find)
+			     ("g" . org-roam-graph)
+			     ("i" . org-roam-node-insert)
+			     ("I" . org-id-get-create)
+			     ("m" . org-roam-buffer-toggle)
+			     ("M" . org-roam-buffer-display-dedicated)
+			     ("n" . org-roam-capture)
+			     ("r" . org-roam-refile)
+			     ("R" . org-roam-link-replace-all)
+			     ;; date
+			     ("d b" . org-roam-dailies-goto-previous-note)
+			     ("d d" . org-roam-dailies-goto-date)
+			     ("d D" . org-roam-dailies-capture-date)
+			     ("d f" . org-roam-dailies-goto-next-note)
+			     ("d m" . org-roam-dailies-goto-tomorrow)
+			     ("d M" . org-roam-dailies-capture-tomorrow)
+			     ("d n" . org-roam-dailies-capture-today)
+			     ("d t" . org-roam-dailies-goto-today)
+			     ("d T" . org-roam-dailies-capture-today)
+			     ("d y" . org-roam-dailies-goto-yesterday)
+			     ("d Y" . org-roam-dailies-capture-yesterday)
+			     ("d -" . org-roam-dailies-find-directory)
+			     ;; "node properties"
+			     ("o a" . org-roam-alias-add)
+			     ("o A" . org-roam-alias-remove)
+			     ("o t" . org-roam-tag-add)
+			     ("o T" . org-roam-tag-remove)
+			     ("o r" . org-roam-ref-add)
+			     ("o R" . org-roam-ref-remove)
+			     ) "n r")
 #+end_src
 * UI
 ** line-number
@@ -851,68 +892,68 @@ Marginalia provides helpful annotations for various types of minibuffer completi
 #+end_src
 ** company
 #+begin_src elisp
-(setup
- (:pkg company))
-(setup (:pkg company-tabnine))
-(add-hook 'prog-mode-hook
-          #'(lambda ()
-              (require 'company)
-              (require 'company-yasnippet)
-              (require 'company-dabbrev)
-              (require 'company-files)
-              (require 'company-tng)
-              (require 'company-tabnine)
+  (setup
+    (:pkg company))
+  (setup (:pkg company-tabnine))
+  (add-hook 'prog-mode-hook
+            #'(lambda ()
+                (require 'company)
+                (require 'company-yasnippet)
+                (require 'company-dabbrev)
+                (require 'company-files)
+                (require 'company-tng)
+                (require 'company-tabnine)
 
-              ;; Config for company mode.
-              (setq company-minimum-prefix-length 1) ; pop up a completion menu by tapping a character
-              (setq company-show-numbers t) ; number the candidates (use M-1, M-2 etc to select completions).
-              (setq company-require-match nil) ; allow input string that do not match candidate words
-              (setq company-idle-delay 0) ; trigger completion immediately.
+                ;; Config for company mode.
+                (setq company-minimum-prefix-length 1) ; pop up a completion menu by tapping a character
+                (setq company-show-numbers t) ; number the candidates (use M-1, M-2 etc to select completions).
+                (setq company-require-match nil) ; allow input string that do not match candidate words
+                (setq company-idle-delay 0) ; trigger completion immediately.
 
-              ;; Don't downcase the returned candidates.
-              (setq company-dabbrev-downcase nil)
-              (setq company-dabbrev-ignore-case t)
+                ;; Don't downcase the returned candidates.
+                (setq company-dabbrev-downcase nil)
+                (setq company-dabbrev-ignore-case t)
 
-              ;; Customize company backends.
-              (setq company-backends
-                    '(
-                      (company-tabnine company-dabbrev company-keywords company-files company-capf)
-                      ))
+                ;; Customize company backends.
+                (setq company-backends
+                      '(
+                        (company-tabnine company-dabbrev company-keywords company-files company-capf)
+                        ))
 
-              ;; Add yasnippet support for all company backends.
-              (defvar company-mode/enable-yas t
-                "Enable yasnippet for all backends.")
+                ;; Add yasnippet support for all company backends.
+                (defvar company-mode/enable-yas t
+                  "Enable yasnippet for all backends.")
 
-              (defun company-mode/backend-with-yas (backend)
-                (if (or (not company-mode/enable-yas) (and (listp backend) (member 'company-yasnippet backend)))
-                    backend
-                  (append (if (consp backend) backend (list backend))
-                          '(:with company-yasnippet))))
+                (defun company-mode/backend-with-yas (backend)
+                  (if (or (not company-mode/enable-yas) (and (listp backend) (member 'company-yasnippet backend)))
+                      backend
+                    (append (if (consp backend) backend (list backend))
+                            '(:with company-yasnippet))))
 
-              (setq company-backends (mapcar #'company-mode/backend-with-yas company-backends))
+                (setq company-backends (mapcar #'company-mode/backend-with-yas company-backends))
 
-              ;; Remove duplicate candidate.
-              (add-to-list 'company-transformers #'delete-dups)
+                ;; Remove duplicate candidate.
+                (add-to-list 'company-transformers #'delete-dups)
 
-              ;; Add `company-elisp' backend for elisp.
-              (add-hook 'emacs-lisp-mode-hook
-                        #'(lambda ()
-                            (require 'company-elisp)
-                            (push 'company-elisp company-backends)))
+                ;; Add `company-elisp' backend for elisp.
+                (add-hook 'emacs-lisp-mode-hook
+                          #'(lambda ()
+                              (require 'company-elisp)
+                              (push 'company-elisp company-backends)))
 
-              ;; Enable global.
-              (global-company-mode)
-              ))
+                ;; Enable global.
+                (global-company-mode)
+                ))
 
-;; The free version of TabNine is good enough,
-;; and below code is recommended that TabNine not always
-;; prompt me to purchase a paid version in a large project.
-(defadvice company-echo-show (around disable-tabnine-upgrade-message activate)
-  (let ((company-message-func (ad-get-arg 0)))
-    (when (and company-message-func
-               (stringp (funcall company-message-func)))
-      (unless (string-match "The free version of TabNine only indexes up to" (funcall company-message-func))
-        ad-do-it))))
+  ;; The free version of TabNine is good enough,
+  ;; and below code is recommended that TabNine not always
+  ;; prompt me to purchase a paid version in a large project.
+  (defadvice company-echo-show (around disable-tabnine-upgrade-message activate)
+    (let ((company-message-func (ad-get-arg 0)))
+      (when (and company-message-func
+                 (stringp (funcall company-message-func)))
+        (unless (string-match "The free version of TabNine only indexes up to" (funcall company-message-func))
+          ad-do-it))))
 
 
 #+end_src
@@ -921,7 +962,8 @@ Marginalia provides helpful annotations for various types of minibuffer completi
   (setup (:pkg company-box)
     (:hook-into company-mode)
     (:option company-box-doc-delay 0.1
-	      company-box-icons-alist 'company-box-icons-all)
+	      ;; company-box-icons-alist 'company-box-icons-all
+	      )
     )
 #+end_src
 ** company-dict
@@ -986,8 +1028,8 @@ Marginalia provides helpful annotations for various types of minibuffer completi
 ** aweshell
 #+begin_src elisp
       (setup (:pkg aweshell :host github :repo "manateelazycat/aweshell")
-	(:autoload "aweshell" aweshell-toggle)
-	(:autoload "aweshell" aweshell-dedicated-toggle))
+	(:autoload aweshell-toggle)
+	(:autoload aweshell-dedicated-toggle))
 #+end_src
 * 编程
 ** magit
@@ -1057,6 +1099,27 @@ Marginalia provides helpful annotations for various types of minibuffer completi
       )
     )
 #+end_src
+** citre
+#+begin_src elisp
+  (setup (:pkg citre)
+    ;; This is needed in `:init' block for lazy load to work.
+    (require 'citre-config)
+    (:option
+     citre-project-root-function #'projectile-project-root
+     ;; See the "Create tags file" section above to know these options
+     citre-use-project-root-when-creating-tags t
+     citre-prompt-language-for-ctags-command t
+     ;; By default, when you open any file, and a tags file can be found for it,
+     ;; `citre-mode' is automatically enabled.  If you only want this to work for
+     ;; certain modes (like `prog-mode'), set it like this.
+     citre-auto-enable-citre-mode-modes '(prog-mode)))
+#+end_src
+** symbol-overlay
+#+begin_src elisp
+  (setup (:pkg symbol-overlay)
+    (:autoload symbol-overlay-put)
+    )
+#+end_src
 * 翻译
 ** 有道词典
 #+begin_src elisp
@@ -1089,24 +1152,25 @@ Marginalia provides helpful annotations for various types of minibuffer completi
 * Org Mode
 ** 杂项设置
 #+begin_src elisp
+  (setq org-adapt-indentation t)
   (setup (:pkg org :type built-in)
     (setq org-directory "~/Documents/emacs/orgmode/")
-
+    (:option org-adapt-indentation t
+             org-startup-indented t)
     (:when-loaded
-      (org-indent-mode t)
+      (require 'org-tempo)
       (setq-default org-todo-keywords
-		    (quote ((sequence "TODO(t)" "NEXT(n)" "|" "DONE(d)")
-			    (sequence "WAITING(w@/!)" "HOLD(h@/!)" "|" "CANCELLED(c@/!)" "PHONE" "MEETING"))))
+                    (quote ((sequence "TODO(t)" "NEXT(n)" "|" "DONE(d)")
+                            (sequence "WAITING(w@/!)" "HOLD(h@/!)" "|" "CANCELLED(c@/!)" "PHONE" "MEETING"))))
       (setq-default org-todo-keyword-faces
-		    (quote (("TODO" :foreground "red" :weight bold)
-			    ("NEXT" :foreground "blue" :weight bold)
-			    ("DONE" :foreground "forest green" :weight bold)
-			    ("WAITING" :foreground "orange" :weight bold)
-			    ("HOLD" :foreground "magenta" :weight bold)
-			    ("CANCELLED" :foreground "forest green" :weight bold)
-			    ("MEETING" :foreground "forest green" :weight bold)
-			    ("PHONE" :foreground "forest green" :weight bold))))
-
+                    (quote (("TODO" :foreground "red" :weight bold)
+                            ("NEXT" :foreground "blue" :weight bold)
+                            ("DONE" :foreground "forest green" :weight bold)
+                            ("WAITING" :foreground "orange" :weight bold)
+                            ("HOLD" :foreground "magenta" :weight bold)
+                            ("CANCELLED" :foreground "forest green" :weight bold)
+                            ("MEETING" :foreground "forest green" :weight bold)
+                            ("PHONE" :foreground "forest green" :weight bold))))
 
       ))
 
@@ -1118,7 +1182,7 @@ Marginalia provides helpful annotations for various types of minibuffer completi
 ** imenu-list
 #+begin_src elisp
   (setup (:pkg imenu-list)
-    (:autoload "imenu-list" imenu-list-smart-toggle)
+    (:autoload imenu-list-smart-toggle)
     (:option imenu-list-focus-after-activate t
 	     imenu-list-auto-resize t
 	     imenu-list-position 'left
@@ -1165,12 +1229,13 @@ Marginalia provides helpful annotations for various types of minibuffer completi
         (setq-default org-download-screenshot-method "spectacle"))
       (when (eq system-type 'darwin)
         (setq org-download-screenshot-method "screencapture -i %s")))
-    (:autoload "org-download" org-download-screenshot)
+    (:autoload org-download-screenshot)
     )
 #+end_src
 
 ** org-roam
 #+begin_src elisp
+  (setup (:pkg emacsql))
   (setq org-roam-v2-ack t)
   (setq org-roam-directory "~/Documents/emacs/orgmode/roam/")
   (setq org-roam-dailies-directory "~/Documents/emacs/orgmode/roam")
@@ -1178,21 +1243,21 @@ Marginalia provides helpful annotations for various types of minibuffer completi
     (:when-loaded
       (org-roam-db-autosync-mode)
       (:option org-roam-mode-section-functions
-               (list #'org-roam-backlinks-section
-                     #'org-roam-reflinks-section
-                     ;; #'org-roam-unlinked-references-section
-                     )
-               org-roam-completion-everywhere t
-               org-roam-db-gc-threshold most-positive-fixnum
-               )
+	       (list #'org-roam-backlinks-section
+		     #'org-roam-reflinks-section
+		     ;; #'org-roam-unlinked-references-section
+		     )
+	       org-roam-completion-everywhere t
+	       org-roam-db-gc-threshold most-positive-fixnum
+	       )
       (add-to-list 'display-buffer-alist
-                   '("\\*org-roam\\*"
-                     (display-buffer-in-side-window)
-                     (side . right)
-                     (slot . 0)
-                     (window-width . 0.25)
-                     (window-parameters . ((no-other-window . t)
-                                           (no-delete-other-windows . t)))))
+		   '("\\*org-roam\\*"
+		     (display-buffer-in-side-window)
+		     (side . right)
+		     (slot . 0)
+		     (window-width . 0.25)
+		     (window-parameters . ((no-other-window . t)
+					   (no-delete-other-windows . t)))))
 
       ))
 #+end_src
@@ -1201,12 +1266,10 @@ Marginalia provides helpful annotations for various types of minibuffer completi
   (setup (:pkg websocket))
   (setup (:pkg org-roam-ui :host github :repo "org-roam/org-roam-ui"))
 #+end_src
+** ox-hugo
 * Runtime Performance
 Dial the GC threshold back down so that garbage collection happens more frequently but in less time.
 #+begin_src elisp
-
   ;; Make gc pauses faster by decreasing the threshold.
   (setq gc-cons-threshold (* 2 1000 1000))
-
 #+end_src
-
