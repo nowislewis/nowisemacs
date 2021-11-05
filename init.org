@@ -77,6 +77,9 @@
   (recentf-mode t)
 #+end_src
 ** generic
+#+begin_src elisp
+  (setq use-short-answers t)
+#+end_src
 #+begin_src elisp :tangle no
   ;; Restore emacs session.
   (setq initial-buffer-choice t)
@@ -233,6 +236,14 @@ This keyword causes a body to be executed after other packages/features are load
           (setq body `(with-eval-after-load ',feature ,body)))
         body))
   :documentation "Load the current feature after FEATURES.")
+#+end_src
+*** :if-host
+#+begin_src elisp
+(setup-define :if-host
+    (lambda (hostname)
+      `(unless (string= (system-name) ,hostname)
+         ,(setup-quit)))
+  :documentation "If HOSTNAME is not the current hostname, stop evaluating form.")
 #+end_src
 *** :autoload
 #+begin_src elisp
@@ -1061,6 +1072,19 @@ Marginalia provides helpful annotations for various types of minibuffer completi
        )
 #+end_src
 ** tree-sitter
+#+begin_src elisp
+  (setup (:pkg tree-sitter-langs)
+    (:if-host 'gnu/linux)
+    )
+  (setup (:pkg tree-sitter)
+    (:if-host 'gnu/linux)
+    (:hook-into prog-mode)
+    (:when-loaded
+      (require 'tree-sitter-langs)
+      (add-hook 'tree-sitter-after-on-hook #'tree-sitter-hl-mode)
+      )
+    )
+#+end_src
 ** lsp-mode
 #+begin_src elisp
   (setup (:pkg lsp-mode)
@@ -1105,7 +1129,7 @@ Marginalia provides helpful annotations for various types of minibuffer completi
     ;; This is needed in `:init' block for lazy load to work.
     (require 'citre-config)
     (:option
-     citre-project-root-function #'projectile-project-root
+     ;; citre-project-root-function #'projectile-project-root
      ;; See the "Create tags file" section above to know these options
      citre-use-project-root-when-creating-tags t
      citre-prompt-language-for-ctags-command t
@@ -1264,9 +1288,58 @@ Marginalia provides helpful annotations for various types of minibuffer completi
 ** org-roam-ui
 #+begin_src elisp
   (setup (:pkg websocket))
-  (setup (:pkg org-roam-ui :host github :repo "org-roam/org-roam-ui"))
+  (setup (:pkg simple-httpd))
+  (setup (:pkg org-roam-ui :host github :repo "org-roam/org-roam-ui" :files ("*.el" "out")))
 #+end_src
 ** ox-hugo
+** org-pomodoro
+#+begin_src elisp
+  (setup (:pkg org-pomodoro)
+    (:option org-pomodoro-finished-sound "~/Documents/emacs/pyim-dict/applaud.wav")
+    (:when-loaded
+      (alert-add-rule :category "org-pomodoro"
+                      :style (cond (alert-growl-command
+                                    'growl)
+                                   (alert-notifier-command
+                                    'notifier)
+                                   (alert-libnotify-command
+                                    'libnotify)
+                                   (alert-default-style)))
+      (defun pomodoro-awesome-tray()
+        (let ((s (cl-case org-pomodoro-state
+                   (:pomodoro
+                    (propertize org-pomodoro-format))
+                   (:overtime
+                    (propertize org-pomodoro-overtime-format))
+                   (:short-break
+                    (propertize org-pomodoro-short-break-format))
+                   (:long-break
+                    (propertize org-pomodoro-long-break-format)))))
+                  (concat "[" (format s (org-pomodoro-format-seconds)) "] ")))
+        (add-to-list 'awesome-tray-module-alist '("pomodoro" . (pomodoro-awesome-tray awesome-tray-module-evil-face)))
+        (add-to-list 'awesome-tray-active-modules "pomodoro")
+        )
+      )
+
+
+#+end_src
+* 阅读
+** pdf-tools
+#+begin_src elisp
+(setup (:pkg pdf-tools :host github :repo "vedang/pdf-tools"))
+#+end_src
+** org-noter
+#+begin_src elisp
+    (setup (:pkg org-noter)
+      (:option
+       org-noter-notes-search-path (list org-directory)
+               org-noter-auto-save-last-location t
+               org-noter-separate-notes-from-heading t
+               org-noter-doc-split-percentage '(0.6 . 0.4)
+               )
+      )
+#+end_src
+** nov
 * Runtime Performance
 Dial the GC threshold back down so that garbage collection happens more frequently but in less time.
 #+begin_src elisp
