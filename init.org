@@ -434,41 +434,46 @@ Avoid constant errors on Windows about the coding system by setting the default 
 *** lewis
 #+begin_src elisp
   (lewis/define-leader-key
-                          '(;; youdao
-                            ("y p" . youdao-dictionary-search-at-point-posframe)
-                            ("y s" . youdao-dictionary-search)
-                            ("y i" . youdao-dictionary-search-from-input)
-                            ("y r" . youdao-dictionary-search-and-replace)
-                            ;; citre
-                            ("c a" . citre-ace-peek)
-                            ("c j" . citre-jump)
-                            ("c p" . citre-peek)
-                            ("c J" . citre-jump-back)
-                            ("c u" . citre-update-this-tags-file)
-                            ("c r" . citre-peek-restore)
-                            ("c s" . citre-peek-save-session)
-                            ("c l" . citre-peek-load-session)
-                            ;; aweshell
-                            ("a a" . aweshell-toggle)
-                            ("a d" . aweshell-dedicated-toggle)
-                            ("a b" . aweshell-switch-buffer)
-                            ("a s" . aweshell-search-history)
-                            ;; insert-translated
-                            ("i i" . insert-translated-name-insert)
-                            ("i r" . insert-translated-name-replace)
+   '(;; youdao
+     ("y p" . youdao-dictionary-search-at-point-posframe)
+     ("y s" . youdao-dictionary-search)
+     ("y i" . youdao-dictionary-search-from-input)
+     ("y r" . youdao-dictionary-search-and-replace)
+     ;; citre
+     ("c a" . citre-ace-peek)
+     ("c j" . citre-jump)
+     ("c p" . citre-peek)
+     ("c J" . citre-jump-back)
+     ("c u" . citre-update-this-tags-file)
+     ("c r" . citre-peek-restore)
+     ("c s" . citre-peek-save-session)
+     ("c l" . citre-peek-load-session)
+     ;; aweshell
+     ("a a" . aweshell-toggle)
+     ("a d" . aweshell-dedicated-toggle)
+     ("a b" . aweshell-switch-buffer)
+     ("a s" . aweshell-search-history)
+     ;; insert-translated
+     ("i i" . insert-translated-name-insert)
+     ("i r" . insert-translated-name-replace)
 
-                            ;; imenu-list
-                            ("l" . imenu-list-smart-toggle)
-                            ;; org-download
-                            ("d" . org-download-screenshot)
-                            ;;leader: lewisliu
-                            ) "e")
+     ;; imenu-list
+     ("l" . imenu-list-smart-toggle)
+     ;; org-download
+     ("d" . org-download-screenshot)
+     ;; english help
+     ("h c" . toggle-company-english-helper)
+     ("h f" . english-teacher-follow-mode)
+     ;;leader: lewisliu
+     ) "e")
 #+end_src
 *** search
 #+begin_src elisp
   (lewis/define-leader-key '(
                              ("s" . consult-line)
                              ("b" . consult-buffer)
+                             ("d" . consult-ripgrep)
+                             ("f" . consult-find)
                              ) "s")
 
   (defun find-config-file()
@@ -515,6 +520,7 @@ Avoid constant errors on Windows about the coding system by setting the default 
 			     ("o R" . org-roam-ref-remove)
 			     ) "n r")
 #+end_src
+*** e
 * UI
 ** line-number
 #+begin_src elisp
@@ -584,7 +590,7 @@ Different platforms need different default font sizes, and [[https://mozilla.git
       emacs-font-name)
   (cond
    ((featurep 'cocoa)
-    (setq emacs-font-name "Monaco"))
+    (setq emacs-font-name "InconsolataGo QiHei NF"))
    ((string-equal system-type "gnu/linux")
     (setq emacs-font-name "Inconsolata")))
   (when (display-grayscale-p)
@@ -815,6 +821,7 @@ The test for presence of the car of ELT-CONS is done with `equal'."
     (vertico-mode)
     (:option vertico-cycle t))
 #+end_src
+
 ** Orderless
 #+begin_src elisp
   (setup (:pkg orderless)
@@ -872,6 +879,13 @@ The test for presence of the car of ELT-CONS is done with `equal'."
 *** consult-dir
 #+begin_src elisp
   (setup (:pkg consult-dir))
+#+end_src
+*** search other cwd
+#+begin_src elisp :tangle no
+  (defun consult-other-dir()
+    (interactive)
+    (progn (universal-argument)
+           (consult-ripgrep)))
 #+end_src
 ** Completion Annotations with Marginalia
 
@@ -1073,11 +1087,15 @@ Marginalia provides helpful annotations for various types of minibuffer completi
 #+end_src
 ** tree-sitter
 #+begin_src elisp
-  (setup (:pkg tree-sitter-langs)
-    (:if-host 'gnu/linux)
+  (setup tree-sitter-langs
+	  (:if-host 'gnu/linux)
+    (:pkg tree-sitter-langs)
+
     )
-  (setup (:pkg tree-sitter)
-    (:if-host 'gnu/linux)
+  (setup tree-sitter
+          (:if-host 'gnu/linux)
+    (:pkg tree-sitter)
+
     (:hook-into prog-mode)
     (:when-loaded
       (require 'tree-sitter-langs)
@@ -1168,10 +1186,7 @@ Marginalia provides helpful annotations for various types of minibuffer completi
 (setup (:pkg company-english-helper :host github
            :repo "manateelazycat/company-english-helper")
        (:autoload english-teacher-follow-mode))
-(lewis/define-leader-key '(
-                          ("e h c" . toggle-company-english-helper)
-                          ("e h f" . english-teacher-follow-mode)
-                          ))
+
 #+end_src
 * Org Mode
 ** 杂项设置
