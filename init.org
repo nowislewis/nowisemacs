@@ -4,17 +4,17 @@
 * 启动优化
 ** UI 加速
 #+begin_src elisp
-    ;; -*- lexical-binding: t; -*-
+     ;; -*- lexical-binding: t; -*-
   (tool-bar-mode -1)                      ;禁用工具栏
-  ;; (menu-bar-mode -1)                      ;禁用菜单栏
-  (scroll-bar-mode -1)                    ;禁用滚动条
-  (setq
-   ;; 不要缩放frame.
-   frame-inhibit-implied-resize t
-   ;; 默认用最简单的模式
-   initial-major-mode 'fundamental-mode
-   ;; 不要自动启用package
-   package-enable-at-startup nil package--init-file-ensured t)
+   ;; (menu-bar-mode -1)                      ;禁用菜单栏
+   (scroll-bar-mode -1)                    ;禁用滚动条
+   (setq
+    ;; 不要缩放frame.
+    frame-inhibit-implied-resize t
+    ;; 默认用最简单的模式
+    initial-major-mode 'fundamental-mode
+    ;; 不要自动启用package
+    package-enable-at-startup nil package--init-file-ensured t)
 #+end_src
 ** Startup Performance
 #+begin_src elisp
@@ -70,7 +70,8 @@
 ** Native Compilation
 #+begin_src elisp :tangle no
   ;; Set the right directory to store the native comp cache
-  (add-to-list 'native-comp-eln-load-path (expand-file-name "eln-cache/" user-emacs-directory))
+  (setq native
+  ;; (add-to-list 'native-comp-eln-load-path (expand-file-name "eln-cache/" user-emacs-directory))
 #+end_src
 ** recentf
 #+begin_src elisp
@@ -130,9 +131,7 @@
 #+end_src
 
 * Package Management
-
 #+begin_src elisp
-
   (unless (featurep 'straight)
     ;; Bootstrap straight.el
     (defvar bootstrap-version)
@@ -237,13 +236,13 @@ This keyword causes a body to be executed after other packages/features are load
         body))
   :documentation "Load the current feature after FEATURES.")
 #+end_src
-*** :if-host
+*** :if-system
 #+begin_src elisp
-(setup-define :if-host
-    (lambda (hostname)
-      `(unless (string= (system-name) ,hostname)
+(setup-define :if-system
+    (lambda (systemtype)
+      `(unless (eq system-type ,systemtype)
          ,(setup-quit)))
-  :documentation "If HOSTNAME is not the current hostname, stop evaluating form.")
+  :documentation "If SYSTEMTYPE is not the current systemtype, stop evaluating form.")
 #+end_src
 *** :autoload
 #+begin_src elisp
@@ -387,7 +386,7 @@ Avoid constant errors on Windows about the coding system by setting the default 
     ;; (meow-setup-line-number)
     ;; 如果你需要自动的 mode-line 设置（如果需要自定义见下文对 `meow-indicator' 说明）
     ;; (meow-setup-indicator)
-    (setq which-key-show-transient-maps t)
+    ;; (setq which-key-show-transient-maps t)
     (setq meow-use-keypad-when-execute-kbd nil)
     (setq meow-expand-exclude-mode-list nil)
     (setq meow-use-clipboard t)
@@ -484,41 +483,45 @@ Avoid constant errors on Windows about the coding system by setting the default 
                              ("p" . find-config-file)
                              ) "f")
 #+end_src
-*** note
+*** roam
 #+begin_src elisp
   (lewis/define-leader-key '(
-			     ("D" . org-roam-demote-entire-buffer)
-			     ("f" . org-roam-node-find)
-			     ("F" . org-roam-ref-find)
-			     ("g" . org-roam-graph)
-			     ("i" . org-roam-node-insert)
-			     ("I" . org-id-get-create)
-			     ("m" . org-roam-buffer-toggle)
-			     ("M" . org-roam-buffer-display-dedicated)
-			     ("n" . org-roam-capture)
-			     ("r" . org-roam-refile)
-			     ("R" . org-roam-link-replace-all)
-			     ;; date
-			     ("d b" . org-roam-dailies-goto-previous-note)
-			     ("d d" . org-roam-dailies-goto-date)
-			     ("d D" . org-roam-dailies-capture-date)
-			     ("d f" . org-roam-dailies-goto-next-note)
-			     ("d m" . org-roam-dailies-goto-tomorrow)
-			     ("d M" . org-roam-dailies-capture-tomorrow)
-			     ("d n" . org-roam-dailies-capture-today)
-			     ("d t" . org-roam-dailies-goto-today)
-			     ("d T" . org-roam-dailies-capture-today)
-			     ("d y" . org-roam-dailies-goto-yesterday)
-			     ("d Y" . org-roam-dailies-capture-yesterday)
-			     ("d -" . org-roam-dailies-find-directory)
-			     ;; "node properties"
-			     ("o a" . org-roam-alias-add)
-			     ("o A" . org-roam-alias-remove)
-			     ("o t" . org-roam-tag-add)
-			     ("o T" . org-roam-tag-remove)
-			     ("o r" . org-roam-ref-add)
-			     ("o R" . org-roam-ref-remove)
-			     ) "n r")
+                             ("D" . org-roam-demote-entire-buffer)
+                             ("f" . org-roam-node-find)
+                             ("F" . org-roam-ref-find)
+                             ("g" . org-roam-graph)
+                             ("i" . org-roam-node-insert)
+                             ("I" . org-id-get-create)
+                             ("m" . org-roam-buffer-toggle)
+                             ("M" . org-roam-buffer-display-dedicated)
+                             ("n" . org-roam-capture)
+                             ("r" . org-roam-refile)
+                             ("R" . org-roam-link-replace-all)
+                             ;; date
+                             ("d b" . org-roam-dailies-goto-previous-note)
+                             ("d d" . org-roam-dailies-goto-date)
+                             ("d D" . org-roam-dailies-capture-date)
+                             ("d f" . org-roam-dailies-goto-next-note)
+                             ("d m" . org-roam-dailies-goto-tomorrow)
+                             ("d M" . org-roam-dailies-capture-tomorrow)
+                             ("d n" . org-roam-dailies-capture-today)
+                             ("d t" . org-roam-dailies-goto-today)
+                             ("d T" . org-roam-dailies-capture-today)
+                             ("d y" . org-roam-dailies-goto-yesterday)
+                             ("d Y" . org-roam-dailies-capture-yesterday)
+                             ("d -" . org-roam-dailies-find-directory)
+                             ;; "node properties"
+                             ("o a" . org-roam-alias-add)
+                             ("o A" . org-roam-alias-remove)
+                             ("o t" . org-roam-tag-add)
+                             ("o T" . org-roam-tag-remove)
+                             ("o r" . org-roam-ref-add)
+                             ("o R" . org-roam-ref-remove)
+                             ) "n r")
+  (lewis/define-leader-key '(
+                             ("e" . org-noter)
+                             )
+                           "n")
 #+end_src
 
 * UI
@@ -582,16 +585,10 @@ Avoid constant errors on Windows about the coding system by setting the default 
   )
 #+end_src
 ** Font
-*** Set the font
-Different platforms need different default font sizes, and [[https://mozilla.github.io/Fira/][Fira Mono]] is currently my favorite face.
 #+begin_src elisp
-(let ((emacs-font-size 14)
+(let ((emacs-font-size 12)
       emacs-font-name)
-  (cond
-   ((featurep 'cocoa)
-    (setq emacs-font-name "InconsolataGo QiHei NF"))
-   ((string-equal system-type "gnu/linux")
-    (setq emacs-font-name "Inconsolata")))
+    (setq emacs-font-name "InconsolataGo QiHei NF")
   (when (display-grayscale-p)
     (set-frame-font (format "%s-%s" (eval emacs-font-name) (eval emacs-font-size)))
     (set-fontset-font (frame-parameter nil 'font) 'unicode (eval emacs-font-name))
@@ -609,11 +606,8 @@ Different platforms need different default font sizes, and [[https://mozilla.git
 ** rainbow-delimiters
 #+begin_src elisp
   (setup (:pkg rainbow-delimiters)
-    ;; (:delay)
-    ;; (rainbow-delimiters-mode)
-    (:hook-into foo-mode)
-  )
-
+    (:hook-into prog-mode)
+    )
 #+end_src
 ** diff-hl
 #+begin_src elisp
@@ -648,10 +642,11 @@ Different platforms need different default font sizes, and [[https://mozilla.git
 ** sort-tab
 #+begin_src elisp
   (setup (:pkg sort-tab
-	    :host github
+            :host github
     :repo "manateelazycat/sort-tab")
-	 (require 'sort-tab)
-	 (sort-tab-mode 1)
+    (:delay)
+         (require 'sort-tab)
+         (sort-tab-mode 1)
   )
 #+end_src
 ** backup
@@ -661,114 +656,116 @@ Different platforms need different default font sizes, and [[https://mozilla.git
   (setq auto-save-default nil)
 
   (setup (:pkg super-save)
-	 (super-save-mode 1)
+    (:delay)
+         (super-save-mode 1)
        (setq super-save-auto-save-when-idle t)
 
   )
 #+end_src
 ** mode 绑定
-#+begin_src elisp
-;;; ### auto-mode-alist ###
-;;; --- 绑定扩展名到特定的模式
-(defun add-to-alist (alist-var elt-cons &optional no-replace)
-  "Add to the value of ALIST-VAR an element ELT-CONS if it isn't there yet.
-If an element with the same car as the car of ELT-CONS is already present,
-replace it with ELT-CONS unless NO-REPLACE is non-nil; if a matching
-element is not already present, add ELT-CONS to the front of the alist.
-The test for presence of the car of ELT-CONS is done with `equal'."
-  (let ((existing-element (assoc (car elt-cons) (symbol-value alist-var))))
-    (if existing-element
-        (or no-replace
-            (rplacd existing-element (cdr elt-cons)))
-      (set alist-var (cons elt-cons (symbol-value alist-var)))))
-  (symbol-value alist-var))
+#+begin_src elisp :tangle no
+  ;;; ### auto-mode-alist ###
+  ;;; --- 绑定扩展名到特定的模式
+  (defun add-to-alist (alist-var elt-cons &optional no-replace)
+    "Add to the value of ALIST-VAR an element ELT-CONS if it isn't there yet.
+  If an element with the same car as the car of ELT-CONS is already present,
+  replace it with ELT-CONS unless NO-REPLACE is non-nil; if a matching
+  element is not already present, add ELT-CONS to the front of the alist.
+  The test for presence of the car of ELT-CONS is done with `equal'."
+    (let ((existing-element (assoc (car elt-cons) (symbol-value alist-var))))
+      (if existing-element
+          (or no-replace
+              (rplacd existing-element (cdr elt-cons)))
+        (set alist-var (cons elt-cons (symbol-value alist-var)))))
+    (symbol-value alist-var))
 
-(dolist (elt-cons '(
-                    ("\\.markdown" . markdown-mode)
-                    ("\\.md" . markdown-mode)
-                    ("\\.coffee$" . coffee-mode)
-                    ("\\.iced$" . coffee-mode)
-                    ("Cakefile" . coffee-mode)
-                    ("\\.stumpwmrc\\'" . lisp-mode)
-                    ("\\.[hg]s\\'" . haskell-mode)
-                    ("\\.hi\\'" . haskell-mode)
-                    ("\\.hs-boot\\'" . haskell-mode)
-                    ("\\.chs\\'" . haskell-mode)
-                    ("\\.l[hg]s\\'" . literate-haskell-mode)
-                    ("\\.inc\\'" . asm-mode)
-                    ("\\.max\\'" . maxima-mode)
-                    ("\\.org\\'" . org-mode)
-                    ("\\.cron\\(tab\\)?\\'" . crontab-mode)
-                    ("cron\\(tab\\)?\\." . crontab-mode)
-                    ("\\.a90\\'" . intel-hex-mode)
-                    ("\\.hex\\'" . intel-hex-mode)
-                    ("\\.py$" . python-mode)
-                    ("SConstruct". python-mode)
-                    ("\\.ml\\'" . tuareg-mode)
-                    ("\\.mli\\'" . tuareg-mode)
-                    ("\\.mly\\'" . tuareg-mode)
-                    ("\\.mll\\'" . tuareg-mode)
-                    ("\\.mlp\\'" . tuareg-mode)
-                    ("\\.qml\\'" . qml-mode)
-                    ("\\.jl\\'" . lisp-mode)
-                    ("\\.asdf\\'" . lisp-mode)
-                    ("CMakeLists\\.txt\\'" . cmake-mode)
-                    ("\\.cmake\\'" . cmake-mode)
-                    ("\\.php\\'" . php-mode)
-                    ("\\.vue" . web-mode)
-                    ("\\.wxml" . web-mode)
-                    ("\\.blade\\.php\\'" . web-mode)
-                    ("\\.phtml\\'" . web-mode)
-                    ("\\.tpl\\.php\\'" . web-mode)
-                    ("\\.jsp\\'" . web-mode)
-                    ("\\.as[cp]x\\'" . web-mode)
-                    ("\\.erb\\'" . web-mode)
-                    ("\\.mustache\\'" . web-mode)
-                    ("\\.djhtml\\'" . web-mode)
-                    ("\\.html?\\'" . web-mode)
-                    ("\\.coffee\\'" . coffee-mode)
-                    ("\\.coffee.erb\\'" . coffee-mode)
-                    ("\\.js.erb\\'" . js-mode)
-                    ("\\.iced\\'" . coffee-mode)
-                    ("\\.css\\'" . css-mode)
-                    ("\\.wxss\\'" . css-mode)
-                    ("Cakefile\\'" . coffee-mode)
-                    ("\\.styl$" . sws-mode)
-                    ("\\.jade" . jade-mode)
-                    ("\\.go$" . go-mode)
-                    ("\\.vala$" . vala-mode)
-                    ("\\.vapi$" . vala-mode)
-                    ("\\.rs$" . rust-mode)
-                    ("\\.pro$" . qmake-mode)
-                    ("\\.js$" . js-mode)
-                    ("\\.wxs$" . js-mode)
-                    ("\\.jsx$" . web-mode)
-                    ("\\.lua$" . lua-mode)
-                    ("\\.swift$" . swift-mode)
-                    ("\\.l$" . flex-mode)
-                    ("\\.y$" . bison-mode)
-                    ("\\.pdf$" . pdf-view-mode)
-                    ("\\.cpp$" . c++-mode)
-                    ("\\.h$" . c++-mode)
-                    ("\\.ll$" . llvm-mode)
-                    ("\\.bc$" . hexl-mode)
-                    ("\\.nim$" . nim-mode)
-                    ("\\.nims$" . nim-mode)
-                    ("\\.nimble$" . nim-mode)
-                    ("\\.nim.cfg$" . nim-mode)
-                    ))
-  (add-to-alist 'auto-mode-alist elt-cons))
+  (dolist (elt-cons '(
+                      ("\\.markdown" . markdown-mode)
+                      ("\\.md" . markdown-mode)
+                      ("\\.coffee$" . coffee-mode)
+                      ("\\.iced$" . coffee-mode)
+                      ("Cakefile" . coffee-mode)
+                      ("\\.stumpwmrc\\'" . lisp-mode)
+                      ("\\.[hg]s\\'" . haskell-mode)
+                      ("\\.hi\\'" . haskell-mode)
+                      ("\\.hs-boot\\'" . haskell-mode)
+                      ("\\.chs\\'" . haskell-mode)
+                      ("\\.l[hg]s\\'" . literate-haskell-mode)
+                      ("\\.inc\\'" . asm-mode)
+                      ("\\.max\\'" . maxima-mode)
+                      ("\\.org\\'" . org-mode)
+                      ("\\.cron\\(tab\\)?\\'" . crontab-mode)
+                      ("cron\\(tab\\)?\\." . crontab-mode)
+                      ("\\.a90\\'" . intel-hex-mode)
+                      ("\\.hex\\'" . intel-hex-mode)
+                      ("\\.py$" . python-mode)
+                      ("SConstruct". python-mode)
+                      ("\\.ml\\'" . tuareg-mode)
+                      ("\\.mli\\'" . tuareg-mode)
+                      ("\\.mly\\'" . tuareg-mode)
+                      ("\\.mll\\'" . tuareg-mode)
+                      ("\\.mlp\\'" . tuareg-mode)
+                      ("\\.qml\\'" . qml-mode)
+                      ("\\.jl\\'" . lisp-mode)
+                      ("\\.asdf\\'" . lisp-mode)
+                      ("CMakeLists\\.txt\\'" . cmake-mode)
+                      ("\\.cmake\\'" . cmake-mode)
+                      ("\\.php\\'" . php-mode)
+                      ("\\.vue" . web-mode)
+                      ("\\.wxml" . web-mode)
+                      ("\\.blade\\.php\\'" . web-mode)
+                      ("\\.phtml\\'" . web-mode)
+                      ("\\.tpl\\.php\\'" . web-mode)
+                      ("\\.jsp\\'" . web-mode)
+                      ("\\.as[cp]x\\'" . web-mode)
+                      ("\\.erb\\'" . web-mode)
+                      ("\\.mustache\\'" . web-mode)
+                      ("\\.djhtml\\'" . web-mode)
+                      ("\\.html?\\'" . web-mode)
+                      ("\\.coffee\\'" . coffee-mode)
+                      ("\\.coffee.erb\\'" . coffee-mode)
+                      ("\\.js.erb\\'" . js-mode)
+                      ("\\.iced\\'" . coffee-mode)
+                      ("\\.css\\'" . css-mode)
+                      ("\\.wxss\\'" . css-mode)
+                      ("Cakefile\\'" . coffee-mode)
+                      ("\\.styl$" . sws-mode)
+                      ("\\.jade" . jade-mode)
+                      ("\\.go$" . go-mode)
+                      ("\\.vala$" . vala-mode)
+                      ("\\.vapi$" . vala-mode)
+                      ("\\.rs$" . rust-mode)
+                      ("\\.pro$" . qmake-mode)
+                      ("\\.js$" . js-mode)
+                      ("\\.wxs$" . js-mode)
+                      ("\\.jsx$" . web-mode)
+                      ("\\.lua$" . lua-mode)
+                      ("\\.swift$" . swift-mode)
+                      ("\\.l$" . flex-mode)
+                      ("\\.y$" . bison-mode)
+                      ("\\.pdf$" . pdf-view-mode)
+                      ("\\.cpp$" . c++-mode)
+                      ("\\.h$" . c++-mode)
+                      ("\\.ll$" . llvm-mode)
+                      ("\\.bc$" . hexl-mode)
+                      ("\\.nim$" . nim-mode)
+                      ("\\.nims$" . nim-mode)
+                      ("\\.nimble$" . nim-mode)
+                      ("\\.nim.cfg$" . nim-mode)
+                      ))
+    (add-to-alist 'auto-mode-alist elt-cons))
 
-(add-to-list 'interpreter-mode-alist '("coffee" . coffee-mode))
+  (add-to-list 'interpreter-mode-alist '("coffee" . coffee-mode))
 
-;;; ### Auto-fill ###
-;;; --- 自动换行
-(setq default-fill-column 100)          ;默认显示 100列就换行
-(dolist (hook (list
-               'after-text-mode-hook
-               'message-mode-hook
-               ))
-  (add-hook hook #'(lambda () (auto-fill-mode 1))))
+** 自动换行
+  ;;; ### Auto-fill ###
+  ;;; --- 自动换行
+  (setq default-fill-column 120)          ;默认显示 100列就换行
+  (dolist (hook (list
+                 'after-text-mode-hook
+                 'message-mode-hook
+                 ))
+    (add-hook hook #'(lambda () (auto-fill-mode 1))))
 #+end_src
 ** indent
 #+begin_src elisp :tangle no
@@ -835,7 +832,7 @@ The test for presence of the car of ELT-CONS is done with `equal'."
   (setup (:pkg ws-butler)
     (:hook-into text-mode prog-mode))
 #+end_src
-* Completion System
+* 补全
 ** Completions with Vertico
 #+begin_src elisp
   (setup (:pkg vertico)
@@ -870,7 +867,6 @@ The test for presence of the car of ELT-CONS is done with `equal'."
     (corfu-global-mode))
 
 #+end_src
-
 ** Consult Commands
 *** consult
 #+begin_src elisp
@@ -898,16 +894,10 @@ The test for presence of the car of ELT-CONS is done with `equal'."
     )
 #+end_src
 *** consult-dir
-#+begin_src elisp
+#+begin_src elisp :tangle no
   (setup (:pkg consult-dir))
 #+end_src
 *** search other cwd
-#+begin_src elisp :tangle no
-  (defun consult-other-dir()
-    (interactive)
-    (progn (universal-argument)
-           (consult-ripgrep)))
-#+end_src
 ** Completion Annotations with Marginalia
 
 Marginalia provides helpful annotations for various types of minibuffer completions.  You can think of it as a replacement of =ivy-rich=.
@@ -939,88 +929,51 @@ Marginalia provides helpful annotations for various types of minibuffer completi
 ** company
 
 #+begin_src elisp
-  (setup
-    (:pkg company))
-  (setup (:pkg company-tabnine))
-  (add-hook 'prog-mode-hook
-            #'(lambda ()
-                (require 'company)
-                (require 'company-yasnippet)
-                (require 'company-dabbrev)
-                (require 'company-files)
-                (require 'company-tng)
-                (require 'company-tabnine)
+    (setup
+        (:pkg company)
+      (:option company-dabbrev-other-buffers nil
+               company-dabbrev-ignore-case nil
+               company-dabbrev-downcase nil
+               company-minimum-prefix-length 2 ; pop up a completion menu by tapping a character
+               company-show-numbers t ; number the candidates (use M-1, M-2 etc to select completions).
+               company-require-match nil ; allow input string that do not match candidate words
+               company-idle-delay 0 ; trigger completion immediately.
+               company-dabbrev-downcase nil
+               company-dabbrev-ignore-case t
 
-                ;; Config for company mode.
-                (setq company-minimum-prefix-length 2) ; pop up a completion menu by tapping a character
-                (setq company-show-numbers t) ; number the candidates (use M-1, M-2 etc to select completions).
-                (setq company-require-match nil) ; allow input string that do not match candidate words
-                (setq company-idle-delay 0) ; trigger completion immediately.
-
-                ;; Don't downcase the returned candidates.
-                (setq company-dabbrev-downcase nil)
-                (setq company-dabbrev-ignore-case t)
-
-                ;; Customize company backends.
-                (setq company-backends
-                      '(
-                        (company-tabnine company-dabbrev company-files company-capf)
-                        ))
-
-                ;; Add yasnippet support for all company backends.
-                (defvar company-mode/enable-yas t
-                  "Enable yasnippet for all backends.")
-
-                (defun company-mode/backend-with-yas (backend)
-                  (if (or (not company-mode/enable-yas) (and (listp backend) (member 'company-yasnippet backend)))
-                      backend
-                    (append (if (consp backend) backend (list backend))
-                            '(:with company-yasnippet))))
-
-                (setq company-backends (mapcar #'company-mode/backend-with-yas company-backends))
-
-                ;; Remove duplicate candidate.
-                (add-to-list 'company-transformers #'delete-dups)
-
-                ;; Add `company-elisp' backend for elisp.
-                (add-hook 'emacs-lisp-mode-hook
-                          #'(lambda ()
-                              (require 'company-elisp)
-                              (push 'company-elisp company-backends)))
-
-                ;; Enable global.
-                (global-company-mode)
-                ))
-
-  ;; The free version of TabNine is good enough,
-  ;; and below code is recommended that TabNine not always
-  ;; prompt me to purchase a paid version in a large project.
-  (defadvice company-echo-show (around disable-tabnine-upgrade-message activate)
-    (let ((company-message-func (ad-get-arg 0)))
-      (when (and company-message-func
-                 (stringp (funcall company-message-func)))
-        (unless (string-match "The free version of TabNine only indexes up to" (funcall company-message-func))
-          ad-do-it))))
-
-
+               company-backends '(
+                                  (company-capf ：with company-yasnippet)
+                                  (company-dabbrev-code company-keywords company-files)
+                                  company-dabbrev
+                                  )
+               )
+      (:hook-into prog-mode-hook)
+      (:when-loaded
+        (global-company-mode)
+        )
+      )
 #+end_src
 ** company-box
 #+begin_src elisp
   (setup (:pkg company-box)
     (:hook-into company-mode)
     (:option company-box-doc-delay 0.1
-	      ;; company-box-icons-alist 'company-box-icons-all
-	      )
+             company-box-show-single-candidate t
+             company-box-backends-colors nil
+             company-box-max-candidates 50
+             )
     )
 #+end_src
 ** company-dict
+#+begin_src elisp
+
+#+end_src
 ** yasnippet
 #+begin_src elisp
   (setup (:pkg yasnippet)
     (require 'yasnippet)
     (yas-global-mode 1))
 #+end_src
-
 * Window Management
 * 输入与阅读
 ** pyim
@@ -1120,14 +1073,12 @@ Marginalia provides helpful annotations for various types of minibuffer completi
 ** tree-sitter
 #+begin_src elisp
   (setup tree-sitter-langs
-	  (:if-host 'gnu/linux)
+	  (:if-system 'gnu/linux)
     (:pkg tree-sitter-langs)
-
     )
   (setup tree-sitter
-          (:if-host 'gnu/linux)
+          (:if-system 'gnu/linux)
     (:pkg tree-sitter)
-
     (:hook-into prog-mode)
     (:when-loaded
       (require 'tree-sitter-langs)
@@ -1136,10 +1087,20 @@ Marginalia provides helpful annotations for various types of minibuffer completi
     )
 #+end_src
 ** lsp-mode
+*** lsp
 #+begin_src elisp
   (setup (:pkg lsp-mode)
     (:hook lsp-enable-which-key-integration)
       (setq lsp-keymap-prefix "C-c l"))
+#+end_src
+*** consult-lsp
+#+begin_src elisp
+  (setup (:pkg consult-lsp)
+    (:load-after lsp-mode)
+    (:when-loaded
+    (define-key lsp-mode-map [remap xref-find-apropos] #'consult-lsp-symbols)
+    )
+   )
 #+end_src
 ** eglot
 #+begin_src elisp :tangle no
@@ -1163,12 +1124,6 @@ Marginalia provides helpful annotations for various types of minibuffer completi
       (conda-env-initialize-interactive-shells)
       ;; eshell support
       (conda-env-initialize-eshell)
-
-      ;; 自动显示 modeline
-      ;; (add-to-list 'global-mode-string
-      ;; 		 '(conda-env-current-name (" conda:" conda-env-current-name " "))
-      ;; 		 'append)
-      ;; auto-activation
       (conda-env-autoactivate-mode t)
       )
     )
@@ -1193,6 +1148,16 @@ Marginalia provides helpful annotations for various types of minibuffer completi
   (setup (:pkg symbol-overlay)
     (:autoload symbol-overlay-put)
     )
+#+end_src
+** graphviz-dot-mode
+#+begin_src elisp
+  (setup (:pkg graphviz-dot-mode)
+    (:file-match "\\.dot\\'")
+    (:option graphviz-dot-indent-width 4))
+#+end_src
+** hdl_checker
+#+begin_src elisp
+
 #+end_src
 * 翻译
 ** 有道词典
@@ -1223,11 +1188,12 @@ Marginalia provides helpful annotations for various types of minibuffer completi
 * Org Mode
 ** 杂项设置
 #+begin_src elisp
-  (setq org-adapt-indentation t)
   (setup (:pkg org :type built-in)
     (setq org-directory "~/Documents/emacs/orgmode/")
     (:option org-adapt-indentation t
-             org-startup-indented t)
+             org-startup-indented t
+             org-imenu-depth 5)
+    (:file-match "\\.org\\'")
     (:when-loaded
       (require 'org-tempo)
       (setq-default org-todo-keywords
@@ -1255,9 +1221,9 @@ Marginalia provides helpful annotations for various types of minibuffer completi
   (setup (:pkg imenu-list)
     (:autoload imenu-list-smart-toggle)
     (:option imenu-list-focus-after-activate t
-	     imenu-list-auto-resize t
-	     imenu-list-position 'left
-	     )
+             imenu-list-auto-resize t
+             imenu-list-position 'left
+             )
     )
 #+end_src
 ** beauty
