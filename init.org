@@ -472,6 +472,7 @@ Avoid constant errors on Windows about the coding system by setting the default 
                              ("s" . consult-line)
                              ("b" . consult-buffer)
                              ("d" . consult-ripgrep)
+                             ("D" . lewis/ripgrep-search-other-dir)
                              ("f" . consult-find)
                              ) "s")
 
@@ -483,7 +484,7 @@ Avoid constant errors on Windows about the coding system by setting the default 
                              ("p" . find-config-file)
                              ) "f")
 #+end_src
-*** roam
+*** notes
 #+begin_src elisp
   (lewis/define-leader-key '(
                              ("D" . org-roam-demote-entire-buffer)
@@ -522,6 +523,13 @@ Avoid constant errors on Windows about the coding system by setting the default 
                              ("e" . org-noter)
                              )
                            "n")
+#+end_src
+*** time
+#+begin_src elisp
+  (lewis/define-leader-key '(
+                             ("t" . org-pomodoro)
+                             )
+                           "t")
 #+end_src
 
 * UI
@@ -595,13 +603,22 @@ Avoid constant errors on Windows about the coding system by setting the default 
     ))
 #+end_src
 ** all-the-icons
+*** all-the-icons
 #+begin_src elisp
-  (setup (:pkg all-the-icons))
+  (setup (:pkg all-the-icons)
+    (:option all-the-icons-scale-factor 1.0)
+    )
 #+end_src
-** all-the-icons-completion
+*** all-the-icons-completion
 #+begin_src elisp
   (setup (:pkg all-the-icons-completion)
   (add-hook 'marginalia-mode-hook #'all-the-icons-completion-marginalia-setup))
+#+end_src
+*** all-the-icons-dired
+#+begin_src elisp
+  (setup (:pkg all-the-icons-dired)
+    (:hook-into dired-mode)
+    )
 #+end_src
 ** rainbow-delimiters
 #+begin_src elisp
@@ -619,7 +636,7 @@ Avoid constant errors on Windows about the coding system by setting the default 
 #+end_src
 * General Configuration
 ** awesome-tray
-#+begin_src elisp
+#+begin_src elisp :tangle no
   (setup
    (:pkg awesome-tray
     :host github
@@ -638,6 +655,14 @@ Avoid constant errors on Windows about the coding system by setting the default 
 
    (setq awesome-tray-active-modules (list "meow" "pyim" "conda" "location" "buffer-name" "mode-name" "git"))
    (awesome-tray-mode 1))
+#+end_src
+** doom-modeline
+#+begin_src elisp
+  (setup (:pkg doom-modeline)
+    (:option doom-modeline-window-width-limit fill-column
+             doom-modeline-height 20)
+    (:hook-into after-init)
+  )
 #+end_src
 ** sort-tab
 #+begin_src elisp
@@ -756,8 +781,9 @@ Avoid constant errors on Windows about the coding system by setting the default 
     (add-to-alist 'auto-mode-alist elt-cons))
 
   (add-to-list 'interpreter-mode-alist '("coffee" . coffee-mode))
-
+#+end_src
 ** 自动换行
+#+begin_src elisp :tangle no
   ;;; ### Auto-fill ###
   ;;; --- 自动换行
   (setq default-fill-column 120)          ;默认显示 100列就换行
@@ -826,6 +852,13 @@ Avoid constant errors on Windows about the coding system by setting the default 
   ;; Set default connection mode to SSH
   (setq tramp-default-method "ssh")
 #+end_src
+
+* Editing Configuration
+** Automatically clean whitespace
+#+begin_src elisp
+  (setup (:pkg ws-butler)
+    (:hook-into text-mode prog-mode))
+#+end_src
 ** awesome-pair
 #+begin_src elisp
   (setup (:pkg awesome-pair :host github :repo "manateelazycat/awesome-pair")
@@ -893,12 +926,6 @@ Avoid constant errors on Windows about the coding system by setting the default 
            )
     )
 #+end_src
-* Editing Configuration
-** Automatically clean whitespace
-#+begin_src elisp
-  (setup (:pkg ws-butler)
-    (:hook-into text-mode prog-mode))
-#+end_src
 * 补全
 ** Completions with Vertico
 #+begin_src elisp
@@ -964,6 +991,12 @@ Avoid constant errors on Windows about the coding system by setting the default 
   (setup (:pkg consult-dir))
 #+end_src
 *** search other cwd
+#+begin_src elisp
+  (defun lewis/ripgrep-search-other-dir()
+    (interactive)
+    (let ((current-prefix-arg '(-1)))
+      (call-interactively 'consult-ripgrep)))
+#+end_src
 ** Completion Annotations with Marginalia
 
 Marginalia provides helpful annotations for various types of minibuffer completions.  You can think of it as a replacement of =ivy-rich=.
@@ -1008,7 +1041,7 @@ Marginalia provides helpful annotations for various types of minibuffer completi
              company-dabbrev-ignore-case t
 
              company-backends '(
-                                (company-capf ：with company-yasnippet)
+                                (company-capf :with company-yasnippet)
                                 (company-dabbrev-code company-keywords company-files)
                                 company-dabbrev
                                 )
@@ -1051,8 +1084,12 @@ Marginalia provides helpful annotations for various types of minibuffer completi
 ** yasnippet
 #+begin_src elisp
   (setup (:pkg yasnippet)
+    (:delay)
     (require 'yasnippet)
+    (:option yas-snippet-dirs '("~/nowisemacs/snippets"))
     (yas-global-mode 1))
+  (setup (:pkg yasnippet-snippets)
+    (:delay))
 #+end_src
 * Window Management
 * 输入与阅读
@@ -1105,11 +1142,7 @@ Marginalia provides helpful annotations for various types of minibuffer completi
 #+end_src
 * File Browsing
 ** dired
-#+begin_src elisp
-  (setup (:pkg all-the-icons-dired)
-    (:hook-into dired-mode)
-    )
-#+end_src
+
 ** fd-dired
 #+begin_src elisp
 (setup (:pkg fd-dired))
@@ -1121,11 +1154,45 @@ Marginalia provides helpful annotations for various types of minibuffer completi
 	(:autoload aweshell-toggle)
 	(:autoload aweshell-dedicated-toggle))
 #+end_src
-* 编程
+** exec-path-from-shell
+#+begin_src elisp
+  (setup (:pkg exec-path-from-shell)
+    (:delay)
+    (when (memq window-system '(mac ns x))
+      (exec-path-from-shell-initialize))
+    )
+#+end_src
+* git
 ** magit
 #+begin_src elisp
   (setup (:pkg magit))
 #+end_src
+** blamer
+#+begin_src elisp
+  (setup (:pkg blamer :host github :repo "artawower/blamer.el")
+    (:option blamer-idle-time 0.3
+             blamer-min-offset 70)
+    (:delay)
+    ;; (:when-loaded
+      ;; (global-blamer-mode 1))
+    )
+
+  ;; (use-package blamer
+  ;; :ensure t
+  ;; :defer 20
+  ;; :custom
+  ;; (blamer-idle-time 0.3)
+  ;; (blamer-min-offset 70)
+  ;; :custom-face
+  ;; (blamer-face ((t :foreground "#7a88cf"
+  ;;                   :background nil
+  ;;                   :height 140
+  ;;                   :italic t)))
+  ;; :config
+  ;; (global-blamer-mode 1))
+
+#+end_src
+* 编程
 ** flycheck
 ** elisp
 *** helpful
@@ -1321,6 +1388,10 @@ Marginalia provides helpful annotations for various types of minibuffer completi
   ;; (add-hook 'visual-line-mode-hook #'visual-fill-column-mode)
   ;; (add-hook 'visual-line-mode-hook #'(lambda () (setq word-wrap nil)))
 #+end_src
+** org-babel
+#+begin_src elisp
+
+#+end_src
 ** imenu-list
 #+begin_src elisp
   (setup (:pkg imenu-list)
@@ -1414,30 +1485,31 @@ Marginalia provides helpful annotations for various types of minibuffer completi
 #+begin_src elisp
   (setup (:pkg org-pomodoro)
     (:option org-pomodoro-finished-sound "~/Documents/emacs/pyim-dict/applaud.wav")
-    (:when-loaded
-      (alert-add-rule :category "org-pomodoro"
-                      :style (cond (alert-growl-command
-                                    'growl)
-                                   (alert-notifier-command
-                                    'notifier)
-                                   (alert-libnotify-command
-                                    'libnotify)
-                                   (alert-default-style)))
-      (defun pomodoro-awesome-tray()
-        (let ((s (cl-case org-pomodoro-state
-                   (:pomodoro
-                    (propertize org-pomodoro-format))
-                   (:overtime
-                    (propertize org-pomodoro-overtime-format))
-                   (:short-break
-                    (propertize org-pomodoro-short-break-format))
-                   (:long-break
-                    (propertize org-pomodoro-long-break-format)))))
-                  (concat "[" (format s (org-pomodoro-format-seconds)) "] ")))
-        (add-to-list 'awesome-tray-module-alist '("pomodoro" . (pomodoro-awesome-tray awesome-tray-module-evil-face)))
-        (add-to-list 'awesome-tray-active-modules "pomodoro")
-        )
-      )
+    )
+    ;; (:when-loaded
+    ;;   (alert-add-rule :category "org-pomodoro"
+    ;;                   :style (cond (alert-growl-command
+    ;;                                 'growl)
+    ;;                                (alert-notifier-command
+    ;;                                 'notifier)
+    ;;                                (alert-libnotify-command
+    ;;                                 'libnotify)
+    ;;                                (alert-default-style)))
+    ;;   (defun pomodoro-awesome-tray()
+    ;;     (let ((s (cl-case org-pomodoro-state
+    ;;                (:pomodoro
+    ;;                 (propertize org-pomodoro-format))
+    ;;                (:overtime
+    ;;                 (propertize org-pomodoro-overtime-format))
+    ;;                (:short-break
+    ;;                 (propertize org-pomodoro-short-break-format))
+    ;;                (:long-break
+    ;;                 (propertize org-pomodoro-long-break-format)))))
+    ;;               (concat "[" (format s (org-pomodoro-format-seconds)) "] ")))
+    ;;     (add-to-list 'awesome-tray-module-alist '("pomodoro" . (pomodoro-awesome-tray awesome-tray-module-evil-face)))
+    ;;     (add-to-list 'awesome-tray-active-modules "pomodoro")
+    ;;     )
+    ;;   )
 
 
 #+end_src

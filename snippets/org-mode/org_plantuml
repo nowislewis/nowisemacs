@@ -1,0 +1,7 @@
+# -*- mode: snippet -*-
+# name: org_plantuml
+# key: uml
+# --
+#+BEGIN_SRC plantuml :file ~/Documents/emacs/orgmode/PicturesForAll/plantuml_pictures/`(format-time-string "%Y%m%d%H%M%S")`.jpg :cmdline -charset UTF-8 :cmdline -config ~/Documents/111.puml
+title ${1}
+#+END_SRC
