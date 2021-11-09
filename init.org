@@ -853,6 +853,8 @@ Avoid constant errors on Windows about the coding system by setting the default 
   (setq tramp-default-method "ssh")
 #+end_src
 
+** undo-tree
+
 * Editing Configuration
 ** Automatically clean whitespace
 #+begin_src elisp
@@ -1283,16 +1285,17 @@ Marginalia provides helpful annotations for various types of minibuffer completi
 ** conda
 #+begin_src elisp
   (setup (:pkg conda)
+    (:delay)
     (:when-loaded
       (when (eq system-type 'darwin)
-	(custom-set-variables '(conda-anaconda-home "/Users/liuyi/miniforge3"))
-	(setq conda-env-home-directory (expand-file-name "~/miniforge3/"))
-	)
+        (custom-set-variables '(conda-anaconda-home "/Users/liuyi/miniforge3"))
+        (setq conda-env-home-directory (expand-file-name "~/miniforge3/"))
+        )
       (when (eq system-type 'gnu/linux)
-	;; 要用绝对路径
-	(custom-set-variables '(conda-anaconda-home "/home/lewisliu/miniconda3"))
-	(setq conda-env-home-directory (expand-file-name "/home/lewisliu/miniconda3/"))
-	)
+        ;; 要用绝对路径
+        (custom-set-variables '(conda-anaconda-home "/home/lewisliu/miniconda3"))
+        (setq conda-env-home-directory (expand-file-name "/home/lewisliu/miniconda3/"))
+        )
       ;; interactivate shell support
       (conda-env-initialize-interactive-shells)
       ;; eshell support
