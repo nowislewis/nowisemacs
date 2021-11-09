@@ -1237,8 +1237,9 @@ Marginalia provides helpful annotations for various types of minibuffer completi
 *** eglot
 #+begin_src elisp
     (setup (:pkg eglot))
-		(setup (:pkg consult-eglot))
-      ;; (:hook-into foo-mode))
+    (setup (:pkg consult-eglot)
+      (:hook-into eglot))
+    ;; (:hook-into foo-mode))
 #+end_src
 
 *** eldoc-box
