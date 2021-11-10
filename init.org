@@ -4,7 +4,7 @@
 * 启动优化
 ** UI 加速
 #+begin_src elisp
-     ;; -*- lexical-binding: t; -*-
+  ;; -*- lexical-binding: t; -*-
   (tool-bar-mode -1)                      ;禁用工具栏
    ;; (menu-bar-mode -1)                      ;禁用菜单栏
    (scroll-bar-mode -1)                    ;禁用滚动条
@@ -593,15 +593,42 @@ Avoid constant errors on Windows about the coding system by setting the default 
   )
 #+end_src
 ** Font
-#+begin_src elisp
-(let ((emacs-font-size 12)
-      emacs-font-name)
-    (setq emacs-font-name "InconsolataGo QiHei NF")
-  (when (display-grayscale-p)
-    (set-frame-font (format "%s-%s" (eval emacs-font-name) (eval emacs-font-size)))
-    (set-fontset-font (frame-parameter nil 'font) 'unicode (eval emacs-font-name))
-    ))
+#+begin_src elisp :tangle no
+  (let ((emacs-font-size 14)
+        emacs-font-name)
+      (setq emacs-font-name "InconsolataGo QiHei NF")
+    (when (display-grayscale-p)
+      (set-frame-font (format "%s-%s" (eval emacs-font-name) (eval emacs-font-size)) t t)
+      (set-fontset-font (frame-parameter nil 'font) 'unicode "等距更纱黑体 SC")
+      ))
 #+end_src
+
+#+begin_src elisp
+(defun +my/better-font()
+(interactive)
+;; english font
+(if (display-graphic-p)
+    (progn
+        (set-face-attribute 'default nil :font (format   "%s:pixelsize=%d" "InconsolataGo QiHei NF" 16)) ;; 11 13 17 19 23
+        ;; chinese font
+        (dolist (charset '(kana han symbol cjk-misc bopomofo))
+        (set-fontset-font (frame-parameter nil 'font)
+                            charset
+                            (font-spec :family "等距更纱黑体 SC")))
+        ) ;; 14 16 20 22 28
+    ))
+
+(defun +my|init-font(frame)
+(with-selected-frame frame
+    (if (display-graphic-p)
+        (+my/better-font))))
+
+(if (and (fboundp 'daemonp) (daemonp))
+    (add-hook 'after-make-frame-functions #'+my|init-font)
+(+my/better-font))
+
+#+end_src
+
 ** all-the-icons
 *** all-the-icons
 #+begin_src elisp
@@ -1143,6 +1170,10 @@ Marginalia provides helpful annotations for various types of minibuffer completi
 (setup (:pkg good-scroll))
 #+end_src
 * File Browsing
+** treemacs
+#+begin_src elisp
+(setup (:pkg treemacs))
+#+end_src
 ** dired
 
 ** fd-dired
@@ -1237,7 +1268,7 @@ Marginalia provides helpful annotations for various types of minibuffer completi
 #+end_src
 ** eglot 相关
 *** eglot
-#+begin_src elisp
+#+begin_src elisp :tangle no
     (setup (:pkg eglot))
     (setup (:pkg consult-eglot)
       (:hook-into eglot))
@@ -1245,7 +1276,7 @@ Marginalia provides helpful annotations for various types of minibuffer completi
 #+end_src
 
 *** eldoc-box
-#+begin_src elisp
+#+begin_src elisp :tangle no
   (setup (:pkg eldoc-box)
     (:autoload eldoc-box-hover-mode)
     (add-hook 'eglot--managed-mode-hook #'eldoc-box-hover-mode t)
@@ -1281,6 +1312,27 @@ Marginalia provides helpful annotations for various types of minibuffer completi
   '("go" "python" "ipython" "bash" "sh" "C++" "C"))
 (dolist (lang org-babel-lang-list)
   (eval `(lsp-org-babel-enable ,lang)))
+#+end_src
+** lsp mode
+#+begin_src elisp
+  (setup (:pkg lsp-mode)
+    (:hook lsp-enable-which-key-integration)
+    (:option lsp-clients-svlangserver-launchConfiguration "/tools/verilator -sv --lint-only -Wall"
+             lsp-clients-svlangserver-formatCommand "/tools/verible-verilog-format")
+    (:with-mode verilog-mode
+      (:hook lsp-deferred))
+   )
+#+end_src
+#+begin_src elisp
+  (setup (:pkg lsp-ui))
+  (setup (:pkg dap-mode))
+  (setup (:pkg consult-lsp))
+#+end_src
+*** svlangserver
+#+begin_src elisp
+  (setup (:pkg verilog-mode)
+    (:file-match "\\.sv\\'")
+  )
 #+end_src
 ** conda
 #+begin_src elisp
