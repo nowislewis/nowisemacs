@@ -15,6 +15,7 @@
     initial-major-mode 'fundamental-mode
     ;; 不要自动启用package
     package-enable-at-startup nil package--init-file-ensured t)
+
 #+end_src
 ** Startup Performance
 #+begin_src elisp
@@ -262,9 +263,7 @@ This keyword causes a body to be executed after other packages/features are load
 #+end_src
 
 * Default Coding System
-
 Avoid constant errors on Windows about the coding system by setting the default to UTF-8.
-
 #+begin_src elisp
   (set-default-coding-systems 'utf-8)
 #+end_src
@@ -593,17 +592,17 @@ Avoid constant errors on Windows about the coding system by setting the default 
   )
 #+end_src
 ** Font
-#+begin_src elisp :tangle no
+#+begin_src elisp
   (let ((emacs-font-size 14)
         emacs-font-name)
       (setq emacs-font-name "InconsolataGo QiHei NF")
     (when (display-grayscale-p)
       (set-frame-font (format "%s-%s" (eval emacs-font-name) (eval emacs-font-size)) t t)
-      (set-fontset-font (frame-parameter nil 'font) 'unicode "等距更纱黑体 SC")
+      (set-fontset-font (frame-parameter nil 'font) 'unicode (eval emacs-font-name))
       ))
 #+end_src
 
-#+begin_src elisp
+#+begin_src elisp :tangle no
 (defun +my/better-font()
 (interactive)
 ;; english font
@@ -820,6 +819,45 @@ Avoid constant errors on Windows about the coding system by setting the default 
                  ))
     (add-hook hook #'(lambda () (auto-fill-mode 1))))
 #+end_src
+** awesome-pair
+#+begin_src elisp
+  (setup (:pkg awesome-pair :host github :repo "manateelazycat/awesome-pair")
+    (:hook-into prog-mode
+                text-mode
+                )
+    (:bind "(" awesome-pair-open-round
+           "[" awesome-pair-open-bracket
+
+           "(" awesome-pair-open-round
+           "[" awesome-pair-open-bracket
+           "{" awesome-pair-open-curly
+           ")" awesome-pair-close-round
+           "]" awesome-pair-close-bracket
+           "}" awesome-pair-close-curly
+           "=" awesome-pair-equal
+
+           "%" awesome-pair-match-paren
+           "\"" awesome-pair-double-quote
+
+           "SPC" awesome-pair-space
+           "RET" awesome-pair-newline
+
+           "M-o" awesome-pair-backward-delete
+           "C-d" awesome-pair-forward-delete
+           "C-k" awesome-pair-kill
+
+           "M-\"" awesome-pair-wrap-double-quote
+           "M-[" awesome-pair-wrap-bracket
+           "M-{" awesome-pair-wrap-curly
+           "M-(" awesome-pair-wrap-round
+           "M-)" awesome-pair-unwrap
+
+           "M-p" awesome-pair-jump-right
+           "M-n" awesome-pair-jump-left
+           "M-:" awesome-pair-jump-out-pair-and-newline
+           )
+    )
+#+end_src
 ** indent
 #+begin_src elisp :tangle no
     (setq-default fill-column 120)
@@ -882,78 +920,10 @@ Avoid constant errors on Windows about the coding system by setting the default 
 
 ** undo-tree
 
-* Editing Configuration
 ** Automatically clean whitespace
 #+begin_src elisp
   (setup (:pkg ws-butler)
     (:hook-into text-mode prog-mode))
-#+end_src
-** awesome-pair
-#+begin_src elisp
-  (setup (:pkg awesome-pair :host github :repo "manateelazycat/awesome-pair")
-    (:hook-into c-mode-common
-                c-mode
-                c++-mode
-                java-mode
-                haskell-mode
-                emacs-lisp-mode
-                lisp-interaction-mode
-                lisp-mode
-                maxima-mode
-                ielm-mode
-                sh-mode
-                makefile-gmake-mode
-                php-mode
-                python-mode
-                js-mode
-                go-mode
-                qml-mode
-                jade-mode
-                css-mode
-                ruby-mode
-                coffee-mode
-                rust-mode
-                qmake-mode
-                lua-mode
-                swift-mode
-                web-mode
-                markdown-mode
-                llvm-mode
-                conf-toml-mode
-                nim-mode
-                )
-    (:bind "(" awesome-pair-open-round
-           "[" awesome-pair-open-bracket
-
-           "(" awesome-pair-open-round
-           "[" awesome-pair-open-bracket
-           "{" awesome-pair-open-curly
-           ")" awesome-pair-close-round
-           "]" awesome-pair-close-bracket
-           "}" awesome-pair-close-curly
-           "=" awesome-pair-equal
-
-           "%" awesome-pair-match-paren
-           "\"" awesome-pair-double-quote
-
-           "SPC" awesome-pair-space
-           "RET" awesome-pair-newline
-
-           "M-o" awesome-pair-backward-delete
-           "C-d" awesome-pair-forward-delete
-           "C-k" awesome-pair-kill
-
-           "M-\"" awesome-pair-wrap-double-quote
-           "M-[" awesome-pair-wrap-bracket
-           "M-{" awesome-pair-wrap-curly
-           "M-(" awesome-pair-wrap-round
-           "M-)" awesome-pair-unwrap
-
-           "M-p" awesome-pair-jump-right
-           "M-n" awesome-pair-jump-left
-           "M-:" awesome-pair-jump-out-pair-and-newline
-           )
-    )
 #+end_src
 * 补全
 ** Completions with Vertico
@@ -1075,7 +1045,8 @@ Marginalia provides helpful annotations for various types of minibuffer completi
                                 company-dabbrev
                                 )
              )
-    (:hook-into prog-mode-hook)
+    (:with-hook after-init
+      (:hook global-company-mode))
     (:when-loaded
                     ;; Add `company-elisp' backend for elisp.
               (add-hook 'emacs-lisp-mode-hook
@@ -1083,31 +1054,235 @@ Marginalia provides helpful annotations for various types of minibuffer completi
                             (require 'company-elisp)
                             (push 'company-elisp company-backends)))
 
-      (global-company-mode)
-      )
-    )
+
+    (with-eval-after-load 'yasnippet
+      (defun company-backend-with-yas (backend)
+        "Add `yasnippet' to company backend."
+        (if (and (listp backend) (member 'company-yasnippet backend))
+            backend
+          (append (if (consp backend) backend (list backend))
+                  '(:with company-yasnippet))))
+
+      (defun my-company-enbale-yas (&rest _)
+        "Enable `yasnippet' in `company'."
+        (setq company-backends (mapcar #'company-backend-with-yas company-backends)))
+
+      (defun my-lsp-fix-company-capf ()
+        "Remove redundant `comapny-capf'."
+        (setq company-backends
+              (remove 'company-backends (remq 'company-capf company-backends))))
+      (advice-add #'lsp-completion--enable :after #'my-lsp-fix-company-capf)
+
+      (defun my-company-yasnippet-disable-inline (fn cmd &optional arg &rest _ignore)
+        "Enable yasnippet but disable it inline."
+        (if (eq cmd  'prefix)
+            (when-let ((prefix (funcall fn 'prefix)))
+              (unless (memq (char-before (- (point) (length prefix)))
+                            '(?. ?< ?> ?\( ?\) ?\[ ?{ ?} ?\" ?' ?`))
+                prefix))
+          (progn
+            (when (and (bound-and-true-p lsp-mode)
+                       arg (not (get-text-property 0 'yas-annotation-patch arg)))
+              (let* ((name (get-text-property 0 'yas-annotation arg))
+                     (snip (format "%s (Snippet)" name))
+                     (len (length arg)))
+                (put-text-property 0 len 'yas-annotation snip arg)
+                (put-text-property 0 len 'yas-annotation-patch t arg)))
+            (funcall fn cmd  arg))))
+      (advice-add #'company-yasnippet :around #'my-company-yasnippet-disable-inline)))
+  )
+
 #+end_src
 *** company-box
-#+begin_src elisp :tangle no
+#+begin_src elisp
   (setup (:pkg company-box)
-    (:hook-into global-company-mode)
+    (:hook-into company-mode)
     (:option company-box-doc-delay 0.1
              company-box-show-single-candidate t
              company-box-backends-colors nil
              company-box-max-candidates 50
              )
-    )
-#+end_src
-*** company-quickhelp
-#+begin_src elisp
-  (if (display-graphic-p)
-      (setup (:pkg company-quickhelp)
-        (:hook-into global-company-mode)
-        (:option company-quickhelp-delay 0.2))
-    (setup (:pkg company-quickhelp-terminal)
-      (:hook-into global-company-mode)
-      (:option company-quickhelp-delay 0.2))
-    )
+    (:when-loaded
+      ;; Display borders and optimize performance
+      (defun my-company-box--display (string on-update)
+        "Display the completions."
+        (company-box--render-buffer string on-update)
+
+        (let ((frame (company-box--get-frame))
+              (border-color (face-foreground 'font-lock-comment-face nil t)))
+          (unless frame
+            (setq frame (company-box--make-frame))
+            (company-box--set-frame frame))
+          (company-box--compute-frame-position frame)
+          (company-box--move-selection t)
+          (company-box--update-frame-position frame)
+          (unless (frame-visible-p frame)
+            (make-frame-visible frame))
+          (company-box--update-scrollbar frame t)
+          (set-face-background 'internal-border border-color frame)
+          (when (facep 'child-frame-border)
+            (set-face-background 'child-frame-border border-color frame)))
+        (with-current-buffer (company-box--get-buffer)
+          (company-box--maybe-move-number (or company-box--last-start 1))))
+      (advice-add #'company-box--display :override #'my-company-box--display)
+
+      (setq company-box-doc-frame-parameters '((internal-border-width . 1)
+                                               (left-fringe . 8)
+                                               (right-fringe . 8)))
+
+      (defun my-company-box-doc--make-buffer (object)
+        (let* ((buffer-list-update-hook nil)
+               (inhibit-modification-hooks t)
+               (string (cond ((stringp object) object)
+                             ((bufferp object) (with-current-buffer object (buffer-string))))))
+          (when (and string (> (length (string-trim string)) 0))
+            (with-current-buffer (company-box--get-buffer "doc")
+              (erase-buffer)
+              (insert (propertize "\n" 'face '(:height 0.5)))
+              (insert string)
+              (insert (propertize "\n\n" 'face '(:height 0.5)))
+
+              ;; Handle hr lines of markdown
+              ;; @see `lsp-ui-doc--handle-hr-lines'
+              (with-current-buffer (company-box--get-buffer "doc")
+                (let (bolp next before after)
+                  (goto-char 1)
+                  (while (setq next (next-single-property-change (or next 1) 'markdown-hr))
+                    (when (get-text-property next 'markdown-hr)
+                      (goto-char next)
+                      (setq bolp (bolp)
+                            before (char-before))
+                      (delete-region (point) (save-excursion (forward-visible-line 1) (point)))
+                      (setq after (char-after (1+ (point))))
+                      (insert
+                       (concat
+                        (and bolp (not (equal before ?\n)) (propertize "\n" 'face '(:height 0.5)))
+                        (propertize "\n" 'face '(:height 0.5))
+                        (propertize " "
+                                    'display '(space :height (1))
+                                    'company-box-doc--replace-hr t
+                                    'face `(:background ,(face-foreground 'font-lock-comment-face)))
+                        (propertize " " 'display '(space :height (1)))
+                        (and (not (equal after ?\n)) (propertize " \n" 'face '(:height 0.5)))))))))
+
+              (setq mode-line-format nil
+                    display-line-numbers nil
+                    header-line-format nil
+                    show-trailing-whitespace nil
+                    cursor-in-non-selected-windows nil)
+              (current-buffer)))))
+      (advice-add #'company-box-doc--make-buffer :override #'my-company-box-doc--make-buffer)
+
+      ;; Display the border and fix the markdown header properties
+      (defun my-company-box-doc--show (selection frame)
+        (cl-letf (((symbol-function 'completing-read) #'company-box-completing-read)
+                  (window-configuration-change-hook nil)
+                  (inhibit-redisplay t)
+                  (display-buffer-alist nil)
+                  (buffer-list-update-hook nil))
+          (-when-let* ((valid-state (and (eq (selected-frame) frame)
+                                         company-box--bottom
+                                         company-selection
+                                         (company-box--get-frame)
+                                         (frame-visible-p (company-box--get-frame))))
+                       (candidate (nth selection company-candidates))
+                       (doc (or (company-call-backend 'quickhelp-string candidate)
+                                (company-box-doc--fetch-doc-buffer candidate)))
+                       (doc (company-box-doc--make-buffer doc)))
+            (let ((frame (frame-local-getq company-box-doc-frame))
+                  (border-color (face-foreground 'font-lock-comment-face nil t)))
+              (unless (frame-live-p frame)
+                (setq frame (company-box-doc--make-frame doc))
+                (frame-local-setq company-box-doc-frame frame))
+              (set-face-background 'internal-border border-color frame)
+              (when (facep 'child-frame-border)
+                (set-face-background 'child-frame-border border-color frame))
+              (company-box-doc--set-frame-position frame)
+
+              ;; Fix hr props. @see `lsp-ui-doc--fix-hr-props'
+              (with-current-buffer (company-box--get-buffer "doc")
+                (let (next)
+                  (while (setq next (next-single-property-change (or next 1) 'company-box-doc--replace-hr))
+                    (when (get-text-property next 'company-box-doc--replace-hr)
+                      (put-text-property next (1+ next) 'display
+                                         '(space :align-to (- right-fringe 1) :height (1)))
+                      (put-text-property (1+ next) (+ next 2) 'display
+                                         '(space :align-to right-fringe :height (1)))))))
+
+              (unless (frame-visible-p frame)
+                (make-frame-visible frame))))))
+      (advice-add #'company-box-doc--show :override #'my-company-box-doc--show)
+
+      (defun my-company-box-doc--set-frame-position (frame)
+        (-let* ((frame-resize-pixelwise t)
+
+                (box-frame (company-box--get-frame))
+                (box-position (frame-position box-frame))
+                (box-width (frame-pixel-width box-frame))
+                (box-height (frame-pixel-height box-frame))
+                (box-border-width (frame-border-width box-frame))
+
+                (window (frame-root-window frame))
+                ((text-width . text-height) (window-text-pixel-size window nil nil
+                                                                    (/ (frame-pixel-width) 2)
+                                                                    (/ (frame-pixel-height) 2)))
+                (border-width (or (alist-get 'internal-border-width company-box-doc-frame-parameters) 0))
+
+                (x (- (+ (car box-position) box-width) border-width))
+                (space-right (- (frame-pixel-width) x))
+                (space-left (car box-position))
+                (fringe-left (or (alist-get 'left-fringe company-box-doc-frame-parameters) 0))
+                (fringe-right (or (alist-get 'right-fringe company-box-doc-frame-parameters) 0))
+                (width (+ text-width border-width fringe-left fringe-right))
+                (x (if (> width space-right)
+                       (if (> space-left width)
+                           (- space-left width)
+                         space-left)
+                     x))
+                (y (cdr box-position))
+                (bottom (+ company-box--bottom (frame-border-width)))
+                (height (+ text-height (* 2 border-width)))
+                (y (cond ((= x space-left)
+                          (if (> (+ y box-height height) bottom)
+                              (+ (- y height) border-width)
+                            (- (+ y box-height) border-width)))
+                         ((> (+ y height) bottom)
+                          (- (+ y box-height) height))
+                         (t y))))
+          (set-frame-position frame (max x 0) (max y 0))
+          (set-frame-size frame text-width text-height t)))
+      (advice-add #'company-box-doc--set-frame-position :override #'my-company-box-doc--set-frame-position)
+
+
+        (setq company-box-icons-all-the-icons
+              `((Unknown . ,(all-the-icons-material "find_in_page" :height 1.0 :v-adjust -0.2))
+                (Text . ,(all-the-icons-faicon "text-width" :height 1.0 :v-adjust -0.02))
+                (Method . ,(all-the-icons-faicon "cube" :height 1.0 :v-adjust -0.02 :face 'all-the-icons-purple))
+                (Function . ,(all-the-icons-faicon "cube" :height 1.0 :v-adjust -0.02 :face 'all-the-icons-purple))
+                (Constructor . ,(all-the-icons-faicon "cube" :height 1.0 :v-adjust -0.02 :face 'all-the-icons-purple))
+                (Field . ,(all-the-icons-octicon "tag" :height 1.1 :v-adjust 0 :face 'all-the-icons-lblue))
+                (Variable . ,(all-the-icons-octicon "tag" :height 1.1 :v-adjust 0 :face 'all-the-icons-lblue))
+                (Class . ,(all-the-icons-material "settings_input_component" :height 1.0 :v-adjust -0.2 :face 'all-the-icons-orange))
+                (Interface . ,(all-the-icons-material "share" :height 1.0 :v-adjust -0.2 :face 'all-the-icons-lblue))
+                (Module . ,(all-the-icons-material "view_module" :height 1.0 :v-adjust -0.2 :face 'all-the-icons-lblue))
+                (Property . ,(all-the-icons-faicon "wrench" :height 1.0 :v-adjust -0.02))
+                (Unit . ,(all-the-icons-material "settings_system_daydream" :height 1.0 :v-adjust -0.2))
+                (Value . ,(all-the-icons-material "format_align_right" :height 1.0 :v-adjust -0.2 :face 'all-the-icons-lblue))
+                (Enum . ,(all-the-icons-material "storage" :height 1.0 :v-adjust -0.2 :face 'all-the-icons-orange))
+                (Keyword . ,(all-the-icons-material "filter_center_focus" :height 1.0 :v-adjust -0.2))
+                (Snippet . ,(all-the-icons-material "format_align_center" :height 1.0 :v-adjust -0.2))
+                (Color . ,(all-the-icons-material "palette" :height 1.0 :v-adjust -0.2))
+                (File . ,(all-the-icons-faicon "file-o" :height 1.0 :v-adjust -0.02))
+                (Reference . ,(all-the-icons-material "collections_bookmark" :height 1.0 :v-adjust -0.2))
+                (Folder . ,(all-the-icons-faicon "folder-open" :height 1.0 :v-adjust -0.02))
+                (EnumMember . ,(all-the-icons-material "format_align_right" :height 1.0 :v-adjust -0.2))
+                (Constant . ,(all-the-icons-faicon "square-o" :height 1.0 :v-adjust -0.1))
+                (Struct . ,(all-the-icons-material "settings_input_component" :height 1.0 :v-adjust -0.2 :face 'all-the-icons-orange))
+                (Event . ,(all-the-icons-octicon "zap" :height 1.0 :v-adjust 0 :face 'all-the-icons-orange))
+                (Operator . ,(all-the-icons-material "control_point" :height 1.0 :v-adjust -0.2))
+                (TypeParameter . ,(all-the-icons-faicon "arrows" :height 1.0 :v-adjust -0.02))
+                (Template . ,(all-the-icons-material "format_align_left" :height 1.0 :v-adjust -0.2)))
+              company-box-icons-alist 'company-box-icons-all-the-icons)))
 
 #+end_src
 ** yasnippet
@@ -1170,10 +1345,6 @@ Marginalia provides helpful annotations for various types of minibuffer completi
 (setup (:pkg good-scroll))
 #+end_src
 * File Browsing
-** treemacs
-#+begin_src elisp
-(setup (:pkg treemacs))
-#+end_src
 ** dired
 
 ** fd-dired
@@ -1209,21 +1380,6 @@ Marginalia provides helpful annotations for various types of minibuffer completi
     ;; (:when-loaded
       ;; (global-blamer-mode 1))
     )
-
-  ;; (use-package blamer
-  ;; :ensure t
-  ;; :defer 20
-  ;; :custom
-  ;; (blamer-idle-time 0.3)
-  ;; (blamer-min-offset 70)
-  ;; :custom-face
-  ;; (blamer-face ((t :foreground "#7a88cf"
-  ;;                   :background nil
-  ;;                   :height 140
-  ;;                   :italic t)))
-  ;; :config
-  ;; (global-blamer-mode 1))
-
 #+end_src
 * 编程
 ** flycheck
@@ -1266,73 +1422,90 @@ Marginalia provides helpful annotations for various types of minibuffer completi
       )
     )
 #+end_src
-** eglot 相关
-*** eglot
-#+begin_src elisp :tangle no
-    (setup (:pkg eglot))
-    (setup (:pkg consult-eglot)
-      (:hook-into eglot))
-    ;; (:hook-into foo-mode))
-#+end_src
 
-*** eldoc-box
-#+begin_src elisp :tangle no
-  (setup (:pkg eldoc-box)
-    (:autoload eldoc-box-hover-mode)
-    (add-hook 'eglot--managed-mode-hook #'eldoc-box-hover-mode t)
-    )
-#+end_src
-*** eglot-org-special
-#+begin_src elisp
-(cl-defmacro lsp-org-babel-enable (lang)
-  "Support LANG in org source code block."
-  (setq centaur-lsp 'lsp-mode)
-  (cl-check-type lang stringp)
-  (let* ((edit-pre (intern (format "org-babel-edit-prep:%s" lang)))
-         (intern-pre (intern (format "lsp--%s" (symbol-name edit-pre)))))
-    `(progn
-       (defun ,intern-pre (info)
-         (let ((file-name (->> info caddr (alist-get :file))))
-           (unless file-name
-             (setq file-name (make-temp-file "babel-lsp-")))
-           (setq buffer-file-name file-name)
-           (eglot-ensure)))
-       (put ',intern-pre 'function-documentation
-            (format "Enable lsp-mode in the buffer of org source block (%s)."
-                    (upcase ,lang)))
-       (if (fboundp ',edit-pre)
-           (advice-add ',edit-pre :after ',intern-pre)
-         (progn
-           (defun ,edit-pre (info)
-             (,intern-pre info))
-           (put ',edit-pre 'function-documentation
-                (format "Prepare local buffer environment for org source block (%s)."
-                        (upcase ,lang))))))))
-(defvar org-babel-lang-list
-  '("go" "python" "ipython" "bash" "sh" "C++" "C"))
-(dolist (lang org-babel-lang-list)
-  (eval `(lsp-org-babel-enable ,lang)))
-#+end_src
 ** lsp mode
+*** lsp-mode
 #+begin_src elisp
   (setup (:pkg lsp-mode)
     (:hook lsp-enable-which-key-integration)
-    (:option lsp-clients-svlangserver-launchConfiguration "/tools/verilator -sv --lint-only -Wall"
+    (:option lsp-keymap-prefix "C-c l"
+             lsp-keep-workspace-alive nil
+             lsp-signature-auto-activate nil
+             lsp-modeline-code-actions-enable nil
+             lsp-modeline-diagnostics-enable nil
+             lsp-modeline-workspace-status-enable nil
+             lsp-headerline-breadcrumb-enable nil
+
+             lsp-enable-file-watchers nil
+             lsp-enable-folding nil
+             lsp-enable-symbol-highlighting nil
+             lsp-enable-text-document-color nil
+
+             lsp-enable-indentation nil
+             lsp-enable-on-type-formatting nil
+
+             lsp-clients-svlangserver-launchConfiguration "/tools/verilator -sv --lint-only -Wall"
              lsp-clients-svlangserver-formatCommand "/tools/verible-verilog-format")
+    (:bind [remap xref-find-definitions] lsp-find-definition)
+    (:bind [remap xref-find-references] lsp-find-references)
+    ;; verilog-mode
     (:with-mode verilog-mode
       (:hook lsp-deferred))
-   )
+
+    )
+#+end_src
+*** lsp-ui
+#+begin_src elisp
+  (setup (:pkg lsp-ui)
+    (:bind [remap xref-find-definitions] lsp-ui-peek-find-definitions)
+    (:bind [remap xref-find-references] lsp-ui-peek-find-references)
+    (:hook-into lsp-mode)
+    (:option lsp-ui-sideline-show-diagnostics nil
+             lsp-ui-sideline-ignore-duplicate t
+             lsp-ui-doc-delay 0.1
+             lsp-ui-doc-position 'at-point
+             lsp-ui-doc-border (face-foreground 'font-lock-comment-face nil t)
+             lsp-ui-imenu-colors `(,(face-foreground 'font-lock-keyword-face)
+                                  ,(face-foreground 'font-lock-string-face)
+                                   ,(face-foreground 'font-lock-constant-face)
+                                   ,(face-foreground 'font-lock-variable-name-face)))
+    )
 #+end_src
 #+begin_src elisp
-  (setup (:pkg lsp-ui))
   (setup (:pkg dap-mode))
   (setup (:pkg consult-lsp))
 #+end_src
-*** svlangserver
+*** lsp-org-special
 #+begin_src elisp
-  (setup (:pkg verilog-mode)
-    (:file-match "\\.sv\\'")
-  )
+  (cl-defmacro lsp-org-babel-enable (lang)
+    "Support LANG in org source code block."
+    (setq centaur-lsp 'lsp-mode)
+    (cl-check-type lang stringp)
+    (let* ((edit-pre (intern (format "org-babel-edit-prep:%s" lang)))
+           (intern-pre (intern (format "lsp--%s" (symbol-name edit-pre)))))
+      `(progn
+         (defun ,intern-pre (info)
+           (let ((file-name (->> info caddr (alist-get :file))))
+             (unless file-name
+               (setq file-name (make-temp-file "babel-lsp-")))
+             (setq buffer-file-name file-name)
+             ;; (eglot-ensure)))
+             (lsp-deferred)))
+         (put ',intern-pre 'function-documentation
+              (format "Enable lsp-mode in the buffer of org source block (%s)."
+                      (upcase ,lang)))
+         (if (fboundp ',edit-pre)
+             (advice-add ',edit-pre :after ',intern-pre)
+           (progn
+             (defun ,edit-pre (info)
+               (,intern-pre info))
+             (put ',edit-pre 'function-documentation
+                  (format "Prepare local buffer environment for org source block (%s)."
+                          (upcase ,lang))))))))
+  (defvar org-babel-lang-list
+    '("go" "python" "ipython" "bash" "sh" "C++" "C"))
+  (dolist (lang org-babel-lang-list)
+    (eval `(lsp-org-babel-enable ,lang)))
 #+end_src
 ** conda
 #+begin_src elisp
@@ -1383,36 +1556,6 @@ Marginalia provides helpful annotations for various types of minibuffer completi
     (:file-match "\\.dot\\'")
     (:option graphviz-dot-indent-width 4))
 #+end_src
-** hdl_checker
-#+begin_src elisp
-
-#+end_src
-* 翻译
-** 有道词典
-#+begin_src elisp
-(setup (:pkg youdao-dictionary)
-  )
-#+end_src
-** english-teacher
-自动翻译当前buffer 的句子，在下方显示，按键和 company-teacher-helper-mode 在一起
-#+begin_src elisp
-(setup (:pkg english-teacher :host github
-           :repo "loyalpartner/english-teacher.el")
-  )
-#+end_src
-** insert-translated-name
-#+begin_src elisp
-(setup (:pkg insert-translated-name :host github
-           :repo "manateelazycat/insert-translated-name"))
-#+end_src
-** company-english-helper
-在输入英文的时候，自动提示单词
-#+begin_src elisp
-(setup (:pkg company-english-helper :host github
-           :repo "manateelazycat/company-english-helper")
-       (:autoload english-teacher-follow-mode))
-
-#+end_src
 * Org Mode
 ** 杂项设置
 #+begin_src elisp
@@ -1420,7 +1563,9 @@ Marginalia provides helpful annotations for various types of minibuffer completi
     (setq org-directory "~/Documents/emacs/orgmode/")
     (:option org-adapt-indentation t
              org-startup-indented t
-             org-imenu-depth 5)
+             org-imenu-depth 5
+             org-startup-folded t
+             )
     (:file-match "\\.org\\'")
     (:when-loaded
       (require 'org-tempo)
@@ -1501,8 +1646,8 @@ Marginalia provides helpful annotations for various types of minibuffer completi
     (:autoload org-download-screenshot)
     )
 #+end_src
-
 ** org-roam
+*** org-roam
 #+begin_src elisp
   (setup (:pkg emacsql))
   (setq org-roam-v2-ack t)
@@ -1530,52 +1675,13 @@ Marginalia provides helpful annotations for various types of minibuffer completi
 
       ))
 #+end_src
-** org-roam-ui
+*** org-roam-ui
 #+begin_src elisp
   (setup (:pkg websocket))
   (setup (:pkg simple-httpd))
   (setup (:pkg org-roam-ui :host github :repo "org-roam/org-roam-ui" :files ("*.el" "out")))
 #+end_src
-** ox-hugo
-** org-pomodoro
-#+begin_src elisp
-  (setup (:pkg org-pomodoro)
-    (:option org-pomodoro-finished-sound "~/Documents/emacs/pyim-dict/applaud.wav")
-    )
-    ;; (:when-loaded
-    ;;   (alert-add-rule :category "org-pomodoro"
-    ;;                   :style (cond (alert-growl-command
-    ;;                                 'growl)
-    ;;                                (alert-notifier-command
-    ;;                                 'notifier)
-    ;;                                (alert-libnotify-command
-    ;;                                 'libnotify)
-    ;;                                (alert-default-style)))
-    ;;   (defun pomodoro-awesome-tray()
-    ;;     (let ((s (cl-case org-pomodoro-state
-    ;;                (:pomodoro
-    ;;                 (propertize org-pomodoro-format))
-    ;;                (:overtime
-    ;;                 (propertize org-pomodoro-overtime-format))
-    ;;                (:short-break
-    ;;                 (propertize org-pomodoro-short-break-format))
-    ;;                (:long-break
-    ;;                 (propertize org-pomodoro-long-break-format)))))
-    ;;               (concat "[" (format s (org-pomodoro-format-seconds)) "] ")))
-    ;;     (add-to-list 'awesome-tray-module-alist '("pomodoro" . (pomodoro-awesome-tray awesome-tray-module-evil-face)))
-    ;;     (add-to-list 'awesome-tray-active-modules "pomodoro")
-    ;;     )
-    ;;   )
-
-
-#+end_src
-** ox-hugo
-#+begin_src elisp
-  (setup (:pkg ox-hugo)
-    (:load-after ox)
-   )
-#+end_src
-** agenda
+*** org-roam-agenda
 #+begin_src elisp
 (defun vulpea-project-p ()
   "Return non-nil if current buffer has any todo entry.
@@ -1714,6 +1820,71 @@ If nil it defaults to `split-string-default-separators', normally
       (split-string-and-unquote value separators))))
 #+end_src
 
+** ox-hugo
+** org-pomodoro
+#+begin_src elisp
+  (setup (:pkg org-pomodoro)
+    (:option org-pomodoro-finished-sound "~/Documents/emacs/pyim-dict/applaud.wav")
+    )
+    ;; (:when-loaded
+    ;;   (alert-add-rule :category "org-pomodoro"
+    ;;                   :style (cond (alert-growl-command
+    ;;                                 'growl)
+    ;;                                (alert-notifier-command
+    ;;                                 'notifier)
+    ;;                                (alert-libnotify-command
+    ;;                                 'libnotify)
+    ;;                                (alert-default-style)))
+    ;;   (defun pomodoro-awesome-tray()
+    ;;     (let ((s (cl-case org-pomodoro-state
+    ;;                (:pomodoro
+    ;;                 (propertize org-pomodoro-format))
+    ;;                (:overtime
+    ;;                 (propertize org-pomodoro-overtime-format))
+    ;;                (:short-break
+    ;;                 (propertize org-pomodoro-short-break-format))
+    ;;                (:long-break
+    ;;                 (propertize org-pomodoro-long-break-format)))))
+    ;;               (concat "[" (format s (org-pomodoro-format-seconds)) "] ")))
+    ;;     (add-to-list 'awesome-tray-module-alist '("pomodoro" . (pomodoro-awesome-tray awesome-tray-module-evil-face)))
+    ;;     (add-to-list 'awesome-tray-active-modules "pomodoro")
+    ;;     )
+    ;;   )
+
+
+#+end_src
+** ox-hugo
+#+begin_src elisp
+  (setup (:pkg ox-hugo)
+    (:load-after ox)
+   )
+#+end_src
+* 翻译
+** 有道词典
+#+begin_src elisp
+(setup (:pkg youdao-dictionary)
+  )
+#+end_src
+** english-teacher
+自动翻译当前buffer 的句子，在下方显示，按键和 company-teacher-helper-mode 在一起
+#+begin_src elisp
+(setup (:pkg english-teacher :host github
+           :repo "loyalpartner/english-teacher.el")
+  )
+#+end_src
+** insert-translated-name
+#+begin_src elisp
+(setup (:pkg insert-translated-name :host github
+           :repo "manateelazycat/insert-translated-name"))
+#+end_src
+** company-english-helper
+在输入英文的时候，自动提示单词
+#+begin_src elisp
+(setup (:pkg company-english-helper :host github
+           :repo "manateelazycat/company-english-helper")
+       (:autoload english-teacher-follow-mode))
+
+#+end_src
 * 阅读
 ** pdf-tools
 #+begin_src elisp
