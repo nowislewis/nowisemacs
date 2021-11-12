@@ -15,7 +15,6 @@
     initial-major-mode 'fundamental-mode
     ;; 不要自动启用package
     package-enable-at-startup nil package--init-file-ensured t)
-
 #+end_src
 ** Startup Performance
 #+begin_src elisp
@@ -595,7 +594,10 @@ Avoid constant errors on Windows about the coding system by setting the default 
 #+begin_src elisp
   (let ((emacs-font-size 14)
         emacs-font-name)
-      (setq emacs-font-name "InconsolataGo QiHei NF")
+       (when (eq system-type 'darwin)
+      (setq emacs-font-name "InconsolataGo QiHei NF"))
+       (when (eq system-type 'gnu/linux)
+      (setq emacs-font-name "等距更纱黑体 SC"))
     (when (display-grayscale-p)
       (set-frame-font (format "%s-%s" (eval emacs-font-name) (eval emacs-font-size)) t t)
       (set-fontset-font (frame-parameter nil 'font) 'unicode (eval emacs-font-name))
@@ -697,7 +699,7 @@ Avoid constant errors on Windows about the coding system by setting the default 
     :repo "manateelazycat/sort-tab")
     (:delay)
          (require 'sort-tab)
-         (sort-tab-mode 1)
+         ;; (sort-tab-mode 1)
   )
 #+end_src
 ** backup
@@ -1351,6 +1353,10 @@ Marginalia provides helpful annotations for various types of minibuffer completi
 #+begin_src elisp
 (setup (:pkg fd-dired))
 #+end_src
+** treemacs
+#+begin_src elisp
+(setup (:pkg treemacs))
+#+end_src
 * shell
 ** aweshell
 #+begin_src elisp
@@ -1471,6 +1477,11 @@ Marginalia provides helpful annotations for various types of minibuffer completi
                                    ,(face-foreground 'font-lock-variable-name-face)))
     )
 #+end_src
+*** lsp-treemacs
+#+begin_src elisp
+(setup (:pkg lsp-treemacs))
+#+end_src
+*** dap-mode
 #+begin_src elisp
   (setup (:pkg dap-mode))
   (setup (:pkg consult-lsp))
@@ -1503,7 +1514,7 @@ Marginalia provides helpful annotations for various types of minibuffer completi
                   (format "Prepare local buffer environment for org source block (%s)."
                           (upcase ,lang))))))))
   (defvar org-babel-lang-list
-    '("go" "python" "ipython" "bash" "sh" "C++" "C"))
+    '("go" "python" "ipython" "bash" "sh" "C++" "C" "verilog"))
   (dolist (lang org-babel-lang-list)
     (eval `(lsp-org-babel-enable ,lang)))
 #+end_src
@@ -1525,7 +1536,7 @@ Marginalia provides helpful annotations for various types of minibuffer completi
       (conda-env-initialize-interactive-shells)
       ;; eshell support
       (conda-env-initialize-eshell)
-      (conda-env-autoactivate-mode t)
+      ;; (conda-env-autoactivate-mode t)
       )
     )
 #+end_src
