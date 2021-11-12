@@ -592,7 +592,7 @@ Avoid constant errors on Windows about the coding system by setting the default 
 #+end_src
 ** Font
 #+begin_src elisp
-  (let ((emacs-font-size 14)
+  (let ((emacs-font-size 12)
         emacs-font-name)
        (when (eq system-type 'darwin)
       (setq emacs-font-name "InconsolataGo QiHei NF"))
@@ -1592,7 +1592,24 @@ Marginalia provides helpful annotations for various types of minibuffer completi
                             ("CANCELLED" :foreground "forest green" :weight bold)
                             ("MEETING" :foreground "forest green" :weight bold)
                             ("PHONE" :foreground "forest green" :weight bold))))
+      ;; 导出相关的设置
 
+      (setq org-latex-pdf-process
+            '("xelatex -interaction nonstopmode %f"
+              "bibtex %b"
+              "xelatex -interaction nonstopmode %f"
+              "xelatex -interaction nonstopmode %f"))
+
+      ;;设置粗体高亮颜色
+      (require 'cl)
+      (setq org-emphasis-alist
+            (cons '("*" '(:emphasis t :foreground "pale violet red" :weight bold))
+                  (delete* "*" org-emphasis-alist :key 'car :test 'equal))
+            )
+      (setq org-emphasis-alist
+            (cons '("/" '(:slant t :foreground "green3" :slant italic))
+                  (delete* "/" org-emphasis-alist :key 'car :test 'equal))
+            )
       ))
 
   (setup (:pkg org-contrib :host github :repo "emacsmirror/org-contrib"))
