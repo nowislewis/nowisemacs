@@ -583,12 +583,12 @@ Avoid constant errors on Windows about the coding system by setting the default 
 #+end_src
 ** Theme
 #+begin_src elisp
-(setup (:pkg doom-themes)
-  ;; Global settings (defaults)
-  (setq doom-themes-enable-bold t    ; if nil, bold is universally disabled
-        doom-themes-enable-italic t) ; if nil, italics is universally disabled
-  (load-theme 'doom-one t)
-  )
+  (setup (:pkg doom-themes)
+    ;; Global settings (defaults)
+    (setq doom-themes-enable-bold t    ; if nil, bold is universally disabled
+          doom-themes-enable-italic t) ; if nil, italics is universally disabled
+    (load-theme 'doom-monokai-pro t)
+    )
 #+end_src
 ** Font
 #+begin_src elisp
@@ -927,6 +927,11 @@ Avoid constant errors on Windows about the coding system by setting the default 
   (setup (:pkg ws-butler)
     (:hook-into text-mode prog-mode))
 #+end_src
+** avy
+#+begin_src elisp
+  (setup (:pkg avy)
+    (:global "M-j" avy-goto-char-timer))
+#+end_src
 * 补全
 ** Completions with Vertico
 #+begin_src elisp
@@ -950,7 +955,6 @@ Avoid constant errors on Windows about the coding system by setting the default 
 #+end_src
 ** Completions in Regions with Corfu
 #+begin_src elisp :tangle no
-
   (setup (:pkg corfu :host github :repo "minad/corfu")
     ;; (:with-map corfu-map
     ;;   (:bind "C-j" corfu-next
@@ -959,32 +963,30 @@ Avoid constant errors on Windows about the coding system by setting the default 
     ;;          "C-f" corfu-insert))
     (:option corfu-cycle t)
     (corfu-global-mode))
-
 #+end_src
 ** Consult Commands
 *** consult
 #+begin_src elisp
-    (setup (:pkg consult)
-        (:with-map minibuffer-local-map
-    (:bind "C-r" consult-history))
-  ;; Optionally configure the register formatting. This improves the register
+  (setup (:pkg consult)
+    (:with-map minibuffer-local-map
+      (:bind "C-r" consult-history))
+    ;; Optionally configure the register formatting. This improves the register
     ;; preview for `consult-register', `consult-register-load',
     ;; `consult-register-store' and the Emacs built-ins.
     (setq register-preview-delay 0
-	  register-preview-function #'consult-register-format)
-      ;; Optionally replace `completing-read-multiple' with an enhanced version.
+          register-preview-function #'consult-register-format)
+    ;; Optionally replace `completing-read-multiple' with an enhanced version.
     (advice-add #'completing-read-multiple :override #'consult-completing-read-multiple)
     ;; Use Consult to select xref locations with preview
     (setq xref-show-xrefs-function #'consult-xref
-	  xref-show-definitions-function #'consult-xref)
-
-      ;; Optionally configure a function which returns the project root directory.
+          xref-show-definitions-function #'consult-xref)
+    ;; Optionally configure a function which returns the project root directory.
     ;; There are multiple reasonable alternatives to chose from.
     ;;;; 1. project.el (project-roots)
     (setq consult-project-root-function
-	  (lambda ()
-	    (when-let (project (project-current))
-	      (car (project-roots project)))))
+          (lambda ()
+            (when-let (project (project-current))
+              (car (project-roots project)))))
     )
 #+end_src
 *** consult-dir
@@ -1049,50 +1051,48 @@ Marginalia provides helpful annotations for various types of minibuffer completi
              )
     (:with-hook after-init
       (:hook global-company-mode))
+    ;; Add `company-elisp' backend for elisp.
+    (add-hook 'emacs-lisp-mode-hook
+              #'(lambda ()
+                  (require 'company-elisp)
+                  (push 'company-elisp company-backends)))
     (:when-loaded
-                    ;; Add `company-elisp' backend for elisp.
-              (add-hook 'emacs-lisp-mode-hook
-                        #'(lambda ()
-                            (require 'company-elisp)
-                            (push 'company-elisp company-backends)))
+      (with-eval-after-load 'yasnippet
+        (defun company-backend-with-yas (backend)
+          "Add `yasnippet' to company backend."
+          (if (and (listp backend) (member 'company-yasnippet backend))
+              backend
+            (append (if (consp backend) backend (list backend))
+                    '(:with company-yasnippet))))
 
+        (defun my-company-enbale-yas (&rest _)
+          "Enable `yasnippet' in `company'."
+          (setq company-backends (mapcar #'company-backend-with-yas company-backends)))
 
-    (with-eval-after-load 'yasnippet
-      (defun company-backend-with-yas (backend)
-        "Add `yasnippet' to company backend."
-        (if (and (listp backend) (member 'company-yasnippet backend))
-            backend
-          (append (if (consp backend) backend (list backend))
-                  '(:with company-yasnippet))))
+        (defun my-lsp-fix-company-capf ()
+          "Remove redundant `comapny-capf'."
+          (setq company-backends
+                (remove 'company-backends (remq 'company-capf company-backends))))
+        (advice-add #'lsp-completion--enable :after #'my-lsp-fix-company-capf)
 
-      (defun my-company-enbale-yas (&rest _)
-        "Enable `yasnippet' in `company'."
-        (setq company-backends (mapcar #'company-backend-with-yas company-backends)))
-
-      (defun my-lsp-fix-company-capf ()
-        "Remove redundant `comapny-capf'."
-        (setq company-backends
-              (remove 'company-backends (remq 'company-capf company-backends))))
-      (advice-add #'lsp-completion--enable :after #'my-lsp-fix-company-capf)
-
-      (defun my-company-yasnippet-disable-inline (fn cmd &optional arg &rest _ignore)
-        "Enable yasnippet but disable it inline."
-        (if (eq cmd  'prefix)
-            (when-let ((prefix (funcall fn 'prefix)))
-              (unless (memq (char-before (- (point) (length prefix)))
-                            '(?. ?< ?> ?\( ?\) ?\[ ?{ ?} ?\" ?' ?`))
-                prefix))
-          (progn
-            (when (and (bound-and-true-p lsp-mode)
-                       arg (not (get-text-property 0 'yas-annotation-patch arg)))
-              (let* ((name (get-text-property 0 'yas-annotation arg))
-                     (snip (format "%s (Snippet)" name))
-                     (len (length arg)))
-                (put-text-property 0 len 'yas-annotation snip arg)
-                (put-text-property 0 len 'yas-annotation-patch t arg)))
-            (funcall fn cmd  arg))))
-      (advice-add #'company-yasnippet :around #'my-company-yasnippet-disable-inline)))
-  )
+        (defun my-company-yasnippet-disable-inline (fn cmd &optional arg &rest _ignore)
+          "Enable yasnippet but disable it inline."
+          (if (eq cmd  'prefix)
+              (when-let ((prefix (funcall fn 'prefix)))
+                (unless (memq (char-before (- (point) (length prefix)))
+                              '(?. ?< ?> ?\( ?\) ?\[ ?{ ?} ?\" ?' ?`))
+                  prefix))
+            (progn
+              (when (and (bound-and-true-p lsp-mode)
+                         arg (not (get-text-property 0 'yas-annotation-patch arg)))
+                (let* ((name (get-text-property 0 'yas-annotation arg))
+                       (snip (format "%s (Snippet)" name))
+                       (len (length arg)))
+                  (put-text-property 0 len 'yas-annotation snip arg)
+                  (put-text-property 0 len 'yas-annotation-patch t arg)))
+              (funcall fn cmd  arg))))
+        (advice-add #'company-yasnippet :around #'my-company-yasnippet-disable-inline)))
+    )
 
 #+end_src
 *** company-box
@@ -1576,6 +1576,9 @@ Marginalia provides helpful annotations for various types of minibuffer completi
              org-startup-indented t
              org-imenu-depth 5
              org-startup-folded t
+             org-blank-before-new-entry '((heading . nil)
+                                          (plain-list-item . nil))
+
              )
     (:file-match "\\.org\\'")
     (:when-loaded
@@ -1682,26 +1685,59 @@ Marginalia provides helpful annotations for various types of minibuffer completi
   (setq org-roam-directory "~/Documents/emacs/orgmode/roam/")
   (setq org-roam-dailies-directory "~/Documents/emacs/orgmode/roam")
   (setup (:pkg org-roam)
+    (:option org-roam-mode-section-functions
+             (list #'org-roam-backlinks-section
+                   #'org-roam-reflinks-section
+                   ;; #'org-roam-unlinked-references-section
+                   )
+             org-roam-completion-everywhere t
+             org-roam-db-gc-threshold most-positive-fixnum
+             org-roam-node-display-template "${doom-hierarchy:*} ${tags:37}"
+             )
     (:when-loaded
       (org-roam-db-autosync-mode)
-      (:option org-roam-mode-section-functions
-	       (list #'org-roam-backlinks-section
-		     #'org-roam-reflinks-section
-		     ;; #'org-roam-unlinked-references-section
-		     )
-	       org-roam-completion-everywhere t
-	       org-roam-db-gc-threshold most-positive-fixnum
-	       )
+
+      (cl-defmethod org-roam-node-doom-filetitle ((node org-roam-node))
+        "Return the value of \"#+title:\" (if any) from file that NODE resides in.
+  If there's no file-level title in the file, return empty string."
+        (or (if (= (org-roam-node-level node) 0)
+                (org-roam-node-title node)
+              (org-roam-get-keyword "TITLE" (org-roam-node-file node)))
+            ""))
+
+      (cl-defmethod org-roam-node-doom-hierarchy ((node org-roam-node))
+        "Return hierarchy for NODE, constructed of its file title, OLP and direct title.
+    If some elements are missing, they will be stripped out."
+        (let ((title     (org-roam-node-title node))
+              (olp       (org-roam-node-olp   node))
+              (level     (org-roam-node-level node))
+              (filetitle (org-roam-node-doom-filetitle node))
+              (separator (propertize " > " 'face 'shadow)))
+          (cl-case level
+            ;; node is a top-level file
+            (0 filetitle)
+            ;; node is a level 1 heading
+            (1 (concat (propertize filetitle 'face '(shadow italic))
+                       separator title))
+            ;; node is a heading with an arbitrary outline path
+            (t (concat (propertize filetitle 'face '(shadow italic))
+                       separator (propertize (string-join olp " > ") 'face '(shadow italic))
+                       separator title)))))
+
+
       (add-to-list 'display-buffer-alist
-		   '("\\*org-roam\\*"
-		     (display-buffer-in-side-window)
-		     (side . right)
-		     (slot . 0)
-		     (window-width . 0.25)
-		     (window-parameters . ((no-other-window . t)
-					   (no-delete-other-windows . t)))))
+                   '("\\*org-roam\\*"
+                     (display-buffer-in-side-window)
+                     (side . right)
+                     (slot . 0)
+                     (window-width . 0.25)
+                     (window-parameters . ((no-other-window . t)
+                                           (no-delete-other-windows . t)))))
 
       ))
+
+
+
 #+end_src
 *** org-roam-ui
 #+begin_src elisp
@@ -1918,21 +1954,29 @@ If nil it defaults to `split-string-default-separators', normally
 #+begin_src elisp
   (setup (:pkg pdf-tools :host github :repo "vedang/pdf-tools")
     (:option pdf-view-use-scaling t)
-      ;; (pdf-annot-list-format '((page . 3) (type . 10) (contents . 25)))
+    ;; (pdf-annot-list-format '((page . 3) (type . 10) (contents . 25)))
+    (pdf-loader-install)
     )
+  (setup (:pkg pdf-continuous-scroll-mode :host github :repo "dalanicolai/pdf-continuous-scroll-mode.el")
+    (:hook-into pdf-view-mode-hook)
+    )
+
 #+end_src
 ** org-noter
 #+begin_src elisp
-    (setup (:pkg org-noter)
-      (:option
-       org-noter-notes-search-path (list org-directory)
-               org-noter-auto-save-last-location t
-               org-noter-separate-notes-from-heading t
-               org-noter-doc-split-percentage '(0.6 . 0.4)
-               )
-      )
+  (setup (:pkg org-noter)
+    (:option
+     org-noter-notes-search-path (list org-directory)
+     org-noter-auto-save-last-location t
+     org-noter-separate-notes-from-heading t
+     org-noter-doc-split-percentage '(0.6 . 0.4)
+     )
+    )
 #+end_src
 ** nov
+#+begin_src elisp
+#+end_src
+** elfeed
 * Runtime Performance
 Dial the GC threshold back down so that garbage collection happens more frequently but in less time.
 #+begin_src elisp
