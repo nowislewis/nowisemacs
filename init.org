@@ -1037,7 +1037,7 @@ Marginalia provides helpful annotations for various types of minibuffer completi
              company-dabbrev-ignore-case nil
              company-dabbrev-downcase nil
              company-minimum-prefix-length 2 ; pop up a completion menu by tapping a character
-             company-show-numbers t ; number the candidates (use M-1, M-2 etc to select completions).
+             company-show-numbers nil ; number the candidates (use M-1, M-2 etc to select completions).
              company-require-match nil ; allow input string that do not match candidate words
              company-idle-delay 0 ; trigger completion immediately.
              company-dabbrev-downcase nil
@@ -1360,6 +1360,10 @@ Marginalia provides helpful annotations for various types of minibuffer completi
 ** app-launcher
 #+begin_src elisp
 (setup (:pkg app-launcher :host github :repo "SebastienWae/app-launcher"))
+#+end_src
+** exwm
+#+begin_src elisp
+(setup (:pkg exwm))
 #+end_src
 * shell
 ** aweshell
@@ -1942,15 +1946,16 @@ If nil it defaults to `split-string-default-separators', normally
 #+end_src
 ** insert-translated-name
 #+begin_src elisp
-(setup (:pkg insert-translated-name :host github
-           :repo "manateelazycat/insert-translated-name"))
+    (setup (:pkg insert-translated-name :host github :repo "manateelazycat/insert-translated-name")
+      (:autoload insert-translated-name-insert)
+      (:autoload insert-translated-name-replace))
 #+end_src
 ** company-english-helper
 在输入英文的时候，自动提示单词
 #+begin_src elisp
 (setup (:pkg company-english-helper :host github
            :repo "manateelazycat/company-english-helper")
-       (:autoload english-teacher-follow-mode))
+       (:autoload toggle-company-english-helper))
 
 #+end_src
 * 阅读
