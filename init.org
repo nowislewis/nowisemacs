@@ -594,10 +594,10 @@ Avoid constant errors on Windows about the coding system by setting the default 
 #+begin_src elisp
   (let ((emacs-font-size 12)
         emacs-font-name)
-       (when (eq system-type 'darwin)
-      (setq emacs-font-name "InconsolataGo QiHei NF"))
-       (when (eq system-type 'gnu/linux)
-      (setq emacs-font-name "等距更纱黑体 SC"))
+       ;; (when (eq system-type 'darwin)
+      (setq emacs-font-name "InconsolataGo QiHei NF")
+       ;; (when (eq system-type 'gnu/linux)
+      ;; (setq emacs-font-name "等距更纱黑体 SC"))
     (when (display-grayscale-p)
       (set-frame-font (format "%s-%s" (eval emacs-font-name) (eval emacs-font-size)) t t)
       (set-fontset-font (frame-parameter nil 'font) 'unicode (eval emacs-font-name))
@@ -1357,6 +1357,10 @@ Marginalia provides helpful annotations for various types of minibuffer completi
 #+begin_src elisp
 (setup (:pkg treemacs))
 #+end_src
+** app-launcher
+#+begin_src elisp
+(setup (:pkg app-launcher :host github :repo "SebastienWae/app-launcher"))
+#+end_src
 * shell
 ** aweshell
 #+begin_src elisp
@@ -1450,8 +1454,8 @@ Marginalia provides helpful annotations for various types of minibuffer completi
              lsp-enable-indentation nil
              lsp-enable-on-type-formatting nil
 
-             lsp-clients-svlangserver-launchConfiguration "/tools/verilator -sv --lint-only -Wall"
-             lsp-clients-svlangserver-formatCommand "/tools/verible-verilog-format")
+             lsp-clients-svlangserver-launchConfiguration "verilator -sv --lint-only -Wall"
+             lsp-clients-svlangserver-formatCommand "verible-verilog-format")
     (:bind [remap xref-find-definitions] lsp-find-definition)
     (:bind [remap xref-find-references] lsp-find-references)
     ;; verilog-mode
