@@ -1390,7 +1390,7 @@ Marginalia provides helpful annotations for various types of minibuffer completi
   (setup (:pkg blamer :host github :repo "artawower/blamer.el")
     (:option blamer-idle-time 0.3
              blamer-min-offset 70)
-    (:delay)
+    ;; (:delay)
     ;; (:when-loaded
       ;; (global-blamer-mode 1))
     )
