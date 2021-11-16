@@ -38,35 +38,6 @@
   (defvar nowisemacs-extension-dir (concat nowisemacs-root-dir "/extensions")))
 
 #+end_src
-** 启动全屏幕
-#+begin_src elisp :tangle no
-(if (featurep 'cocoa)
-    (progn
-      ;; 在Mac平台, Emacs不能进入Mac原生的全屏模式,否则会导致 `make-frame' 创建时也集成原生全屏属性后造成白屏和左右滑动现象.
-      ;; 所以先设置 `ns-use-native-fullscreen' 和 `ns-use-fullscreen-animation' 禁止Emacs使用Mac原生的全屏模式.
-      ;; 而是采用传统的全屏模式, 传统的全屏模式, 只会在当前工作区全屏,而不是切换到Mac那种单独的全屏工作区,
-      ;; 这样执行 `make-frame' 先关代码或插件时,就不会因为Mac单独工作区左右滑动产生的bug.
-      ;;
-      ;; Mac平台下,不能直接使用 `set-frame-parameter' 和 `fullboth' 来设置全屏,
-      ;; 那样也会导致Mac窗口管理器直接把Emacs窗口扔到单独的工作区, 从而对 `make-frame' 产生同样的Bug.
-      ;; 所以, 启动的时候通过 `set-frame-parameter' 和 `maximized' 先设置Emacs为最大化窗口状态, 启动5秒以后再设置成全屏状态,
-      ;; Mac就不会移动Emacs窗口到单独的工作区, 最终解决Mac平台下原生全屏窗口导致 `make-frame' 左右滑动闪烁的问题.
-      (setq ns-use-native-fullscreen nil)
-      (setq ns-use-fullscreen-animation nil)
-
-      ;; 默认先最大化。
-      (set-frame-parameter (selected-frame) 'fullscreen 'maximized)
-
-      (run-at-time "2sec" nil
-                   (lambda ()
-                     (toggle-frame-fullscreen)
-                     ))
-      )
-
-  ;; 非Mac平台直接全屏
-  (require 'fullscreen)
-  (fullscreen))
-#+end_src
 ** Native Compilation
 #+begin_src elisp :tangle no
   ;; Set the right directory to store the native comp cache
@@ -715,107 +686,13 @@ Avoid constant errors on Windows about the coding system by setting the default 
 
   )
 #+end_src
-** mode 绑定
-#+begin_src elisp :tangle no
-  ;;; ### auto-mode-alist ###
-  ;;; --- 绑定扩展名到特定的模式
-  (defun add-to-alist (alist-var elt-cons &optional no-replace)
-    "Add to the value of ALIST-VAR an element ELT-CONS if it isn't there yet.
-  If an element with the same car as the car of ELT-CONS is already present,
-  replace it with ELT-CONS unless NO-REPLACE is non-nil; if a matching
-  element is not already present, add ELT-CONS to the front of the alist.
-  The test for presence of the car of ELT-CONS is done with `equal'."
-    (let ((existing-element (assoc (car elt-cons) (symbol-value alist-var))))
-      (if existing-element
-          (or no-replace
-              (rplacd existing-element (cdr elt-cons)))
-        (set alist-var (cons elt-cons (symbol-value alist-var)))))
-    (symbol-value alist-var))
-
-  (dolist (elt-cons '(
-                      ("\\.markdown" . markdown-mode)
-                      ("\\.md" . markdown-mode)
-                      ("\\.coffee$" . coffee-mode)
-                      ("\\.iced$" . coffee-mode)
-                      ("Cakefile" . coffee-mode)
-                      ("\\.stumpwmrc\\'" . lisp-mode)
-                      ("\\.[hg]s\\'" . haskell-mode)
-                      ("\\.hi\\'" . haskell-mode)
-                      ("\\.hs-boot\\'" . haskell-mode)
-                      ("\\.chs\\'" . haskell-mode)
-                      ("\\.l[hg]s\\'" . literate-haskell-mode)
-                      ("\\.inc\\'" . asm-mode)
-                      ("\\.max\\'" . maxima-mode)
-                      ("\\.org\\'" . org-mode)
-                      ("\\.cron\\(tab\\)?\\'" . crontab-mode)
-                      ("cron\\(tab\\)?\\." . crontab-mode)
-                      ("\\.a90\\'" . intel-hex-mode)
-                      ("\\.hex\\'" . intel-hex-mode)
-                      ("\\.py$" . python-mode)
-                      ("SConstruct". python-mode)
-                      ("\\.ml\\'" . tuareg-mode)
-                      ("\\.mli\\'" . tuareg-mode)
-                      ("\\.mly\\'" . tuareg-mode)
-                      ("\\.mll\\'" . tuareg-mode)
-                      ("\\.mlp\\'" . tuareg-mode)
-                      ("\\.qml\\'" . qml-mode)
-                      ("\\.jl\\'" . lisp-mode)
-                      ("\\.asdf\\'" . lisp-mode)
-                      ("CMakeLists\\.txt\\'" . cmake-mode)
-                      ("\\.cmake\\'" . cmake-mode)
-                      ("\\.php\\'" . php-mode)
-                      ("\\.vue" . web-mode)
-                      ("\\.wxml" . web-mode)
-                      ("\\.blade\\.php\\'" . web-mode)
-                      ("\\.phtml\\'" . web-mode)
-                      ("\\.tpl\\.php\\'" . web-mode)
-                      ("\\.jsp\\'" . web-mode)
-                      ("\\.as[cp]x\\'" . web-mode)
-                      ("\\.erb\\'" . web-mode)
-                      ("\\.mustache\\'" . web-mode)
-                      ("\\.djhtml\\'" . web-mode)
-                      ("\\.html?\\'" . web-mode)
-                      ("\\.coffee\\'" . coffee-mode)
-                      ("\\.coffee.erb\\'" . coffee-mode)
-                      ("\\.js.erb\\'" . js-mode)
-                      ("\\.iced\\'" . coffee-mode)
-                      ("\\.css\\'" . css-mode)
-                      ("\\.wxss\\'" . css-mode)
-                      ("Cakefile\\'" . coffee-mode)
-                      ("\\.styl$" . sws-mode)
-                      ("\\.jade" . jade-mode)
-                      ("\\.go$" . go-mode)
-                      ("\\.vala$" . vala-mode)
-                      ("\\.vapi$" . vala-mode)
-                      ("\\.rs$" . rust-mode)
-                      ("\\.pro$" . qmake-mode)
-                      ("\\.js$" . js-mode)
-                      ("\\.wxs$" . js-mode)
-                      ("\\.jsx$" . web-mode)
-                      ("\\.lua$" . lua-mode)
-                      ("\\.swift$" . swift-mode)
-                      ("\\.l$" . flex-mode)
-                      ("\\.y$" . bison-mode)
-                      ("\\.pdf$" . pdf-view-mode)
-                      ("\\.cpp$" . c++-mode)
-                      ("\\.h$" . c++-mode)
-                      ("\\.ll$" . llvm-mode)
-                      ("\\.bc$" . hexl-mode)
-                      ("\\.nim$" . nim-mode)
-                      ("\\.nims$" . nim-mode)
-                      ("\\.nimble$" . nim-mode)
-                      ("\\.nim.cfg$" . nim-mode)
-                      ))
-    (add-to-alist 'auto-mode-alist elt-cons))
-
-  (add-to-list 'interpreter-mode-alist '("coffee" . coffee-mode))
-#+end_src
 ** 自动换行
-#+begin_src elisp :tangle no
+#+begin_src elisp
     ;;; ### Auto-fill ###
     ;;; --- 自动换行
-    (setq fill-column 120)          ;默认显示 100列就换行
+  (setq fill-column 120)          ;默认显示 100列就换行
   (setq word-wrap t)
+  (add-hook 'text-mode-hook 'visual-line-mode)
   (add-hook 'org-mode-hook 'turn-on-auto-fill)
 #+end_src
 ** awesome-pair
@@ -857,60 +734,6 @@ Avoid constant errors on Windows about the coding system by setting the default 
            )
     )
 #+end_src
-** indent
-#+begin_src elisp :tangle no
-    (setq-default fill-column 120)
-  (setq-default indent-tabs-mode nil)
-  (setq-default tab-width 4)
-
-  (defun adjust-languages-indent (n)
-    (setq-local c-basic-offset n)
-
-    (setq-local coffee-tab-width n)
-    (setq-local javascript-indent-level n)
-    (setq-local js-indent-level n)
-    (setq-local js2-basic-offset n)
-
-    (setq-local web-mode-attr-indent-offset n)
-    (setq-local web-mode-attr-value-indent-offset n)
-    (setq-local web-mode-code-indent-offset n)
-    (setq-local web-mode-css-indent-offset n)
-    (setq-local web-mode-markup-indent-offset n)
-    (setq-local web-mode-sql-indent-offset n)
-
-    (setq-local css-indent-offset n))
-
-  (dolist (hook (list
-		 'c-mode-hook
-		 'c++-mode-hook
-		 'java-mode-hook
-		 'haskell-mode-hook
-		 'asm-mode-hook
-		 'sh-mode-hook
-		 'haskell-cabal-mode-hook
-		 'ruby-mode-hook
-		 'qml-mode-hook
-		 'scss-mode-hook
-		 'coffee-mode-hook
-		 ))
-    (add-hook hook #'(lambda ()
-		       (setq indent-tabs-mode nil)
-		       (adjust-languages-indent 4)
-		       )))
-
-  (dolist (hook (list
-		 'web-mode-hook
-		 'js-mode-hook
-		 ))
-    (add-hook hook #'(lambda ()
-		       (setq indent-tabs-mode nil)
-		       (adjust-languages-indent 2)
-		       )))
-
-  ;;; init-indent.el ends here
-
-#+end_src
-
 ** TRAMP
 #+begin_src elisp
   ;; Set default connection mode to SSH
@@ -1356,7 +1179,9 @@ Marginalia provides helpful annotations for various types of minibuffer completi
 #+end_src
 ** app-launcher
 #+begin_src elisp
-(setup (:pkg app-launcher :host github :repo "SebastienWae/app-launcher"))
+    (setup app-launcher
+      (:if-system 'gnu/linux)
+        (:pkg app-launcher :host github :repo "SebastienWae/app-launcher"))
 #+end_src
 ** exwm
 #+begin_src elisp :tangle no
