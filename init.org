@@ -812,14 +812,11 @@ Avoid constant errors on Windows about the coding system by setting the default 
 #+end_src
 ** 自动换行
 #+begin_src elisp :tangle no
-  ;;; ### Auto-fill ###
-  ;;; --- 自动换行
-  (setq default-fill-column 120)          ;默认显示 100列就换行
-  (dolist (hook (list
-                 'after-text-mode-hook
-                 'message-mode-hook
-                 ))
-    (add-hook hook #'(lambda () (auto-fill-mode 1))))
+    ;;; ### Auto-fill ###
+    ;;; --- 自动换行
+    (setq fill-column 120)          ;默认显示 100列就换行
+  (setq word-wrap t)
+  (add-hook 'org-mode-hook 'turn-on-auto-fill)
 #+end_src
 ** awesome-pair
 #+begin_src elisp
@@ -1362,8 +1359,21 @@ Marginalia provides helpful annotations for various types of minibuffer completi
 (setup (:pkg app-launcher :host github :repo "SebastienWae/app-launcher"))
 #+end_src
 ** exwm
-#+begin_src elisp
-(setup (:pkg exwm))
+#+begin_src elisp :tangle no
+  (setup exwm
+    (:if-system 'gnu/linux)
+    (:pkg exwm)
+    (:when-loaded
+      (require 'exwm)
+
+      (require 'exwm-config)
+      (exwm-config-example)
+        ;; using xim input
+  (require 'exwm-xim)
+  (exwm-xim-enable)
+  (push ?\C-\\ exwm-input-prefix-keys)   ;; use Ctrl + \ to switch input method
+      )
+    )
 #+end_src
 * shell
 ** aweshell
@@ -1423,13 +1433,13 @@ Marginalia provides helpful annotations for various types of minibuffer completi
 ** tree-sitter
 #+begin_src elisp
   (setup tree-sitter-langs
-	  (:if-system 'gnu/linux)
+    (:if-system 'gnu/linux)
     (:pkg tree-sitter-langs)
     )
   (setup tree-sitter
-          (:if-system 'gnu/linux)
+    (:if-system 'gnu/linux)
     (:pkg tree-sitter)
-    (:hook-into prog-mode)
+    ;; (:hook-into prog-mode)
     (:when-loaded
       (require 'tree-sitter-langs)
       (add-hook 'tree-sitter-after-on-hook #'tree-sitter-hl-mode)
@@ -1457,14 +1467,15 @@ Marginalia provides helpful annotations for various types of minibuffer completi
 
              lsp-enable-indentation nil
              lsp-enable-on-type-formatting nil
+             )
 
-             lsp-clients-svlangserver-launchConfiguration "verilator -sv --lint-only -Wall"
-             lsp-clients-svlangserver-formatCommand "verible-verilog-format")
+             ;; lsp-clients-svlangserver-launchConfiguration "verilator -sv --lint-only -Wall"
+             ;; lsp-clients-svlangserver-formatCommand "verible-verilog-format")
     (:bind [remap xref-find-definitions] lsp-find-definition)
     (:bind [remap xref-find-references] lsp-find-references)
     ;; verilog-mode
-    (:with-mode verilog-mode
-      (:hook lsp-deferred))
+    ;; (:with-mode verilog-mode
+    ;;   (:hook lsp-deferred))
 
     )
 #+end_src
@@ -1574,6 +1585,24 @@ Marginalia provides helpful annotations for various types of minibuffer completi
   (setup (:pkg graphviz-dot-mode)
     (:file-match "\\.dot\\'")
     (:option graphviz-dot-indent-width 4))
+#+end_src
+** verilog
+#+begin_src elisp :tangle nil
+  (setup verilog-mode
+    (:file-match "//.sv//")
+    (:when-loaded
+      (require 'lsp)
+      (lsp-register-client
+       (make-lsp-client :new-connection (lsp-stdio-connection '("svls"))
+                        :major-modes '(verilog-mode)
+                        :priority -1
+                        ))
+      ;; (lsp)
+      ;; (flycheck-mode t)
+      (add-to-list 'lsp-language-id-configuration '(verilog-mode . "verilog"))
+      )
+    )
+
 #+end_src
 * Org Mode
 ** 杂项设置
@@ -1977,7 +2006,7 @@ If nil it defaults to `split-string-default-separators', normally
     (:option
      org-noter-notes-search-path (list org-directory)
      org-noter-auto-save-last-location t
-     org-noter-separate-notes-from-heading t
+     org-noter-separate-notes-from-heading nil
      org-noter-doc-split-percentage '(0.6 . 0.4)
      )
     )
