@@ -1274,7 +1274,7 @@ Marginalia provides helpful annotations for various types of minibuffer completi
 
 ** lsp mode
 *** lsp-mode
-#+begin_src elisp
+#+begin_src elisp :tangle no
   (setup (:pkg lsp-mode)
     (:hook lsp-enable-which-key-integration)
     (:option lsp-keymap-prefix "C-c l"
@@ -1305,7 +1305,7 @@ Marginalia provides helpful annotations for various types of minibuffer completi
     )
 #+end_src
 *** lsp-ui
-#+begin_src elisp
+#+begin_src elisp :tangle no
   (setup (:pkg lsp-ui)
     (:bind [remap xref-find-definitions] lsp-ui-peek-find-definitions)
     (:bind [remap xref-find-references] lsp-ui-peek-find-references)
@@ -1322,14 +1322,12 @@ Marginalia provides helpful annotations for various types of minibuffer completi
     )
 #+end_src
 *** lsp-treemacs
-#+begin_src elisp
+#+begin_src elisp :tangle no
 (setup (:pkg lsp-treemacs))
-#+end_src
-*** dap-mode
-#+begin_src elisp
   (setup (:pkg dap-mode))
   (setup (:pkg consult-lsp))
 #+end_src
+*** eglot
 *** lsp-org-special
 #+begin_src elisp
   (cl-defmacro lsp-org-babel-enable (lang)
@@ -1344,8 +1342,8 @@ Marginalia provides helpful annotations for various types of minibuffer completi
              (unless file-name
                (setq file-name (make-temp-file "babel-lsp-")))
              (setq buffer-file-name file-name)
-             ;; (eglot-ensure)))
-             (lsp-deferred)))
+             (eglot-ensure)))
+             ;; (lsp-deferred)))
          (put ',intern-pre 'function-documentation
               (format "Enable lsp-mode in the buffer of org source block (%s)."
                       (upcase ,lang)))
@@ -1410,24 +1408,6 @@ Marginalia provides helpful annotations for various types of minibuffer completi
   (setup (:pkg graphviz-dot-mode)
     (:file-match "\\.dot\\'")
     (:option graphviz-dot-indent-width 4))
-#+end_src
-** verilog
-#+begin_src elisp :tangle nil
-  (setup verilog-mode
-    (:file-match "//.sv//")
-    (:when-loaded
-      (require 'lsp)
-      (lsp-register-client
-       (make-lsp-client :new-connection (lsp-stdio-connection '("svls"))
-                        :major-modes '(verilog-mode)
-                        :priority -1
-                        ))
-      ;; (lsp)
-      ;; (flycheck-mode t)
-      (add-to-list 'lsp-language-id-configuration '(verilog-mode . "verilog"))
-      )
-    )
-
 #+end_src
 * Org Mode
 ** 杂项设置
