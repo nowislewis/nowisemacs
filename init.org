@@ -8,7 +8,9 @@
   (tool-bar-mode -1)                      ;禁用工具栏
    ;; (menu-bar-mode -1)                      ;禁用菜单栏
    (scroll-bar-mode -1)                    ;禁用滚动条
-   (setq
+
+
+  (setq
     ;; 不要缩放frame.
     frame-inhibit-implied-resize t
     ;; 默认用最简单的模式
@@ -102,6 +104,15 @@
 #+end_src
 
 * Package Management
+#+begin_src elisp
+  (defun my-setproxy()
+        (setq url-proxy-services
+          '(("http" . "localhost:12333")
+            ("https" . "localhost:12333")
+            ("no_proxy" . "0.0.0.0")))
+    )
+  (my-setproxy)
+#+end_src
 #+begin_src elisp
   (unless (featurep 'straight)
     ;; Bootstrap straight.el
