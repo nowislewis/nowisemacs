@@ -111,7 +111,7 @@
             ("https" . "localhost:12333")
             ("no_proxy" . "0.0.0.0")))
     )
-  (my-setproxy)
+  ;; (my-setproxy)
 #+end_src
 #+begin_src elisp
   (unless (featurep 'straight)
@@ -1334,7 +1334,7 @@ Marginalia provides helpful annotations for various types of minibuffer completi
       (setup (:pkg consult-lsp))
 #+end_src
 *** eglot
-#+begin_src elisp :tangle nil
+#+begin_src elisp :tangle no
   (setup (:pkg eglot)
     (:option eglot-sync-connect 1
 	     eglot-connect-timeout 10
