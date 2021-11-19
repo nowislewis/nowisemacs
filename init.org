@@ -8,8 +8,6 @@
   (tool-bar-mode -1)                      ;禁用工具栏
    ;; (menu-bar-mode -1)                      ;禁用菜单栏
    (scroll-bar-mode -1)                    ;禁用滚动条
-
-
   (setq
     ;; 不要缩放frame.
     frame-inhibit-implied-resize t
@@ -26,19 +24,16 @@
               (message "*** Emacs loaded in %s seconds with %d garbage collections."
                        (emacs-init-time "%.2f")
                        gcs-done)))
-
 (let (
       ;; 加载的时候临时增大`gc-cons-threshold'以加速启动速度。
       (gc-cons-threshold most-positive-fixnum)
       (gc-cons-percentage 0.6)
       ;; 清空避免加载远程文件的时候分析文件。
       (file-name-handler-alist nil))
-
   ;; 定义一些启动目录，方便下次迁移修改
   (defvar nowisemacs-root-dir (file-truename "~/nowisemacs/"))
   (defvar nowisemacs-config-dir (concat nowisemacs-root-dir "init.org"))
   (defvar nowisemacs-extension-dir (concat nowisemacs-root-dir "/extensions")))
-
 #+end_src
 ** Native Compilation
 #+begin_src elisp :tangle no
@@ -67,7 +62,6 @@
   (setq process-adaptive-read-buffering nil)
   (setq read-process-output-max (* 1024 1024))
 
-  (fset 'yes-or-no-p 'y-or-n-p)           ;以 y/n代表 yes/no
   (blink-cursor-mode -1)                  ;指针不闪动
   (transient-mark-mode 1)                 ;标记高亮
   (global-subword-mode 1)                 ;Word移动支持 FooBar 的格式
@@ -766,9 +760,17 @@ Avoid constant errors on Windows about the coding system by setting the default 
 * 补全
 ** Completions with Vertico
 #+begin_src elisp
-  (setup (:pkg vertico)
-    (vertico-mode)
-    (:option vertico-cycle t))
+    (setup (:pkg vertico)
+      (vertico-mode)
+      (:option vertico-cycle t))
+
+  (setup (:pkg vertico-posframe)
+    (:option vertico-posframe-parameters
+      '((left-fringe . 16)
+        (right-fringe . 16)))
+    vertico-posframe-border-width 8
+     (vertico-posframe-mode 1)
+    )
 #+end_src
 
 ** Orderless
@@ -1360,7 +1362,6 @@ Marginalia provides helpful annotations for various types of minibuffer completi
 #+begin_src elisp
   (cl-defmacro lsp-org-babel-enable (lang)
     "Support LANG in org source code block."
-    (setq centaur-lsp 'lsp-mode)
     (cl-check-type lang stringp)
     (let* ((edit-pre (intern (format "org-babel-edit-prep:%s" lang)))
            (intern-pre (intern (format "lsp--%s" (symbol-name edit-pre)))))
@@ -1370,8 +1371,8 @@ Marginalia provides helpful annotations for various types of minibuffer completi
              (unless file-name
                (setq file-name (make-temp-file "babel-lsp-")))
              (setq buffer-file-name file-name)
-             (eglot-ensure)))
-             ;; (lsp-deferred)))
+             ;; (eglot-ensure)))
+             (lsp-deferred)))
          (put ',intern-pre 'function-documentation
               (format "Enable lsp-mode in the buffer of org source block (%s)."
                       (upcase ,lang)))
