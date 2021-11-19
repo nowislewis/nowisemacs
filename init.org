@@ -457,11 +457,11 @@ Avoid constant errors on Windows about the coding system by setting the default 
                              ("r" . consult-recent-file)
                              ("p" . find-config-file)
                              ) "f")
-  (lewis/define-leader-key '(
-                             ("d" . xref-find-definitions)
-                             ("D" . xref-find-references)
-                             ("m" . consult-mark)
-                             ) "g")
+;;  (lewis/define-leader-key '(
+  ;;                           ("d" . xref-find-definitions)
+    ;;                         ("D" . xref-find-references)
+      ;;                       ("m" . consult-mark)
+        ;;                     ) "g")
 #+end_src
 *** notes
 #+begin_src elisp
@@ -773,8 +773,8 @@ Avoid constant errors on Windows about the coding system by setting the default 
     (:option vertico-posframe-parameters
       '((left-fringe . 16)
         (right-fringe . 16)))
-    vertico-posframe-border-width 8
-     (vertico-posframe-mode 1)
+    ;; vertico-posframe-border-width 8
+     ;; (vertico-posframe-mode nil)
     )
 #+end_src
 
@@ -1200,15 +1200,15 @@ Marginalia provides helpful annotations for various types of minibuffer completi
         (:pkg app-launcher :host github :repo "SebastienWae/app-launcher"))
 #+end_src
 ** exwm
-#+begin_src elisp :tangle no
+#+begin_src elisp
   (setup exwm
     (:if-system 'gnu/linux)
     (:pkg exwm)
     (:when-loaded
       (require 'exwm)
 
-      (require 'exwm-config)
-      (exwm-config-example)
+      ;; (require 'exwm-config)
+      ;; (exwm-config-example)
         ;; using xim input
   (require 'exwm-xim)
   (exwm-xim-enable)
