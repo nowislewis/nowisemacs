@@ -452,11 +452,16 @@ Avoid constant errors on Windows about the coding system by setting the default 
 
   (defun find-config-file()
     (interactive)
-       (find-file nowisemacs-config-dir))
+    (find-file nowisemacs-config-dir))
   (lewis/define-leader-key '(
                              ("r" . consult-recent-file)
                              ("p" . find-config-file)
                              ) "f")
+  (lewis/define-leader-key '(
+                             ("d" . xref-find-definitions)
+                             ("D" . xref-find-references)
+                             ("m" . consult-mark)
+                             ) "g")
 #+end_src
 *** notes
 #+begin_src elisp
