@@ -14,8 +14,19 @@
     ;; 默认用最简单的模式
     initial-major-mode 'fundamental-mode
     ;; 不要自动启用package
-    package-enable-at-startup nil package--init-file-ensured t)
+    package-enable-at-startup nil package--init-file-ensured t
+   inhibit-startup-message t             ; 关闭启动 Emacs 时的欢迎界面
+    )
+    ;; (setq make-backup-files nil)                 ; 关闭文件自动备份
+    ;; (electric-pair-mode t)                       ; 自动补全括号
+  ;; (add-hook 'prog-mode-hook #'show-paren-mode) ; 编程模式下，光标在括号上时高亮另一个括号
+    (column-number-mode t)                       ; 在 Mode line 上显示列号
+  (global-auto-revert-mode t)                  ; 当另一程序修改了文件时，让 Emacs 及时刷新 Buffer
+  (delete-selection-mode t)                    ; 选中文本后输入文本会替换文本（更符合我们习惯了的其它编辑器的逻辑）
+  ;; (add-hook 'prog-mode-hook #'hs-minor-mode)   ; 编程模式下，可以折叠代码块
+  (global-display-line-numbers-mode 1)         ; 在 Window 显示行号
 #+end_src
+
 ** Startup Performance
 #+begin_src elisp
   ;; Profile emacs startup
@@ -292,6 +303,12 @@ Avoid constant errors on Windows about the coding system by setting the default 
                                            '("f" . meow-find)
                                            '("F" . meow-find-expand)
                                            ;; (cons "g" (concat doom-leader-alt-key " c"))
+
+                                          '("g d" . xref-find-definitions)
+                                           '("g D" . xref-find-references)
+                                           '("g m" . consult-mark)
+
+
                                            '("G" . meow-grab)
                                            '("h" . meow-left)
                                            '("H" . meow-left-expand)
@@ -314,7 +331,7 @@ Avoid constant errors on Windows about the coding system by setting the default 
                                            '("q" . meow-quit)
                                            '("Q" . meow-goto-line)
                                            '("r" . meow-replace)
-                                           '("R" . meow-swap-grab)
+                                          '("R" . meow-swap-grab)
                                            '("s" . meow-line)
                                            '("S" . meow-kmacro-lines)
                                            '("t" . meow-till)
@@ -442,26 +459,21 @@ Avoid constant errors on Windows about the coding system by setting the default 
 #+end_src
 *** search
 #+begin_src elisp
-  (lewis/define-leader-key '(
-                             ("s" . consult-line)
-                             ("b" . consult-buffer)
-                             ("d" . consult-ripgrep)
-                             ("D" . lewis/ripgrep-search-other-dir)
-                             ("f" . consult-find)
-                             ) "s")
+   (lewis/define-leader-key '(
+                              ("s" . consult-line)
+                              ("b" . consult-buffer)
+                              ("d" . consult-ripgrep)
+                              ("D" . lewis/ripgrep-search-other-dir)
+                              ("f" . consult-find)
+                              ) "s")
 
-  (defun find-config-file()
-    (interactive)
-    (find-file nowisemacs-config-dir))
-  (lewis/define-leader-key '(
-                             ("r" . consult-recent-file)
-                             ("p" . find-config-file)
-                             ) "f")
-;;  (lewis/define-leader-key '(
-  ;;                           ("d" . xref-find-definitions)
-    ;;                         ("D" . xref-find-references)
-      ;;                       ("m" . consult-mark)
-        ;;                     ) "g")
+   (defun find-config-file()
+     (interactive)
+     (find-file nowisemacs-config-dir))
+   (lewis/define-leader-key '(
+                              ("r" . consult-recent-file)
+                              ("p" . find-config-file)
+                              ) "f")
 #+end_src
 *** notes
 #+begin_src elisp
@@ -512,56 +524,6 @@ Avoid constant errors on Windows about the coding system by setting the default 
 #+end_src
 
 * UI
-** line-number
-#+begin_src elisp
-  ;; Line numbers are not displayed when large files are used.
-  (setq line-number-display-limit large-file-warning-threshold)
-  (setq line-number-display-limit-width 1000)
-
-  (dolist (hook (list
-		 'c-mode-common-hook
-		 'c-mode-hook
-		 'elisp-mode-hook
-		 'lisp-interaction-mode-hook
-		 'lisp-mode-hook
-		 'java-mode-hook
-		 'asm-mode-hook
-		 'haskell-mode-hook
-		 'rcirc-mode-hook
-		 'erc-mode-hook
-		 'sh-mode-hook
-		 'makefile-gmake-mode-hook
-		 'python-mode-hook
-		 'js-mode-hook
-		 'html-mode-hook
-		 'css-mode-hook
-		 'tuareg-mode-hook
-		 'go-mode-hook
-		 'coffee-mode-hook
-		 'qml-mode-hook
-		 'markdown-mode-hook
-		 'slime-repl-mode-hook
-		 'package-menu-mode-hook
-		 'cmake-mode-hook
-		 'php-mode-hook
-		 'web-mode-hook
-		 'coffee-mode-hook
-		 'sws-mode-hook
-		 'jade-mode-hook
-		 'vala-mode-hook
-		 'rust-mode-hook
-		 'ruby-mode-hook
-		 'qmake-mode-hook
-		 'lua-mode-hook
-		 'swift-mode-hook
-		 'llvm-mode-hook
-		 'conf-toml-mode-hook
-		 'nxml-mode-hook
-		 'nim-mode-hook
-		 'org-mode-hook
-		 ))
-    (add-hook hook (lambda () (display-line-numbers-mode))))
-#+end_src
 ** Theme
 #+begin_src elisp
   (setup (:pkg doom-themes)
@@ -774,7 +736,7 @@ Avoid constant errors on Windows about the coding system by setting the default 
       '((left-fringe . 16)
         (right-fringe . 16)))
     ;; vertico-posframe-border-width 8
-     ;; (vertico-posframe-mode nil)
+     (vertico-posframe-mode t)
     )
 #+end_src
 
@@ -869,37 +831,38 @@ Marginalia provides helpful annotations for various types of minibuffer completi
 ** company 相关
 *** company-mode
 #+begin_src elisp
-    (setup (:pkg company-tabnine))
-    (setup
-	(:pkg company)
-      (:option
-       company-dabbrev-ignore-case nil
-       company-dabbrev-downcase nil
-       company-minimum-prefix-length 2 ; pop up a completion menu by tapping a character
-       company-show-numbers t ; number the candidates (use M-1, M-2 etc to select completions).
-       company-require-match nil ; allow input string that do not match candidate words
-       company-idle-delay 0 ; trigger completion immediately.
-       company-dabbrev-downcase nil
-       company-dabbrev-ignore-case t
+  (setup (:pkg company-tabnine))
+  (setup
+      (:pkg company)
+    (:option
+     company-dabbrev-ignore-case nil
+     company-dabbrev-downcase nil
+     company-minimum-prefix-length 2 ; pop up a completion menu by tapping a character
+     company-show-numbers 2 ; number the candidates (use M-1, M-2 etc to select completions).
+     company-require-match nil ; allow input string that do not match candidate words
+     company-idle-delay 0 ; trigger completion immediately.
+     company-dabbrev-downcase nil
+     company-dabbrev-ignore-case t
 
-       company-backends '(
-			  (company-tabnine company-dabbrev
-					   company-keywords company-files
-					   company-capf
-					   )
-			  )
-       )
-          (add-hook 'after-init-hook #'global-company-mode)
-  (:when-loaded
+     company-backends '(
+                        ;; (company-tabnine company-dabbrev
+                        (company-dabbrev
+                                         company-keywords company-files
+                                         company-capf
+                                         )
+                        )
+     )
+    (add-hook 'after-init-hook #'global-company-mode)
+    (:when-loaded
 
       (defvar company-mode/enable-yas t
-	"Enable yasnippet for all backends.")
+        "Enable yasnippet for all backends.")
 
       (defun company-mode/backend-with-yas (backend)
-	(if (or (not company-mode/enable-yas) (and (listp backend) (member 'company-yasnippet backend)))
-	    backend
-	  (append (if (consp backend) backend (list backend))
-		  '(:with company-yasnippet))))
+        (if (or (not company-mode/enable-yas) (and (listp backend) (member 'company-yasnippet backend)))
+            backend
+          (append (if (consp backend) backend (list backend))
+                  '(:with company-yasnippet))))
 
       (setq company-backends (mapcar #'company-mode/backend-with-yas company-backends))
 
@@ -908,24 +871,21 @@ Marginalia provides helpful annotations for various types of minibuffer completi
 
       ;; Add `company-elisp' backend for elisp.
       (add-hook 'emacs-lisp-mode-hook
-		#'(lambda ()
-		    (require 'company-elisp)
-		    (push 'company-elisp company-backends)))
-
-
-
+                #'(lambda ()
+                    (require 'company-elisp)
+                    (push 'company-elisp company-backends)))
 
       ;; The free version of TabNine is good enough,
       ;; and below code is recommended that TabNine not always
       ;; prompt me to purchase a paid version in a large project.
       (defadvice company-echo-show (around disable-tabnine-upgrade-message activate)
-	(let ((company-message-func (ad-get-arg 0)))
-	  (when (and company-message-func
-		     (stringp (funcall company-message-func)))
-	    (unless (string-match "The free version of TabNine only indexes up to" (funcall company-message-func))
-	      ad-do-it))))
-  )
+        (let ((company-message-func (ad-get-arg 0)))
+          (when (and company-message-func
+                     (stringp (funcall company-message-func)))
+            (unless (string-match "The free version of TabNine only indexes up to" (funcall company-message-func))
+              ad-do-it))))
       )
+    )
 
 #+end_src
 *** company-box
@@ -938,157 +898,6 @@ Marginalia provides helpful annotations for various types of minibuffer completi
              company-box-max-candidates 50
              )
     (:when-loaded
-      ;; Display borders and optimize performance
-      (defun my-company-box--display (string on-update)
-        "Display the completions."
-        (company-box--render-buffer string on-update)
-
-        (let ((frame (company-box--get-frame))
-              (border-color (face-foreground 'font-lock-comment-face nil t)))
-          (unless frame
-            (setq frame (company-box--make-frame))
-            (company-box--set-frame frame))
-          (company-box--compute-frame-position frame)
-          (company-box--move-selection t)
-          (company-box--update-frame-position frame)
-          (unless (frame-visible-p frame)
-            (make-frame-visible frame))
-          (company-box--update-scrollbar frame t)
-          (set-face-background 'internal-border border-color frame)
-          (when (facep 'child-frame-border)
-            (set-face-background 'child-frame-border border-color frame)))
-        (with-current-buffer (company-box--get-buffer)
-          (company-box--maybe-move-number (or company-box--last-start 1))))
-      (advice-add #'company-box--display :override #'my-company-box--display)
-
-      (setq company-box-doc-frame-parameters '((internal-border-width . 1)
-                                               (left-fringe . 8)
-                                               (right-fringe . 8)))
-
-      (defun my-company-box-doc--make-buffer (object)
-        (let* ((buffer-list-update-hook nil)
-               (inhibit-modification-hooks t)
-               (string (cond ((stringp object) object)
-                             ((bufferp object) (with-current-buffer object (buffer-string))))))
-          (when (and string (> (length (string-trim string)) 0))
-            (with-current-buffer (company-box--get-buffer "doc")
-              (erase-buffer)
-              (insert (propertize "\n" 'face '(:height 0.5)))
-              (insert string)
-              (insert (propertize "\n\n" 'face '(:height 0.5)))
-
-              ;; Handle hr lines of markdown
-              ;; @see `lsp-ui-doc--handle-hr-lines'
-              (with-current-buffer (company-box--get-buffer "doc")
-                (let (bolp next before after)
-                  (goto-char 1)
-                  (while (setq next (next-single-property-change (or next 1) 'markdown-hr))
-                    (when (get-text-property next 'markdown-hr)
-                      (goto-char next)
-                      (setq bolp (bolp)
-                            before (char-before))
-                      (delete-region (point) (save-excursion (forward-visible-line 1) (point)))
-                      (setq after (char-after (1+ (point))))
-                      (insert
-                       (concat
-                        (and bolp (not (equal before ?\n)) (propertize "\n" 'face '(:height 0.5)))
-                        (propertize "\n" 'face '(:height 0.5))
-                        (propertize " "
-                                    'display '(space :height (1))
-                                    'company-box-doc--replace-hr t
-                                    'face `(:background ,(face-foreground 'font-lock-comment-face)))
-                        (propertize " " 'display '(space :height (1)))
-                        (and (not (equal after ?\n)) (propertize " \n" 'face '(:height 0.5)))))))))
-
-              (setq mode-line-format nil
-                    display-line-numbers nil
-                    header-line-format nil
-                    show-trailing-whitespace nil
-                    cursor-in-non-selected-windows nil)
-              (current-buffer)))))
-      (advice-add #'company-box-doc--make-buffer :override #'my-company-box-doc--make-buffer)
-
-      ;; Display the border and fix the markdown header properties
-      (defun my-company-box-doc--show (selection frame)
-        (cl-letf (((symbol-function 'completing-read) #'company-box-completing-read)
-                  (window-configuration-change-hook nil)
-                  (inhibit-redisplay t)
-                  (display-buffer-alist nil)
-                  (buffer-list-update-hook nil))
-          (-when-let* ((valid-state (and (eq (selected-frame) frame)
-                                         company-box--bottom
-                                         company-selection
-                                         (company-box--get-frame)
-                                         (frame-visible-p (company-box--get-frame))))
-                       (candidate (nth selection company-candidates))
-                       (doc (or (company-call-backend 'quickhelp-string candidate)
-                                (company-box-doc--fetch-doc-buffer candidate)))
-                       (doc (company-box-doc--make-buffer doc)))
-            (let ((frame (frame-local-getq company-box-doc-frame))
-                  (border-color (face-foreground 'font-lock-comment-face nil t)))
-              (unless (frame-live-p frame)
-                (setq frame (company-box-doc--make-frame doc))
-                (frame-local-setq company-box-doc-frame frame))
-              (set-face-background 'internal-border border-color frame)
-              (when (facep 'child-frame-border)
-                (set-face-background 'child-frame-border border-color frame))
-              (company-box-doc--set-frame-position frame)
-
-              ;; Fix hr props. @see `lsp-ui-doc--fix-hr-props'
-              (with-current-buffer (company-box--get-buffer "doc")
-                (let (next)
-                  (while (setq next (next-single-property-change (or next 1) 'company-box-doc--replace-hr))
-                    (when (get-text-property next 'company-box-doc--replace-hr)
-                      (put-text-property next (1+ next) 'display
-                                         '(space :align-to (- right-fringe 1) :height (1)))
-                      (put-text-property (1+ next) (+ next 2) 'display
-                                         '(space :align-to right-fringe :height (1)))))))
-
-              (unless (frame-visible-p frame)
-                (make-frame-visible frame))))))
-      (advice-add #'company-box-doc--show :override #'my-company-box-doc--show)
-
-      (defun my-company-box-doc--set-frame-position (frame)
-        (-let* ((frame-resize-pixelwise t)
-
-                (box-frame (company-box--get-frame))
-                (box-position (frame-position box-frame))
-                (box-width (frame-pixel-width box-frame))
-                (box-height (frame-pixel-height box-frame))
-                (box-border-width (frame-border-width box-frame))
-
-                (window (frame-root-window frame))
-                ((text-width . text-height) (window-text-pixel-size window nil nil
-                                                                    (/ (frame-pixel-width) 2)
-                                                                    (/ (frame-pixel-height) 2)))
-                (border-width (or (alist-get 'internal-border-width company-box-doc-frame-parameters) 0))
-
-                (x (- (+ (car box-position) box-width) border-width))
-                (space-right (- (frame-pixel-width) x))
-                (space-left (car box-position))
-                (fringe-left (or (alist-get 'left-fringe company-box-doc-frame-parameters) 0))
-                (fringe-right (or (alist-get 'right-fringe company-box-doc-frame-parameters) 0))
-                (width (+ text-width border-width fringe-left fringe-right))
-                (x (if (> width space-right)
-                       (if (> space-left width)
-                           (- space-left width)
-                         space-left)
-                     x))
-                (y (cdr box-position))
-                (bottom (+ company-box--bottom (frame-border-width)))
-                (height (+ text-height (* 2 border-width)))
-                (y (cond ((= x space-left)
-                          (if (> (+ y box-height height) bottom)
-                              (+ (- y height) border-width)
-                            (- (+ y box-height) border-width)))
-                         ((> (+ y height) bottom)
-                          (- (+ y box-height) height))
-                         (t y))))
-          (set-frame-position frame (max x 0) (max y 0))
-          (set-frame-size frame text-width text-height t)))
-      (advice-add #'company-box-doc--set-frame-position :override #'my-company-box-doc--set-frame-position)
-
-
         (setq company-box-icons-all-the-icons
               `((Unknown . ,(all-the-icons-material "find_in_page" :height 1.0 :v-adjust -0.2))
                 (Text . ,(all-the-icons-faicon "text-width" :height 1.0 :v-adjust -0.02))
@@ -1184,7 +993,6 @@ Marginalia provides helpful annotations for various types of minibuffer completi
 #+end_src
 * File Browsing
 ** dired
-
 ** fd-dired
 #+begin_src elisp
 (setup (:pkg fd-dired))
@@ -1340,29 +1148,6 @@ Marginalia provides helpful annotations for various types of minibuffer completi
       (setup (:pkg dap-mode))
       (setup (:pkg consult-lsp))
 #+end_src
-*** eglot
-#+begin_src elisp :tangle no
-  (setup (:pkg eglot)
-    (:option eglot-sync-connect 1
-	     eglot-connect-timeout 10
-	     eglot-autoshutdown t
-	     eglot-send-changes-idle-time 0.5
-	     eglot-auto-display-help-buffer nil)
-    (:when-loaded
-    (add-to-list 'eglot-server-programs '(verilog-mode . ("hdl_checker" "--lsp")))
-    )
-    )
-
-  (setup (:pkg consult-eglot)
-    (:with-mode eglot-mode
-      ;; (:bind [remap xref-find-apropos])
-      ))
-
-  (setup (:pkg eldoc-box)
-    (add-hook 'eglot--managed-mode-hook #'eldoc-box-hover-mode t)
-    )
-#+end_src
-
 *** lsp-org-special
 #+begin_src elisp
   (cl-defmacro lsp-org-babel-enable (lang)
@@ -1760,7 +1545,6 @@ If nil it defaults to `split-string-default-separators', normally
       (split-string-and-unquote value separators))))
 #+end_src
 
-** ox-hugo
 ** org-pomodoro
 #+begin_src elisp
   (setup (:pkg org-pomodoro)
