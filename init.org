@@ -727,14 +727,17 @@ Avoid constant errors on Windows about the coding system by setting the default 
 * 补全
 ** Completions with Vertico
 #+begin_src elisp
-    (setup (:pkg vertico)
+    (setup (:pkg vertico :host github :repo "minad/vertico" :files ("*.el" "extensions/*.el"))
+      (:option vertico-cycle t)
+      (:with-mode vertico
+      (:bind [backspace] vertico-directory-delete-char))
       (vertico-mode)
-      (:option vertico-cycle t))
+      )
 
   (setup (:pkg vertico-posframe)
     (:option vertico-posframe-parameters
       '((left-fringe . 16)
-        (right-fringe . 16)))
+	(right-fringe . 16)))
     ;; vertico-posframe-border-width 8
      (vertico-posframe-mode t)
     )
