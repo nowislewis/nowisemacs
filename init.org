@@ -1,4 +1,5 @@
 #+TITLE: Emacs Configuration
+
 #+PROPERTY: header-args:elisp :tangle ~/my-emacs/init.el
 
 * 启动优化
@@ -18,7 +19,7 @@
    inhibit-startup-message t             ; 关闭启动 Emacs 时的欢迎界面
     )
     ;; (setq make-backup-files nil)                 ; 关闭文件自动备份
-    ;; (electric-pair-mode t)                       ; 自动补全括号
+    (electric-pair-mode t)                       ; 自动补全括号
   ;; (add-hook 'prog-mode-hook #'show-paren-mode) ; 编程模式下，光标在括号上时高亮另一个括号
     (column-number-mode t)                       ; 在 Mode line 上显示列号
   (global-auto-revert-mode t)                  ; 当另一程序修改了文件时，让 Emacs 及时刷新 Buffer
@@ -668,7 +669,7 @@ Avoid constant errors on Windows about the coding system by setting the default 
   (add-hook 'org-mode-hook 'turn-on-auto-fill)
 #+end_src
 ** awesome-pair
-#+begin_src elisp
+#+begin_src elisp :tangle nil
   (setup (:pkg awesome-pair :host github :repo "manateelazycat/awesome-pair")
     (:hook-into prog-mode
                 text-mode
@@ -1240,6 +1241,7 @@ Marginalia provides helpful annotations for various types of minibuffer completi
              org-startup-indented t
              org-imenu-depth 5
              org-startup-folded t
+             org-return-follows-link t
              org-blank-before-new-entry '((heading . nil)
                                           (plain-list-item . nil))
 
@@ -1397,7 +1399,7 @@ Marginalia provides helpful annotations for various types of minibuffer completi
                      (window-width . 0.25)
                      (window-parameters . ((no-other-window . t)
                                            (no-delete-other-windows . t)))))
-
+      (org-roam-buffer-toggle)
       ))
 
 
@@ -1408,6 +1410,15 @@ Marginalia provides helpful annotations for various types of minibuffer completi
   (setup (:pkg websocket))
   (setup (:pkg simple-httpd))
   (setup (:pkg org-roam-ui :host github :repo "org-roam/org-roam-ui" :files ("*.el" "out")))
+#+end_src
+*** org-roam-timestamps
+#+begin_src elisp
+  (setup (:pkg org-roam-timestamps)
+    (:load-after org-roam)
+    (:when-loaded
+      (org-roam-timestamps-mode)
+      ))
+
 #+end_src
 *** org-roam-agenda
 #+begin_src elisp
@@ -1621,9 +1632,9 @@ If nil it defaults to `split-string-default-separators', normally
     ;; (pdf-annot-list-format '((page . 3) (type . 10) (contents . 25)))
     (pdf-loader-install)
     )
-  (setup (:pkg pdf-continuous-scroll-mode :host github :repo "dalanicolai/pdf-continuous-scroll-mode.el")
-    (:hook-into pdf-view-mode-hook)
-    )
+  ;; (setup (:pkg pdf-continuous-scroll-mode :host github :repo "dalanicolai/pdf-continuous-scroll-mode.el")
+  ;;   (:hook-into pdf-view-mode-hook)
+  ;;   )
 
 #+end_src
 ** org-noter
