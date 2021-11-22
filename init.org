@@ -669,7 +669,7 @@ Avoid constant errors on Windows about the coding system by setting the default 
   (add-hook 'org-mode-hook 'turn-on-auto-fill)
 #+end_src
 ** awesome-pair
-#+begin_src elisp :tangle nil
+#+begin_src elisp :tangle no
   (setup (:pkg awesome-pair :host github :repo "manateelazycat/awesome-pair")
     (:hook-into prog-mode
                 text-mode
@@ -1412,7 +1412,7 @@ Marginalia provides helpful annotations for various types of minibuffer completi
   (setup (:pkg org-roam-ui :host github :repo "org-roam/org-roam-ui" :files ("*.el" "out")))
 #+end_src
 *** org-roam-timestamps
-#+begin_src elisp :tangle nil
+#+begin_src elisp :tangle no
   (setup (:pkg org-roam-timestamps)
     (:load-after org-roam)
     (:when-loaded
