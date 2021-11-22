@@ -1412,13 +1412,12 @@ Marginalia provides helpful annotations for various types of minibuffer completi
   (setup (:pkg org-roam-ui :host github :repo "org-roam/org-roam-ui" :files ("*.el" "out")))
 #+end_src
 *** org-roam-timestamps
-#+begin_src elisp
+#+begin_src elisp :tangle nil
   (setup (:pkg org-roam-timestamps)
     (:load-after org-roam)
     (:when-loaded
       (org-roam-timestamps-mode)
       ))
-
 #+end_src
 *** org-roam-agenda
 #+begin_src elisp
