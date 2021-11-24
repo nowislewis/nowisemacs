@@ -59,6 +59,8 @@
 ** generic
 #+begin_src elisp
   (setq use-short-answers t)
+  (blink-cursor-mode -1)                  ;指针不闪动
+
 #+end_src
 #+begin_src elisp :tangle no
   ;; Restore emacs session.
@@ -1103,54 +1105,54 @@ Marginalia provides helpful annotations for various types of minibuffer completi
 ** lsp mode
 *** lsp-mode
 #+begin_src elisp
-      (setup (:pkg lsp-mode)
-        (:hook lsp-enable-which-key-integration)
-        (:option lsp-keymap-prefix "C-c l"
-                 lsp-keep-workspace-alive nil
-                 lsp-signature-auto-activate nil
-                 lsp-modeline-code-actions-enable nil
-                 lsp-modeline-diagnostics-enable nil
-                 lsp-modeline-workspace-status-enable nil
-                 lsp-headerline-breadcrumb-enable nil
+    (setup (:pkg lsp-mode)
+      (:hook lsp-enable-which-key-integration)
+      (:option lsp-keymap-prefix "C-c l"
+               lsp-keep-workspace-alive nil
+               lsp-signature-auto-activate nil
+               lsp-modeline-code-actions-enable nil
+               lsp-modeline-diagnostics-enable nil
+               lsp-modeline-workspace-status-enable nil
+               lsp-headerline-breadcrumb-enable nil
 
-                 lsp-enable-file-watchers nil
-                 lsp-enable-folding nil
-                 lsp-enable-symbol-highlighting nil
-                 lsp-enable-text-document-color nil
+               lsp-enable-file-watchers nil
+               lsp-enable-folding nil
+               lsp-enable-symbol-highlighting nil
+               lsp-enable-text-document-color nil
 
-                 lsp-enable-indentation nil
-                 lsp-enable-on-type-formatting nil
+               lsp-enable-indentation nil
+               lsp-enable-on-type-formatting nil
 
-                 lsp-clients-svlangserver-launchConfiguration "/tools/verilator -sv --lint-only -Wall"
-                 lsp-clients-svlangserver-formatCommand "/tools/verible-verilog-format"
-                 )
-        (:bind [remap xref-find-definitions] lsp-find-definition)
-        (:bind [remap xref-find-references] lsp-find-references)
-        ;; verilog-mode
-        ;; (:with-mode verilog-mode
-        ;;   (:hook lsp-deferred))
+               ;; lsp-clients-svlangserver-launchConfiguration "/tools/verilator -sv --lint-only -Wall"
+               ;; lsp-clients-svlangserver-formatCommand "/tools/verible-verilog-format"
+               )
+      (:bind [remap xref-find-definitions] lsp-find-definition)
+      (:bind [remap xref-find-references] lsp-find-references)
+      ;; verilog-mode
+      ;; (:with-mode verilog-mode
+      ;;   (:hook lsp-deferred))
 
-        )
+      )
 
 
-      (setup (:pkg lsp-ui)
-        (:bind [remap xref-find-definitions] lsp-ui-peek-find-definitions)
-        (:bind [remap xref-find-references] lsp-ui-peek-find-references)
-        (:hook-into lsp-mode)
-        (:option lsp-ui-sideline-show-diagnostics nil
-                 lsp-ui-sideline-ignore-duplicate t
-                 lsp-ui-doc-delay 0.1
-                 lsp-ui-doc-position 'at-point
-                 lsp-ui-doc-border (face-foreground 'font-lock-comment-face nil t)
-                 lsp-ui-imenu-colors `(,(face-foreground 'font-lock-keyword-face)
-                                      ,(face-foreground 'font-lock-string-face)
-                                       ,(face-foreground 'font-lock-constant-face)
-                                       ,(face-foreground 'font-lock-variable-name-face)))
-        )
+    (setup (:pkg lsp-ui)
+      (:bind [remap xref-find-definitions] lsp-ui-peek-find-definitions)
+      (:bind [remap xref-find-references] lsp-ui-peek-find-references)
+      (:hook-into lsp-mode)
+      (:option lsp-ui-sideline-show-diagnostics nil
+               lsp-ui-sideline-ignore-duplicate t
+               lsp-ui-doc-delay 0.1
+               lsp-ui-doc-position 'at-point
+               lsp-ui-doc-border (face-foreground 'font-lock-comment-face nil t)
+               lsp-ui-imenu-colors `(,(face-foreground 'font-lock-keyword-face)
+                                    ,(face-foreground 'font-lock-string-face)
+                                     ,(face-foreground 'font-lock-constant-face)
+                                     ,(face-foreground 'font-lock-variable-name-face)))
+      )
 
-    (setup (:pkg lsp-treemacs))
-      (setup (:pkg dap-mode))
-      (setup (:pkg consult-lsp))
+  (setup (:pkg lsp-treemacs))
+    (setup (:pkg dap-mode))
+    (setup (:pkg consult-lsp))
 #+end_src
 *** lsp-org-special
 #+begin_src elisp
@@ -1247,6 +1249,10 @@ Marginalia provides helpful annotations for various types of minibuffer completi
     )
   )
 #+end_src
+** jupyter
+#+begin_src elisp
+(setup (:pkg jupyter))
+#+end_src
 * Org Mode
 ** 杂项设置
 #+begin_src elisp
@@ -1303,7 +1309,12 @@ Marginalia provides helpful annotations for various types of minibuffer completi
 #+end_src
 ** org-babel
 #+begin_src elisp
-
+(org-babel-do-load-languages
+ 'org-babel-load-languages
+ '((emacs-lisp . t)
+   (julia . t)
+   (python . t)
+   (jupyter . t)))
 #+end_src
 ** imenu-list
 #+begin_src elisp
