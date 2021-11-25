@@ -24,7 +24,7 @@
   (column-number-mode t)                       ; 在 Mode line 上显示列号
   (global-auto-revert-mode t)                  ; 当另一程序修改了文件时，让 Emacs 及时刷新 Buffer
   (delete-selection-mode t)                    ; 选中文本后输入文本会替换文本（更符合我们习惯了的其它编辑器的逻辑）
-  ;; (add-hook 'prog-mode-hook #'hs-minor-mode)   ; 编程模式下，可以折叠代码块
+  (add-hook 'prog-mode-hook #'hs-minor-mode)   ; 编程模式下，可以折叠代码块
   (global-display-line-numbers-mode 1)         ; 在 Window 显示行号
 #+end_src
 ** Startup Performance
@@ -75,7 +75,6 @@
   (setq process-adaptive-read-buffering nil)
   (setq read-process-output-max (* 1024 1024))
 
-  (blink-cursor-mode -1)                  ;指针不闪动
   (transient-mark-mode 1)                 ;标记高亮
   (global-subword-mode 1)                 ;Word移动支持 FooBar 的格式
   (setq use-dialog-box nil)               ;never pop dialog
@@ -255,7 +254,6 @@ Avoid constant errors on Windows about the coding system by setting the default 
 #+begin_src elisp
   (set-default-coding-systems 'utf-8)
 #+end_src
-
 * Keyboard Bindings
 ** meow
 #+begin_src elisp
@@ -663,8 +661,6 @@ Avoid constant errors on Windows about the coding system by setting the default 
 #+end_src
 ** 自动换行
 #+begin_src elisp
-    ;;; ### Auto-fill ###
-    ;;; --- 自动换行
   (setq fill-column 120)          ;默认显示 100列就换行
   (setq word-wrap t)
   (add-hook 'text-mode-hook 'visual-line-mode)
@@ -851,8 +847,8 @@ Marginalia provides helpful annotations for various types of minibuffer completi
      company-dabbrev-ignore-case t
 
      company-backends '(
-                        ;; (company-tabnine company-dabbrev
-                        (company-dabbrev
+                        (company-tabnine company-dabbrev
+                        ;; (company-dabbrev
                                          company-keywords company-files
                                          company-capf
                                          )
@@ -879,7 +875,9 @@ Marginalia provides helpful annotations for various types of minibuffer completi
       (add-hook 'emacs-lisp-mode-hook
                 #'(lambda ()
                     (require 'company-elisp)
-                    (push 'company-elisp company-backends)))
+                    (add-to-list (make-local-variable 'company-backends)
+                                 'company-elisp)))
+                    ;; (push 'company-elisp company-backends)))
 
       ;; The free version of TabNine is good enough,
       ;; and below code is recommended that TabNine not always
@@ -935,6 +933,7 @@ Marginalia provides helpful annotations for various types of minibuffer completi
               company-box-icons-alist 'company-box-icons-all-the-icons)))
 
 #+end_src
+
 ** yasnippet
 #+begin_src elisp
   (setup (:pkg yasnippet)
@@ -1037,6 +1036,10 @@ Marginalia provides helpful annotations for various types of minibuffer completi
 	(:autoload aweshell-toggle)
 	(:autoload aweshell-dedicated-toggle))
 #+end_src
+** vterm
+#+begin_src elisp
+  (setup (:pkg vterm))
+#+end_src
 ** exec-path-from-shell
 #+begin_src elisp
   (setup (:pkg exec-path-from-shell)
@@ -1061,7 +1064,6 @@ Marginalia provides helpful annotations for various types of minibuffer completi
     )
 #+end_src
 * 编程
-** flycheck
 ** elisp
 *** helpful
 #+begin_src elisp
@@ -1103,56 +1105,23 @@ Marginalia provides helpful annotations for various types of minibuffer completi
 #+end_src
 
 ** lsp mode
-*** lsp-mode
+*** eglot
 #+begin_src elisp
-    (setup (:pkg lsp-mode)
-      (:hook lsp-enable-which-key-integration)
-      (:option lsp-keymap-prefix "C-c l"
-               lsp-keep-workspace-alive nil
-               lsp-signature-auto-activate nil
-               lsp-modeline-code-actions-enable nil
-               lsp-modeline-diagnostics-enable nil
-               lsp-modeline-workspace-status-enable nil
-               lsp-headerline-breadcrumb-enable nil
-
-               lsp-enable-file-watchers nil
-               lsp-enable-folding nil
-               lsp-enable-symbol-highlighting nil
-               lsp-enable-text-document-color nil
-
-               lsp-enable-indentation nil
-               lsp-enable-on-type-formatting nil
-
-               ;; lsp-clients-svlangserver-launchConfiguration "/tools/verilator -sv --lint-only -Wall"
-               ;; lsp-clients-svlangserver-formatCommand "/tools/verible-verilog-format"
-               )
-      (:bind [remap xref-find-definitions] lsp-find-definition)
-      (:bind [remap xref-find-references] lsp-find-references)
-      ;; verilog-mode
-      ;; (:with-mode verilog-mode
-      ;;   (:hook lsp-deferred))
-
-      )
+  ;; use built-in package dep
+    (setup (:pkg project :type built-in))
+    (setup (:pkg xref :type built-in))
+    (setup (:pkg flymake :type built-in))
+    (setup (:pkg jsonrpc :type built-in))
+    (setup (:pkg eldoc :type built-in))
 
 
-    (setup (:pkg lsp-ui)
-      (:bind [remap xref-find-definitions] lsp-ui-peek-find-definitions)
-      (:bind [remap xref-find-references] lsp-ui-peek-find-references)
-      (:hook-into lsp-mode)
-      (:option lsp-ui-sideline-show-diagnostics nil
-               lsp-ui-sideline-ignore-duplicate t
-               lsp-ui-doc-delay 0.1
-               lsp-ui-doc-position 'at-point
-               lsp-ui-doc-border (face-foreground 'font-lock-comment-face nil t)
-               lsp-ui-imenu-colors `(,(face-foreground 'font-lock-keyword-face)
-                                    ,(face-foreground 'font-lock-string-face)
-                                     ,(face-foreground 'font-lock-constant-face)
-                                     ,(face-foreground 'font-lock-variable-name-face)))
-      )
 
-  (setup (:pkg lsp-treemacs))
-    (setup (:pkg dap-mode))
-    (setup (:pkg consult-lsp))
+  (setup (:pkg eglot)
+    )
+  ;;beauty
+  (setup (:pkg markdown-mode))
+  (setup (:pkg eldoc-box)
+    (add-hook 'eglot--managed-mode-hook #'eldoc-box-hover-mode t))
 #+end_src
 *** lsp-org-special
 #+begin_src elisp
@@ -1167,8 +1136,8 @@ Marginalia provides helpful annotations for various types of minibuffer completi
              (unless file-name
                (setq file-name (make-temp-file "babel-lsp-")))
              (setq buffer-file-name file-name)
-             ;; (eglot-ensure)))
-             (lsp-deferred)))
+             (eglot-ensure)))
+             ;; (lsp-deferred)))
          (put ',intern-pre 'function-documentation
               (format "Enable lsp-mode in the buffer of org source block (%s)."
                       (upcase ,lang)))
@@ -1269,7 +1238,7 @@ Marginalia provides helpful annotations for various types of minibuffer completi
              )
     (:file-match "\\.org\\'")
     (:when-loaded
-      (require 'org-tempo)
+      ;; (require 'org-tempo)
       (setq-default org-todo-keywords
                     (quote ((sequence "TODO(t)" "NEXT(n)" "|" "DONE(d)")
                             (sequence "WAITING(w@/!)" "HOLD(h@/!)" "|" "CANCELLED(c@/!)" "PHONE" "MEETING"))))
@@ -1302,10 +1271,9 @@ Marginalia provides helpful annotations for various types of minibuffer completi
             )
       ))
 
-  (setup (:pkg org-contrib :host github :repo "emacsmirror/org-contrib"))
+  ;; (setup (:pkg org-contrib :host github :repo "emacsmirror/org-contrib"))
 
-  ;; (add-hook 'visual-line-mode-hook #'visual-fill-column-mode)
-  ;; (add-hook 'visual-line-mode-hook #'(lambda () (setq word-wrap nil)))
+
 #+end_src
 ** org-babel
 #+begin_src elisp
@@ -1354,7 +1322,13 @@ Marginalia provides helpful annotations for various types of minibuffer completi
 (add-hook 'org-mode-hook 'prettify-symbols-mode)
 
 #+end_src
-
+** company-org-block
+#+begin_src elisp
+  (setup (:pkg company-org-block)
+    (add-hook 'org-mode-hook (lambda ()
+                               (setq-local company-backends '(company-org-block))
+                               )))
+#+end_src
 ** org-download
 #+begin_src elisp
   (setup (:pkg org-download)
@@ -1687,25 +1661,4 @@ Dial the GC threshold back down so that garbage collection happens more frequent
 ** restart-emacs
 #+begin_src elisp
 (setup (:pkg restart-emacs))
-#+end_src
-** eaf
-#+begin_src elisp :tangle no
-      (setup-define :load-from
-          (lambda (path)
-            `(let ((path* (expand-file-name ,path)))
-               (if (file-exists-p path*)
-                   (add-to-list 'load-path path*)
-                 ,(setup-quit))))
-        :documentation "Add PATH to load path.
-      This macro can be used as NAME, and it will replace itself with
-      the nondirectory part of PATH.
-      If PATH does not exist, abort the evaluation."
-        :shorthand (lambda (args)
-                     (intern
-                      (file-name-nondirectory
-                       (directory-file-name (cadr args))))))
-        (setup eaf
-          (:load-from "~/Downloads/emacs-application-framework/")
-          (require 'eaf)
-          (require 'eaf-browser))
 #+end_src
