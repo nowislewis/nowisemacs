@@ -25,7 +25,10 @@
   (global-auto-revert-mode t)                  ; 当另一程序修改了文件时，让 Emacs 及时刷新 Buffer
   (delete-selection-mode t)                    ; 选中文本后输入文本会替换文本（更符合我们习惯了的其它编辑器的逻辑）
   (add-hook 'prog-mode-hook #'hs-minor-mode)   ; 编程模式下，可以折叠代码块
+
   (global-display-line-numbers-mode 1)         ; 在 Window 显示行号
+  (setq display-line-numbers-width-start t)
+  (pixel-scroll-precision-mode t)
 #+end_src
 ** Startup Performance
 #+begin_src elisp
@@ -60,7 +63,6 @@
 #+begin_src elisp
   (setq use-short-answers t)
   (blink-cursor-mode -1)                  ;指针不闪动
-
 #+end_src
 #+begin_src elisp :tangle no
   ;; Restore emacs session.
@@ -112,6 +114,7 @@
 * Package Management
 #+begin_src elisp
   (defun my-setproxy()
+    (interactive)
         (setq url-proxy-services
           '(("http" . "localhost:12333")
             ("https" . "localhost:12333")
@@ -1222,6 +1225,12 @@ Marginalia provides helpful annotations for various types of minibuffer completi
 #+begin_src elisp
 (setup (:pkg jupyter))
 #+end_src
+** beancount
+#+begin_src elisp
+  (setup (:pkg beancount :host github :repo "beancount/beancount-mode")
+    (add-to-list 'auto-mode-alist '("\\.beancount\\'" . beancount-mode))
+    )
+#+end_src
 * Org Mode
 ** 杂项设置
 #+begin_src elisp
@@ -1284,16 +1293,6 @@ Marginalia provides helpful annotations for various types of minibuffer completi
    (python . t)
    (jupyter . t)))
 #+end_src
-** imenu-list
-#+begin_src elisp
-  (setup (:pkg imenu-list)
-    (:autoload imenu-list-smart-toggle)
-    (:option imenu-list-focus-after-activate t
-             imenu-list-auto-resize t
-             imenu-list-position 'left
-             )
-    )
-#+end_src
 ** beauty
 #+begin_src elisp
   (setup (:pkg org-superstar)
@@ -1321,6 +1320,47 @@ Marginalia provides helpful annotations for various types of minibuffer completi
                                        ("#+end_src" . "Ⅎ")))
 (add-hook 'org-mode-hook 'prettify-symbols-mode)
 
+#+end_src
+** org-agenda
+#+begin_src elisp
+    ;; (global-set-key (kbd "C-c l") 'org-store-link)
+  (global-set-key (kbd "C-c a") 'org-agenda)
+  ;; (global-set-key (kbd "C-c c") 'org-capture)
+  (setup (:pkg org-super-agenda)
+    (:option
+     org-agenda-compact-blocks t
+     org-agenda-custom-commands '(("z" "super view"
+                                   ((agenda "" ((org-agenda-span 'day)
+                                                (org-super-agenda-groups
+                                                 '((:name "Today"
+                                                          :time-grid t
+                                                          :date today
+                                                          :todo "TODAY"
+                                                          :scheduled today
+                                                          :order 1)))))
+                                    (alltodo "" ((org-agenda-overriding-header "")
+                                                 (org-super-agenda-groups
+                                                  '((:name "Next to do"
+                                                           :todo "NEXT"
+                                                           :order 1)
+                                                    (:name "Important"
+                                                           :tag "Important"
+                                                           :priority "A"
+                                                           :order 6)
+                                                    ))))
+                                    )
+                                   ))
+     ))
+#+end_src
+** imenu-list
+#+begin_src elisp
+  (setup (:pkg imenu-list)
+    (:autoload imenu-list-smart-toggle)
+    (:option imenu-list-focus-after-activate t
+             imenu-list-auto-resize t
+             imenu-list-position 'left
+             )
+    )
 #+end_src
 ** company-org-block
 #+begin_src elisp
