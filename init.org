@@ -609,6 +609,20 @@ Avoid constant errors on Windows about the coding system by setting the default 
     (diff-hl-margin-mode)
     )
 #+end_src
+** emacs-dashboard
+#+begin_src elisp
+  (setup (:pkg dashboard)
+    (:option dashboard-items '((recents . 5)
+                               (agenda . 5)
+                               (bookmarks . 5)
+                               (projects . 5))
+             ;; dashboard-set-heading-icons t
+             dashboard-center-content t
+             dashboard-set-init-info t
+             )
+    (dashboard-setup-startup-hook)
+    (add-to-list 'dashboard-items '(agenda) t))
+#+end_src
 * General Configuration
 ** awesome-tray
 #+begin_src elisp :tangle no
@@ -1344,13 +1358,13 @@ Marginalia provides helpful annotations for various types of minibuffer completi
                                                            :todo "NEXT"
                                                            :order 1)
                                                     (:name "Important"
-                                                           :tag "Important"
+                                                           ;; :tag "Important"
                                                            :priority "A"
                                                            :order 6)
                                                     ))))
                                     )
-                                   ))
-     ))
+                                   )))
+    (:hook-into org-agenda-mode))
 #+end_src
 ** imenu-list
 #+begin_src elisp
