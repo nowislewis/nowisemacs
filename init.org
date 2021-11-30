@@ -266,7 +266,10 @@ Avoid constant errors on Windows about the coding system by setting the default 
     (defun meow-setup()
       (setq meow-cheatsheet-layout meow-cheatsheet-layout-qwerty)
       (meow-motion-overwrite-define-key '("j" . meow-next)
-                                        '("k" . meow-prev))
+                                        '("k" . meow-prev)
+                                        '("<" . sort-tab-select-prev-tab)
+                                        '(">" . sort-tab-select-next-tab)
+                                        )
       (meow-leader-define-key
        ;; SPC j/k will run the original command in MOTION state.
        '("j" . meow-motion-origin-command)
@@ -359,7 +362,7 @@ Avoid constant errors on Windows about the coding system by setting the default 
                               '("}" . meow-bounds-of-thing)
                               '("[" . meow-beginning-of-thing)
                               '("]" . meow-end-of-thing)
-                              '("<" . sort-tab-select-first-tab)
+                              '("<" . sort-tab-select-prev-tab)
                               '(">" . sort-tab-select-next-tab)
                               '("." . repeat)
                               '("," . meow-join)
@@ -1257,7 +1260,7 @@ Marginalia provides helpful annotations for various types of minibuffer completi
              org-return-follows-link t
              org-blank-before-new-entry '((heading . nil)
                                           (plain-list-item . nil))
-
+             org-image-actual-width 600
              )
     (:file-match "\\.org\\'")
     (:when-loaded
