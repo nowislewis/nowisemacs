@@ -1340,33 +1340,35 @@ Marginalia provides helpful annotations for various types of minibuffer completi
 #+end_src
 ** org-agenda
 #+begin_src elisp
-    ;; (global-set-key (kbd "C-c l") 'org-store-link)
   (global-set-key (kbd "C-c a") 'org-agenda)
-  ;; (global-set-key (kbd "C-c c") 'org-capture)
   (setup (:pkg org-super-agenda)
-    (:option
-     org-agenda-compact-blocks t
-     org-agenda-custom-commands '(("z" "super view"
-                                   ((agenda "" ((org-agenda-span 'day)
-                                                (org-super-agenda-groups
-                                                 '((:name "Today"
-                                                          :time-grid t
-                                                          :date today
-                                                          :todo "TODAY"
-                                                          :scheduled today
-                                                          :order 1)))))
-                                    (alltodo "" ((org-agenda-overriding-header "")
-                                                 (org-super-agenda-groups
-                                                  '((:name "Next to do"
-                                                           :todo "NEXT"
-                                                           :order 1)
-                                                    (:name "Important"
-                                                           ;; :tag "Important"
-                                                           :priority "A"
-                                                           :order 6)
-                                                    ))))
-                                    )
-                                   )))
+    (:option org-agenda-compact-blocks t)
+    (let ((org-super-agenda-groups
+           '(;; Each group has an implicit boolean OR operator between its selectors.
+             (:name "Today"  ; Optionally specify section name
+                    :time-grid t  ; Items that appear on the time grid
+                    :todo "TODAY")  ; Items that have this TODO keyword
+             (:name "Important"
+                    :priority "A")
+             ;; Set order of multiple groups at once
+             (:order-multi (2 (:name "Shopping in town"
+                                     ;; Boolean AND group matches items that match all subgroups
+                                     :and (:tag "shopping" :tag "@town"))
+                              (:name "Food-related"
+                                     ;; Multiple args given in list with implicit OR
+                                     :tag ("food" "dinner"))
+                              (:name "Index"
+                                     :tag "index")
+                              (:name "Space-related (non-moon-or-planet-related)"
+                                     ;; Regexps match case-insensitively on the entire entry
+                                     :and (:regexp ("space" "NASA")
+                                                   ;; Boolean NOT also has implicit OR between selectors
+                                                   :not (:regexp "moon" :tag "planet")))))
+             (:priority<= "B"
+                          :order 1)
+             )))
+      (org-agenda nil "a"))
+
     (:hook-into org-agenda-mode))
 #+end_src
 ** imenu-list
