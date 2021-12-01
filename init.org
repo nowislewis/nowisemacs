@@ -1220,8 +1220,12 @@ Marginalia provides helpful annotations for various types of minibuffer completi
 ** graphviz-dot-mode
 #+begin_src elisp
   (setup (:pkg graphviz-dot-mode)
-    (:file-match "\\.dot\\'")
-    (:option graphviz-dot-indent-width 4))
+    ;; (:file-match "\\.dot\\'")
+    (:option graphviz-dot-indent-width 4)
+    (:when-loaded
+      (require 'company-graphviz-dot)
+      )
+    )
 #+end_src
 ** verilog
 #+begin_src verilog
@@ -1303,12 +1307,13 @@ Marginalia provides helpful annotations for various types of minibuffer completi
 #+end_src
 ** org-babel
 #+begin_src elisp
-(org-babel-do-load-languages
- 'org-babel-load-languages
- '((emacs-lisp . t)
-   (julia . t)
-   (python . t)
-   (jupyter . t)))
+  (org-babel-do-load-languages
+   'org-babel-load-languages
+   '((emacs-lisp . t)
+     (julia . t)
+     (python . t)
+     (dot . t)
+     (jupyter . t)))
 #+end_src
 ** beauty
 #+begin_src elisp
@@ -1471,12 +1476,10 @@ Marginalia provides helpful annotations for various types of minibuffer completi
   (setup (:pkg org-roam-ui :host github :repo "org-roam/org-roam-ui" :files ("*.el" "out")))
 #+end_src
 *** org-roam-timestamps
-#+begin_src elisp :tangle no
+#+begin_src elisp
   (setup (:pkg org-roam-timestamps)
-    (:load-after org-roam)
-    (:when-loaded
-      (org-roam-timestamps-mode)
-      ))
+      (:hook-into org-roam-mode)
+      )
 #+end_src
 *** org-roam-agenda
 #+begin_src elisp
