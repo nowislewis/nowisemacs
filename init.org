@@ -63,6 +63,8 @@
 #+begin_src elisp
   (setq use-short-answers t)
   (blink-cursor-mode -1)                  ;指针不闪动
+    (setq ring-bell-function 'ignore)       ;关闭烦人的出错时的提示声
+
 #+end_src
 #+begin_src elisp :tangle no
   ;; Restore emacs session.
@@ -1348,6 +1350,7 @@ Marginalia provides helpful annotations for various types of minibuffer completi
   (global-set-key (kbd "C-c a") 'org-agenda)
   (setup (:pkg org-super-agenda)
     (:option org-agenda-compact-blocks t)
+    (:when-loaded
     (let ((org-super-agenda-groups
            '(;; Each group has an implicit boolean OR operator between its selectors.
              (:name "Today"  ; Optionally specify section name
@@ -1372,7 +1375,7 @@ Marginalia provides helpful annotations for various types of minibuffer completi
              (:priority<= "B"
                           :order 1)
              )))
-      (org-agenda nil "a"))
+      (org-agenda nil "a")))
 
     (:hook-into org-agenda-mode))
 #+end_src
