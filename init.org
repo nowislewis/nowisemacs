@@ -262,9 +262,23 @@ Avoid constant errors on Windows about the coding system by setting the default 
 * Keyboard Bindings
 ** meow
 #+begin_src elisp
-  (setup
-      (:pkg meow)
-    (require 'meow)
+    (setup
+        (:pkg meow)
+      (require 'meow)
+      (:option meow-char-thing-table '(
+                                       (?\( . round)
+                                       (?\[ . square)
+                                       (?\{ . curly)
+                                       (?\" . string)
+                                       (?e . symbol)
+                                       (?w . window)
+                                       (?b . buffer)
+                                       (?p . paragraph)
+                                       (?l . line)
+                                       (?d . defun)
+                                       (?i . indent)
+                                       (?x . extend)
+                                       ))
     (defun meow-setup()
       (setq meow-cheatsheet-layout meow-cheatsheet-layout-qwerty)
       (meow-motion-overwrite-define-key '("j" . meow-next)
@@ -531,6 +545,13 @@ Avoid constant errors on Windows about the coding system by setting the default 
                              )
                            "t")
 #+end_src
+*** agenda
+#+begin_src elisp
+  (lewis/define-leader-key '(
+                             ("a" . org-agenda)
+                             )
+                           "a")
+#+end_src
 
 * UI
 ** Theme
@@ -759,11 +780,9 @@ Avoid constant errors on Windows about the coding system by setting the default 
     (:option vertico-posframe-parameters
       '((left-fringe . 16)
 	(right-fringe . 16)))
-    ;; vertico-posframe-border-width 8
      (vertico-posframe-mode t)
     )
 #+end_src
-
 ** Orderless
 #+begin_src elisp
   (setup (:pkg orderless)
@@ -855,7 +874,7 @@ Marginalia provides helpful annotations for various types of minibuffer completi
 ** company 相关
 *** company-mode
 #+begin_src elisp
-  (setup (:pkg company-tabnine))
+  ;; (setup (:pkg company-tabnine))
   (setup
       (:pkg company)
     (:option
@@ -869,8 +888,8 @@ Marginalia provides helpful annotations for various types of minibuffer completi
      company-dabbrev-ignore-case t
 
      company-backends '(
-                        (company-tabnine company-dabbrev
-                        ;; (company-dabbrev
+                        ;; (company-tabnine company-dabbrev
+                        (company-dabbrev
                                          company-keywords company-files
                                          company-capf
                                          )
@@ -1251,7 +1270,7 @@ Marginalia provides helpful annotations for various types of minibuffer completi
 ** beancount
 #+begin_src elisp
   (setup (:pkg beancount :host github :repo "beancount/beancount-mode")
-    (add-to-list 'auto-mode-alist '("\\.beancount\\'" . beancount-mode))
+    (:file-match "\\.beancount\\'")
     )
 #+end_src
 * Org Mode
@@ -1347,7 +1366,7 @@ Marginalia provides helpful annotations for various types of minibuffer completi
 #+end_src
 ** org-agenda
 #+begin_src elisp
-  (global-set-key (kbd "C-c a") 'org-agenda)
+
   (setup (:pkg org-super-agenda)
     (:option org-agenda-compact-blocks t)
     (:when-loaded
