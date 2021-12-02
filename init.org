@@ -262,23 +262,34 @@ Avoid constant errors on Windows about the coding system by setting the default 
 * Keyboard Bindings
 ** meow
 #+begin_src elisp
-    (setup
-        (:pkg meow)
-      (require 'meow)
-      (:option meow-char-thing-table '(
-                                       (?\( . round)
-                                       (?\[ . square)
-                                       (?\{ . curly)
-                                       (?\" . string)
-                                       (?e . symbol)
-                                       (?w . window)
-                                       (?b . buffer)
-                                       (?p . paragraph)
-                                       (?l . line)
-                                       (?d . defun)
-                                       (?i . indent)
-                                       (?x . extend)
-                                       ))
+  (setup
+      (:pkg meow)
+    (require 'meow)
+    (:option meow-char-thing-table '(
+                                     (?\( . round)
+                                     (?\[ . square)
+                                     (?\{ . curly)
+                                     (?\" . string)
+                                     (?e . symbol)
+                                     (?w . window)
+                                     (?b . buffer)
+                                     (?p . paragraph)
+                                     (?l . line)
+                                     (?d . defun)
+                                     (?i . indent)
+                                     (?x . extend)
+                                     )
+             meow-use-keypad-when-execute-kbd nil
+             meow-expand-exclude-mode-list nil
+             meow-use-clipboard t
+             meow-cursor-type-normal '(bar . 5)
+             meow-cursor-type-insert '(bar . 1)
+             meow-replace-state-name-list '((normal . "N")
+                                            (motion . "M")
+                                            (keypad . "K")
+                                            (insert . "I"))
+             meow-use-enhanced-selection-effect t
+             )
     (defun meow-setup()
       (setq meow-cheatsheet-layout meow-cheatsheet-layout-qwerty)
       (meow-motion-overwrite-define-key '("j" . meow-next)
@@ -400,16 +411,7 @@ Avoid constant errors on Windows about the coding system by setting the default 
     ;; 如果你需要自动的 mode-line 设置（如果需要自定义见下文对 `meow-indicator' 说明）
     ;; (meow-setup-indicator)
     ;; (setq which-key-show-transient-maps t)
-    (setq meow-use-keypad-when-execute-kbd nil)
-    (setq meow-expand-exclude-mode-list nil)
-    (setq meow-use-clipboard t)
-    (setq meow-cursor-type-normal '(bar . 5))
-    (setq meow-cursor-type-insert '(bar . 1))
-    (setq meow-replace-state-name-list '((normal . "N")
-                                         (motion . "M")
-                                         (keypad . "K")
-                                         (insert . "I")))
-    (setq meow-use-enhanced-selection-effect t)
+
     )
 #+end_src
 ** undo-tree
