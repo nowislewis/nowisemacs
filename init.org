@@ -50,10 +50,12 @@
   (defvar nowisemacs-extension-dir (concat nowisemacs-root-dir "/extensions")))
 #+end_src
 ** Native Compilation
-#+begin_src elisp :tangle no
-  ;; Set the right directory to store the native comp cache
-  (setq native
-  ;; (add-to-list 'native-comp-eln-load-path (expand-file-name "eln-cache/" user-emacs-directory))
+#+begin_src elisp
+;; Silence compiler warnings as they can be pretty disruptive
+(setq native-comp-async-report-warnings-errors nil)
+
+;; Set the right directory to store the native comp cache
+(add-to-list 'native-comp-eln-load-path (expand-file-name "eln-cache/" user-emacs-directory))
 #+end_src
 ** recentf
 #+begin_src elisp
@@ -448,6 +450,7 @@ Avoid constant errors on Windows about the coding system by setting the default 
 ** keybinding
 *** lewis
 #+begin_src elisp
+  ;;; lewisliu
   (lewis/define-leader-key
    '(;; youdao
      ("y p" . youdao-dictionary-search-at-point-posframe)
@@ -479,11 +482,9 @@ Avoid constant errors on Windows about the coding system by setting the default 
      ;; english help
      ("h c" . toggle-company-english-helper)
      ("h f" . english-teacher-follow-mode)
-     ;;leader: lewisliu
      ) "e")
-#+end_src
-*** search
-#+begin_src elisp
+
+  ;;; search
    (lewis/define-leader-key '(
                               ("s" . consult-line)
                               ("b" . consult-buffer)
@@ -492,6 +493,7 @@ Avoid constant errors on Windows about the coding system by setting the default 
                               ("f" . consult-find)
                               ) "s")
 
+  ;;; find-file
    (defun find-config-file()
      (interactive)
      (find-file nowisemacs-config-dir))
@@ -499,9 +501,8 @@ Avoid constant errors on Windows about the coding system by setting the default 
                               ("r" . consult-recent-file)
                               ("p" . find-config-file)
                               ) "f")
-#+end_src
-*** notes
-#+begin_src elisp
+  ;;; notes
+  ;;roam
   (lewis/define-leader-key '(
                              ("D" . org-roam-demote-entire-buffer)
                              ("f" . org-roam-node-find)
@@ -537,24 +538,17 @@ Avoid constant errors on Windows about the coding system by setting the default 
                              ) "n r")
   (lewis/define-leader-key '(
                              ("e" . org-noter)
-                             )
-                           "n")
-#+end_src
-*** time
-#+begin_src elisp
+                             ) "n")
+
+  ;;; time
   (lewis/define-leader-key '(
                              ("t" . org-pomodoro)
-                             )
-                           "t")
-#+end_src
-*** agenda
-#+begin_src elisp
+                             ) "t")
+  ;;a agenda
   (lewis/define-leader-key '(
                              ("a" . org-agenda)
-                             )
-                           "a")
+                             ) "a")
 #+end_src
-
 * UI
 ** Theme
 #+begin_src elisp
@@ -1274,10 +1268,6 @@ Marginalia provides helpful annotations for various types of minibuffer completi
     )
   )
 #+end_src
-** jupyter
-#+begin_src elisp
-(setup (:pkg jupyter))
-#+end_src
 ** beancount
 #+begin_src elisp
   (setup (:pkg beancount :host github :repo "beancount/beancount-mode")
@@ -1346,7 +1336,8 @@ Marginalia provides helpful annotations for various types of minibuffer completi
      (julia . t)
      (python . t)
      (dot . t)
-     (jupyter . t)))
+     ;; (jupyter . t)
+     ))
 #+end_src
 ** beauty
 #+begin_src elisp
@@ -1743,10 +1734,6 @@ If nil it defaults to `split-string-default-separators', normally
      )
     )
 #+end_src
-** nov
-#+begin_src elisp
-#+end_src
-** elfeed
 * tools
 ** GC
 Dial the GC threshold back down so that garbage collection happens more frequently but in less time.
