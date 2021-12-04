@@ -203,7 +203,7 @@ installed via Guix.")
 #+begin_src elisp
   (setup-define :delay
      (lambda (&rest time)
-       `(run-with-idle-timer ,(or time 1)
+       `(run-with-idle-timer ,(or time 0.1)
                              nil ;; Don't repeat
                              (lambda () (require ',(setup-get 'feature)))))
      :documentation "Delay loading the feature until a certain amount of idle time has passed.")
@@ -684,12 +684,11 @@ Avoid constant errors on Windows about the coding system by setting the default 
 ** sort-tab
 #+begin_src elisp
   (setup (:pkg sort-tab
-            :host github
-    :repo "manateelazycat/sort-tab")
-    (:delay)
-         (require 'sort-tab)
-         ;; (sort-tab-mode 1)
-  )
+               :host github
+               :repo "manateelazycat/sort-tab")
+    (require 'sort-tab)
+    (sort-tab-mode)
+    )
 #+end_src
 ** backup
 #+begin_src elisp
@@ -1150,21 +1149,31 @@ Marginalia provides helpful annotations for various types of minibuffer completi
 ** lsp mode
 *** eglot
 #+begin_src elisp
-  ;; use built-in package dep
-    (setup (:pkg project :type built-in))
-    (setup (:pkg xref :type built-in))
-    (setup (:pkg flymake :type built-in))
-    (setup (:pkg jsonrpc :type built-in))
-    (setup (:pkg eldoc :type built-in))
 
+      ;; use built-in package dep
+        (setup (:pkg project :type built-in))
+        (setup (:pkg xref :type built-in))
+        (setup (:pkg flymake :type built-in))
+        (setup (:pkg jsonrpc :type built-in))
+        (setup (:pkg eldoc :type built-in))
 
-
-  (setup (:pkg eglot)
-    )
-  ;;beauty
-  (setup (:pkg markdown-mode))
-  (setup (:pkg eldoc-box)
-    (add-hook 'eglot--managed-mode-hook #'eldoc-box-hover-mode t))
+      (setup (:pkg lsp-mode))
+    (setup (:pkg lsp-treemacs))
+    (setup (:pkg lsp-ui)
+      (:hook-into lsp-mode))
+    (setup (:pkg dap-mode)
+      ;; (:option dap-auto-configure-features '(sessions locals controls tooltip))
+      (:when-loaded
+      (require 'dap-gdb-lldb)
+      (require 'dap-cpptools)
+      (require 'dap-python)
+      ))
+      ;; (setup (:pkg eglot)
+      ;;   )
+      ;;beauty
+      ;; (setup (:pkg markdown-mode))
+      ;; (setup (:pkg eldoc-box)
+      ;;   (add-hook 'eglot--managed-mode-hook #'eldoc-box-hover-mode t))
 #+end_src
 *** lsp-org-special
 #+begin_src elisp
@@ -1288,43 +1297,44 @@ Marginalia provides helpful annotations for various types of minibuffer completi
              org-blank-before-new-entry '((heading . nil)
                                           (plain-list-item . nil))
              org-image-actual-width 600
-             )
-    (:file-match "\\.org\\'")
-    (:when-loaded
-      ;; (require 'org-tempo)
-      (setq-default org-todo-keywords
-                    (quote ((sequence "TODO(t)" "NEXT(n)" "|" "DONE(d)")
-                            (sequence "WAITING(w@/!)" "HOLD(h@/!)" "|" "CANCELLED(c@/!)" "PHONE" "MEETING"))))
-      (setq-default org-todo-keyword-faces
-                    (quote (("TODO" :foreground "red" :weight bold)
-                            ("NEXT" :foreground "blue" :weight bold)
-                            ("DONE" :foreground "forest green" :weight bold)
-                            ("WAITING" :foreground "orange" :weight bold)
-                            ("HOLD" :foreground "magenta" :weight bold)
-                            ("CANCELLED" :foreground "forest green" :weight bold)
-                            ("MEETING" :foreground "forest green" :weight bold)
-                            ("PHONE" :foreground "forest green" :weight bold))))
-      ;; 导出相关的设置
+             org-refile-targets '(("~/Documents/emacs/orgmode/roam/20211204000712-refile_index.org" . (:maxlevel . 9))
+                                  ))
+             (:file-match "\\.org\\'")
+             (:when-loaded
+               ;; (require 'org-tempo)
+               (setq-default org-todo-keywords
+                             (quote ((sequence "TODO(t)" "NEXT(n)" "|" "DONE(d)")
+                                     (sequence "WAITING(w@/!)" "HOLD(h@/!)" "|" "CANCELLED(c@/!)" "PHONE" "MEETING"))))
+               (setq-default org-todo-keyword-faces
+                             (quote (("TODO" :foreground "red" :weight bold)
+                                     ("NEXT" :foreground "blue" :weight bold)
+                                     ("DONE" :foreground "forest green" :weight bold)
+                                     ("WAITING" :foreground "orange" :weight bold)
+                                     ("HOLD" :foreground "magenta" :weight bold)
+                                     ("CANCELLED" :foreground "forest green" :weight bold)
+                                     ("MEETING" :foreground "forest green" :weight bold)
+                                     ("PHONE" :foreground "forest green" :weight bold))))
+               ;; 导出相关的设置
 
-      (setq org-latex-pdf-process
-            '("xelatex -interaction nonstopmode %f"
-              "bibtex %b"
-              "xelatex -interaction nonstopmode %f"
-              "xelatex -interaction nonstopmode %f"))
+               (setq org-latex-pdf-process
+                     '("xelatex -interaction nonstopmode %f"
+                       "bibtex %b"
+                       "xelatex -interaction nonstopmode %f"
+                       "xelatex -interaction nonstopmode %f"))
 
-      ;;设置粗体高亮颜色
-      (require 'cl)
-      (setq org-emphasis-alist
-            (cons '("*" '(:emphasis t :foreground "pale violet red" :weight bold))
-                  (delete* "*" org-emphasis-alist :key 'car :test 'equal))
-            )
-      (setq org-emphasis-alist
-            (cons '("/" '(:slant t :foreground "green3" :slant italic))
-                  (delete* "/" org-emphasis-alist :key 'car :test 'equal))
-            )
-      ))
+               ;;设置粗体高亮颜色
+               (require 'cl)
+               (setq org-emphasis-alist
+                     (cons '("*" '(:emphasis t :foreground "pale violet red" :weight bold))
+                           (delete* "*" org-emphasis-alist :key 'car :test 'equal))
+                     )
+               (setq org-emphasis-alist
+                     (cons '("/" '(:slant t :foreground "green3" :slant italic))
+                           (delete* "/" org-emphasis-alist :key 'car :test 'equal))
+                     )
+               ))
 
-  ;; (setup (:pkg org-contrib :host github :repo "emacsmirror/org-contrib"))
+    ;; (setup (:pkg org-contrib :host github :repo "emacsmirror/org-contrib"))
 
 
 #+end_src
