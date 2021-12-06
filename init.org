@@ -836,17 +836,12 @@ This keyword causes a body to be executed after other packages/features are load
       (call-interactively 'consult-ripgrep)))
 #+end_src
 ** Marginalia
-
-Marginalia provides helpful annotations for various types of minibuffer completions.  You can think of it as a replacement of =ivy-rich=.
-
 #+begin_src elisp
-
   (setup (:pkg marginalia)
     (:option marginalia-annotators '(marginalia-annotators-heavy
                                      marginalia-annotators-light
                                      nil))
     (marginalia-mode))
-
 #+end_src
 ** embark
 #+begin_src elisp
@@ -983,7 +978,6 @@ Marginalia provides helpful annotations for various types of minibuffer completi
 #+end_src
 * 输入与阅读
 ** pyim
-只在linux平台使用
 #+begin_src elisp
   (setup (:pkg posframe))
 
@@ -1020,7 +1014,6 @@ Marginalia provides helpful annotations for various types of minibuffer completi
     (setq default-input-method "pyim")
     )
 #+end_src
-
 ** good-scroll
 #+begin_src elisp
 (setup (:pkg good-scroll))
@@ -1048,7 +1041,6 @@ Marginalia provides helpful annotations for various types of minibuffer completi
     (:pkg exwm)
     (:when-loaded
       (require 'exwm)
-
       ;; (require 'exwm-config)
       ;; (exwm-config-example)
       ;; using xim input
@@ -1128,7 +1120,6 @@ Marginalia provides helpful annotations for various types of minibuffer completi
 ** lsp mode
 *** eglot
 #+begin_src elisp
-
       ;; use built-in package dep
         (setup (:pkg project :type built-in))
         (setup (:pkg xref :type built-in))
@@ -1141,18 +1132,12 @@ Marginalia provides helpful annotations for various types of minibuffer completi
     (setup (:pkg lsp-ui)
       (:hook-into lsp-mode))
     (setup (:pkg dap-mode)
-      ;; (:option dap-auto-configure-features '(sessions locals controls tooltip))
       (:when-loaded
       (require 'dap-gdb-lldb)
       (require 'dap-cpptools)
       (require 'dap-python)
       ))
-      ;; (setup (:pkg eglot)
-      ;;   )
-      ;;beauty
-      ;; (setup (:pkg markdown-mode))
-      ;; (setup (:pkg eldoc-box)
-      ;;   (add-hook 'eglot--managed-mode-hook #'eldoc-box-hover-mode t))
+
 #+end_src
 *** lsp-org-special
 #+begin_src elisp :tangle no
@@ -1337,7 +1322,6 @@ Marginalia provides helpful annotations for various types of minibuffer completi
 #+end_src
 ** org-agenda
 #+begin_src elisp
-
   (setup (:pkg org-super-agenda)
     (:option org-agenda-compact-blocks t)
     (:when-loaded
@@ -1658,7 +1642,6 @@ If nil it defaults to `split-string-default-separators', normally
   )
 #+end_src
 ** english-teacher
-自动翻译当前buffer 的句子，在下方显示，按键和 company-teacher-helper-mode 在一起
 #+begin_src elisp
 (setup (:pkg english-teacher :host github
            :repo "loyalpartner/english-teacher.el")
@@ -1671,7 +1654,6 @@ If nil it defaults to `split-string-default-separators', normally
       (:autoload insert-translated-name-replace))
 #+end_src
 ** company-english-helper
-在输入英文的时候，自动提示单词
 #+begin_src elisp
 (setup (:pkg company-english-helper :host github
            :repo "manateelazycat/company-english-helper")
@@ -1683,12 +1665,8 @@ If nil it defaults to `split-string-default-separators', normally
 #+begin_src elisp
   (setup (:pkg pdf-tools :host github :repo "vedang/pdf-tools")
     (:option pdf-view-use-scaling t)
-    ;; (pdf-annot-list-format '((page . 3) (type . 10) (contents . 25)))
     (pdf-loader-install)
     )
-  ;; (setup (:pkg pdf-continuous-scroll-mode :host github :repo "dalanicolai/pdf-continuous-scroll-mode.el")
-  ;;   (:hook-into pdf-view-mode-hook)
-  ;;   )
 
 #+end_src
 ** org-noter
