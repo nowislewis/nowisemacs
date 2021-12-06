@@ -57,16 +57,14 @@
 ;; Set the right directory to store the native comp cache
 (add-to-list 'native-comp-eln-load-path (expand-file-name "eln-cache/" user-emacs-directory))
 #+end_src
-** recentf
-#+begin_src elisp
-  (recentf-mode t)
-#+end_src
+
 ** generic
 #+begin_src elisp
+  (recentf-mode t)
   (setq use-short-answers t)
   (blink-cursor-mode -1)                  ;指针不闪动
-    (setq ring-bell-function 'ignore)       ;关闭烦人的出错时的提示声
-
+  (setq ring-bell-function 'ignore)       ;关闭烦人的出错时的提示声
+  (set-default-coding-systems 'utf-8)
 #+end_src
 #+begin_src elisp :tangle no
   ;; Restore emacs session.
@@ -116,6 +114,7 @@
 #+end_src
 
 * Package Management
+** proxy
 #+begin_src elisp
   (defun my-setproxy()
     (interactive)
@@ -126,6 +125,7 @@
     )
   ;; (my-setproxy)
 #+end_src
+** straight
 #+begin_src elisp
   (unless (featurep 'straight)
     ;; Bootstrap straight.el
@@ -255,11 +255,83 @@ This keyword causes a body to be executed after other packages/features are load
         ;;            :repo "manateelazycat/company-english-helper")
         ;;        (:autoload "company-english-helper" toggle-english-helper))
 #+end_src
-
-* Default Coding System
-Avoid constant errors on Windows about the coding system by setting the default to UTF-8.
+** benchmark
 #+begin_src elisp
-  (set-default-coding-systems 'utf-8)
+  (defun sanityinc/time-subtract-millis (b a)
+    (* 1000.0 (float-time (time-subtract b a))))
+
+
+  (defvar sanityinc/require-times nil
+    "A list of (FEATURE LOAD-START-TIME LOAD-DURATION).
+  LOAD-DURATION is the time taken in milliseconds to load FEATURE.")
+
+  (defun sanityinc/require-times-wrapper (orig feature &rest args)
+    "Note in `sanityinc/require-times' the time taken to require each feature."
+    (let* ((already-loaded (memq feature features))
+           (require-start-time (and (not already-loaded) (current-time))))
+      (prog1
+          (apply orig feature args)
+        (when (and (not already-loaded) (memq feature features))
+          (let ((time (sanityinc/time-subtract-millis (current-time) require-start-time)))
+            (add-to-list 'sanityinc/require-times
+                         (list feature require-start-time time)
+                         t))))))
+
+  (advice-add 'require :around 'sanityinc/require-times-wrapper)
+
+  (define-derived-mode sanityinc/require-times-mode tabulated-list-mode "Require-Times"
+    "Show times taken to `require' packages."
+    (setq tabulated-list-format
+          [("Start time (ms)" 20 sanityinc/require-times-sort-by-start-time-pred)
+           ("Feature" 30 t)
+           ("Time (ms)" 12 sanityinc/require-times-sort-by-load-time-pred)])
+    (setq tabulated-list-sort-key (cons "Start time (ms)" nil))
+    ;; (setq tabulated-list-padding 2)
+    (setq tabulated-list-entries #'sanityinc/require-times-tabulated-list-entries)
+    (tabulated-list-init-header)
+    (when (fboundp 'tablist-minor-mode)
+      (tablist-minor-mode)))
+
+  (defun sanityinc/require-times-sort-by-start-time-pred (entry1 entry2)
+    (< (string-to-number (elt (nth 1 entry1) 0))
+       (string-to-number (elt (nth 1 entry2) 0))))
+
+  (defun sanityinc/require-times-sort-by-load-time-pred (entry1 entry2)
+    (> (string-to-number (elt (nth 1 entry1) 2))
+       (string-to-number (elt (nth 1 entry2) 2))))
+
+  (defun sanityinc/require-times-tabulated-list-entries ()
+    (cl-loop for (feature start-time millis) in sanityinc/require-times
+             with order = 0
+             do (cl-incf order)
+             collect (list order
+                           (vector
+                            (format "%.3f" (sanityinc/time-subtract-millis start-time before-init-time))
+                            (symbol-name feature)
+                            (format "%.3f" millis)))))
+
+  (defun sanityinc/require-times ()
+    "Show a tabular view of how long various libraries took to load."
+    (interactive)
+    (with-current-buffer (get-buffer-create "*Require Times*")
+      (sanityinc/require-times-mode)
+      (tabulated-list-revert)
+      (display-buffer (current-buffer))))
+
+
+  (defun sanityinc/show-init-time ()
+    (message "init completed in %.2fms"
+             (sanityinc/time-subtract-millis after-init-time before-init-time)))
+
+  (add-hook 'after-init-hook 'sanityinc/show-init-time)
+#+end_src
+* exec-path-from-shell
+#+begin_src elisp
+  (setup (:pkg exec-path-from-shell)
+    (:delay)
+    (when (memq window-system '(mac ns x))
+      (exec-path-from-shell-initialize))
+    )
 #+end_src
 * Keyboard Bindings
 ** meow
@@ -416,13 +488,6 @@ Avoid constant errors on Windows about the coding system by setting the default 
 
     )
 #+end_src
-** undo-tree
-#+begin_src elisp :tangle no
-  (setup (:pkg undo-tree)
-    (setq undo-tree-auto-save-history nil)
-    (global-undo-tree-mode 1))
-#+end_src
-
 ** which-key
 #+begin_src elisp
   (setup (:pkg which-key)
@@ -430,7 +495,8 @@ Avoid constant errors on Windows about the coding system by setting the default 
     (setq which-key-idle-delay 0.1))
 #+end_src
 
-** lewis-define-key
+** keybinding
+*** lewis-define-key
 #+begin_src elisp
   (defun lewis/define-leader-key (key-alist &optional key-prefix)
     (let (key def)
@@ -446,9 +512,7 @@ Avoid constant errors on Windows about the coding system by setting the default 
 	      (t (signal 'wrong-type-argument (list 'array key))))
 	(define-key keymap key def))))
 #+end_src
-
-** keybinding
-*** lewis
+*** keys
 #+begin_src elisp
   ;;; lewisliu
   (lewis/define-leader-key
@@ -572,33 +636,6 @@ Avoid constant errors on Windows about the coding system by setting the default 
       (set-fontset-font (frame-parameter nil 'font) 'unicode (eval emacs-font-name))
       ))
 #+end_src
-
-#+begin_src elisp :tangle no
-(defun +my/better-font()
-(interactive)
-;; english font
-(if (display-graphic-p)
-    (progn
-        (set-face-attribute 'default nil :font (format   "%s:pixelsize=%d" "InconsolataGo QiHei NF" 16)) ;; 11 13 17 19 23
-        ;; chinese font
-        (dolist (charset '(kana han symbol cjk-misc bopomofo))
-        (set-fontset-font (frame-parameter nil 'font)
-                            charset
-                            (font-spec :family "等距更纱黑体 SC")))
-        ) ;; 14 16 20 22 28
-    ))
-
-(defun +my|init-font(frame)
-(with-selected-frame frame
-    (if (display-graphic-p)
-        (+my/better-font))))
-
-(if (and (fboundp 'daemonp) (daemonp))
-    (add-hook 'after-make-frame-functions #'+my|init-font)
-(+my/better-font))
-
-#+end_src
-
 ** all-the-icons
 *** all-the-icons
 #+begin_src elisp
@@ -626,7 +663,6 @@ Avoid constant errors on Windows about the coding system by setting the default 
 ** diff-hl
 #+begin_src elisp
   (setup (:pkg diff-hl)
-    (:delay)
     (global-diff-hl-mode)
     (diff-hl-margin-mode)
     )
@@ -635,15 +671,17 @@ Avoid constant errors on Windows about the coding system by setting the default 
 #+begin_src elisp
   (setup (:pkg dashboard)
     (:option dashboard-items '((recents . 5)
-                               (agenda . 5)
+                               ;; (agenda . 5)
                                (bookmarks . 5)
-                               (projects . 5))
+                               ;; (projects . 5)
+                               )
              ;; dashboard-set-heading-icons t
              dashboard-center-content t
              dashboard-set-init-info t
              )
     (dashboard-setup-startup-hook)
-    (add-to-list 'dashboard-items '(agenda) t))
+    ;; (add-to-list 'dashboard-items '(agenda) t)
+    )
 #+end_src
 * General Configuration
 ** awesome-tray
@@ -681,7 +719,7 @@ Avoid constant errors on Windows about the coding system by setting the default 
                :host github
                :repo "manateelazycat/sort-tab")
     (require 'sort-tab)
-    (sort-tab-mode)
+    ;; (sort-tab-mode)
     )
 #+end_src
 ** backup
@@ -704,52 +742,11 @@ Avoid constant errors on Windows about the coding system by setting the default 
   (add-hook 'text-mode-hook 'visual-line-mode)
   (add-hook 'org-mode-hook 'turn-on-auto-fill)
 #+end_src
-** awesome-pair
-#+begin_src elisp :tangle no
-  (setup (:pkg awesome-pair :host github :repo "manateelazycat/awesome-pair")
-    (:hook-into prog-mode
-                text-mode
-                )
-    (:bind "(" awesome-pair-open-round
-           "[" awesome-pair-open-bracket
-
-           "(" awesome-pair-open-round
-           "[" awesome-pair-open-bracket
-           "{" awesome-pair-open-curly
-           ")" awesome-pair-close-round
-           "]" awesome-pair-close-bracket
-           "}" awesome-pair-close-curly
-           "=" awesome-pair-equal
-
-           "%" awesome-pair-match-paren
-           "\"" awesome-pair-double-quote
-
-           "SPC" awesome-pair-space
-           "RET" awesome-pair-newline
-
-           "M-o" awesome-pair-backward-delete
-           "C-d" awesome-pair-forward-delete
-           "C-k" awesome-pair-kill
-
-           "M-\"" awesome-pair-wrap-double-quote
-           "M-[" awesome-pair-wrap-bracket
-           "M-{" awesome-pair-wrap-curly
-           "M-(" awesome-pair-wrap-round
-           "M-)" awesome-pair-unwrap
-
-           "M-p" awesome-pair-jump-right
-           "M-n" awesome-pair-jump-left
-           "M-:" awesome-pair-jump-out-pair-and-newline
-           )
-    )
-#+end_src
 ** TRAMP
 #+begin_src elisp
   ;; Set default connection mode to SSH
   (setq tramp-default-method "ssh")
 #+end_src
-
-** undo-tree
 
 ** Automatically clean whitespace
 #+begin_src elisp
@@ -838,7 +835,7 @@ Avoid constant errors on Windows about the coding system by setting the default 
     (let ((current-prefix-arg '(-1)))
       (call-interactively 'consult-ripgrep)))
 #+end_src
-** Completion Annotations with Marginalia
+** Marginalia
 
 Marginalia provides helpful annotations for various types of minibuffer completions.  You can think of it as a replacement of =ivy-rich=.
 
@@ -988,44 +985,40 @@ Marginalia provides helpful annotations for various types of minibuffer completi
 ** pyim
 只在linux平台使用
 #+begin_src elisp
-   (setup (:pkg posframe))
+  (setup (:pkg posframe))
 
-  (defun lewis/pyim-config()
-        (setq pyim-default-scheme 'quanpin)
-        (setq pyim-punctuation-translate-p
-              '(auto yes no))
-        (progn
-          (set-default 'pyim-punctuation-half-width-functions
-                       '(pyim-probe-punctuation-line-beginning pyim-probe-punctuation-after-punctuation)))
-        (pyim-isearch-mode 1)
-        (defalias 'pyim-probe-meow-normal-mode
-          #'(lambda nil
-              (meow-normal-mode-p)))
-        (progn
-          (set-default 'pyim-english-input-switch-functions
-                       '(pyim-probe-auto-english pyim-probe-isearch-mode pyim-probe-program-mode pyim-probe-org-structure-template pyim-probe-org-latex-mode pyim-probe-meow-normal-mode)))
-        (setq pyim-page-tooltip 'posframe)
-        (setq pyim-page-length 5)
-        ;; (setq ivy-re-builders-alist
-        ;; 	    '((t . pyim-cregexp-ivy)))
-        (defalias 'my-orderless-regexp
-          #'(lambda
-              (orig_func component)
-              (let
-                  ((result
-                    (funcall orig_func component)))
-                (pyim-cregexp-build result))))
-        (advice-add 'orderless-regexp :around #'my-orderless-regexp)
-
-    )
   (setup (:pkg pyim)
-        (:option pyim-dicts
-           '((:name "lewis_pyim_dict" :file "~/Documents/emacs/pyim-dict/lewis_pyim_dict.pyim")
-             (:name "lewis_big_dict" :file "~/Documents/emacs/pyim-dict/pyim-bigdict.pyim.gz")))
-        (:delay)
-        (:when-loaded (lewis/pyim-config))
-        (setq default-input-method "pyim")
-        )
+    (:option pyim-dicts '((:name "lewis_pyim_dict" :file "~/Documents/emacs/pyim-dict/lewis_pyim_dict.pyim")
+                          (:name "lewis_big_dict" :file "~/Documents/emacs/pyim-dict/pyim-bigdict.pyim.gz"))
+             pyim-default-scheme 'quanpin
+             pyim-punctuation-translate-p '(auto yes no)
+             pyim-page-tooltip 'posframe
+             pyim-page-length 5
+             )
+    (:when-loaded
+      (progn
+        (set-default 'pyim-punctuation-half-width-functions
+                     '(pyim-probe-punctuation-line-beginning pyim-probe-punctuation-after-punctuation)))
+      (pyim-isearch-mode 1)
+      (defalias 'pyim-probe-meow-normal-mode
+        #'(lambda nil
+            (meow-normal-mode-p)))
+      (progn
+        (set-default 'pyim-english-input-switch-functions
+                     '(pyim-probe-auto-english pyim-probe-isearch-mode pyim-probe-program-mode pyim-probe-org-structure-template pyim-probe-org-latex-mode pyim-probe-meow-normal-mode)))
+
+      (defalias 'my-orderless-regexp
+        #'(lambda
+            (orig_func component)
+            (let
+                ((result
+                  (funcall orig_func component)))
+              (pyim-cregexp-build result))))
+      (advice-add 'orderless-regexp :around #'my-orderless-regexp)
+      )
+
+    (setq default-input-method "pyim")
+    )
 #+end_src
 
 ** good-scroll
@@ -1058,10 +1051,10 @@ Marginalia provides helpful annotations for various types of minibuffer completi
 
       ;; (require 'exwm-config)
       ;; (exwm-config-example)
-        ;; using xim input
-  (require 'exwm-xim)
-  (exwm-xim-enable)
-  (push ?\C-\\ exwm-input-prefix-keys)   ;; use Ctrl + \ to switch input method
+      ;; using xim input
+      (require 'exwm-xim)
+      (exwm-xim-enable)
+      (push ?\C-\\ exwm-input-prefix-keys)   ;; use Ctrl + \ to switch input method
       )
     )
 #+end_src
@@ -1075,14 +1068,6 @@ Marginalia provides helpful annotations for various types of minibuffer completi
 ** vterm
 #+begin_src elisp
   (setup (:pkg vterm))
-#+end_src
-** exec-path-from-shell
-#+begin_src elisp
-  (setup (:pkg exec-path-from-shell)
-    (:delay)
-    (when (memq window-system '(mac ns x))
-      (exec-path-from-shell-initialize))
-    )
 #+end_src
 * git
 ** magit
@@ -1170,7 +1155,7 @@ Marginalia provides helpful annotations for various types of minibuffer completi
       ;;   (add-hook 'eglot--managed-mode-hook #'eldoc-box-hover-mode t))
 #+end_src
 *** lsp-org-special
-#+begin_src elisp
+#+begin_src elisp :tangle no
   (cl-defmacro lsp-org-babel-enable (lang)
     "Support LANG in org source code block."
     (cl-check-type lang stringp)
@@ -1203,7 +1188,7 @@ Marginalia provides helpful annotations for various types of minibuffer completi
 ** conda
 #+begin_src elisp
   (setup (:pkg conda)
-    (:delay)
+    ;; (:delay)
     (:when-loaded
       (when (eq system-type 'darwin)
         (custom-set-variables '(conda-anaconda-home "/Users/liuyi/miniforge3"))
@@ -1253,21 +1238,6 @@ Marginalia provides helpful annotations for various types of minibuffer completi
       )
     )
 #+end_src
-** verilog
-#+begin_src verilog
-  (setup verilog-mode
-   (:when-loaded
-    (require 'lsp)
-    (lsp-register-client
-     (make-lsp-client
-      :new-connection (lsp-stdio-connection '("svls"))
-      :major-modes '(verilog-mode)
-      :priority -1))
-    (lsp)
-    (add-to-list 'lsp-language-id-configuration '(verilog-mode . "verlog"))
-    )
-  )
-#+end_src
 ** beancount
 #+begin_src elisp
   (setup (:pkg beancount :host github :repo "beancount/beancount-mode")
@@ -1275,7 +1245,7 @@ Marginalia provides helpful annotations for various types of minibuffer completi
     )
 #+end_src
 * Org Mode
-** 杂项设置
+** 设置
 #+begin_src elisp
   (setup (:pkg org :type built-in)
     (setq org-directory "~/Documents/emacs/orgmode/")
@@ -1289,55 +1259,53 @@ Marginalia provides helpful annotations for various types of minibuffer completi
              org-image-actual-width 600
              org-refile-targets '(("~/Documents/emacs/orgmode/roam/20211204000712-refile_index.org" . (:maxlevel . 9))
                                   ))
-             (:file-match "\\.org\\'")
-             (:when-loaded
-               ;; (require 'org-tempo)
-               (setq-default org-todo-keywords
-                             (quote ((sequence "TODO(t)" "NEXT(n)" "|" "DONE(d)")
-                                     (sequence "WAITING(w@/!)" "HOLD(h@/!)" "|" "CANCELLED(c@/!)" "PHONE" "MEETING"))))
-               (setq-default org-todo-keyword-faces
-                             (quote (("TODO" :foreground "red" :weight bold)
-                                     ("NEXT" :foreground "blue" :weight bold)
-                                     ("DONE" :foreground "forest green" :weight bold)
-                                     ("WAITING" :foreground "orange" :weight bold)
-                                     ("HOLD" :foreground "magenta" :weight bold)
-                                     ("CANCELLED" :foreground "forest green" :weight bold)
-                                     ("MEETING" :foreground "forest green" :weight bold)
-                                     ("PHONE" :foreground "forest green" :weight bold))))
-               ;; 导出相关的设置
+    (:file-match "\\.org\\'")
+    (:when-loaded
+      ;; (require 'org-tempo)
+      (setq-default org-todo-keywords
+                    (quote ((sequence "TODO(t)" "NEXT(n)" "|" "DONE(d)")
+                            (sequence "WAITING(w@/!)" "HOLD(h@/!)" "|" "CANCELLED(c@/!)" "PHONE" "MEETING"))))
+      (setq-default org-todo-keyword-faces
+                    (quote (("TODO" :foreground "red" :weight bold)
+                            ("NEXT" :foreground "blue" :weight bold)
+                            ("DONE" :foreground "forest green" :weight bold)
+                            ("WAITING" :foreground "orange" :weight bold)
+                            ("HOLD" :foreground "magenta" :weight bold)
+                            ("CANCELLED" :foreground "forest green" :weight bold)
+                            ("MEETING" :foreground "forest green" :weight bold)
+                            ("PHONE" :foreground "forest green" :weight bold))))
+      ;; 导出相关的设置
 
-               (setq org-latex-pdf-process
-                     '("xelatex -interaction nonstopmode %f"
-                       "bibtex %b"
-                       "xelatex -interaction nonstopmode %f"
-                       "xelatex -interaction nonstopmode %f"))
+      (setq org-latex-pdf-process
+            '("xelatex -interaction nonstopmode %f"
+              "bibtex %b"
+              "xelatex -interaction nonstopmode %f"
+              "xelatex -interaction nonstopmode %f"))
 
-               ;;设置粗体高亮颜色
-               (require 'cl)
-               (setq org-emphasis-alist
-                     (cons '("*" '(:emphasis t :foreground "pale violet red" :weight bold))
-                           (delete* "*" org-emphasis-alist :key 'car :test 'equal))
-                     )
-               (setq org-emphasis-alist
-                     (cons '("/" '(:slant t :foreground "green3" :slant italic))
-                           (delete* "/" org-emphasis-alist :key 'car :test 'equal))
-                     )
-               ))
+      ;;设置粗体高亮颜色
+      (require 'cl)
+      (setq org-emphasis-alist
+            (cons '("*" '(:emphasis t :foreground "pale violet red" :weight bold))
+                  (delete* "*" org-emphasis-alist :key 'car :test 'equal))
+            )
+      (setq org-emphasis-alist
+            (cons '("/" '(:slant t :foreground "green3" :slant italic))
+                  (delete* "/" org-emphasis-alist :key 'car :test 'equal))
+            )
 
-    ;; (setup (:pkg org-contrib :host github :repo "emacsmirror/org-contrib"))
+      (org-babel-do-load-languages
+       'org-babel-load-languages
+       '((emacs-lisp . t)
+         (julia . t)
+         (python . t)
+         (dot . t)
+         ;; (jupyter . t)
+         ))
+      ))
+
+  ;; (setup (:pkg org-contrib :host github :repo "emacsmirror/org-contrib"))
 
 
-#+end_src
-** org-babel
-#+begin_src elisp
-  (org-babel-do-load-languages
-   'org-babel-load-languages
-   '((emacs-lisp . t)
-     (julia . t)
-     (python . t)
-     (dot . t)
-     ;; (jupyter . t)
-     ))
 #+end_src
 ** beauty
 #+begin_src elisp
