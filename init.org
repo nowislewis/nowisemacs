@@ -980,7 +980,6 @@ This keyword causes a body to be executed after other packages/features are load
 ** pyim
 #+begin_src elisp
   (setup (:pkg posframe))
-
   (setup (:pkg pyim)
     (:option pyim-dicts '((:name "lewis_pyim_dict" :file "~/Documents/emacs/pyim-dict/lewis_pyim_dict.pyim")
                           (:name "lewis_big_dict" :file "~/Documents/emacs/pyim-dict/pyim-bigdict.pyim.gz"))
@@ -1010,7 +1009,6 @@ This keyword causes a body to be executed after other packages/features are load
               (pyim-cregexp-build result))))
       (advice-add 'orderless-regexp :around #'my-orderless-regexp)
       )
-
     (setq default-input-method "pyim")
     )
 #+end_src
