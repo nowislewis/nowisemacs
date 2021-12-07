@@ -1116,21 +1116,21 @@ This keyword causes a body to be executed after other packages/features are load
 #+end_src
 
 ** lsp mode
-*** eglot
+*** lsp
 #+begin_src elisp
-      ;; use built-in package dep
-        (setup (:pkg project :type built-in))
-        (setup (:pkg xref :type built-in))
-        (setup (:pkg flymake :type built-in))
-        (setup (:pkg jsonrpc :type built-in))
-        (setup (:pkg eldoc :type built-in))
+  ;; use built-in package dep
+  (setup (:pkg project :type built-in))
+  (setup (:pkg xref :type built-in))
+  (setup (:pkg flymake :type built-in))
+  (setup (:pkg jsonrpc :type built-in))
+  (setup (:pkg eldoc :type built-in))
 
-      (setup (:pkg lsp-mode))
-    (setup (:pkg lsp-treemacs))
-    (setup (:pkg lsp-ui)
-      (:hook-into lsp-mode))
-    (setup (:pkg dap-mode)
-      (:when-loaded
+  (setup (:pkg lsp-mode))
+  (setup (:pkg lsp-treemacs))
+  (setup (:pkg lsp-ui)
+    (:hook-into lsp-mode))
+  (setup (:pkg dap-mode)
+    (:when-loaded
       (require 'dap-gdb-lldb)
       (require 'dap-cpptools)
       (require 'dap-python)
@@ -1237,6 +1237,7 @@ This keyword causes a body to be executed after other packages/features are load
              org-imenu-depth 5
              org-startup-folded t
              org-return-follows-link t
+             fill-column 120
              org-blank-before-new-entry '((heading . nil)
                                           (plain-list-item . nil))
              org-image-actual-width 600
