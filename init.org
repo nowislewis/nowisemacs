@@ -444,7 +444,7 @@ This keyword causes a body to be executed after other packages/features are load
                               '("t" . meow-till)
                               '("T" . meow-till-expand)
                               '("u" . meow-undo)
-                              '("U" . undo-tree-redo)
+                              '("U" . undo-redo)
                               '("v" . meow-visit)
                               '("V" . meow-kmacro-matches)
                               '("w" . meow-block)
@@ -1018,6 +1018,14 @@ This keyword causes a body to be executed after other packages/features are load
 #+end_src
 * File Browsing
 ** dired
+** dired-subtree
+#+begin_src elisp
+  (setup (:pkg dired-subtree)
+    (:with-map dired-mode-map
+      (:bind "TAB" dired-subtree-cycle)
+      )
+    )
+#+end_src
 ** fd-dired
 #+begin_src elisp
 (setup (:pkg fd-dired))
