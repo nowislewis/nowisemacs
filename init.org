@@ -404,7 +404,7 @@ This keyword causes a body to be executed after other packages/features are load
                               '("B" . meow-back-symbol)
                               '("c" . meow-change)
                               '("C" . meow-change-save)
-                              '("d" . meow-clipboard-kill)
+                              '("d" . meow-kill)
                               '("e" . meow-next-word)
                               '("E" . meow-next-symbol)
                               '("f" . meow-find)
@@ -449,7 +449,7 @@ This keyword causes a body to be executed after other packages/features are load
                               '("V" . meow-kmacro-matches)
                               '("w" . meow-block)
                               '("W" . meow-block-expand)
-                              '("x" . meow-C-d)
+                              '("x" . meow-delete)
                               '("X" . meow-backward-delete)
                               '("y" . meow-save)
                               '("Y" . meow-sync-grab)
@@ -1021,6 +1021,8 @@ This keyword causes a body to be executed after other packages/features are load
 ** dired-subtree
 #+begin_src elisp
   (setup (:pkg dired-subtree)
+    (:load-after dired)
+    (:option dired-subtree-line-prefix "     ")
     (:with-map dired-mode-map
       (:bind "TAB" dired-subtree-cycle)
       )
@@ -1105,6 +1107,10 @@ This keyword causes a body to be executed after other packages/features are load
 (setup (:pkg elispfl :host github :repo "cireu/elispfl")
        (:hook-into emacs-lisp-mode ielm)
        )
+#+end_src
+** quickrun
+#+begin_src elisp
+  (setup (:pkg quickrun))
 #+end_src
 ** tree-sitter
 #+begin_src elisp
