@@ -149,6 +149,38 @@
 
 Sometimes it's good to clean up unused repositories if I've removed packages from my configuration.  Use =straight-remove-unused-repos= for this purpose.
 
+** straight print
+#+begin_src elisp
+  (defun straight-fetch-report (&rest _)
+    "Show fetched commit summary."
+    (interactive)
+    (with-current-buffer (get-buffer-create "*straight-fetch-report*")
+      (read-only-mode -1)
+      (erase-buffer)
+      (let ((updates nil))
+        (straight--map-repos
+         (lambda (recipe)
+           (straight--with-plist recipe (package local-repo)
+             (let* ((default-directory (straight--repos-dir local-repo))
+                    (commits (straight--process-output "git" "log" "..@{u}" "--oneline")))
+               (unless (string-empty-p commits)
+                 (push (cons package (split-string commits "\n")) updates))))))
+        (mapc (lambda (update)
+                (let* ((commits (cdr update)))
+                  (insert
+                   (propertize
+                    (format "%s [%s commit%s]\n"
+                            (car update)
+                            (number-to-string (length commits))
+                            (if (cdr commits) "s" ""))
+                    'face 'font-lock-constant-face)
+                   (format "  %s\n" (string-join (cdr update) "\n  ")))))
+              (cl-sort updates #'string< :key #'car))
+        (special-mode)
+        (pop-to-buffer (current-buffer)))))
+
+  (advice-add #'straight-fetch-all :after #'straight-fetch-report)
+#+end_src
 ** Streamlined Configuration with setup.el
 #+begin_src elisp
   (straight-use-package '(setup :type git :host nil :repo "https://git.sr.ht/~pkal/setup"))
@@ -1016,9 +1048,10 @@ This keyword causes a body to be executed after other packages/features are load
 #+begin_src elisp
 (setup (:pkg good-scroll))
 #+end_src
-* File Browsing
-** dired
-** dired-subtree
+* Browsing
+** file browsing
+*** dired
+*** dired-subtree
 #+begin_src elisp
   (setup (:pkg dired-subtree)
     (:load-after dired)
@@ -1028,21 +1061,21 @@ This keyword causes a body to be executed after other packages/features are load
       )
     )
 #+end_src
-** fd-dired
+*** fd-dired
 #+begin_src elisp
 (setup (:pkg fd-dired))
 #+end_src
-** treemacs
+*** treemacs
 #+begin_src elisp
 (setup (:pkg treemacs))
 #+end_src
-** app-launcher
+*** app-launcher
 #+begin_src elisp
     (setup app-launcher
       (:if-system 'gnu/linux)
         (:pkg app-launcher :host github :repo "SebastienWae/app-launcher"))
 #+end_src
-** exwm
+*** exwm
 #+begin_src elisp
   (setup exwm
     (:if-system 'gnu/linux)
@@ -1057,6 +1090,23 @@ This keyword causes a body to be executed after other packages/features are load
       (push ?\C-\\ exwm-input-prefix-keys)   ;; use Ctrl + \ to switch input method
       )
     )
+#+end_src
+** structure browsing
+*** imenu-list
+#+begin_src elisp
+  (setup (:pkg imenu-list)
+    (:autoload imenu-list-smart-toggle)
+    (:option imenu-list-focus-after-activate t
+             imenu-list-auto-resize t
+             imenu-list-position 'left
+             )
+    )
+#+end_src
+
+*** outshine
+#+begin_src elisp
+  (setup (:pkg outshine :host github :repo "alphapapa/outshine")
+    (:option outline-minor-mode-prefix "\M-#"))
 #+end_src
 * shell
 ** aweshell
@@ -1242,7 +1292,7 @@ This keyword causes a body to be executed after other packages/features are load
     )
 #+end_src
 * Org Mode
-** 设置
+** org-mode
 #+begin_src elisp
   (setup (:pkg org :type built-in)
     (setq org-directory "~/Documents/emacs/orgmode/")
@@ -1365,16 +1415,6 @@ This keyword causes a body to be executed after other packages/features are load
       (org-agenda nil "a")))
 
     (:hook-into org-agenda-mode))
-#+end_src
-** imenu-list
-#+begin_src elisp
-  (setup (:pkg imenu-list)
-    (:autoload imenu-list-smart-toggle)
-    (:option imenu-list-focus-after-activate t
-             imenu-list-auto-resize t
-             imenu-list-position 'left
-             )
-    )
 #+end_src
 ** company-org-block
 #+begin_src elisp
