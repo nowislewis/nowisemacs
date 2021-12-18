@@ -441,12 +441,10 @@ This keyword causes a body to be executed after other packages/features are load
                               '("E" . meow-next-symbol)
                               '("f" . meow-find)
                               '("F" . meow-find-expand)
-                              ;; (cons "g" (concat doom-leader-alt-key " c"))
 
                               '("g d" . xref-find-definitions)
                               '("g D" . xref-find-references)
                               '("g m" . consult-mark)
-
 
                               '("G" . meow-grab)
                               '("h" . meow-left)
@@ -505,10 +503,7 @@ This keyword causes a body to be executed after other packages/features are load
                               '("@" . meow-end-or-call-kmacro)
                               '("'" . meow-comment)
                               '("/" . meow-last-buffer)))
-    ;; (setq doom-leader-alt-key "M-SPC")
     (meow-global-mode 1)
-
-    ;; (custom-set-default meow-cursor-type-normal '(box 4))
 
     ;; meow-setup 用于自定义按键绑定，可以直接使用下文中的示例
     (meow-setup)
