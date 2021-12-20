@@ -952,7 +952,7 @@ This keyword causes a body to be executed after other packages/features are load
   (setup (:pkg company-box)
     (:hook-into company-mode)
     (:option company-box-doc-delay 0.1
-             company-box-show-single-candidate t
+             company-box-show-single-candidate nil
              company-box-backends-colors nil
              company-box-max-candidates 50
              )
