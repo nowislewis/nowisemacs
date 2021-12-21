@@ -710,6 +710,13 @@ This keyword causes a body to be executed after other packages/features are load
     ;; (add-to-list 'dashboard-items '(agenda) t)
     )
 #+end_src
+** beacon
+#+begin_src elisp
+  (setup (:pkg beacon)
+    (:delay)
+    (beacon-mode 1)
+    )
+#+end_src
 * General Configuration
 ** awesome-tray
 #+begin_src elisp :tangle no
