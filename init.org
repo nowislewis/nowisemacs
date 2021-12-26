@@ -26,7 +26,7 @@
   (delete-selection-mode t)                    ; 选中文本后输入文本会替换文本（更符合我们习惯了的其它编辑器的逻辑）
   (add-hook 'prog-mode-hook #'hs-minor-mode)   ; 编程模式下，可以折叠代码块
 
-  (global-display-line-numbers-mode 1)         ; 在 Window 显示行号
+  ;; (global-display-line-numbers-mode 1)         ; 在 Window 显示行号
   (setq display-line-numbers-width-start t)
   (pixel-scroll-precision-mode t)
 #+end_src
@@ -400,13 +400,15 @@ This keyword causes a body to be executed after other packages/features are load
       (setq meow-cheatsheet-layout meow-cheatsheet-layout-qwerty)
       (meow-motion-overwrite-define-key '("j" . meow-next)
                                         '("k" . meow-prev)
-                                        '("<" . sort-tab-select-prev-tab)
-                                        '(">" . sort-tab-select-next-tab)
+                                        '("<escape>" . ignore)
+                                        ;; '("<" . sort-tab-select-prev-tab)
+                                        ;; '(">" . sort-tab-select-next-tab)
                                         )
       (meow-leader-define-key
        ;; SPC j/k will run the original command in MOTION state.
-       '("j" . meow-motion-origin-command)
-       '("k" . meow-motion-origin-command)
+       '("j" . "H-j")
+       '("k" . "H-k")
+       ;; '("k" . meow-motion-origin-command)
        ;; Use SPC (0-9) for digit arguments.
        '("1" . meow-digit-argument)
        '("2" . meow-digit-argument)
@@ -663,20 +665,65 @@ This keyword causes a body to be executed after other packages/features are load
       (set-fontset-font (frame-parameter nil 'font) 'unicode (eval emacs-font-name))
       ))
 #+end_src
+** line number
+#+begin_src elisp
+  (setq line-number-display-limit large-file-warning-threshold)
+  (setq line-number-display-limit-width 1000)
+
+  (dolist (hook (list
+                 'c-mode-common-hook
+                 'c-mode-hook
+                 'emacs-lisp-mode-hook
+                 'lisp-interaction-mode-hook
+                 'lisp-mode-hook
+                 'java-mode-hook
+                 'asm-mode-hook
+                 'haskell-mode-hook
+                 'rcirc-mode-hook
+                 'erc-mode-hook
+                 'sh-mode-hook
+                 'makefile-gmake-mode-hook
+                 'python-mode-hook
+                 'js-mode-hook
+                 'html-mode-hook
+                 'css-mode-hook
+                 'tuareg-mode-hook
+                 'go-mode-hook
+                 'coffee-mode-hook
+                 'qml-mode-hook
+                 'markdown-mode-hook
+                 'slime-repl-mode-hook
+                 'package-menu-mode-hook
+                 'cmake-mode-hook
+                 'php-mode-hook
+                 'web-mode-hook
+                 'coffee-mode-hook
+                 'sws-mode-hook
+                 'jade-mode-hook
+                 'vala-mode-hook
+                 'rust-mode-hook
+                 'ruby-mode-hook
+                 'qmake-mode-hook
+                 'lua-mode-hook
+                 'swift-mode-hook
+                 'llvm-mode-hook
+                 'conf-toml-mode-hook
+                 'nxml-mode-hook
+                 'nim-mode-hook
+                 'org-mode-hook
+                 ))
+    (add-hook hook (lambda () (display-line-numbers-mode))))
+#+end_src
 ** all-the-icons
 *** all-the-icons
 #+begin_src elisp
   (setup (:pkg all-the-icons)
     (:option all-the-icons-scale-factor 1.0)
     )
-#+end_src
-*** all-the-icons-completion
-#+begin_src elisp
+
   (setup (:pkg all-the-icons-completion)
-  (add-hook 'marginalia-mode-hook #'all-the-icons-completion-marginalia-setup))
-#+end_src
-*** all-the-icons-dired
-#+begin_src elisp
+    (add-hook 'marginalia-mode-hook #'all-the-icons-completion-marginalia-setup))
+
   (setup (:pkg all-the-icons-dired)
     (:hook-into dired-mode)
     )
@@ -710,6 +757,15 @@ This keyword causes a body to be executed after other packages/features are load
     ;; (add-to-list 'dashboard-items '(agenda) t)
     )
 #+end_src
+** sort-tab
+#+begin_src elisp
+  (setup (:pkg sort-tab
+               :host github
+               :repo "manateelazycat/sort-tab")
+    (require 'sort-tab)
+    (sort-tab-mode)
+    )
+#+end_src
 ** beacon
 #+begin_src elisp
   (setup (:pkg beacon)
@@ -718,27 +774,6 @@ This keyword causes a body to be executed after other packages/features are load
     )
 #+end_src
 * General Configuration
-** awesome-tray
-#+begin_src elisp :tangle no
-  (setup
-   (:pkg awesome-tray
-    :host github
-    :repo "manateelazycat/awesome-tray")
-   (require 'awesome-tray)
-
-   (defun pyim-awesome-tray()
-     (concat current-input-method-title))
-
-   (defun conda-awesome-tray()
-     (concat conda-env-current-name))
-
-    (add-to-list 'awesome-tray-module-alist '("meow" . (meow-indicator awesome-tray-module-evil-face)))
-    (add-to-list 'awesome-tray-module-alist '("pyim" . (pyim-awesome-tray awesome-tray-module-evil-face)))
-    (add-to-list 'awesome-tray-module-alist '("conda" . (conda-awesome-tray awesome-tray-module-evil-face)))
-
-   (setq awesome-tray-active-modules (list "meow" "pyim" "conda" "location" "buffer-name" "mode-name" "git"))
-   (awesome-tray-mode 1))
-#+end_src
 ** doom-modeline
 #+begin_src elisp
   (setup (:pkg doom-modeline)
@@ -746,15 +781,6 @@ This keyword causes a body to be executed after other packages/features are load
              doom-modeline-height 20)
     (:hook-into after-init)
   )
-#+end_src
-** sort-tab
-#+begin_src elisp
-  (setup (:pkg sort-tab
-               :host github
-               :repo "manateelazycat/sort-tab")
-    (require 'sort-tab)
-    ;; (sort-tab-mode)
-    )
 #+end_src
 ** backup
 #+begin_src elisp
@@ -802,12 +828,12 @@ This keyword causes a body to be executed after other packages/features are load
       (vertico-mode)
       )
 
-  (setup (:pkg vertico-posframe)
-    (:option vertico-posframe-parameters
-      '((left-fringe . 16)
-	(right-fringe . 16)))
-     (vertico-posframe-mode t)
-    )
+  ;; (setup (:pkg vertico-posframe)
+  ;;   (:option vertico-posframe-parameters
+  ;;     '((left-fringe . 16)
+  ;;       (right-fringe . 16)))
+  ;;    (vertico-posframe-mode t)
+  ;;   )
 #+end_src
 ** Orderless
 #+begin_src elisp
@@ -1110,6 +1136,12 @@ This keyword causes a body to be executed after other packages/features are load
   (setup (:pkg outshine :host github :repo "alphapapa/outshine")
     (:option outline-minor-mode-prefix "\M-#"))
 #+end_src
+** bufler
+#+begin_src elisp
+  (setup (:pkg bufler :host github :repo "alphapapa/bufler.el")
+    (:global "C-x C-b" #'bufler)
+    (:global "C-x b" #'bufler-switch-buffer))
+#+end_src
 * shell
 ** aweshell
 #+begin_src elisp
@@ -1385,39 +1417,6 @@ This keyword causes a body to be executed after other packages/features are load
 (add-hook 'org-mode-hook 'prettify-symbols-mode)
 
 #+end_src
-** org-agenda
-#+begin_src elisp
-  (setup (:pkg org-super-agenda)
-    (:option org-agenda-compact-blocks t)
-    (:when-loaded
-    (let ((org-super-agenda-groups
-           '(;; Each group has an implicit boolean OR operator between its selectors.
-             (:name "Today"  ; Optionally specify section name
-                    :time-grid t  ; Items that appear on the time grid
-                    :todo "TODAY")  ; Items that have this TODO keyword
-             (:name "Important"
-                    :priority "A")
-             ;; Set order of multiple groups at once
-             (:order-multi (2 (:name "Shopping in town"
-                                     ;; Boolean AND group matches items that match all subgroups
-                                     :and (:tag "shopping" :tag "@town"))
-                              (:name "Food-related"
-                                     ;; Multiple args given in list with implicit OR
-                                     :tag ("food" "dinner"))
-                              (:name "Index"
-                                     :tag "index")
-                              (:name "Space-related (non-moon-or-planet-related)"
-                                     ;; Regexps match case-insensitively on the entire entry
-                                     :and (:regexp ("space" "NASA")
-                                                   ;; Boolean NOT also has implicit OR between selectors
-                                                   :not (:regexp "moon" :tag "planet")))))
-             (:priority<= "B"
-                          :order 1)
-             )))
-      (org-agenda nil "a")))
-
-    (:hook-into org-agenda-mode))
-#+end_src
 ** company-org-block
 #+begin_src elisp
   (setup (:pkg company-org-block)
@@ -1657,32 +1656,6 @@ If nil it defaults to `split-string-default-separators', normally
   (setup (:pkg org-pomodoro)
     (:option org-pomodoro-finished-sound "~/Documents/emacs/pyim-dict/applaud.wav")
     )
-    ;; (:when-loaded
-    ;;   (alert-add-rule :category "org-pomodoro"
-    ;;                   :style (cond (alert-growl-command
-    ;;                                 'growl)
-    ;;                                (alert-notifier-command
-    ;;                                 'notifier)
-    ;;                                (alert-libnotify-command
-    ;;                                 'libnotify)
-    ;;                                (alert-default-style)))
-    ;;   (defun pomodoro-awesome-tray()
-    ;;     (let ((s (cl-case org-pomodoro-state
-    ;;                (:pomodoro
-    ;;                 (propertize org-pomodoro-format))
-    ;;                (:overtime
-    ;;                 (propertize org-pomodoro-overtime-format))
-    ;;                (:short-break
-    ;;                 (propertize org-pomodoro-short-break-format))
-    ;;                (:long-break
-    ;;                 (propertize org-pomodoro-long-break-format)))))
-    ;;               (concat "[" (format s (org-pomodoro-format-seconds)) "] ")))
-    ;;     (add-to-list 'awesome-tray-module-alist '("pomodoro" . (pomodoro-awesome-tray awesome-tray-module-evil-face)))
-    ;;     (add-to-list 'awesome-tray-active-modules "pomodoro")
-    ;;     )
-    ;;   )
-
-
 #+end_src
 ** ox-hugo
 #+begin_src elisp
