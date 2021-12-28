@@ -3,51 +3,50 @@
 #+PROPERTY: header-args:elisp :tangle ~/my-emacs/init.el
 
 * 启动优化
-** UI 加速
-#+begin_src elisp
-  ;; -*- lexical-binding: t; -*-
-  (tool-bar-mode -1)                      ;禁用工具栏
-   ;; (menu-bar-mode -1)                      ;禁用菜单栏
-   (scroll-bar-mode -1)                    ;禁用滚动条
-  (setq
-    ;; 不要缩放frame.
-    frame-inhibit-implied-resize t
-    ;; 默认用最简单的模式
-    initial-major-mode 'fundamental-mode
-    ;; 不要自动启用package
-    package-enable-at-startup nil package--init-file-ensured t
-   inhibit-startup-message t             ; 关闭启动 Emacs 时的欢迎界面
-    )
-    ;; (setq make-backup-files nil)                 ; 关闭文件自动备份
-  (electric-pair-mode t)                       ; 自动补全括号
-  ;; (add-hook 'prog-mode-hook #'show-paren-mode) ; 编程模式下，光标在括号上时高亮另一个括号
-  (column-number-mode t)                       ; 在 Mode line 上显示列号
-  (global-auto-revert-mode t)                  ; 当另一程序修改了文件时，让 Emacs 及时刷新 Buffer
-  (delete-selection-mode t)                    ; 选中文本后输入文本会替换文本（更符合我们习惯了的其它编辑器的逻辑）
-  (add-hook 'prog-mode-hook #'hs-minor-mode)   ; 编程模式下，可以折叠代码块
-
-  ;; (global-display-line-numbers-mode 1)         ; 在 Window 显示行号
-  (setq display-line-numbers-width-start t)
-  (pixel-scroll-precision-mode t)
-#+end_src
 ** Startup Performance
 #+begin_src elisp
+  (setq gc-cons-threshold most-positive-fixnum
+        gc-cons-percentage 0.5)
+  (add-hook 'emacs-startup-hook
+            (lambda ()
+              "Recover GC values after startup."
+              (setq gc-cons-threshold 800000
+                    gc-cons-percentage 0.1)))
   ;; Profile emacs startup
   (add-hook 'emacs-startup-hook
             (lambda ()
               (message "*** Emacs loaded in %s seconds with %d garbage collections."
                        (emacs-init-time "%.2f")
                        gcs-done)))
-(let (
-      ;; 加载的时候临时增大`gc-cons-threshold'以加速启动速度。
-      (gc-cons-threshold most-positive-fixnum)
-      (gc-cons-percentage 0.6)
-      ;; 清空避免加载远程文件的时候分析文件。
-      (file-name-handler-alist nil))
-  ;; 定义一些启动目录，方便下次迁移修改
-  (defvar nowisemacs-root-dir (file-truename "~/nowisemacs/"))
-  (defvar nowisemacs-config-dir (concat nowisemacs-root-dir "init.org"))
-  (defvar nowisemacs-extension-dir (concat nowisemacs-root-dir "/extensions")))
+
+#+end_src
+** UI 加速
+#+begin_src elisp
+    ;; -*- lexical-binding: t; -*-
+    (tool-bar-mode -1)                      ;禁用工具栏
+     ;; (menu-bar-mode -1)                      ;禁用菜单栏
+     (scroll-bar-mode -1)                    ;禁用滚动条
+    (setq
+      ;; 不要缩放frame.
+      frame-inhibit-implied-resize t
+      ;; 默认用最简单的模式
+      initial-major-mode 'fundamental-mode
+      ;; 不要自动启用package
+      package-enable-at-startup nil
+      package--init-file-ensured t
+     inhibit-startup-message t             ; 关闭启动 Emacs 时的欢迎界面
+      )
+      ;; (setq make-backup-files nil)                 ; 关闭文件自动备份
+    (electric-pair-mode t)                       ; 自动补全括号
+    ;; (add-hook 'prog-mode-hook #'show-paren-mode) ; 编程模式下，光标在括号上时高亮另一个括号
+    (column-number-mode t)                       ; 在 Mode line 上显示列号
+    (global-auto-revert-mode t)                  ; 当另一程序修改了文件时，让 Emacs 及时刷新 Buffer
+    (delete-selection-mode t)                    ; 选中文本后输入文本会替换文本（更符合我们习惯了的其它编辑器的逻辑）
+    (add-hook 'prog-mode-hook #'hs-minor-mode)   ; 编程模式下，可以折叠代码块
+
+    ;; (global-display-line-numbers-mode 1)         ; 在 Window 显示行号
+    (setq display-line-numbers-width-start t)
+    (pixel-scroll-precision-mode t)
 #+end_src
 ** Native Compilation
 #+begin_src elisp
@@ -60,11 +59,16 @@
 
 ** generic
 #+begin_src elisp
-  (recentf-mode t)
-  (setq use-short-answers t)
-  (blink-cursor-mode -1)                  ;指针不闪动
-  (setq ring-bell-function 'ignore)       ;关闭烦人的出错时的提示声
-  (set-default-coding-systems 'utf-8)
+    ;; 定义一些启动目录，方便下次迁移修改
+  (defvar nowisemacs-root-dir (file-truename "~/nowisemacs/"))
+  (defvar nowisemacs-config-dir (concat nowisemacs-root-dir "init.org"))
+  (defvar nowisemacs-extension-dir (concat nowisemacs-root-dir "/extensions"))
+
+     (recentf-mode t)
+     (setq use-short-answers t)
+     (blink-cursor-mode -1)                  ;指针不闪动
+     (setq ring-bell-function 'ignore)       ;关闭烦人的出错时的提示声
+     (set-default-coding-systems 'utf-8)
 #+end_src
 #+begin_src elisp :tangle no
   ;; Restore emacs session.
@@ -357,8 +361,15 @@ This keyword causes a body to be executed after other packages/features are load
 
   (add-hook 'after-init-hook 'sanityinc/show-init-time)
 #+end_src
+* gcmh
+    #+begin_src elisp
+      (setup (:pkg gcmh)
+        (:option gcmh-idle-delay 5
+                 gcmh-high-cons-threshold #x1000000) ; 16MB
+        (gcmh-mode 1))
+    #+end_src
 * exec-path-from-shell
-#+begin_src elisp
+#+begin_src elisp :tangle no
   (setup (:pkg exec-path-from-shell)
     (:delay)
     (when (memq window-system '(mac ns x))
@@ -1197,7 +1208,7 @@ This keyword causes a body to be executed after other packages/features are load
   (setup (:pkg quickrun))
 #+end_src
 ** tree-sitter
-#+begin_src elisp
+#+begin_src elisp :tangle no
   (setup tree-sitter-langs
     (:if-system 'gnu/linux)
     (:pkg tree-sitter-langs)
@@ -1338,7 +1349,11 @@ This keyword causes a body to be executed after other packages/features are load
              fill-column 120
              org-blank-before-new-entry '((heading . nil)
                                           (plain-list-item . nil))
+
              org-image-actual-width 600
+             org-confirm-babel-evaluate nil
+             org-src-window-setup 'split-window-below
+
              org-refile-targets '(("~/Documents/emacs/orgmode/roam/20211204000712-refile_index.org" . (:maxlevel . 9))
                                   ))
     (:file-match "\\.org\\'")
