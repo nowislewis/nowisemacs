@@ -155,7 +155,7 @@ Sometimes it's good to clean up unused repositories if I've removed packages fro
 
 ** straight print
 #+begin_src elisp
-  (defun straight-fetch-report (&rest _)
+  (defun straight-pull-report (&rest _)
     "Show fetched commit summary."
     (interactive)
     (with-current-buffer (get-buffer-create "*straight-fetch-report*")
@@ -182,8 +182,7 @@ Sometimes it's good to clean up unused repositories if I've removed packages fro
               (cl-sort updates #'string< :key #'car))
         (special-mode)
         (pop-to-buffer (current-buffer)))))
-
-  (advice-add #'straight-fetch-all :after #'straight-fetch-report)
+  ;; (advice-add #'straight-fetch-all :after #'straight-fetch-report)
 #+end_src
 ** Streamlined Configuration with setup.el
 #+begin_src elisp
@@ -668,7 +667,7 @@ This keyword causes a body to be executed after other packages/features are load
   (let ((emacs-font-size 12)
         emacs-font-name)
        ;; (when (eq system-type 'darwin)
-      (setq emacs-font-name "InconsolataGo QiHei NF")
+      (setq emacs-font-name "yaheiInconsolata")
        ;; (when (eq system-type 'gnu/linux)
       ;; (setq emacs-font-name "等距更纱黑体 SC"))
     (when (display-grayscale-p)
@@ -1341,10 +1340,16 @@ This keyword causes a body to be executed after other packages/features are load
 * Org Mode
 ** org-mode
 #+begin_src elisp
+    (setq-default prettify-symbols-alist '(("#+BEGIN_SRC" . "ℱ")
+                                         ("#+END_SRC" . "Ⅎ")
+                                         ("#+begin_src" . "ℱ")
+                                         ("#+end_src" . "Ⅎ")))
+
   (setup (:pkg org :type built-in)
     (setq org-directory "~/Documents/emacs/orgmode/")
     (:option org-adapt-indentation t
              org-startup-indented t
+             org-hide-emphasis-markers t
              org-imenu-depth 5
              org-startup-folded t
              org-return-follows-link t
@@ -1359,6 +1364,7 @@ This keyword causes a body to be executed after other packages/features are load
              org-refile-targets '(("~/Documents/emacs/orgmode/roam/20211204000712-refile_index.org" . (:maxlevel . 9))
                                   ))
     (:file-match "\\.org\\'")
+    (:hook 'prettify-symbols-mode org-num-mode)
     (:when-loaded
       ;; (require 'org-tempo)
       (setq-default org-todo-keywords
@@ -1406,33 +1412,35 @@ This keyword causes a body to be executed after other packages/features are load
 
 
 #+end_src
-** beauty
+** org-superstar(no)
+#+begin_src elisp :tangle no
+    (setup (:pkg org-superstar)
+      (:hook-into org-mode)
+      (:option org-superstar-leading-bullet ?\s
+               org-superstar-leading-fallback ?\s
+               org-hide-leading-stars nil
+               org-superstar-todo-bullet-alist
+          '(("TODO" . 9744)
+            ("[ ]"  . 9744)
+            ("DONE" . 9745)
+            ("[X]"  . 9745))))
+  (setq org-superstar-headline-bullets-list '("①" "②" "③"
+                                  "④" "⑤" "⑥" "⑦"
+                                  "⑧" "⑨" "⑩" "⑪"
+                                  "⑫" "⑬" "⑭"
+                                  "⑮" "⑯" "⑰"
+                                  "⑱" "⑲" "⑳"))
+  ;;"⓪"
+
+#+end_src
+** org-bars
 #+begin_src elisp
-  (setup (:pkg org-superstar)
-    (:hook-into org-mode)
-    (:option org-superstar-leading-bullet ?\s
-	     org-superstar-leading-fallback ?\s
-	     org-hide-leading-stars nil
-	     org-superstar-todo-bullet-alist
-	'(("TODO" . 9744)
-	  ("[ ]"  . 9744)
-	  ("DONE" . 9745)
-	  ("[X]"  . 9745))))
-(setq org-superstar-headline-bullets-list '("①" "②" "③"
-                                "④" "⑤" "⑥" "⑦"
-                                "⑧" "⑨" "⑩" "⑪"
-                                "⑫" "⑬" "⑭"
-                                "⑮" "⑯" "⑰"
-                                "⑱" "⑲" "⑳"))
-;;"⓪"
-
-(setq org-hide-emphasis-markers t)
-(setq-default prettify-symbols-alist '(("#+BEGIN_SRC" . "ℱ")
-                                       ("#+END_SRC" . "Ⅎ")
-                                       ("#+begin_src" . "ℱ")
-                                       ("#+end_src" . "Ⅎ")))
-(add-hook 'org-mode-hook 'prettify-symbols-mode)
-
+      (setup (:pkg org-bars :host github :repo "tonyaldon/org-bars")
+        (:option org-bars-color-options '(:only-one-color t
+                                                          :bar-color "#4C4A4D"))
+        (:load-after org)
+        (:hook-into org-mode)
+        )
 #+end_src
 ** company-org-block
 #+begin_src elisp
@@ -1680,6 +1688,10 @@ If nil it defaults to `split-string-default-separators', normally
     (:load-after ox)
    )
 #+end_src
+** org-transclusion
+#+begin_src elisp
+
+#+end_src
 * 翻译
 ** 有道词典
 #+begin_src elisp
@@ -1708,17 +1720,15 @@ If nil it defaults to `split-string-default-separators', normally
 * 阅读
 ** pdf-tools
 #+begin_src elisp
-    (setup (:pkg pdf-tools :host github :repo "vedang/pdf-tools")
-      (:option pdf-view-use-scaling t)
-      (:with-map pdf-view-mode-map
+  (setup (:pkg pdf-tools :host github :repo "vedang/pdf-tools")
+    (:option pdf-view-use-scaling t)
+    (:with-map pdf-view-mode-map
       (:bind "h" pdf-annot-add-highlight-markup-annotation))
+    (pdf-loader-install)
+    (add-hook 'pdf-view-mode-hook (lambda() (linum-mode -1)))
+    )
 
-
-      (pdf-loader-install)
-      (add-hook 'pdf-view-mode-hook (lambda() (linum-mode -1)))
-      )
-
-    (setq TeX-view-program-selection '((output-pdf "PDF Tools"))
+  (setq TeX-view-program-selection '((output-pdf "PDF Tools"))
         TeX-view-program-list '(("PDF Tools" TeX-pdf-tools-sync-view))
         TeX-source-correlate-start-server t)
 
