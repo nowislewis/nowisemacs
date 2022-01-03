@@ -1,5 +1,4 @@
 #+TITLE: Emacs Configuration
-
 #+PROPERTY: header-args:elisp :tangle ~/my-emacs/init.el
 
 * 启动优化
@@ -1435,12 +1434,15 @@ This keyword causes a body to be executed after other packages/features are load
 #+end_src
 ** org-bars
 #+begin_src elisp
-      (setup (:pkg org-bars :host github :repo "tonyaldon/org-bars")
-        (:option org-bars-color-options '(:only-one-color t
-                                                          :bar-color "#4C4A4D"))
-        (:load-after org)
-        (:hook-into org-mode)
-        )
+  (setup (:pkg org-bars :host github :repo "tonyaldon/org-bars")
+    (:option org-bars-color-options '(:only-one-color t
+                                      :bar-color "#4C4A4D")
+             org-bars-stars '(:empty "◉"
+                              :invisible "▶"
+                              :visible "∇"))
+    (:load-after org)
+    (:hook-into org-mode)
+    )
 #+end_src
 ** company-org-block
 #+begin_src elisp
@@ -1734,6 +1736,10 @@ If nil it defaults to `split-string-default-separators', normally
 
   (add-hook 'TeX-after-compilation-finished-functions
             #'TeX-revert-document-buffer)
+
+  (setup (:pkg pdf-continuous-scroll-mode :host github :repo "dalanicolai/pdf-continuous-scroll-mode.el")
+    (add-hook 'pdf-view-mode-hook 'pdf-continuous-scroll-mode)
+    )
 #+end_src
 ** org-noter
 #+begin_src elisp
