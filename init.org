@@ -1156,9 +1156,12 @@ This keyword causes a body to be executed after other packages/features are load
 * shell
 ** aweshell
 #+begin_src elisp
-      (setup (:pkg aweshell :host github :repo "manateelazycat/aweshell")
-	(:autoload aweshell-toggle)
-	(:autoload aweshell-dedicated-toggle))
+    (setup (:pkg aweshell :host github :repo "manateelazycat/aweshell")
+      (:option epe-path-stype 'single
+               )
+      (:autoload aweshell-toggle)
+      (:autoload aweshell-dedicated-toggle)
+      )
 #+end_src
 ** vterm
 #+begin_src elisp
