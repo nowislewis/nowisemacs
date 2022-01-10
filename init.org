@@ -367,14 +367,6 @@ This keyword causes a body to be executed after other packages/features are load
                  gcmh-high-cons-threshold #x1000000) ; 16MB
         (gcmh-mode 1))
     #+end_src
-* exec-path-from-shell
-#+begin_src elisp :tangle no
-  (setup (:pkg exec-path-from-shell)
-    (:delay)
-    (when (memq window-system '(mac ns x))
-      (exec-path-from-shell-initialize))
-    )
-#+end_src
 * Keyboard Bindings
 ** meow
 #+begin_src elisp
@@ -820,11 +812,6 @@ This keyword causes a body to be executed after other packages/features are load
   (setup (:pkg ws-butler)
     (:hook-into text-mode prog-mode))
 #+end_src
-** avy
-#+begin_src elisp
-  (setup (:pkg avy)
-    (:global "M-j" avy-goto-word-1))
-#+end_src
 * 补全
 ** Completions with Vertico
 #+begin_src elisp
@@ -1044,6 +1031,11 @@ This keyword causes a body to be executed after other packages/features are load
 #+begin_src elisp
 (winner-mode t)
 #+end_src
+** avy
+#+begin_src elisp
+  (setup (:pkg avy)
+    (:global "M-j" avy-goto-word-1))
+#+end_src
 * 输入与阅读
 ** pyim
 #+begin_src elisp
@@ -1221,7 +1213,7 @@ This keyword causes a body to be executed after other packages/features are load
 #+end_src
 
 ** lsp mode
-*** lsp
+*** eglot
 #+begin_src elisp
   ;; use built-in package dep
   (setup (:pkg project :type built-in))
@@ -1230,16 +1222,24 @@ This keyword causes a body to be executed after other packages/features are load
   (setup (:pkg jsonrpc :type built-in))
   (setup (:pkg eldoc :type built-in))
 
-  (setup (:pkg lsp-mode))
-  (setup (:pkg lsp-treemacs))
-  (setup (:pkg lsp-ui)
-    (:hook-into lsp-mode))
-  (setup (:pkg dap-mode)
-    (:when-loaded
-      (require 'dap-gdb-lldb)
-      (require 'dap-cpptools)
-      (require 'dap-python)
-      ))
+  (setup (:pkg markdown-mode))
+  (setup (:pkg eldoc-box)
+    (add-hook 'eglot--managed-mode-hook #'eldoc-box-hover-at-point-mode t)
+    )
+
+  (setup (:pkg eglot))
+
+
+  ;; (setup (:pkg lsp-mode))
+  ;; (setup (:pkg lsp-treemacs))
+  ;; (setup (:pkg lsp-ui)
+  ;;   (:hook-into lsp-mode))
+  ;; (setup (:pkg dap-mode)
+  ;;   (:when-loaded
+  ;;     (require 'dap-gdb-lldb)
+  ;;     (require 'dap-cpptools)
+  ;;     (require 'dap-python)
+  ;;     ))
 
 #+end_src
 *** lsp-org-special
