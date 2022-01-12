@@ -805,18 +805,32 @@ This keyword causes a body to be executed after other packages/features are load
 #+end_src
 ** embark
 #+begin_src elisp
-  (setup (:pkg embark-consult)
-	(add-hook 'embark-collect-mode-hook #'consult-preview-at-point-mode)
-    )
+    (setup (:pkg embark-consult)
+          (add-hook 'embark-collect-mode-hook #'consult-preview-at-point-mode)
+      )
+    ;; (setup (:pkg embark)
+    ;;   (:also-load embark-consult)
+    ;;   (:bind "C-;" embark-act)
+    ;;   ;; (add-to-list 'display-buffer-alist
+    ;;   ;; 	       '("\\`\\*Embark Collect \\(Live\\|Completions\\)\\*"
+    ;;   ;; 		 nil
+    ;;   ;; 		 (window-parameters (mode-line-format . none))))
+    ;;   )
+
   (setup (:pkg embark)
     (:also-load embark-consult)
-    (:bind "C-c" embark-act)
-    (add-to-list 'display-buffer-alist
-		 '("\\`\\*Embark Collect \\(Live\\|Completions\\)\\*"
-		   nil
-		   (window-parameters (mode-line-format . none))))
-    )
-  (setup (:pkg wgrep))
+    (:global "C-S-a" embark-act)
+    (:with-map minibuffer-local-map
+     (:bind "C-d" embark-act))
+
+    ;; Show Embark actions via which-key
+    (setq embark-action-indicator
+          (lambda (map)
+            (which-key--show-keymap "Embark" map nil nil 'no-paging)
+            #'which-key--hide-popup-ignore-command)
+          embark-become-indicator embark-action-indicator))
+
+    (setup (:pkg wgrep))
 #+end_src
 ** company 相关
 *** company-mode
