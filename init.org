@@ -39,8 +39,8 @@
               (setq gc-cons-threshold 800000
                     gc-cons-percentage 0.1)))
 #+end_src
-** Native Compilation
-#+begin_src elisp
+** Native Compilation(disabled)
+#+begin_src elisp :tangle no
 ;; Silence compiler warnings as they can be pretty disruptive
 (setq native-comp-async-report-warnings-errors nil)
 ;; Set the right directory to store the native comp cache
@@ -808,20 +808,10 @@ This keyword causes a body to be executed after other packages/features are load
     (setup (:pkg embark-consult)
           (add-hook 'embark-collect-mode-hook #'consult-preview-at-point-mode)
       )
-    ;; (setup (:pkg embark)
-    ;;   (:also-load embark-consult)
-    ;;   (:bind "C-;" embark-act)
-    ;;   ;; (add-to-list 'display-buffer-alist
-    ;;   ;; 	       '("\\`\\*Embark Collect \\(Live\\|Completions\\)\\*"
-    ;;   ;; 		 nil
-    ;;   ;; 		 (window-parameters (mode-line-format . none))))
-    ;;   )
 
   (setup (:pkg embark)
     (:also-load embark-consult)
-    (:global "C-S-a" embark-act)
-    (:with-map minibuffer-local-map
-     (:bind "C-d" embark-act))
+    (:global "C-;" embark-act)
 
     ;; Show Embark actions via which-key
     (setq embark-action-indicator
@@ -832,110 +822,44 @@ This keyword causes a body to be executed after other packages/features are load
 
     (setup (:pkg wgrep))
 #+end_src
-** company 相关
-*** company-mode
+** complete with corfu(instead of company)
 #+begin_src elisp
-  ;; (setup (:pkg company-tabnine))
-  (setup
-      (:pkg company)
+  (setup (:pkg corfu)
     (:option
-     company-dabbrev-ignore-case nil
-     company-dabbrev-downcase nil
-     company-minimum-prefix-length 2 ; pop up a completion menu by tapping a character
-     company-show-numbers 2 ; number the candidates (use M-1, M-2 etc to select completions).
-     company-require-match nil ; allow input string that do not match candidate words
-     company-idle-delay 0 ; trigger completion immediately.
-     company-dabbrev-downcase nil
-     company-dabbrev-ignore-case t
-
-     company-backends '(
-                        ;; (company-tabnine company-dabbrev
-                        (company-dabbrev
-                                         company-keywords company-files
-                                         company-capf
-                                         )
-                        )
+     ;; Optional customizations
+     corfu-cycle t                ;; Enable cycling for `corfu-next/previous'
+     corfu-auto t                 ;; Enable auto completion
+     ;; (corfu-commit-predicate nil)   ;; Do not commit selected candidates on next input
+     ;; (corfu-quit-at-boundary t)     ;; Automatically quit at word boundary
+     ;; (corfu-quit-no-match t)        ;; Automatically quit if there is no match
+     ;; (corfu-preview-current nil)    ;; Disable current candidate preview
+     corfu-preselect-first nil    ;; Disable candidate preselection
+     ;; (corfu-echo-documentation nil) ;; Disable documentation in the echo area
+     ;; (corfu-scroll-margin 5)        ;; Use scroll margin
      )
-    (add-hook 'after-init-hook #'global-company-mode)
+    (:with-map corfu-map
+      (:bind "TAB" corfu-next
+             "S-TAB" corfu-previous))
+    (corfu-global-mode))
+  ;; corfu backend
+  (setup (:pkg cape)
+    (add-to-list 'completion-at-point-functions #'cape-file)
+    (add-to-list 'completion-at-point-functions #'cape-tex)
+    (add-to-list 'completion-at-point-functions #'cape-dabbrev)
+    (add-to-list 'completion-at-point-functions #'cape-keyword))
+
+  ;; Enable Corfu completion UI
+  (setup (:pkg corfu-doc :host github :repo "galeo/corfu-doc")
+    (:hook-into corfu-mode))
+
+  ;; (setup (:pkg svg-lib :type built-in)) ;; built-in has litter icons
+  (setup (:pkg kind-icon)
+    (:load-after corfu)
+    (:option kind-icon-default-face 'corfu-default) ; to compute blended backgrounds correctly
     (:when-loaded
-
-      (defvar company-mode/enable-yas t
-        "Enable yasnippet for all backends.")
-
-      (defun company-mode/backend-with-yas (backend)
-        (if (or (not company-mode/enable-yas) (and (listp backend) (member 'company-yasnippet backend)))
-            backend
-          (append (if (consp backend) backend (list backend))
-                  '(:with company-yasnippet))))
-
-      (setq company-backends (mapcar #'company-mode/backend-with-yas company-backends))
-
-      ;; Remove duplicate candidate.
-      (add-to-list 'company-transformers #'delete-dups)
-
-      ;; Add `company-elisp' backend for elisp.
-      (add-hook 'emacs-lisp-mode-hook
-                #'(lambda ()
-                    (require 'company-elisp)
-                    (add-to-list (make-local-variable 'company-backends)
-                                 'company-elisp)))
-                    ;; (push 'company-elisp company-backends)))
-
-      ;; The free version of TabNine is good enough,
-      ;; and below code is recommended that TabNine not always
-      ;; prompt me to purchase a paid version in a large project.
-      (defadvice company-echo-show (around disable-tabnine-upgrade-message activate)
-        (let ((company-message-func (ad-get-arg 0)))
-          (when (and company-message-func
-                     (stringp (funcall company-message-func)))
-            (unless (string-match "The free version of TabNine only indexes up to" (funcall company-message-func))
-              ad-do-it))))
-      )
-    )
-
+      (add-to-list 'corfu-margin-formatters #'kind-icon-margin-formatter)
+      ))
 #+end_src
-*** company-box
-#+begin_src elisp
-  (setup (:pkg company-box)
-    (:hook-into company-mode)
-    (:option company-box-doc-delay 0.1
-             company-box-show-single-candidate nil
-             company-box-backends-colors nil
-             company-box-max-candidates 50
-             )
-    (:when-loaded
-        (setq company-box-icons-all-the-icons
-              `((Unknown . ,(all-the-icons-material "find_in_page" :height 1.0 :v-adjust -0.2))
-                (Text . ,(all-the-icons-faicon "text-width" :height 1.0 :v-adjust -0.02))
-                (Method . ,(all-the-icons-faicon "cube" :height 1.0 :v-adjust -0.02 :face 'all-the-icons-purple))
-                (Function . ,(all-the-icons-faicon "cube" :height 1.0 :v-adjust -0.02 :face 'all-the-icons-purple))
-                (Constructor . ,(all-the-icons-faicon "cube" :height 1.0 :v-adjust -0.02 :face 'all-the-icons-purple))
-                (Field . ,(all-the-icons-octicon "tag" :height 1.1 :v-adjust 0 :face 'all-the-icons-lblue))
-                (Variable . ,(all-the-icons-octicon "tag" :height 1.1 :v-adjust 0 :face 'all-the-icons-lblue))
-                (Class . ,(all-the-icons-material "settings_input_component" :height 1.0 :v-adjust -0.2 :face 'all-the-icons-orange))
-                (Interface . ,(all-the-icons-material "share" :height 1.0 :v-adjust -0.2 :face 'all-the-icons-lblue))
-                (Module . ,(all-the-icons-material "view_module" :height 1.0 :v-adjust -0.2 :face 'all-the-icons-lblue))
-                (Property . ,(all-the-icons-faicon "wrench" :height 1.0 :v-adjust -0.02))
-                (Unit . ,(all-the-icons-material "settings_system_daydream" :height 1.0 :v-adjust -0.2))
-                (Value . ,(all-the-icons-material "format_align_right" :height 1.0 :v-adjust -0.2 :face 'all-the-icons-lblue))
-                (Enum . ,(all-the-icons-material "storage" :height 1.0 :v-adjust -0.2 :face 'all-the-icons-orange))
-                (Keyword . ,(all-the-icons-material "filter_center_focus" :height 1.0 :v-adjust -0.2))
-                (Snippet . ,(all-the-icons-material "format_align_center" :height 1.0 :v-adjust -0.2))
-                (Color . ,(all-the-icons-material "palette" :height 1.0 :v-adjust -0.2))
-                (File . ,(all-the-icons-faicon "file-o" :height 1.0 :v-adjust -0.02))
-                (Reference . ,(all-the-icons-material "collections_bookmark" :height 1.0 :v-adjust -0.2))
-                (Folder . ,(all-the-icons-faicon "folder-open" :height 1.0 :v-adjust -0.02))
-                (EnumMember . ,(all-the-icons-material "format_align_right" :height 1.0 :v-adjust -0.2))
-                (Constant . ,(all-the-icons-faicon "square-o" :height 1.0 :v-adjust -0.1))
-                (Struct . ,(all-the-icons-material "settings_input_component" :height 1.0 :v-adjust -0.2 :face 'all-the-icons-orange))
-                (Event . ,(all-the-icons-octicon "zap" :height 1.0 :v-adjust 0 :face 'all-the-icons-orange))
-                (Operator . ,(all-the-icons-material "control_point" :height 1.0 :v-adjust -0.2))
-                (TypeParameter . ,(all-the-icons-faicon "arrows" :height 1.0 :v-adjust -0.02))
-                (Template . ,(all-the-icons-material "format_align_left" :height 1.0 :v-adjust -0.2)))
-              company-box-icons-alist 'company-box-icons-all-the-icons)))
-
-#+end_src
-
 ** yasnippet
 #+begin_src elisp
   (setup (:pkg yasnippet)
@@ -1263,13 +1187,12 @@ This keyword causes a body to be executed after other packages/features are load
              org-image-actual-width 600
              org-confirm-babel-evaluate nil
              org-src-window-setup 'split-window-below
-
              org-refile-targets '(("~/Documents/emacs/orgmode/roam/20211204000712-refile_index.org" . (:maxlevel . 9))
                                   ))
     (:file-match "\\.org\\'")
     (:hook 'prettify-symbols-mode org-num-mode)
     (:when-loaded
-      ;; (require 'org-tempo)
+      (require 'org-tempo) ;; so that <s is useful
       (setq-default org-todo-keywords
                     (quote ((sequence "TODO(t)" "NEXT(n)" "|" "DONE(d)")
                             (sequence "WAITING(w@/!)" "HOLD(h@/!)" "|" "CANCELLED(c@/!)" "PHONE" "MEETING"))))
@@ -1330,7 +1253,7 @@ This keyword causes a body to be executed after other packages/features are load
     )
 #+end_src
 ** company-org-block
-#+begin_src elisp
+#+begin_src elisp :tangle no
   (setup (:pkg company-org-block)
     (add-hook 'org-mode-hook (lambda ()
                                (setq-local company-backends '(company-org-block))
