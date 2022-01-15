@@ -40,7 +40,6 @@
   ;; Set the right directory to store the native comp cache
   (add-to-list 'native-comp-eln-load-path (expand-file-name "eln-cache/" user-emacs-directory))
 #+end_src
-
 ** generic
 #+begin_src elisp
   ;; 定义一些启动目录，方便下次迁移修改
@@ -788,43 +787,44 @@ This keyword causes a body to be executed after other packages/features are load
 #+end_src
 ** corfu(instead of company)
 #+begin_src elisp
-  (setup (:pkg corfu)
-    (:option
-     ;; Optional customizations
-     corfu-cycle t                ;; Enable cycling for `corfu-next/previous'
-     corfu-auto t                 ;; Enable auto completion
-     ;; (corfu-commit-predicate nil)   ;; Do not commit selected candidates on next input
-     ;; (corfu-quit-at-boundary t)     ;; Automatically quit at word boundary
-     ;; (corfu-quit-no-match t)        ;; Automatically quit if there is no match
-     ;; (corfu-preview-current nil)    ;; Disable current candidate preview
-     corfu-preselect-first nil    ;; Disable candidate preselection
-     corfu-echo-documentation nil ;; Disable documentation in the echo area
-     ;; (corfu-scroll-margin 5)        ;; Use scroll margin
-     corfu-auto-prefix 2
-     )
-    (:with-map corfu-map
-      (:bind "TAB" corfu-next
-             "S-TAB" corfu-previous))
-    (corfu-global-mode)
-    )
-  ;; corfu backend
-  (setup (:pkg cape)
-    (add-to-list 'completion-at-point-functions #'cape-file)
-    (add-to-list 'completion-at-point-functions #'cape-tex)
-    (add-to-list 'completion-at-point-functions #'cape-dabbrev)
-    (add-to-list 'completion-at-point-functions #'cape-keyword))
+    (setup (:pkg corfu)
+      (:option
+       ;; Optional customizations
+       corfu-cycle t                ;; Enable cycling for `corfu-next/previous'
+       corfu-auto t                 ;; Enable auto completion
+       ;; corfu-commit-predicate nil   ;; Do not commit selected candidates on next input
+       ;; (corfu-quit-at-boundary t)     ;; Automatically quit at word boundary
+       ;; (corfu-quit-no-match t)        ;; Automatically quit if there is no match
+       corfu-preview-current nil    ;; Disable current candidate preview
+       corfu-preselect-first nil    ;; Disable candidate preselection
+       corfu-echo-documentation nil ;; Disable documentation in the echo area
+       ;; (corfu-scroll-margin 5)        ;; Use scroll margin
+       corfu-auto-prefix 2
+       )
+      (:with-map corfu-map
+        (:bind [tab] corfu-next
+               [backtab] corfu-previous
+               "<escape>" corfu-quit))
+          (corfu-global-mode)
+      )
+    ;; corfu backend
+    (setup (:pkg cape)
+      (add-to-list 'completion-at-point-functions #'cape-file)
+      (add-to-list 'completion-at-point-functions #'cape-tex)
+      (add-to-list 'completion-at-point-functions #'cape-dabbrev)
+      (add-to-list 'completion-at-point-functions #'cape-keyword))
 
-  ;; Enable Corfu completion UI
-  (setup (:pkg corfu-doc :host github :repo "galeo/corfu-doc")
-    (:hook-into corfu-mode))
+    ;; Enable Corfu completion UI
+    (setup (:pkg corfu-doc :host github :repo "galeo/corfu-doc")
+      (:hook-into corfu-mode))
 
-  ;; (setup (:pkg svg-lib :type built-in)) ;; built-in has little icons
-  (setup (:pkg kind-icon)
-    (:load-after corfu)
-    (:option kind-icon-default-face 'corfu-default) ; to compute blended backgrounds correctly
-    (:when-loaded
-      (add-to-list 'corfu-margin-formatters #'kind-icon-margin-formatter)
-      ))
+    ;; (setup (:pkg svg-lib :type built-in)) ;; built-in has little icons
+    (setup (:pkg kind-icon)
+      (:load-after corfu)
+      (:option kind-icon-default-face 'corfu-default) ; to compute blended backgrounds correctly
+      (:when-loaded
+        (add-to-list 'corfu-margin-formatters #'kind-icon-margin-formatter)
+        ))
 #+end_src
 ** yasnippet
 #+begin_src elisp
