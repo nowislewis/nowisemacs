@@ -3,64 +3,57 @@
 * 启动优化
 ** UI 加速
 #+begin_src elisp
-    ;; -*- lexical-binding: t; -*-
-    (tool-bar-mode -1)                      ;禁用工具栏
-     ;; (menu-bar-mode -1)                      ;禁用菜单栏
-     (scroll-bar-mode -1)                    ;禁用滚动条
-    (setq
-      ;; 不要缩放frame.
-      frame-inhibit-implied-resize t
-      ;; 默认用最简单的模式
-      initial-major-mode 'fundamental-mode
-      ;; 不要自动启用package
-      package-enable-at-startup nil
-      package--init-file-ensured t
-     inhibit-startup-message t             ; 关闭启动 Emacs 时的欢迎界面
-      )
-      ;; (setq make-backup-files nil)                 ; 关闭文件自动备份
-    (electric-pair-mode t)                       ; 自动补全括号
-    ;; (add-hook 'prog-mode-hook #'show-paren-mode) ; 编程模式下，光标在括号上时高亮另一个括号
-    (column-number-mode t)                       ; 在 Mode line 上显示列号
-    (global-auto-revert-mode t)                  ; 当另一程序修改了文件时，让 Emacs 及时刷新 Buffer
-    (delete-selection-mode t)                    ; 选中文本后输入文本会替换文本（更符合我们习惯了的其它编辑器的逻辑）
-    (add-hook 'prog-mode-hook #'hs-minor-mode)   ; 编程模式下，可以折叠代码块
+  ;; -*- lexical-binding: t; -*-
+  (tool-bar-mode -1)                      ;禁用工具栏
+  (scroll-bar-mode -1)                    ;禁用滚动条
+  (setq
+   ;; 不要缩放frame.
+   frame-inhibit-implied-resize t
+   ;; 默认用最简单的模式
+   initial-major-mode 'fundamental-mode
+   ;; 不要自动启用package
+   package-enable-at-startup nil
+   package--init-file-ensured t
+   inhibit-startup-message t             ; 关闭启动 Emacs 时的欢迎界面
+   )
+  ;; (setq make-backup-files nil)                 ; 关闭文件自动备份
+  (electric-pair-mode t)                       ; 自动补全括号
+  ;; (add-hook 'prog-mode-hook #'show-paren-mode) ; 编程模式下，光标在括号上时高亮另一个括号
+  (column-number-mode t)                       ; 在 Mode line 上显示列号
+  (global-auto-revert-mode t)                  ; 当另一程序修改了文件时，让 Emacs 及时刷新 Buffer
+  (delete-selection-mode t)                    ; 选中文本后输入文本会替换文本（更符合我们习惯了的其它编辑器的逻辑）
+  (add-hook 'prog-mode-hook #'hs-minor-mode)   ; 编程模式下，可以折叠代码块
 
-    ;; (global-display-line-numbers-mode 1)         ; 在 Window 显示行号
-    (setq display-line-numbers-width-start t)
-    (pixel-scroll-precision-mode t)
+  ;; (global-display-line-numbers-mode 1)         ; 在 Window 显示行号
+  (setq display-line-numbers-width-start t)
+  (pixel-scroll-precision-mode t)
 #+end_src
 ** Startup Performance
 #+begin_src elisp
   (setq gc-cons-threshold most-positive-fixnum
         gc-cons-percentage 0.5)
-  (add-hook 'emacs-startup-hook
-            (lambda ()
-              "Recover GC values after startup."
-              (setq gc-cons-threshold 800000
-                    gc-cons-percentage 0.1)))
 #+end_src
 ** Native Compilation(disabled)
 #+begin_src elisp :tangle no
-;; Silence compiler warnings as they can be pretty disruptive
-(setq native-comp-async-report-warnings-errors nil)
-;; Set the right directory to store the native comp cache
-(add-to-list 'native-comp-eln-load-path (expand-file-name "eln-cache/" user-emacs-directory))
+  ;; Silence compiler warnings as they can be pretty disruptive
+  (setq native-comp-async-report-warnings-errors nil)
+  ;; Set the right directory to store the native comp cache
+  (add-to-list 'native-comp-eln-load-path (expand-file-name "eln-cache/" user-emacs-directory))
 #+end_src
 
 ** generic
 #+begin_src elisp
-    ;; 定义一些启动目录，方便下次迁移修改
+  ;; 定义一些启动目录，方便下次迁移修改
   (defvar nowisemacs-root-dir (file-truename "~/nowisemacs/"))
   (defvar nowisemacs-config-dir (concat nowisemacs-root-dir "init.org"))
   (defvar nowisemacs-extension-dir (concat nowisemacs-root-dir "/extensions"))
 
-     (recentf-mode t)
-     (setq use-short-answers t)
-     (blink-cursor-mode -1)                  ;指针不闪动
-     (setq ring-bell-function 'ignore)       ;关闭烦人的出错时的提示声
-     (set-default-coding-systems 'utf-8)
-    (global-hl-line-mode)
-
+  (recentf-mode t)
+  (setq use-short-answers t)
+  (blink-cursor-mode -1)                  ;指针不闪动
+  (setq ring-bell-function 'ignore)       ;关闭烦人的出错时的提示声
+  (set-default-coding-systems 'utf-8)
+  (global-hl-line-mode)
 #+end_src
 #+begin_src elisp :tangle no
   ;; Restore emacs session.
@@ -110,17 +103,6 @@
 #+end_src
 
 * Package Management
-** proxy
-#+begin_src elisp
-  (defun my-setproxy()
-    (interactive)
-        (setq url-proxy-services
-          '(("http" . "localhost:12333")
-            ("https" . "localhost:12333")
-            ("no_proxy" . "0.0.0.0")))
-    )
-  ;; (my-setproxy)
-#+end_src
 ** straight
 #+begin_src elisp
   (unless (featurep 'straight)
@@ -137,14 +119,8 @@
           (goto-char (point-max))
           (eval-print-last-sexp)))
       (load bootstrap-file nil 'nomessage)))
-(setq straight-vc-git-default-clone-depth 1)
-  ;; Use straight.el for use-package expressions
-  ;; (straight-use-package 'use-package)
-
+  (setq straight-vc-git-default-clone-depth 1)
 #+end_src
-
-Sometimes it's good to clean up unused repositories if I've removed packages from my configuration.  Use =straight-remove-unused-repos= for this purpose.
-
 ** straight print
 #+begin_src elisp
   (defun straight-pull-report (&rest _)
@@ -184,58 +160,58 @@ Sometimes it's good to clean up unused repositories if I've removed packages fro
 
 *** :straight
 #+begin_src elisp
-(setup-define :straight
-  (lambda (recipe)
-    `(unless (straight-use-package ',recipe)
-       ,(setup-quit)))
-  :documentation
-  "Install RECIPE with `straight-use-package'.
-This macro can be used as HEAD, and will replace itself with the
-first RECIPE's package."
-  :repeatable t
-  :shorthand (lambda (sexp)
-               (let ((recipe (cadr sexp)))
-                 (if (consp recipe)
-                     (car recipe)
-                   recipe))))
+  (setup-define :straight
+    (lambda (recipe)
+      `(unless (straight-use-package ',recipe)
+         ,(setup-quit)))
+    :documentation
+    "Install RECIPE with `straight-use-package'.
+  This macro can be used as HEAD, and will replace itself with the
+  first RECIPE's package."
+    :repeatable t
+    :shorthand (lambda (sexp)
+                 (let ((recipe (cadr sexp)))
+                   (if (consp recipe)
+                       (car recipe)
+                     recipe))))
 #+end_src
 *** :pkg
 #+begin_src elisp
-;; Recipe is always a list
-;; Install via Guix if length == 1 or :guix t is present
+  ;; Recipe is always a list
+  ;; Install via Guix if length == 1 or :guix t is present
 
-(defvar dw/guix-emacs-packages '()
-  "Contains a list of all Emacs package names that must be
-installed via Guix.")
+  (defvar dw/guix-emacs-packages '()
+    "Contains a list of all Emacs package names that must be
+  installed via Guix.")
 
-(defun dw/filter-straight-recipe (recipe)
-  (let* ((plist (cdr recipe))
-         (name (plist-get plist
-                          :straight)))
-    (cons (if (and name
-                   (not (equal name t))) name (car recipe))
-          (plist-put plist
-                     :straight nil))))
+  (defun dw/filter-straight-recipe (recipe)
+    (let* ((plist (cdr recipe))
+           (name (plist-get plist
+                            :straight)))
+      (cons (if (and name
+                     (not (equal name t))) name (car recipe))
+            (plist-put plist
+                       :straight nil))))
 
-(setup-define :pkg (lambda
-                     (&rest
-                      recipe)
-                     `(add-to-list 'dw/guix-emacs-packages ,(or (plist-get recipe
-                                                                           :guix)
-                                                                (concat "emacs-" (symbol-name (car
-                                                                                               recipe)))))
-                     `(straight-use-package ',(dw/filter-straight-recipe recipe)))
-              :documentation "Install RECIPE via Guix or straight.el"
-              :shorthand #'cadr)
+  (setup-define :pkg (lambda
+                       (&rest
+                        recipe)
+                       `(add-to-list 'dw/guix-emacs-packages ,(or (plist-get recipe
+                                                                             :guix)
+                                                                  (concat "emacs-" (symbol-name (car
+                                                                                                 recipe)))))
+                       `(straight-use-package ',(dw/filter-straight-recipe recipe)))
+                :documentation "Install RECIPE via Guix or straight.el"
+                :shorthand #'cadr)
 #+end_src
 *** :delay
 #+begin_src elisp
   (setup-define :delay
-     (lambda (&rest time)
-       `(run-with-idle-timer ,(or time 0.1)
-                             nil ;; Don't repeat
-                             (lambda () (require ',(setup-get 'feature)))))
-     :documentation "Delay loading the feature until a certain amount of idle time has passed.")
+    (lambda (&rest time)
+      `(run-with-idle-timer ,(or time 0.1)
+                            nil ;; Don't repeat
+                            (lambda () (require ',(setup-get 'feature)))))
+    :documentation "Delay loading the feature until a certain amount of idle time has passed.")
 #+end_src
 *** :disabled
 
@@ -250,45 +226,45 @@ Used to disable a package configuration, similar to =:disabled= in =use-package=
 *** :load-after
 This keyword causes a body to be executed after other packages/features are loaded:
 #+begin_src elisp
-(setup-define :load-after
+  (setup-define :load-after
     (lambda (&rest features)
       (let ((body `(require ',(setup-get 'feature))))
         (dolist (feature (nreverse features))
           (setq body `(with-eval-after-load ',feature ,body)))
         body))
-  :documentation "Load the current feature after FEATURES.")
+    :documentation "Load the current feature after FEATURES.")
 #+end_src
 *** :if-system
 #+begin_src elisp
-(setup-define :if-system
+  (setup-define :if-system
     (lambda (systemtype)
       `(unless (eq system-type ,systemtype)
          ,(setup-quit)))
-  :documentation "If SYSTEMTYPE is not the current systemtype, stop evaluating form.")
+    :documentation "If SYSTEMTYPE is not the current systemtype, stop evaluating form.")
 #+end_src
 *** :autoload
 #+begin_src elisp
-      (setup-define :autoload
-        (lambda (&rest funcs)
-          (let ((body '())
-                (feature-string (symbol-name (setup-get 'feature))))
-            (dolist (single-func (nreverse funcs))
-              (add-to-list 'body `(autoload ',single-func ,feature-string nil t))
-              (add-to-list 'body 'progn))
-              body))
-          :documentation "Load the current feature after FEATURES.")
+  (setup-define :autoload
+    (lambda (&rest funcs)
+      (let ((body '())
+            (feature-string (symbol-name (setup-get 'feature))))
+        (dolist (single-func (nreverse funcs))
+          (add-to-list 'body `(autoload ',single-func ,feature-string nil t))
+          (add-to-list 'body 'progn))
+        body))
+    :documentation "Load the current feature after FEATURES.")
 
-        ;; (setup (:pkg company-english-helper :host github
-        ;;            :repo "manateelazycat/company-english-helper")
-        ;;        (:autoload "company-english-helper" toggle-english-helper))
+  ;; (setup (:pkg company-english-helper :host github
+  ;;            :repo "manateelazycat/company-english-helper")
+  ;;        (:autoload "company-english-helper" toggle-english-helper))
 #+end_src
 * gcmh
-    #+begin_src elisp
-      (setup (:pkg gcmh)
-        (:option gcmh-idle-delay 5
-                 gcmh-high-cons-threshold #x1000000) ; 16MB
-        (gcmh-mode 1))
-    #+end_src
+#+begin_src elisp
+  (setup (:pkg gcmh)
+    (:option gcmh-idle-delay 5
+             gcmh-high-cons-threshold #x1000000) ; 16MB
+    (gcmh-mode 1))
+#+end_src
 * Keyboard Bindings
 ** meow
 #+begin_src elisp
@@ -308,7 +284,6 @@ This keyword causes a body to be executed after other packages/features are load
                                      (?i . indent)
                                      (?x . extend)
                                      )
-
              meow-use-keypad-when-execute-kbd nil
              meow-expand-exclude-mode-list nil
              meow-use-clipboard t
@@ -332,7 +307,6 @@ This keyword causes a body to be executed after other packages/features are load
        ;; SPC j/k will run the original command in MOTION state.
        '("j" . "H-j")
        '("k" . "H-k")
-       ;; '("k" . meow-motion-origin-command)
        ;; Use SPC (0-9) for digit arguments.
        '("1" . meow-digit-argument)
        '("2" . meow-digit-argument)
@@ -447,7 +421,6 @@ This keyword causes a body to be executed after other packages/features are load
     (which-key-mode)
     (setq which-key-idle-delay 0.1))
 #+end_src
-
 ** keybinding
 *** lewis-define-key
 #+begin_src elisp
@@ -455,15 +428,15 @@ This keyword causes a body to be executed after other packages/features are load
     (let (key def)
       (setq keymap meow-leader-keymap)
       (if key-prefix
-	  (setq key-prefix (concat key-prefix " "))
-	(setq key-prefix ""))
+          (setq key-prefix (concat key-prefix " "))
+        (setq key-prefix ""))
       (dolist (element key-alist)
-	(setq key (car element))
-	(setq def (cdr element))
-	(cond ((stringp key) (setq key (read-kbd-macro (concat key-prefix key))))
-	      ((vectorp key) nil)
-	      (t (signal 'wrong-type-argument (list 'array key))))
-	(define-key keymap key def))))
+        (setq key (car element))
+        (setq def (cdr element))
+        (cond ((stringp key) (setq key (read-kbd-macro (concat key-prefix key))))
+              ((vectorp key) nil)
+              (t (signal 'wrong-type-argument (list 'array key))))
+        (define-key keymap key def))))
 #+end_src
 *** keys
 #+begin_src elisp
@@ -502,22 +475,22 @@ This keyword causes a body to be executed after other packages/features are load
      ) "e")
 
   ;;; search
-   (lewis/define-leader-key '(
-                              ("s" . consult-line)
-                              ("b" . consult-buffer)
-                              ("d" . consult-ripgrep)
-                              ("D" . lewis/ripgrep-search-other-dir)
-                              ("f" . consult-find)
-                              ) "s")
+  (lewis/define-leader-key '(
+                             ("s" . consult-line)
+                             ("b" . consult-buffer)
+                             ("d" . consult-ripgrep)
+                             ("D" . lewis/ripgrep-search-other-dir)
+                             ("f" . consult-find)
+                             ) "s")
 
   ;;; find-file
-   (defun find-config-file()
-     (interactive)
-     (find-file nowisemacs-config-dir))
-   (lewis/define-leader-key '(
-                              ("r" . consult-recent-file)
-                              ("p" . find-config-file)
-                              ) "f")
+  (defun find-config-file()
+    (interactive)
+    (find-file nowisemacs-config-dir))
+  (lewis/define-leader-key '(
+                             ("r" . consult-recent-file)
+                             ("p" . find-config-file)
+                             ) "f")
   ;;; notes
   ;;roam
   (lewis/define-leader-key '(
@@ -556,7 +529,6 @@ This keyword causes a body to be executed after other packages/features are load
   (lewis/define-leader-key '(
                              ("e" . org-noter)
                              ) "n")
-
   ;;; time
   (lewis/define-leader-key '(
                              ("t" . org-pomodoro)
@@ -575,16 +547,15 @@ This keyword causes a body to be executed after other packages/features are load
           doom-themes-enable-italic t) ; if nil, italics is universally disabled
     (load-theme 'doom-monokai-pro t)
     )
-
 #+end_src
 ** Font
 #+begin_src elisp
   (let ((emacs-font-size 12)
         emacs-font-name)
-       ;; (when (eq system-type 'darwin)
-      (setq emacs-font-name "yaheiInconsolata")
-       ;; (when (eq system-type 'gnu/linux)
-      ;; (setq emacs-font-name "等距更纱黑体 SC"))
+    ;; (when (eq system-type 'darwin)
+    (setq emacs-font-name "yaheiInconsolata")
+    ;; (when (eq system-type 'gnu/linux)
+    ;; (setq emacs-font-name "等距更纱黑体 SC"))
     (when (display-grayscale-p)
       (set-frame-font (format "%s-%s" (eval emacs-font-name) (eval emacs-font-size)) t t)
       (set-fontset-font (frame-parameter nil 'font) 'unicode (eval emacs-font-name))
@@ -645,7 +616,6 @@ This keyword causes a body to be executed after other packages/features are load
   (setup (:pkg all-the-icons)
     (:option all-the-icons-scale-factor 1.0)
     )
-
   (setup (:pkg all-the-icons-completion)
     (add-hook 'marginalia-mode-hook #'all-the-icons-completion-marginalia-setup))
 #+end_src
@@ -699,20 +669,18 @@ This keyword causes a body to be executed after other packages/features are load
     (:option doom-modeline-window-width-limit fill-column
              doom-modeline-height 20)
     (:hook-into after-init)
-  )
+    )
 #+end_src
-** backup
+** backup, super-save
 #+begin_src elisp
-  ;; 不要自动备份，auto-save.el 就挺好用
   (setq make-backup-files nil)
   (setq auto-save-default nil)
 
   (setup (:pkg super-save)
     (:delay)
-         (super-save-mode 1)
-       (setq super-save-auto-save-when-idle t)
-
-  )
+    (super-save-mode 1)
+    (setq super-save-auto-save-when-idle t)
+    )
 #+end_src
 ** 自动换行
 #+begin_src elisp
@@ -733,12 +701,12 @@ This keyword causes a body to be executed after other packages/features are load
 * 补全
 ** Completions with Vertico
 #+begin_src elisp
-    (setup (:pkg vertico :host github :repo "minad/vertico" :files ("*.el" "extensions/*.el"))
-      (:option vertico-cycle t)
-      (:with-mode vertico
+  (setup (:pkg vertico :host github :repo "minad/vertico" :files ("*.el" "extensions/*.el"))
+    (:option vertico-cycle t)
+    (:with-mode vertico
       (:bind [backspace] vertico-directory-delete-char))
-      (vertico-mode)
-      )
+    (vertico-mode)
+    )
   ;; (setup (:pkg vertico-posframe)
   ;;   (:option vertico-posframe-parameters
   ;;     '((left-fringe . 16)
@@ -756,8 +724,8 @@ This keyword causes a body to be executed after other packages/features are load
 #+end_src
 ** savehist
 #+begin_src elisp
-(setup savehist
-       (savehist-mode))
+  (setup savehist
+    (savehist-mode))
 #+end_src
 ** Consult Commands
 *** consult
@@ -784,10 +752,6 @@ This keyword causes a body to be executed after other packages/features are load
               (car (project-roots project)))))
     )
 #+end_src
-*** consult-dir
-#+begin_src elisp :tangle no
-  (setup (:pkg consult-dir))
-#+end_src
 *** search other cwd
 #+begin_src elisp
   (defun lewis/ripgrep-search-other-dir()
@@ -805,9 +769,9 @@ This keyword causes a body to be executed after other packages/features are load
 #+end_src
 ** embark
 #+begin_src elisp
-    (setup (:pkg embark-consult)
-          (add-hook 'embark-collect-mode-hook #'consult-preview-at-point-mode)
-      )
+  (setup (:pkg embark-consult)
+    (add-hook 'embark-collect-mode-hook #'consult-preview-at-point-mode)
+    )
 
   (setup (:pkg embark)
     (:also-load embark-consult)
@@ -820,7 +784,7 @@ This keyword causes a body to be executed after other packages/features are load
             #'which-key--hide-popup-ignore-command)
           embark-become-indicator embark-action-indicator))
 
-    (setup (:pkg wgrep))
+  (setup (:pkg wgrep))
 #+end_src
 ** complete with corfu(instead of company)
 #+begin_src elisp
@@ -872,7 +836,7 @@ This keyword causes a body to be executed after other packages/features are load
 #+end_src
 * Window Management
 #+begin_src elisp
-(winner-mode t)
+  (winner-mode t)
 #+end_src
 ** avy
 #+begin_src elisp
@@ -882,39 +846,39 @@ This keyword causes a body to be executed after other packages/features are load
 * 输入与阅读
 ** pyim
 #+begin_src elisp
-    (setup (:pkg posframe))
-    (setup (:pkg pyim)
-      (:option pyim-dicts '((:name "lewis_pyim_dict" :file "~/Documents/emacs/pyim-dict/lewis_pyim_dict.pyim")
-                            (:name "lewis_big_dict" :file "~/Documents/emacs/pyim-dict/pyim-bigdict.pyim.gz"))
-               pyim-default-scheme 'quanpin
-               pyim-punctuation-translate-p '(no yes auto)
-               pyim-page-tooltip 'posframe
-               pyim-page-length 5
-  ;;              (setq-default pyim-punctuation-translate-p '(yes no auto))   ;使用全角标点。
-  ;; (setq-default pyim-punctuation-translate-p '(no yes auto))   ;使用半角标点。
-  ;; (setq-default pyim-punctuation-translate-p '(auto yes no))   ;中文使用全角标点，英文使用半角标点。
-               )
-      (:when-loaded
-        (set-default 'pyim-punctuation-half-width-functions
-                     '(pyim-probe-punctuation-line-beginning pyim-probe-punctuation-after-punctuation))
-        (pyim-isearch-mode 1)
-        (defalias 'pyim-probe-meow-normal-mode
-          #'(lambda nil
-              (meow-normal-mode-p)))
-          (set-default 'pyim-english-input-switch-functions
-                       '(pyim-probe-auto-english pyim-probe-isearch-mode pyim-probe-program-mode pyim-probe-org-structure-template pyim-probe-org-latex-mode pyim-probe-meow-normal-mode))
+  (setup (:pkg posframe))
+  (setup (:pkg pyim)
+    (:option pyim-dicts '((:name "lewis_pyim_dict" :file "~/Documents/emacs/pyim-dict/lewis_pyim_dict.pyim")
+                          (:name "lewis_big_dict" :file "~/Documents/emacs/pyim-dict/pyim-bigdict.pyim.gz"))
+             pyim-default-scheme 'quanpin
+             pyim-punctuation-translate-p '(no yes auto)
+             pyim-page-tooltip 'posframe
+             pyim-page-length 5
+             ;;              (setq-default pyim-punctuation-translate-p '(yes no auto))   ;使用全角标点。
+             ;; (setq-default pyim-punctuation-translate-p '(no yes auto))   ;使用半角标点。
+             ;; (setq-default pyim-punctuation-translate-p '(auto yes no))   ;中文使用全角标点，英文使用半角标点。
+             )
+    (:when-loaded
+      (set-default 'pyim-punctuation-half-width-functions
+                   '(pyim-probe-punctuation-line-beginning pyim-probe-punctuation-after-punctuation))
+      (pyim-isearch-mode 1)
+      (defalias 'pyim-probe-meow-normal-mode
+        #'(lambda nil
+            (meow-normal-mode-p)))
+      (set-default 'pyim-english-input-switch-functions
+                   '(pyim-probe-auto-english pyim-probe-isearch-mode pyim-probe-program-mode pyim-probe-org-structure-template pyim-probe-org-latex-mode pyim-probe-meow-normal-mode))
 
-        (defalias 'my-orderless-regexp
-          #'(lambda
-              (orig_func component)
-              (let
-                  ((result
-                    (funcall orig_func component)))
-                (pyim-cregexp-build result))))
-        (advice-add 'orderless-regexp :around #'my-orderless-regexp)
-        )
-      (setq default-input-method "pyim")
+      (defalias 'my-orderless-regexp
+        #'(lambda
+            (orig_func component)
+            (let
+                ((result
+                  (funcall orig_func component)))
+              (pyim-cregexp-build result))))
+      (advice-add 'orderless-regexp :around #'my-orderless-regexp)
       )
+    (setq default-input-method "pyim")
+    )
 #+end_src
 * Browsing
 ** file browsing
@@ -922,7 +886,7 @@ This keyword causes a body to be executed after other packages/features are load
 #+begin_src elisp
   (setup (:pkg dirvish)
     (:when-loaded
-    (dirvish-override-dired-mode)))
+      (dirvish-override-dired-mode)))
 #+end_src
 *** diredfl
 #+begin_src elisp
@@ -941,11 +905,11 @@ This keyword causes a body to be executed after other packages/features are load
 #+end_src
 *** fd-dired
 #+begin_src elisp
-(setup (:pkg fd-dired))
+  (setup (:pkg fd-dired))
 #+end_src
 *** treemacs
 #+begin_src elisp
-(setup (:pkg treemacs))
+  (setup (:pkg treemacs))
 #+end_src
 ** structure browsing
 *** imenu-list
@@ -958,7 +922,6 @@ This keyword causes a body to be executed after other packages/features are load
              )
     )
 #+end_src
-
 *** outshine
 #+begin_src elisp
   (setup (:pkg outshine :host github :repo "alphapapa/outshine")
@@ -973,12 +936,12 @@ This keyword causes a body to be executed after other packages/features are load
 * shell
 ** aweshell
 #+begin_src elisp
-    (setup (:pkg aweshell :host github :repo "manateelazycat/aweshell")
-      (:option epe-path-stype 'single
-               )
-      (:autoload aweshell-toggle)
-      (:autoload aweshell-dedicated-toggle)
-      )
+  (setup (:pkg aweshell :host github :repo "manateelazycat/aweshell")
+    (:option epe-path-stype 'single
+             )
+    (:autoload aweshell-toggle)
+    (:autoload aweshell-dedicated-toggle)
+    )
 #+end_src
 ** vterm
 #+begin_src elisp
@@ -997,32 +960,32 @@ This keyword causes a body to be executed after other packages/features are load
              blamer-min-offset 70)
     ;; (:delay)
     ;; (:when-loaded
-      ;; (global-blamer-mode 1))
+    ;; (global-blamer-mode 1))
     )
 #+end_src
 * 编程
 ** elisp
 *** helpful
 #+begin_src elisp
-(setup (:pkg helpful)
-       (:global "C-h f" #'helpful-callable
-                "C-h v" #'helpful-variable
-                "C-h k" #'helpful-key
-                "C-c C-d" #'helpful-at-point
-                "C-h F" #'helpful-function
-                "C-h C" #'helpful-command))
+  (setup (:pkg helpful)
+    (:global "C-h f" #'helpful-callable
+             "C-h v" #'helpful-variable
+             "C-h k" #'helpful-key
+             "C-c C-d" #'helpful-at-point
+             "C-h F" #'helpful-function
+             "C-h C" #'helpful-command))
 #+end_src
 *** elisp-demos
 #+begin_src elisp
-(setup (:pkg elisp-demos)
-       (advice-add 'helpful-update :after #'elisp-demos-advice-helpful-update)
-       )
+  (setup (:pkg elisp-demos)
+    (advice-add 'helpful-update :after #'elisp-demos-advice-helpful-update)
+    )
 #+end_src
 *** elispfl
 #+begin_src elisp
-(setup (:pkg elispfl :host github :repo "cireu/elispfl")
-       (:hook-into emacs-lisp-mode ielm)
-       )
+  (setup (:pkg elispfl :host github :repo "cireu/elispfl")
+    (:hook-into emacs-lisp-mode ielm)
+    )
 #+end_src
 ** quickrun
 #+begin_src elisp
@@ -1044,7 +1007,6 @@ This keyword causes a body to be executed after other packages/features are load
       )
     )
 #+end_src
-
 ** lsp mode
 *** eglot
 #+begin_src elisp
@@ -1059,10 +1021,7 @@ This keyword causes a body to be executed after other packages/features are load
   (setup (:pkg eldoc-box)
     (add-hook 'eglot--managed-mode-hook #'eldoc-box-hover-at-point-mode t)
     )
-
   (setup (:pkg eglot))
-
-
   ;; (setup (:pkg lsp-mode))
   ;; (setup (:pkg lsp-treemacs))
   ;; (setup (:pkg lsp-ui)
@@ -1089,7 +1048,7 @@ This keyword causes a body to be executed after other packages/features are load
                (setq file-name (make-temp-file "babel-lsp-")))
              (setq buffer-file-name file-name)
              (eglot-ensure)))
-             ;; (lsp-deferred)))
+         ;; (lsp-deferred)))
          (put ',intern-pre 'function-documentation
               (format "Enable lsp-mode in the buffer of org source block (%s)."
                       (upcase ,lang)))
@@ -1238,10 +1197,10 @@ This keyword causes a body to be executed after other packages/features are load
 #+begin_src elisp
   (setup (:pkg org-bars :host github :repo "tonyaldon/org-bars")
     (:option org-bars-color-options '(:only-one-color t
-                                      :bar-color "#4C4A4D")
+                                                      :bar-color "#4C4A4D")
              org-bars-stars '(:empty "◉"
-                              :invisible "▶"
-                              :visible "∇"))
+                                     :invisible "▶"
+                                     :visible "∇"))
     (:load-after org)
     (:hook-into org-mode)
     )
@@ -1252,19 +1211,12 @@ This keyword causes a body to be executed after other packages/features are load
     (:hook-into org-mode)
     )
 #+end_src
-** company-org-block
-#+begin_src elisp :tangle no
-  (setup (:pkg company-org-block)
-    (add-hook 'org-mode-hook (lambda ()
-                               (setq-local company-backends '(company-org-block))
-                               )))
-#+end_src
 ** org-download
 #+begin_src elisp
   (setup (:pkg org-download)
     (:option org-download-method 'directory
-              org-download-screenshot-basename "screenshot.jpg"
-              org-download-image-dir "~/Documents/emacs/orgmode/PicturesForAll/org_download_images")
+             org-download-screenshot-basename "screenshot.jpg"
+             org-download-image-dir "~/Documents/emacs/orgmode/PicturesForAll/org_download_images")
     (:when-loaded
       (when (eq system-type 'gnu/linux)
         (setq-default org-download-screenshot-method "spectacle"))
@@ -1331,9 +1283,6 @@ This keyword causes a body to be executed after other packages/features are load
                                            (no-delete-other-windows . t)))))
       (org-roam-buffer-toggle)
       ))
-
-
-
 #+end_src
 *** org-roam-ui
 #+begin_src elisp
@@ -1344,26 +1293,26 @@ This keyword causes a body to be executed after other packages/features are load
 *** org-roam-timestamps
 #+begin_src elisp
   (setup (:pkg org-roam-timestamps)
-      (:hook-into org-roam-mode)
-      )
+    (:hook-into org-roam-mode)
+    )
 #+end_src
 *** org-roam-agenda
 #+begin_src elisp
-(defun vulpea-project-p ()
-  "Return non-nil if current buffer has any todo entry.
-TODO entries marked as done are ignored, meaning the this
-function returns nil if current buffer contains only completed
-tasks."
-  (seq-find                                 ; (3)
-   (lambda (type)
-     (eq type 'todo))
-   (org-element-map                         ; (2)
-       (org-element-parse-buffer 'headline) ; (1)
-       'headline
-     (lambda (h)
-       (org-element-property :todo-type h)))))
+  (defun vulpea-project-p ()
+    "Return non-nil if current buffer has any todo entry.
+  TODO entries marked as done are ignored, meaning the this
+  function returns nil if current buffer contains only completed
+  tasks."
+    (seq-find                                 ; (3)
+     (lambda (type)
+       (eq type 'todo))
+     (org-element-map                         ; (2)
+         (org-element-parse-buffer 'headline) ; (1)
+         'headline
+       (lambda (h)
+         (org-element-property :todo-type h)))))
 
-(defun vulpea-project-update-tag ()
+  (defun vulpea-project-update-tag ()
     "Update PROJECT tag in the current buffer."
     (when (and (not (active-minibuffer-window))
                (vulpea-buffer-p))
@@ -1383,107 +1332,107 @@ tasks."
                     (seq-difference original-tags tags))
             (apply #'vulpea-buffer-tags-set tags))))))
 
-(defun vulpea-buffer-p ()
-  "Return non-nil if the currently visited buffer is a note."
-  (and buffer-file-name
-       (string-prefix-p
-        (expand-file-name (file-name-as-directory org-roam-directory))
-        (file-name-directory buffer-file-name))))
+  (defun vulpea-buffer-p ()
+    "Return non-nil if the currently visited buffer is a note."
+    (and buffer-file-name
+         (string-prefix-p
+          (expand-file-name (file-name-as-directory org-roam-directory))
+          (file-name-directory buffer-file-name))))
 
-(defun vulpea-project-files ()
+  (defun vulpea-project-files ()
     "Return a list of note files containing 'project' tag." ;
     (seq-uniq
      (seq-map
       #'car
       (org-roam-db-query
        [:select [nodes:file]
-        :from tags
-        :left-join nodes
-        :on (= tags:node-id nodes:id)
-        :where (like tag (quote "%\"project\"%"))]))))
+                :from tags
+                :left-join nodes
+                :on (= tags:node-id nodes:id)
+                :where (like tag (quote "%\"project\"%"))]))))
 
-(defun vulpea-agenda-files-update (&rest _)
-  "Update the value of `org-agenda-files'."
-  (setq org-agenda-files (vulpea-project-files)))
+  (defun vulpea-agenda-files-update (&rest _)
+    "Update the value of `org-agenda-files'."
+    (setq org-agenda-files (vulpea-project-files)))
 
-(add-hook 'find-file-hook #'vulpea-project-update-tag)
-(add-hook 'before-save-hook #'vulpea-project-update-tag)
+  (add-hook 'find-file-hook #'vulpea-project-update-tag)
+  (add-hook 'before-save-hook #'vulpea-project-update-tag)
 
-(advice-add 'org-agenda :before #'vulpea-agenda-files-update)
+  (advice-add 'org-agenda :before #'vulpea-agenda-files-update)
 
-;; functions borrowed from `vulpea' library
-;; https://github.com/d12frosted/vulpea/blob/6a735c34f1f64e1f70da77989e9ce8da7864e5ff/vulpea-buffer.el
+  ;; functions borrowed from `vulpea' library
+  ;; https://github.com/d12frosted/vulpea/blob/6a735c34f1f64e1f70da77989e9ce8da7864e5ff/vulpea-buffer.el
 
-(defun vulpea-buffer-tags-get ()
-  "Return filetags value in current buffer."
-  (vulpea-buffer-prop-get-list "filetags" " "))
+  (defun vulpea-buffer-tags-get ()
+    "Return filetags value in current buffer."
+    (vulpea-buffer-prop-get-list "filetags" " "))
 
-(defun vulpea-buffer-tags-set (&rest tags)
-  "Set TAGS in current buffer.
-If filetags value is already set, replace it."
-  (vulpea-buffer-prop-set "filetags" (string-join tags " ")))
+  (defun vulpea-buffer-tags-set (&rest tags)
+    "Set TAGS in current buffer.
+  If filetags value is already set, replace it."
+    (vulpea-buffer-prop-set "filetags" (string-join tags " ")))
 
-(defun vulpea-buffer-tags-add (tag)
-  "Add a TAG to filetags in current buffer."
-  (let* ((tags (vulpea-buffer-tags-get))
-         (tags (append tags (list tag))))
-    (apply #'vulpea-buffer-tags-set tags)))
+  (defun vulpea-buffer-tags-add (tag)
+    "Add a TAG to filetags in current buffer."
+    (let* ((tags (vulpea-buffer-tags-get))
+           (tags (append tags (list tag))))
+      (apply #'vulpea-buffer-tags-set tags)))
 
-(defun vulpea-buffer-tags-remove (tag)
-  "Remove a TAG from filetags in current buffer."
-  (let* ((tags (vulpea-buffer-tags-get))
-         (tags (delete tag tags)))
-    (apply #'vulpea-buffer-tags-set tags)))
+  (defun vulpea-buffer-tags-remove (tag)
+    "Remove a TAG from filetags in current buffer."
+    (let* ((tags (vulpea-buffer-tags-get))
+           (tags (delete tag tags)))
+      (apply #'vulpea-buffer-tags-set tags)))
 
-(defun vulpea-buffer-prop-set (name value)
-  "Set a file property called NAME to VALUE in buffer file.
-If the property is already set, replace its value."
-  (setq name (downcase name))
-  (org-with-point-at 1
-    (let ((case-fold-search t))
-      (if (re-search-forward (concat "^#\\+" name ":\\(.*\\)")
-                             (point-max) t)
-          (replace-match (concat "#+" name ": " value) 'fixedcase)
-        (while (and (not (eobp))
-                    (looking-at "^[#:]"))
-          (if (save-excursion (end-of-line) (eobp))
-              (progn
-                (end-of-line)
-                (insert "\n"))
-            (forward-line)
-            (beginning-of-line)))
-        (insert "#+" name ": " value "\n")))))
+  (defun vulpea-buffer-prop-set (name value)
+    "Set a file property called NAME to VALUE in buffer file.
+  If the property is already set, replace its value."
+    (setq name (downcase name))
+    (org-with-point-at 1
+      (let ((case-fold-search t))
+        (if (re-search-forward (concat "^#\\+" name ":\\(.*\\)")
+                               (point-max) t)
+            (replace-match (concat "#+" name ": " value) 'fixedcase)
+          (while (and (not (eobp))
+                      (looking-at "^[#:]"))
+            (if (save-excursion (end-of-line) (eobp))
+                (progn
+                  (end-of-line)
+                  (insert "\n"))
+              (forward-line)
+              (beginning-of-line)))
+          (insert "#+" name ": " value "\n")))))
 
-(defun vulpea-buffer-prop-set-list (name values &optional separators)
-  "Set a file property called NAME to VALUES in current buffer.
-VALUES are quoted and combined into single string using
-`combine-and-quote-strings'.
-If SEPARATORS is non-nil, it should be a regular expression
-matching text that separates, but is not part of, the substrings.
-If nil it defaults to `split-string-default-separators', normally
-\"[ \f\t\n\r\v]+\", and OMIT-NULLS is forced to t.
-If the property is already set, replace its value."
-  (vulpea-buffer-prop-set
-   name (combine-and-quote-strings values separators)))
+  (defun vulpea-buffer-prop-set-list (name values &optional separators)
+    "Set a file property called NAME to VALUES in current buffer.
+  VALUES are quoted and combined into single string using
+  `combine-and-quote-strings'.
+  If SEPARATORS is non-nil, it should be a regular expression
+  matching text that separates, but is not part of, the substrings.
+  If nil it defaults to `split-string-default-separators', normally
+  \"[ \f\t\n\r\v]+\", and OMIT-NULLS is forced to t.
+  If the property is already set, replace its value."
+    (vulpea-buffer-prop-set
+     name (combine-and-quote-strings values separators)))
 
-(defun vulpea-buffer-prop-get (name)
-  "Get a buffer property called NAME as a string."
-  (org-with-point-at 1
-    (when (re-search-forward (concat "^#\\+" name ": \\(.*\\)")
-                             (point-max) t)
-      (buffer-substring-no-properties
-       (match-beginning 1)
-       (match-end 1)))))
+  (defun vulpea-buffer-prop-get (name)
+    "Get a buffer property called NAME as a string."
+    (org-with-point-at 1
+      (when (re-search-forward (concat "^#\\+" name ": \\(.*\\)")
+                               (point-max) t)
+        (buffer-substring-no-properties
+         (match-beginning 1)
+         (match-end 1)))))
 
-(defun vulpea-buffer-prop-get-list (name &optional separators)
-  "Get a buffer property NAME as a list using SEPARATORS.
-If SEPARATORS is non-nil, it should be a regular expression
-matching text that separates, but is not part of, the substrings.
-If nil it defaults to `split-string-default-separators', normally
-\"[ \f\t\n\r\v]+\", and OMIT-NULLS is forced to t."
-  (let ((value (vulpea-buffer-prop-get name)))
-    (when (and value (not (string-empty-p value)))
-      (split-string-and-unquote value separators))))
+  (defun vulpea-buffer-prop-get-list (name &optional separators)
+    "Get a buffer property NAME as a list using SEPARATORS.
+  If SEPARATORS is non-nil, it should be a regular expression
+  matching text that separates, but is not part of, the substrings.
+  If nil it defaults to `split-string-default-separators', normally
+  \"[ \f\t\n\r\v]+\", and OMIT-NULLS is forced to t."
+    (let ((value (vulpea-buffer-prop-get name)))
+      (when (and value (not (string-empty-p value)))
+        (split-string-and-unquote value separators))))
 #+end_src
 
 ** org-pomodoro
@@ -1496,7 +1445,7 @@ If nil it defaults to `split-string-default-separators', normally
 #+begin_src elisp
   (setup (:pkg ox-hugo)
     (:load-after ox)
-   )
+    )
 #+end_src
 ** org-transclusion
 #+begin_src elisp
@@ -1505,27 +1454,25 @@ If nil it defaults to `split-string-default-separators', normally
 * 翻译
 ** 有道词典
 #+begin_src elisp
-(setup (:pkg youdao-dictionary)
-  )
+  (setup (:pkg youdao-dictionary))
 #+end_src
 ** english-teacher
 #+begin_src elisp
-(setup (:pkg english-teacher :host github
-           :repo "loyalpartner/english-teacher.el")
-  )
+  (setup (:pkg english-teacher :host github
+               :repo "loyalpartner/english-teacher.el")
+    )
 #+end_src
 ** insert-translated-name
 #+begin_src elisp
-    (setup (:pkg insert-translated-name :host github :repo "manateelazycat/insert-translated-name")
-      (:autoload insert-translated-name-insert)
-      (:autoload insert-translated-name-replace))
+  (setup (:pkg insert-translated-name :host github :repo "manateelazycat/insert-translated-name")
+    (:autoload insert-translated-name-insert)
+    (:autoload insert-translated-name-replace))
 #+end_src
 ** company-english-helper
 #+begin_src elisp
-(setup (:pkg company-english-helper :host github
-           :repo "manateelazycat/company-english-helper")
-       (:autoload toggle-company-english-helper))
-
+  (setup (:pkg company-english-helper :host github
+               :repo "manateelazycat/company-english-helper")
+    (:autoload toggle-company-english-helper))
 #+end_src
 * 阅读
 ** pdf-tools
@@ -1569,5 +1516,5 @@ Dial the GC threshold back down so that garbage collection happens more frequent
 #+end_src
 ** restart-emacs
 #+begin_src elisp
-(setup (:pkg restart-emacs))
+  (setup (:pkg restart-emacs))
 #+end_src
