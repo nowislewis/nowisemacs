@@ -775,7 +775,7 @@ This keyword causes a body to be executed after other packages/features are load
 
   (setup (:pkg embark)
     (:also-load embark-consult)
-    (:global "C-;" embark-act)
+    (:global "C-S-a" embark-act)
 
     ;; Show Embark actions via which-key
     (setq embark-action-indicator
@@ -786,7 +786,7 @@ This keyword causes a body to be executed after other packages/features are load
 
   (setup (:pkg wgrep))
 #+end_src
-** complete with corfu(instead of company)
+** corfu(instead of company)
 #+begin_src elisp
   (setup (:pkg corfu)
     (:option
@@ -798,13 +798,15 @@ This keyword causes a body to be executed after other packages/features are load
      ;; (corfu-quit-no-match t)        ;; Automatically quit if there is no match
      ;; (corfu-preview-current nil)    ;; Disable current candidate preview
      corfu-preselect-first nil    ;; Disable candidate preselection
-     ;; (corfu-echo-documentation nil) ;; Disable documentation in the echo area
+     corfu-echo-documentation nil ;; Disable documentation in the echo area
      ;; (corfu-scroll-margin 5)        ;; Use scroll margin
+     corfu-auto-prefix 2
      )
     (:with-map corfu-map
       (:bind "TAB" corfu-next
              "S-TAB" corfu-previous))
-    (corfu-global-mode))
+    (corfu-global-mode)
+    )
   ;; corfu backend
   (setup (:pkg cape)
     (add-to-list 'completion-at-point-functions #'cape-file)
@@ -816,7 +818,7 @@ This keyword causes a body to be executed after other packages/features are load
   (setup (:pkg corfu-doc :host github :repo "galeo/corfu-doc")
     (:hook-into corfu-mode))
 
-  ;; (setup (:pkg svg-lib :type built-in)) ;; built-in has litter icons
+  ;; (setup (:pkg svg-lib :type built-in)) ;; built-in has little icons
   (setup (:pkg kind-icon)
     (:load-after corfu)
     (:option kind-icon-default-face 'corfu-default) ; to compute blended backgrounds correctly
@@ -1140,6 +1142,7 @@ This keyword causes a body to be executed after other packages/features are load
              org-startup-folded t
              org-return-follows-link t
              fill-column 120
+             org-log-done 'time ;; 记录完成时间
              org-blank-before-new-entry '((heading . nil)
                                           (plain-list-item . nil))
 
@@ -1517,4 +1520,30 @@ Dial the GC threshold back down so that garbage collection happens more frequent
 ** restart-emacs
 #+begin_src elisp
   (setup (:pkg restart-emacs))
+#+end_src
+** english-corfu
+#+begin_src elisp
+(defvaralias 'company-candidates 'corfu--candidates)
+(defalias 'company-mode 'corfu-mode) ;; should be deleted
+(defun company-grab-symbol ()
+  "If point is at the end of a symbol, return it.
+Otherwise, if point is not inside a symbol, return an empty string."
+  (if (looking-at "\\_>")
+      (buffer-substring (point) (save-excursion (skip-syntax-backward "w_")
+                                                (point)))
+    (unless (and (char-after) (memq (char-syntax (char-after)) '(?w ?_)))
+      "")))
+
+(defun toggle-corfu-english-helper ()
+  (interactive)
+  (if (not (featurep 'company-english-helper))
+      (require 'company-english-helper))
+  (if (not corfu-mode)
+      (corfu-mode t))
+  (make-variable-buffer-local 'ompletion-at-point-functions)
+  (setq completion-at-point-functions
+	(list (cape-company-to-capf #'company-english-helper-search)))
+    (message "English helper has enable."))
+
+(provide 'company)
 #+end_src
