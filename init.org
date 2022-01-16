@@ -563,7 +563,6 @@ This keyword causes a body to be executed after other packages/features are load
              )
     (load-theme 'modus-vivendi))
 #+end_src
-  *ni* /hl/ =aa= +aa+ ~aa~
 ** line number
 #+begin_src elisp
   (setq line-number-display-limit large-file-warning-threshold)
