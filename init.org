@@ -543,12 +543,17 @@ This keyword causes a body to be executed after other packages/features are load
 * UI
 ** Theme
 #+begin_src elisp
-  (setup (:pkg doom-themes)
-    ;; Global settings (defaults)
-    (setq doom-themes-enable-bold t    ; if nil, bold is universally disabled
-          doom-themes-enable-italic t) ; if nil, italics is universally disabled
-    (load-theme 'doom-monokai-pro t)
-    )
+  ;; (setup (:pkg doom-themes)
+  ;;   ;; Global settings (defaults)
+  ;;   (setq doom-themes-enable-bold t    ; if nil, bold is universally disabled
+  ;;         doom-themes-enable-italic t) ; if nil, italics is universally disabled
+  ;;   (load-theme 'doom-monokai-pro t)
+  ;;   )
+  (setup (:pkg modus-themes :type built-in)
+    (:option modus-themes-org-blocks 'tinted-background
+             modus-themes-headings '((t . (background overline rainbow variable-pitch)))
+             )
+    (load-theme 'modus-vivendi))
 #+end_src
 ** Font
 #+begin_src elisp
