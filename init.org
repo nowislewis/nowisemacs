@@ -540,34 +540,30 @@ This keyword causes a body to be executed after other packages/features are load
                              ("a" . org-agenda)
                              ) "a")
 #+end_src
-* UI
+* UI** Font
+#+begin_src elisp
+  (set-face-attribute 'default nil :family "yaheiInconsolata" :height 140)
+
+  ;; Proportionately spaced typeface
+  ;; (set-face-attribute 'variable-pitch nil :family "Helvetica" :height 1.0)
+
+  ;; Monospaced typeface
+  (set-face-attribute 'fixed-pitch nil :family "yaheiInconsolata" :height 1.0)
+#+end_src
 ** Theme
 #+begin_src elisp
-  ;; (setup (:pkg doom-themes)
-  ;;   ;; Global settings (defaults)
-  ;;   (setq doom-themes-enable-bold t    ; if nil, bold is universally disabled
-  ;;         doom-themes-enable-italic t) ; if nil, italics is universally disabled
-  ;;   (load-theme 'doom-monokai-pro t)
-  ;;   )
   (setup (:pkg modus-themes :type built-in)
     (:option modus-themes-org-blocks 'tinted-background
-             modus-themes-headings '((t . (background overline rainbow variable-pitch)))
+             modus-themes-headings '((t . (background overline rainbow)))
+             modus-themes-mode-line '(3d)
+             modus-themes-intense-markup t
+             modus-themes-hl-line '(intense accented)
+             modus-themes-paren-match '(intense bold underline)
+             modus-themes-subtle-line-numbers t
              )
     (load-theme 'modus-vivendi))
 #+end_src
-** Font
-#+begin_src elisp
-  (let ((emacs-font-size 12)
-        emacs-font-name)
-    ;; (when (eq system-type 'darwin)
-    (setq emacs-font-name "yaheiInconsolata")
-    ;; (when (eq system-type 'gnu/linux)
-    ;; (setq emacs-font-name "等距更纱黑体 SC"))
-    (when (display-grayscale-p)
-      (set-frame-font (format "%s-%s" (eval emacs-font-name) (eval emacs-font-size)) t t)
-      (set-fontset-font (frame-parameter nil 'font) 'unicode (eval emacs-font-name))
-      ))
-#+end_src
+  *ni* /hl/ =aa= +aa+ ~aa~
 ** line number
 #+begin_src elisp
   (setq line-number-display-limit large-file-warning-threshold)
@@ -581,6 +577,7 @@ This keyword causes a body to be executed after other packages/features are load
                  'lisp-mode-hook
                  'java-mode-hook
                  'asm-mode-hook
+
                  'haskell-mode-hook
                  'rcirc-mode-hook
                  'erc-mode-hook
@@ -663,18 +660,20 @@ This keyword causes a body to be executed after other packages/features are load
     )
 #+end_src
 ** beacon
-#+begin_src elisp
+#+begin_src elisp :tangle no
   (setup (:pkg beacon)
     (:delay)
-    (beacon-mode 1)
-    )
+    (beacon-mode 1))
 #+end_src
 * General Configuration
 ** doom-modeline
 #+begin_src elisp
   (setup (:pkg doom-modeline)
     (:option doom-modeline-window-width-limit fill-column
-             doom-modeline-height 20)
+             doom-modeline-hud t
+             doom-modeline-icon nil
+             doom-modeline-unicode-fallback t
+             )
     (:hook-into after-init)
     )
 #+end_src
@@ -714,12 +713,6 @@ This keyword causes a body to be executed after other packages/features are load
       (:bind [backspace] vertico-directory-delete-char))
     (vertico-mode)
     )
-  ;; (setup (:pkg vertico-posframe)
-  ;;   (:option vertico-posframe-parameters
-  ;;     '((left-fringe . 16)
-  ;;       (right-fringe . 16)))
-  ;;    (vertico-posframe-mode t)
-  ;;   )
 #+end_src
 ** Orderless
 #+begin_src elisp
@@ -800,13 +793,10 @@ This keyword causes a body to be executed after other packages/features are load
      ;; Optional customizations
      corfu-cycle t                ;; Enable cycling for `corfu-next/previous'
      corfu-auto t                 ;; Enable auto completion
-     ;; corfu-commit-predicate nil   ;; Do not commit selected candidates on next input
      ;; (corfu-quit-at-boundary t)     ;; Automatically quit at word boundary
-     ;; (corfu-quit-no-match t)        ;; Automatically quit if there is no match
+     corfu-quit-no-match t        ;; Automatically quit if there is no match
      corfu-preview-current nil    ;; Disable current candidate preview
-     corfu-preselect-first nil    ;; Disable candidate preselection
      corfu-echo-documentation nil ;; Disable documentation in the echo area
-     ;; (corfu-scroll-margin 5)        ;; Use scroll margin
      corfu-auto-prefix 2
      )
     (:with-map corfu-map
@@ -1183,26 +1173,59 @@ This keyword causes a body to be executed after other packages/features are load
               "xelatex -interaction nonstopmode %f"
               "xelatex -interaction nonstopmode %f"))
 
-      ;;设置粗体高亮颜色
-      (require 'cl)
-      (setq org-emphasis-alist
-            (cons '("*" '(:emphasis t :foreground "pale violet red" :weight bold))
-                  (delete* "*" org-emphasis-alist :key 'car :test 'equal))
-            )
-      (setq org-emphasis-alist
-            (cons '("/" '(:slant t :foreground "green3" :slant italic))
-                  (delete* "/" org-emphasis-alist :key 'car :test 'equal))
-            )
+      (defface my-org-emphasis-bold
+        '((default :inherit bold)
+          (((class color) (min-colors 88) (background light))
+           :foreground "pale violet red")
+          (((class color) (min-colors 88) (background dark))
+           :foreground "pale violet red"))
+        "My bold emphasis for Org.")
 
-      (org-babel-do-load-languages
-       'org-babel-load-languages
-       '((emacs-lisp . t)
-         (julia . t)
-         (python . t)
-         (dot . t)
-         ;; (jupyter . t)
-         ))
-      ))
+      (defface my-org-emphasis-italic
+        '((default :inherit italic)
+          (((class color) (min-colors 88) (background light))
+           :foreground "green3")
+          (((class color) (min-colors 88) (background dark))
+           :foreground "green3"))
+        "My italic emphasis for Org.")
+
+      (defface my-org-emphasis-underline
+        '((default :inherit underline)
+          (((class color) (min-colors 88) (background light))
+           :foreground "#813e00")
+          (((class color) (min-colors 88) (background dark))
+           :foreground "#d0bc00"))
+        "My underline emphasis for Org.")
+
+      (setq org-emphasis-alist
+            '(("*" my-org-emphasis-bold)
+              ("/" my-org-emphasis-italic)
+              ("_" underline)
+              ("=" org-verbatim verbatim)
+              ("~" org-code verbatim)
+              ("+" (:strike-through t))
+            ))
+
+    ;;设置粗体高亮颜色
+    ;; (require 'cl)
+    ;; (setq org-emphasis-alist
+    ;;       (cons '("*" '(:emphasis t :foreground "pale violet red" :weight bold))
+    ;;             (delete* "*" org-emphasis-alist :key 'car :test 'equal))
+    ;;       )
+    ;; (setq org-emphasis-alist
+    ;;       (cons '("/" '(:slant t :foreground "green3" :slant italic))
+    ;;             (delete* "/" org-emphasis-alist :key 'car :test 'equal))
+    ;;       )
+
+    (org-babel-do-load-languages
+     'org-babel-load-languages
+     '((emacs-lisp . t)
+       (julia . t)
+       (python . t)
+       (dot . t)
+       ;; (jupyter . t)
+       ))
+    ))
 #+end_src
 ** org-bars
 #+begin_src elisp
