@@ -670,6 +670,7 @@ This keyword causes a body to be executed after other packages/features are load
 #+begin_src elisp
   (setup (:pkg doom-modeline)
     (:option doom-modeline-window-width-limit fill-column
+             doom-modeline-height 20
              doom-modeline-hud t
              doom-modeline-icon nil
              doom-modeline-unicode-fallback t
