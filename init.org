@@ -1575,27 +1575,46 @@ Dial the GC threshold back down so that garbage collection happens more frequent
 
 ** english-corfu
 #+begin_src elisp
-(defvaralias 'company-candidates 'corfu--candidates)
-(defalias 'company-mode 'corfu-mode) ;; should be deleted
-(defun company-grab-symbol ()
-  "If point is at the end of a symbol, return it.
-Otherwise, if point is not inside a symbol, return an empty string."
-  (if (looking-at "\\_>")
-      (buffer-substring (point) (save-excursion (skip-syntax-backward "w_")
-                                                (point)))
-    (unless (and (char-after) (memq (char-syntax (char-after)) '(?w ?_)))
-      "")))
+  (defvaralias 'company-candidates 'corfu--candidates)
+  (defalias 'company-mode 'corfu-mode) ;; should be deleted
+  (defvaralias 'company-mode 'corfu-mode) ;; should be deleted
+  (setq company-backends '())
+  (setq completion-at-point-functions-backup completion-at-point-functions)
+  (provide 'company)
 
-(defun toggle-corfu-english-helper ()
-  (interactive)
-  (if (not (featurep 'company-english-helper))
-      (require 'company-english-helper))
-  (if (not corfu-mode)
-      (corfu-mode t))
-  (make-variable-buffer-local 'ompletion-at-point-functions)
-  (setq completion-at-point-functions
-	(list (cape-company-to-capf #'company-english-helper-search)))
-    (message "English helper has enable."))
+  (defun set-completion-functions ()
+    (cl-concatenate completion-at-point-functions completion-at-point-functions-backup
+                                                     (mapcar #'cape-company-to-capf company-backends)))
+  (advice-add 'toggle-company-english-helper :after #'set-completion-functions)
 
-(provide 'company)
+  (defun company-grab-symbol ()
+    "If point is at the end of a symbol, return it.
+    Otherwise, if point is not inside a symbol, return an empty string."
+    (if (looking-at "\\_>")
+        (buffer-substring (point) (save-excursion (skip-syntax-backward "w_")
+                                                  (point)))
+      (unless (and (char-after) (memq (char-syntax (char-after)) '(?w ?_)))
+        "")))
+
+
+  ;; (defun toggle-corfu-english-helper ()
+  ;;   (interactive)
+  ;;   (if company-english-helper-active-p
+  ;;       (progn
+  ;;         (setq completion-at-point-functions (remove (cape-company-to-capf #'company-english-helper-search) completion-at-point-functions))
+
+  ;;         (if (not (featurep 'company-english-helper))
+  ;;             (require 'company-english-helper))
+  ;;         (if (not corfu-mode)
+  ;;             (corfu-mode t))
+  ;;         ;; (make-variable-buffer-local 'completion-at-point-functions)
+  ;;         (add-to-list 'completion-at-point-functions (cape-company-to-capf #'company-english-helper-search))
+
+  ;;         ;; Use Company backends as Capfs.
+  ;;         (setq-local completion-at-point-functions
+  ;;                     (mapcar #'cape-company-to-capf company-backends)
+  ;;                             ;; (list #'company-files #'company-ispell #'company-dabbrev)
+  ;;                             ))
+  ;;         (message "English helper has enable."))
+
 #+end_src
