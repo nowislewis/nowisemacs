@@ -540,15 +540,17 @@ This keyword causes a body to be executed after other packages/features are load
                              ("a" . org-agenda)
                              ) "a")
 #+end_src
-* UI** Font
+* UI
+** Font
 #+begin_src elisp
-  (set-face-attribute 'default nil :family "yaheiInconsolata" :height 140)
+    ;; (set-face-attribute 'default nil :family "yaheiInconsolata" :height 140)
+    (set-face-attribute 'default nil :family "InconsolataGo QiHei NF" :height 140)
+    ;; Proportionately spaced typeface
+    ;; (set-face-attribute 'variable-pitch nil :family "Helvetica" :height 1.0)
 
-  ;; Proportionately spaced typeface
-  ;; (set-face-attribute 'variable-pitch nil :family "Helvetica" :height 1.0)
-
-  ;; Monospaced typeface
-  (set-face-attribute 'fixed-pitch nil :family "yaheiInconsolata" :height 1.0)
+    ;; Monospaced typeface
+    ;; (set-face-attribute 'fixed-pitch nil :family "yaheiInconsolata" :height 1.0)
+    (set-face-attribute 'fixed-pitch nil :family "InconsolataGo QiHei NF" :height 1.0)
 #+end_src
 ** Theme
 #+begin_src elisp
@@ -1488,8 +1490,13 @@ This keyword causes a body to be executed after other packages/features are load
 * 翻译
 ** 有道词典
 #+begin_src elisp
-  (setup (:pkg youdao-dictionary))
+  ;; (setup (:pkg youdao-dictionary))
 #+end_src
+** fanyi
+#+begin_src elisp
+(setup (:pkg fanyi))
+#+end_src
+** google translate
 ** english-teacher
 #+begin_src elisp
   (setup (:pkg english-teacher :host github
