@@ -1,5 +1,6 @@
 #+TITLE: Emacs Configuration
 #+PROPERTY: header-args:elisp :tangle ~/.emacs.d/init.el
+"Simulate company with corfu" is at the end of this file.
 * 启动优化
 ** UI speed up
 #+begin_src elisp
