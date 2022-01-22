@@ -1,7 +1,7 @@
 #+TITLE: Emacs Configuration
 #+PROPERTY: header-args:elisp :tangle ~/.emacs.d/init.el
 * 启动优化
-** UI 加速
+** UI speed up
 #+begin_src elisp
   ;; -*- lexical-binding: t; -*-
   (tool-bar-mode -1)                      ;禁用工具栏
@@ -29,6 +29,7 @@
   (pixel-scroll-precision-mode t)
 #+end_src
 ** Startup Performance
+Make startup faster by reducing the frequency of garbage collection
 #+begin_src elisp
   (setq gc-cons-threshold most-positive-fixnum
         gc-cons-percentage 0.5)
@@ -54,6 +55,7 @@
   (set-default-coding-systems 'utf-8)
   (global-hl-line-mode)
 #+end_src
+The following content is not enabled yet, because I want to minimize unnecessary settings as much as possible
 #+begin_src elisp :tangle no
   ;; Restore emacs session.
   (setq initial-buffer-choice t)
@@ -121,6 +123,7 @@
   (setq straight-vc-git-default-clone-depth 1)
 #+end_src
 ** straight print
+Use straight-pull-report to get detailed messages after update.
 #+begin_src elisp
   (defun straight-pull-report (&rest _)
     "Show fetched commit summary."
@@ -156,7 +159,6 @@
   (straight-use-package '(setup :type git :host nil :repo "https://git.sr.ht/~pkal/setup"))
   (require 'setup)
 #+end_src
-
 *** :straight
 #+begin_src elisp
   (setup-define :straight
@@ -653,19 +655,6 @@ This keyword causes a body to be executed after other packages/features are load
     ;; (add-to-list 'dashboard-items '(agenda) t)
     )
 #+end_src
-** sort-tab
-#+begin_src elisp
-  (setup (:pkg sort-tab
-               :host github
-               :repo "manateelazycat/sort-tab")
-    )
-#+end_src
-** beacon
-#+begin_src elisp :tangle no
-  (setup (:pkg beacon)
-    (:delay)
-    (beacon-mode 1))
-#+end_src
 * General Configuration
 ** doom-modeline
 #+begin_src elisp
@@ -929,6 +918,21 @@ This keyword causes a body to be executed after other packages/features are load
   (setup (:pkg outshine :host github :repo "alphapapa/outshine")
     (:option outline-minor-mode-prefix "\M-#"))
 #+end_src
+** perspective
+#+begin_src elisp
+  (setup (:pkg perspective)
+    (:option persp-initial-frame-name "Main")
+    ;; Running `persp-mode' multiple times resets the perspective list...
+    (unless (equal persp-mode t)
+      (persp-mode)))
+#+end_src
+** auto-revert changed files
+#+begin_src elisp
+;; Revert Dired and other buffers
+(setq global-auto-revert-non-file-buffers t)
+;; Revert buffers when the underlying file has changed
+(global-auto-revert-mode 1)
+#+end_src
 ** bufler
 #+begin_src elisp
   (setup (:pkg bufler :host github :repo "alphapapa/bufler.el")
@@ -1115,9 +1119,9 @@ This keyword causes a body to be executed after other packages/features are load
   (setup (:pkg graphviz-dot-mode)
     (:file-match "\\.dot\\'")
     (:option graphviz-dot-indent-width 4)
-    (:when-loaded
-      (require 'company-graphviz-dot)
-      )
+    ;; (:when-loaded
+    ;;   (require 'company-graphviz-dot)
+    ;;   )
     )
 #+end_src
 ** beancount
@@ -1490,7 +1494,7 @@ This keyword causes a body to be executed after other packages/features are load
 * 翻译
 ** 有道词典
 #+begin_src elisp
-  ;; (setup (:pkg youdao-dictionary))
+  (setup (:pkg youdao-dictionary))
 #+end_src
 ** fanyi
 #+begin_src elisp
@@ -1580,48 +1584,25 @@ Dial the GC threshold back down so that garbage collection happens more frequent
 #+RESULTS:
 : t
 
-** english-corfu
+** simulate company with corfu
 #+begin_src elisp
-  (defvaralias 'company-candidates 'corfu--candidates)
-  (defalias 'company-mode 'corfu-mode) ;; should be deleted
-  (defvaralias 'company-mode 'corfu-mode) ;; should be deleted
-  (setq company-backends '())
-  (setq completion-at-point-functions-backup completion-at-point-functions)
-  (provide 'company)
+    (defvaralias 'company-candidates 'corfu--candidates)
+    (defalias 'company-mode 'corfu-mode) ;; should be deleted
+    (defvaralias 'company-mode 'corfu-mode) ;; should be deleted
+    (setq company-backends '())
+    (setq completion-at-point-functions-backup completion-at-point-functions)
+    (provide 'company)
 
-  (defun set-completion-functions ()
-    (cl-concatenate completion-at-point-functions completion-at-point-functions-backup
-                                                     (mapcar #'cape-company-to-capf company-backends)))
-  (advice-add 'toggle-company-english-helper :after #'set-completion-functions)
+    (defun set-completion-functions ()
+      (setq completion-at-point-functions (cl-concatenate 'list (mapcar #'cape-company-to-capf company-backends) completion-at-point-functions-backup)))
 
-  (defun company-grab-symbol ()
-    "If point is at the end of a symbol, return it.
-    Otherwise, if point is not inside a symbol, return an empty string."
-    (if (looking-at "\\_>")
-        (buffer-substring (point) (save-excursion (skip-syntax-backward "w_")
-                                                  (point)))
-      (unless (and (char-after) (memq (char-syntax (char-after)) '(?w ?_)))
-        "")))
-
-
-  ;; (defun toggle-corfu-english-helper ()
-  ;;   (interactive)
-  ;;   (if company-english-helper-active-p
-  ;;       (progn
-  ;;         (setq completion-at-point-functions (remove (cape-company-to-capf #'company-english-helper-search) completion-at-point-functions))
-
-  ;;         (if (not (featurep 'company-english-helper))
-  ;;             (require 'company-english-helper))
-  ;;         (if (not corfu-mode)
-  ;;             (corfu-mode t))
-  ;;         ;; (make-variable-buffer-local 'completion-at-point-functions)
-  ;;         (add-to-list 'completion-at-point-functions (cape-company-to-capf #'company-english-helper-search))
-
-  ;;         ;; Use Company backends as Capfs.
-  ;;         (setq-local completion-at-point-functions
-  ;;                     (mapcar #'cape-company-to-capf company-backends)
-  ;;                             ;; (list #'company-files #'company-ispell #'company-dabbrev)
-  ;;                             ))
-  ;;         (message "English helper has enable."))
-
+    (defun company-grab-symbol ()
+      "If point is at the end of a symbol, return it.
+      Otherwise, if point is not inside a symbol, return an empty string."
+      (if (looking-at "\\_>")
+          (buffer-substring (point) (save-excursion (skip-syntax-backward "w_")
+                                                    (point)))
+        (unless (and (char-after) (memq (char-syntax (char-after)) '(?w ?_)))
+          "")))
+    (advice-add 'toggle-company-english-helper :after #'set-completion-functions)
 #+end_src
