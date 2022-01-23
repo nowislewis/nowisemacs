@@ -543,6 +543,11 @@ This keyword causes a body to be executed after other packages/features are load
   (lewis/define-leader-key '(
                              ("a" . org-agenda)
                              ) "a")
+  ;;p persp (project)
+  (lewis/define-leader-key '(
+                             ("". perspective-map)
+                             ) "p")
+
 #+end_src
 * UI
 ** Font
@@ -943,7 +948,10 @@ This keyword causes a body to be executed after other packages/features are load
 ** perspective
 #+begin_src elisp
   (setup (:pkg perspective)
-    (:option persp-initial-frame-name "Main")
+    (:option persp-initial-frame-name "Main"
+             persp-mode-prefix-key ""
+             ;; persp-mode-prefix-key
+             )
     ;; Running `persp-mode' multiple times resets the perspective list...
     (unless (equal persp-mode t)
       (persp-mode)))
@@ -1233,17 +1241,6 @@ This keyword causes a body to be executed after other packages/features are load
               ("~" org-code verbatim)
               ("+" (:strike-through t))
             ))
-
-    ;;设置粗体高亮颜色
-    ;; (require 'cl)
-    ;; (setq org-emphasis-alist
-    ;;       (cons '("*" '(:emphasis t :foreground "pale violet red" :weight bold))
-    ;;             (delete* "*" org-emphasis-alist :key 'car :test 'equal))
-    ;;       )
-    ;; (setq org-emphasis-alist
-    ;;       (cons '("/" '(:slant t :foreground "green3" :slant italic))
-    ;;             (delete* "/" org-emphasis-alist :key 'car :test 'equal))
-    ;;       )
 
     (org-babel-do-load-languages
      'org-babel-load-languages
