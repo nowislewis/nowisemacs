@@ -834,15 +834,18 @@ This keyword causes a body to be executed after other packages/features are load
 #+end_src
 * Window Management
 ** winner-mode
+回到之前的windows 布局
 #+begin_src elisp
   (winner-mode t)
 #+end_src
 ** avy
+全局任意位置跳跃
 #+begin_src elisp
   (setup (:pkg avy)
     (:global "M-j" avy-goto-word-1))
 #+end_src
 ** popper
+popper 用来控制临时buffer 的弹出, 保证它们不会破坏已有的 windows 结构
 #+begin_src elisp
     (setup (:pkg popper)
       (:option popper-reference-buffers         '("\\*Messages\\*"
