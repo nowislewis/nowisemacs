@@ -1002,7 +1002,7 @@ popper 用来控制临时buffer 的弹出, 保证它们不会破坏已有的 win
     ;; (global-blamer-mode 1))
     )
 #+end_src
-* 编程
+* 程序语言
 ** elisp
 *** helpful
 #+begin_src elisp
@@ -1163,6 +1163,7 @@ popper 用来控制临时buffer 的弹出, 保证它们不会破坏已有的 win
     (:file-match "\\.beancount\\'")
     )
 #+end_src
+** latex
 * Org Mode
 ** org-mode
 #+begin_src elisp
@@ -1251,6 +1252,7 @@ popper 用来控制临时buffer 的弹出, 保证它们不会破坏已有的 win
        (julia . t)
        (python . t)
        (dot . t)
+       (latex . t)
        ;; (jupyter . t)
        ))
     ))
@@ -1512,6 +1514,13 @@ popper 用来控制临时buffer 的弹出, 保证它们不会破坏已有的 win
 ** org-transclusion
 #+begin_src elisp
 
+#+end_src
+** org-elp for latex live preview
+#+begin_src elisp
+  (setup (:pkg org-elp)
+    (:option org-elp-idle-time 0.5
+             org-elp-split-fraction 0.25)
+    )
 #+end_src
 * 翻译
 ** 有道词典
