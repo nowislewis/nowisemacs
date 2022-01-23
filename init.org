@@ -1,5 +1,6 @@
 #+TITLE: Emacs Configuration
 #+PROPERTY: header-args:elisp :tangle ~/.emacs.d/init.el
+
 "Simulate company with corfu" is at the end of this file.
 * 启动优化
 ** UI speed up
@@ -656,7 +657,6 @@ This keyword causes a body to be executed after other packages/features are load
     ;; (add-to-list 'dashboard-items '(agenda) t)
     )
 #+end_src
-* General Configuration
 ** doom-modeline
 #+begin_src elisp
   (setup (:pkg doom-modeline)
@@ -669,6 +669,7 @@ This keyword causes a body to be executed after other packages/features are load
     (:hook-into after-init)
     )
 #+end_src
+* General Configuration
 ** backup, super-save
 #+begin_src elisp
   (setq make-backup-files nil)
@@ -827,6 +828,7 @@ This keyword causes a body to be executed after other packages/features are load
     (:delay))
 #+end_src
 * Window Management
+** winner-mode
 #+begin_src elisp
   (winner-mode t)
 #+end_src
@@ -835,7 +837,26 @@ This keyword causes a body to be executed after other packages/features are load
   (setup (:pkg avy)
     (:global "M-j" avy-goto-word-1))
 #+end_src
-* 输入与阅读
+** popper
+#+begin_src elisp
+    (setup (:pkg popper)
+      (:option popper-reference-buffers         '("\\*Messages\\*"
+                                                  "Output\\*$"
+                                                  "\\*Async Shell Command\\*"
+                                                  help-mode
+                                                  helpful-mode
+                                                  compilation-mode
+                                                  youdao-dictionary-mode)
+               )
+      (:global "C-`" popper-toggle-latest
+               "M-`" popper-cycle
+               "C-M-`" popper-toggle-type
+               )
+      (popper-mode +1)
+      (popper-echo-mode +1)
+      )
+#+end_src
+* 输入
 ** pyim
 #+begin_src elisp
   (setup (:pkg posframe))
@@ -872,7 +893,7 @@ This keyword causes a body to be executed after other packages/features are load
     (setq default-input-method "pyim")
     )
 #+end_src
-* Browsing
+* File and Browsing
 ** file browsing
 *** dirvish
 #+begin_src elisp
@@ -1120,9 +1141,9 @@ This keyword causes a body to be executed after other packages/features are load
   (setup (:pkg graphviz-dot-mode)
     (:file-match "\\.dot\\'")
     (:option graphviz-dot-indent-width 4)
-    ;; (:when-loaded
-    ;;   (require 'company-graphviz-dot)
-    ;;   )
+    (:when-loaded
+      (require 'company-graphviz-dot)
+      )
     )
 #+end_src
 ** beancount
@@ -1144,7 +1165,7 @@ This keyword causes a body to be executed after other packages/features are load
              org-startup-indented t
              org-hide-emphasis-markers t
              org-imenu-depth 5
-             org-startup-folded t
+             ;; org-startup-folded t
              org-return-follows-link t
              fill-column 120
              org-log-done 'time ;; 记录完成时间
@@ -1554,12 +1575,6 @@ This keyword causes a body to be executed after other packages/features are load
     )
 #+end_src
 * tools
-** GC
-Dial the GC threshold back down so that garbage collection happens more frequently but in less time.
-#+begin_src elisp
-  ;; Make gc pauses faster by decreasing the threshold.
-  (setq gc-cons-threshold (* 2 1000 1000))
-#+end_src
 ** restart-emacs
 #+begin_src elisp
   (setup (:pkg restart-emacs))
@@ -1582,10 +1597,7 @@ Dial the GC threshold back down so that garbage collection happens more frequent
 
 #+end_src
 
-#+RESULTS:
-: t
-
-** simulate company with corfu
+** Simulate company with corfu
 #+begin_src elisp
     (defvaralias 'company-candidates 'corfu--candidates)
     (defalias 'company-mode 'corfu-mode) ;; should be deleted
