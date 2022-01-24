@@ -869,7 +869,7 @@ popper 用来控制临时buffer 的弹出, 保证它们不会破坏已有的 win
 *** jump-back
 #+begin_src elisp
   (defun my--push-point-to-xref-marker-stack (&rest r)
-    (xref-push-marker-stack (point-marker)))
+    (xref-push-marker-stack (point-marker))) ;; must autoload this command in xref
   (dolist (func '(find-function
                   consult-imenu
                   consult-ripgrep
@@ -1066,7 +1066,8 @@ popper 用来控制临时buffer 的弹出, 保证它们不会破坏已有的 win
 #+begin_src elisp
   ;; use built-in package dep
   (setup (:pkg project :type built-in))
-  (setup (:pkg xref :type built-in))
+  (setup (:pkg xref :type built-in)
+    (:autoload xref-push-marker-stack)) ;; autoload this command for jump-back
   (setup (:pkg flymake :type built-in))
   (setup (:pkg jsonrpc :type built-in))
   (setup (:pkg eldoc :type built-in))
