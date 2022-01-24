@@ -839,12 +839,6 @@ This keyword causes a body to be executed after other packages/features are load
 #+begin_src elisp
   (winner-mode t)
 #+end_src
-** avy
-全局任意位置跳跃
-#+begin_src elisp
-  (setup (:pkg avy)
-    (:global "M-j" avy-goto-word-1))
-#+end_src
 ** popper
 popper 用来控制临时buffer 的弹出, 保证它们不会破坏已有的 windows 结构
 #+begin_src elisp
@@ -864,6 +858,26 @@ popper 用来控制临时buffer 的弹出, 保证它们不会破坏已有的 win
       (popper-mode +1)
       (popper-echo-mode +1)
       )
+#+end_src
+** 移动
+*** avy
+全局任意位置跳跃
+#+begin_src elisp
+  (setup (:pkg avy)
+    (:global "M-j" avy-goto-word-1))
+#+end_src
+*** jump-back
+#+begin_src elisp
+  (defun my--push-point-to-xref-marker-stack (&rest r)
+    (xref-push-marker-stack (point-marker)))
+  (dolist (func '(find-function
+                  consult-imenu
+                  consult-ripgrep
+                  consult-line
+                  consult-find
+                  find-file
+                  citre-jump))
+    (advice-add func :before 'my--push-point-to-xref-marker-stack))
 #+end_src
 * 输入
 ** pyim
