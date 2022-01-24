@@ -546,7 +546,7 @@ This keyword causes a body to be executed after other packages/features are load
   ;;p persp (project)
   (lewis/define-leader-key '(
                              ("". perspective-map)
-                             ) "p")
+                             ) "TAB")
 
 #+end_src
 * UI
