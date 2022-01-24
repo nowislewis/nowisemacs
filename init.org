@@ -161,6 +161,7 @@ Use straight-pull-report to get detailed messages after update.
   (straight-use-package '(setup :type git :host nil :repo "https://git.sr.ht/~pkal/setup"))
   (require 'setup)
 #+end_src
+
 *** :straight
 #+begin_src elisp
   (setup-define :straight
