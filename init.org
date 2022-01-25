@@ -705,6 +705,7 @@ This keyword causes a body to be executed after other packages/features are load
 #+end_src
 ** exec-path-from-shell
 #+begin_src elisp
+  ;; 可以优化速度, 建议看一下官网的一篇文章
   (setup (:pkg exec-path-from-shell)
     (:delay)
     (when (memq window-system '(mac ns x))
