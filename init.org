@@ -682,7 +682,7 @@ This keyword causes a body to be executed after other packages/features are load
   (setq auto-save-default nil)
 
   (setup (:pkg super-save)
-    (:delay)
+    ;; (:delay)
     (super-save-mode 1)
     (setq super-save-auto-save-when-idle t)
     )
@@ -707,7 +707,7 @@ This keyword causes a body to be executed after other packages/features are load
 #+begin_src elisp
   ;; 可以优化速度, 建议看一下官网的一篇文章
   (setup (:pkg exec-path-from-shell)
-    (:delay)
+    ;; (:delay)
     (when (memq window-system '(mac ns x))
       (exec-path-from-shell-initialize)))
 #+end_src
@@ -836,12 +836,10 @@ This keyword causes a body to be executed after other packages/features are load
 ** yasnippet
 #+begin_src elisp
   (setup (:pkg yasnippet)
-    (:delay)
     (require 'yasnippet)
     (:option yas-snippet-dirs '("~/nowisemacs/snippets"))
     (yas-global-mode 1))
-  (setup (:pkg yasnippet-snippets)
-    (:delay))
+  (setup (:pkg yasnippet-snippets))
 #+end_src
 * Window Management
 ** winner-mode
