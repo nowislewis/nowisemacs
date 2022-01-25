@@ -212,7 +212,7 @@ Use straight-pull-report to get detailed messages after update.
 #+begin_src elisp
   (setup-define :delay
     (lambda (&rest time)
-      `(run-with-idle-timer ,(or time 0.1)
+      `(run-with-idle-timer ,(or time 1)
                             nil ;; Don't repeat
                             (lambda () (require ',(setup-get 'feature)))))
     :documentation "Delay loading the feature until a certain amount of idle time has passed.")
@@ -703,6 +703,14 @@ This keyword causes a body to be executed after other packages/features are load
   (setup (:pkg ws-butler)
     (:hook-into text-mode prog-mode))
 #+end_src
+** exec-path-from-shell
+#+begin_src elisp
+  (setup (:pkg exec-path-from-shell)
+    (:delay)
+    (when (memq window-system '(mac ns x))
+      (exec-path-from-shell-initialize)))
+#+end_src
+
 * 补全
 ** Completions with Vertico
 #+begin_src elisp
@@ -807,9 +815,10 @@ This keyword causes a body to be executed after other packages/features are load
   ;; corfu backend
   (setup (:pkg cape)
     (add-to-list 'completion-at-point-functions #'cape-file)
-    (add-to-list 'completion-at-point-functions #'cape-tex)
-    (add-to-list 'completion-at-point-functions #'cape-dabbrev)
-    (add-to-list 'completion-at-point-functions #'cape-keyword))
+    ;; (add-to-list 'completion-at-point-functions #'cape-tex)
+    ;; (add-to-list 'completion-at-point-functions #'cape-dabbrev)
+    ;; (add-to-list 'completion-at-point-functions #'cape-keyword)
+    )
 
   ;; Enable Corfu completion UI
   (setup (:pkg corfu-doc :host github :repo "galeo/corfu-doc")
@@ -1180,6 +1189,10 @@ popper 用来控制临时buffer 的弹出, 保证它们不会破坏已有的 win
     )
 #+end_src
 ** latex
+#+begin_src elisp
+  (setup (:pkg cdlatex))
+  (setup (:pkg auctex))
+#+end_src
 * Org Mode
 ** org-mode
 #+begin_src elisp
@@ -1201,6 +1214,8 @@ popper 用来控制临时buffer 的弹出, 保证它们不会破坏已有的 win
                                           (plain-list-item . nil))
 
              org-image-actual-width 600
+             org-preview-latex-image-directory "~/.cache/ltximg/"
+
              org-confirm-babel-evaluate nil
              org-src-window-setup 'split-window-below
              org-refile-targets '(("~/Documents/emacs/orgmode/roam/20211204000712-refile_index.org" . (:maxlevel . 9))
@@ -1228,6 +1243,7 @@ popper 用来控制临时buffer 的弹出, 保证它们不会破坏已有的 win
               "bibtex %b"
               "xelatex -interaction nonstopmode %f"
               "xelatex -interaction nonstopmode %f"))
+      (setq org-format-latex-options (plist-put org-format-latex-options :scale 2.0)) ;; use a large preview for latex
 
       (defface my-org-emphasis-bold
         '((default :inherit bold)
