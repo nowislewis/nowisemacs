@@ -429,126 +429,101 @@ This keyword causes a body to be executed after other packages/features are load
     (setq which-key-idle-delay 0.1))
 #+end_src
 ** keybinding
-*** lewis-define-key
 #+begin_src elisp
-  (defun lewis/define-leader-key (key-alist &optional key-prefix)
-    (let (key def)
-      (setq keymap meow-leader-keymap)
-      (if key-prefix
-          (setq key-prefix (concat key-prefix " "))
-        (setq key-prefix ""))
-      (dolist (element key-alist)
-        (setq key (car element))
-        (setq def (cdr element))
-        (cond ((stringp key) (setq key (read-kbd-macro (concat key-prefix key))))
-              ((vectorp key) nil)
-              (t (signal 'wrong-type-argument (list 'array key))))
-        (define-key keymap key def))))
-#+end_src
-*** keys
-#+begin_src elisp
-  ;;; lewisliu
-  (lewis/define-leader-key
-   '(;; youdao
-     ("y p" . youdao-dictionary-search-at-point-posframe)
-     ("y s" . youdao-dictionary-search)
-     ("y i" . youdao-dictionary-search-from-input)
-     ("y r" . youdao-dictionary-search-and-replace)
-     ;; citre
-     ("c a" . citre-ace-peek)
-     ("c j" . citre-jump)
-     ("c p" . citre-peek)
-     ("c J" . citre-jump-back)
-     ("c u" . citre-update-this-tags-file)
-     ("c r" . citre-peek-restore)
-     ("c s" . citre-peek-save-session)
-     ("c l" . citre-peek-load-session)
-     ;; aweshell
-     ("a a" . aweshell-toggle)
-     ("a d" . aweshell-dedicated-toggle)
-     ("a b" . aweshell-switch-buffer)
-     ("a s" . aweshell-search-history)
-     ;; insert-translated
-     ("i i" . insert-translated-name-insert)
-     ("i r" . insert-translated-name-replace)
+  ;; lewisliu
+  (meow-leader-define-key
+   ;; youdao
+   '("e y p" . youdao-dictionary-search-at-point-posframe)
+   '("e y s" . youdao-dictionary-search)
+   '("e y i" . youdao-dictionary-search-from-input)
+   '("e y r" . youdao-dictionary-search-and-replace)
+   ;; citre
+   '("e c a" . citre-ace-peek)
+   '("e c j" . citre-jump)
+   '("e c p" . citre-peek)
+   '("e c J" . citre-jump-back)
+   '("e c u" . citre-update-this-tags-file)
+   '("e c r" . citre-peek-restore)
+   '("e c s" . citre-peek-save-session)
+   '("e c l" . citre-peek-load-session)
+   ;; aweshell
+   '("e a a" . aweshell-toggle)
+   '("e a d" . aweshell-dedicated-toggle)
+   '("e a b" . aweshell-switch-buffer)
+   '("e a s" . aweshell-search-history)
+   ;; insert-translated
+   '("e i i" . insert-translated-name-insert)
+   '("e i r" . insert-translated-name-replace)
 
-     ;; imenu-list
-     ("l" . imenu-list-smart-toggle)
-     ;; org-download
-     ("d" . org-download-screenshot)
-     ;; english help
-     ("h c" . toggle-company-english-helper)
-     ("h f" . english-teacher-follow-mode)
-     ) "e")
+   ;; imenu-list
+   '("e l" . imenu-list-smart-toggle)
+   ;; org-download
+   '("e d" . org-download-screenshot)
+   ;; english help
+   '("e h c" . toggle-company-english-helper)
+   '("e h f" . english-teacher-follow-mode))
 
-  ;;; search
-  (lewis/define-leader-key '(
-                             ("s" . consult-line)
-                             ("b" . consult-buffer)
-                             ("d" . consult-ripgrep)
-                             ("D" . lewis/ripgrep-search-other-dir)
-                             ("f" . consult-find)
-                             ) "s")
+  ;; search
+  (meow-leader-define-key
+   '("s s" . consult-line)
+   '("s b" . consult-buffer)
+   '("s d" . consult-ripgrep)
+   '("s D" . lewis/ripgrep-search-other-dir)
+   '("s f" . consult-find))
 
-  ;;; find-file
+
   (defun find-config-file()
     (interactive)
     (find-file nowisemacs-config-dir))
-  (lewis/define-leader-key '(
-                             ("r" . consult-recent-file)
-                             ("p" . find-config-file)
-                             ) "f")
-  ;;; notes
-  ;;roam
-  (lewis/define-leader-key '(
-                             ("D" . org-roam-demote-entire-buffer)
-                             ("f" . org-roam-node-find)
-                             ("F" . org-roam-ref-find)
-                             ("g" . org-roam-graph)
-                             ("i" . org-roam-node-insert)
-                             ("I" . org-id-get-create)
-                             ("m" . org-roam-buffer-toggle)
-                             ("M" . org-roam-buffer-display-dedicated)
-                             ("n" . org-roam-capture)
-                             ("r" . org-roam-refile)
-                             ("R" . org-roam-link-replace-all)
-                             ;; date
-                             ("d b" . org-roam-dailies-goto-previous-note)
-                             ("d d" . org-roam-dailies-goto-date)
-                             ("d D" . org-roam-dailies-capture-date)
-                             ("d f" . org-roam-dailies-goto-next-note)
-                             ("d m" . org-roam-dailies-goto-tomorrow)
-                             ("d M" . org-roam-dailies-capture-tomorrow)
-                             ("d n" . org-roam-dailies-capture-today)
-                             ("d t" . org-roam-dailies-goto-today)
-                             ("d T" . org-roam-dailies-capture-today)
-                             ("d y" . org-roam-dailies-goto-yesterday)
-                             ("d Y" . org-roam-dailies-capture-yesterday)
-                             ("d -" . org-roam-dailies-find-directory)
-                             ;; "node properties"
-                             ("o a" . org-roam-alias-add)
-                             ("o A" . org-roam-alias-remove)
-                             ("o t" . org-roam-tag-add)
-                             ("o T" . org-roam-tag-remove)
-                             ("o r" . org-roam-ref-add)
-                             ("o R" . org-roam-ref-remove)
-                             ) "n r")
-  (lewis/define-leader-key '(
-                             ("e" . org-noter)
-                             ) "n")
-  ;;; time
-  (lewis/define-leader-key '(
-                             ("t" . org-pomodoro)
-                             ) "t")
-  ;;a agenda
-  (lewis/define-leader-key '(
-                             ("a" . org-agenda)
-                             ) "a")
-  ;;p persp (project)
-  (lewis/define-leader-key '(
-                             ("". perspective-map)
-                             ) "TAB")
 
+  ;; file
+  (meow-leader-define-key
+   '("f r" . consult-recent-file)
+   '("f p" . find-config-file))
+
+  ;; notes
+  (meow-leader-define-key
+   '("n r D" . org-roam-demote-entire-buffer)
+   '("n r f" . org-roam-node-find)
+   '("n r F" . org-roam-ref-find)
+   '("n r g" . org-roam-graph)
+   '("n r i" . org-roam-node-insert)
+   '("n r I" . org-id-get-create)
+   '("n r m" . org-roam-buffer-toggle)
+   '("n r M" . org-roam-buffer-display-dedicated)
+   '("n r n" . org-roam-capture)
+   '("n r r" . org-roam-refile)
+   '("n r R" . org-roam-link-replace-all)
+   ;; date
+   '("n r d b" . org-roam-dailies-goto-previous-note)
+   '("n r d d" . org-roam-dailies-goto-date)
+   '("n r d D" . org-roam-dailies-capture-date)
+   '("n r d f" . org-roam-dailies-goto-next-note)
+   '("n r d m" . org-roam-dailies-goto-tomorrow)
+   '("n r d M" . org-roam-dailies-capture-tomorrow)
+   '("n r d n" . org-roam-dailies-capture-today)
+   '("n r d t" . org-roam-dailies-goto-today)
+   '("n r d T" . org-roam-dailies-capture-today)
+   '("n r d y" . org-roam-dailies-goto-yesterday)
+   '("n r d Y" . org-roam-dailies-capture-yesterday)
+   '("n r d -" . org-roam-dailies-find-directory)
+   ;; "node properties"
+   '("n r o a" . org-roam-alias-add)
+   '("n r o A" . org-roam-alias-remove)
+   '("n r o t" . org-roam-tag-add)
+   '("n r o T" . org-roam-tag-remove)
+   '("n r o r" . org-roam-ref-add)
+   '("n r o R" . org-roam-ref-remove)
+
+   '("n e" . org-noter)
+   )
+  (meow-leader-define-key
+   ;; time
+   '("t t" . org-pomodoro)
+   ;;a agenda
+   '("a a" . org-agenda)
+   ;;w workspace
+   '("w". perspective-map))
 #+end_src
 * UI
 ** Font
@@ -843,7 +818,6 @@ This keyword causes a body to be executed after other packages/features are load
 #+end_src
 * Window Management
 ** winner-mode
-回到之前的windows 布局
 #+begin_src elisp
   (winner-mode t)
 #+end_src
@@ -951,10 +925,6 @@ popper 用来控制临时buffer 的弹出, 保证它们不会破坏已有的 win
 #+begin_src elisp
   (setup (:pkg fd-dired))
 #+end_src
-*** treemacs
-#+begin_src elisp
-  (setup (:pkg treemacs))
-#+end_src
 ** structure browsing
 *** imenu-list
 #+begin_src elisp
@@ -999,8 +969,7 @@ popper 用来控制临时buffer 的弹出, 保证它们不会破坏已有的 win
 ** aweshell
 #+begin_src elisp
   (setup (:pkg aweshell :host github :repo "manateelazycat/aweshell")
-    (:option epe-path-stype 'single
-             )
+    (:option epe-path-stype 'single)
     (:autoload aweshell-toggle)
     (:autoload aweshell-dedicated-toggle)
     )
@@ -1020,9 +989,6 @@ popper 用来控制临时buffer 的弹出, 保证它们不会破坏已有的 win
   (setup (:pkg blamer :host github :repo "artawower/blamer.el")
     (:option blamer-idle-time 0.3
              blamer-min-offset 70)
-    ;; (:delay)
-    ;; (:when-loaded
-    ;; (global-blamer-mode 1))
     )
 #+end_src
 * 程序语言
@@ -1055,19 +1021,15 @@ popper 用来控制临时buffer 的弹出, 保证它们不会破坏已有的 win
 #+end_src
 ** tree-sitter
 #+begin_src elisp :tangle no
-  (setup tree-sitter-langs
-    (:if-system 'gnu/linux)
-    (:pkg tree-sitter-langs)
-    )
-  (setup tree-sitter
-    (:if-system 'gnu/linux)
-    (:pkg tree-sitter)
+  (setup (:pkg tree-sitter)
     ;; (:hook-into prog-mode)
     (:when-loaded
-      (require 'tree-sitter-langs)
+      ;; (require 'tree-sitter-langs)
       (add-hook 'tree-sitter-after-on-hook #'tree-sitter-hl-mode)
       )
     )
+    (setup (:pkg tree-sitter-langs))
+
 #+end_src
 ** lsp mode
 *** eglot
@@ -1639,23 +1601,24 @@ popper 用来控制临时buffer 的弹出, 保证它们不会破坏已有的 win
 
 ** Simulate company with corfu
 #+begin_src elisp
-    (defvaralias 'company-candidates 'corfu--candidates)
-    (defalias 'company-mode 'corfu-mode) ;; should be deleted
-    (defvaralias 'company-mode 'corfu-mode) ;; should be deleted
-    (setq company-backends '())
-    (setq completion-at-point-functions-backup completion-at-point-functions)
-    (provide 'company)
+  (defvaralias 'company-candidates 'corfu--candidates)
+  (defalias 'company-mode 'corfu-mode) ;; should be deleted
+  (defvaralias 'company-mode 'corfu-mode) ;; should be deleted
+  (setq company-backends '())
+  (setq completion-at-point-functions-backup completion-at-point-functions)
+  (provide 'company)
 
-    (defun set-completion-functions ()
-      (setq completion-at-point-functions (cl-concatenate 'list (mapcar #'cape-company-to-capf company-backends) completion-at-point-functions-backup)))
+  (defun set-completion-functions ()
+    (setq completion-at-point-functions (cl-concatenate 'list (mapcar #'cape-company-to-capf company-backends) completion-at-point-functions-backup)))
 
-    (defun company-grab-symbol ()
-      "If point is at the end of a symbol, return it.
-      Otherwise, if point is not inside a symbol, return an empty string."
-      (if (looking-at "\\_>")
-          (buffer-substring (point) (save-excursion (skip-syntax-backward "w_")
-                                                    (point)))
-        (unless (and (char-after) (memq (char-syntax (char-after)) '(?w ?_)))
-          "")))
-    (advice-add 'toggle-company-english-helper :after #'set-completion-functions)
+  (defun company-grab-symbol ()
+    "If point is at the end of a symbol, return it.
+    Otherwise, if point is not inside a symbol, return an empty string."
+    (if (looking-at "\\_>")
+        (buffer-substring (point) (save-excursion (skip-syntax-backward "w_")
+                                                  (point)))
+      (unless (and (char-after) (memq (char-syntax (char-after)) '(?w ?_)))
+        "")))
+  (advice-add 'toggle-company-english-helper :after #'set-completion-functions)
+
 #+end_src
