@@ -433,10 +433,12 @@ This keyword causes a body to be executed after other packages/features are load
   ;; lewisliu
   (meow-leader-define-key
    ;; youdao
-   '("e y p" . youdao-dictionary-search-at-point-posframe)
-   '("e y s" . youdao-dictionary-search)
-   '("e y i" . youdao-dictionary-search-from-input)
-   '("e y r" . youdao-dictionary-search-and-replace)
+   ;; '("e y p" . youdao-dictionary-search-at-point-posframe)
+   ;; '("e y s" . youdao-dictionary-search)
+   ;; '("e y i" . youdao-dictionary-search-from-input)
+   ;; '("e y r" . youdao-dictionary-search-and-replace)
+   '("e y p" . my-gts-translate-posframe)
+   '("e y i" . gts-do-translate)
    ;; citre
    '("e c a" . citre-ace-peek)
    '("e c j" . citre-jump)
@@ -489,10 +491,10 @@ This keyword causes a body to be executed after other packages/features are load
    '("n r g" . org-roam-graph)
    '("n r i" . org-roam-node-insert)
    '("n r I" . org-id-get-create)
-   '("n r m" . org-roam-buffer-toggle)
+   ;; '("n r m" . org-roam-buffer-toggle)
    '("n r M" . org-roam-buffer-display-dedicated)
    '("n r n" . org-roam-capture)
-   '("n r r" . org-roam-refile)
+   '("n r r" . org-roam-buffer-toggle)
    '("n r R" . org-roam-link-replace-all)
    ;; date
    '("n r d b" . org-roam-dailies-goto-previous-note)
@@ -824,22 +826,23 @@ This keyword causes a body to be executed after other packages/features are load
 ** popper
 popper 用来控制临时buffer 的弹出, 保证它们不会破坏已有的 windows 结构
 #+begin_src elisp
-    (setup (:pkg popper)
-      (:option popper-reference-buffers         '("\\*Messages\\*"
-                                                  "Output\\*$"
-                                                  "\\*Async Shell Command\\*"
-                                                  help-mode
-                                                  helpful-mode
-                                                  compilation-mode
-                                                  youdao-dictionary-mode)
-               )
-      (:global "C-`" popper-toggle-latest
-               "M-`" popper-cycle
-               "C-M-`" popper-toggle-type
-               )
-      (popper-mode +1)
-      (popper-echo-mode +1)
-      )
+  (setup (:pkg popper)
+    (:option popper-reference-buffers         '("\\*Messages\\*"
+                                                "Output\\*$"
+                                                "\\*Async Shell Command\\*"
+                                                "Go-Translate"
+                                                help-mode
+                                                helpful-mode
+                                                compilation-mode
+                                                youdao-dictionary-mode)
+             )
+    (:global "C-`" popper-toggle-latest
+             "M-`" popper-cycle
+             "C-M-`" popper-toggle-type
+             )
+    (popper-mode +1)
+    (popper-echo-mode +1)
+    )
 #+end_src
 ** 移动
 *** avy
@@ -971,14 +974,14 @@ popper 用来控制临时buffer 的弹出, 保证它们不会破坏已有的 win
   (setup (:pkg aweshell :host github :repo "manateelazycat/aweshell")
     (:autoload aweshell-toggle)
     (:autoload aweshell-dedicated-toggle)
+    (:when-loaded (add-hook 'eshell-mode-hook
+                            (lambda ()
+                              (setq-local corfu-quit-at-boundary t
+                                          corfu-quit-no-match t
+                                          corfu-auto nil)
+                              (corfu-mode)))
+                  )
     )
-
-   (add-hook 'eshell-mode-hook
-          (lambda ()
-            (setq-local corfu-quit-at-boundary t
-                        corfu-quit-no-match t
-                        corfu-auto nil)
-            (corfu-mode)))
   ;;   (setup (:pkg pcmpl-args)
   ;;     (:load-after eshell-mode)
   ;;     )
@@ -1525,15 +1528,21 @@ popper 用来控制临时buffer 的弹出, 保证它们不会破坏已有的 win
     )
 #+end_src
 * 翻译
-** 有道词典
+** go-translate
 #+begin_src elisp
-  (setup (:pkg youdao-dictionary))
+  (setup (:pkg go-translate)
+    (:option gts-translate-list '(("en" "zh")))
+    (defun my-gts-translate-posframe ()
+      (interactive)
+      (if (not (featurep 'go-translate))
+          (require 'go-translate))
+      (defvar my-translator-posframe
+        (gts-translator
+                        :picker (gts-noprompt-picker)
+                        :engines (gts-google-rpc-engine)
+                        :render (gts-posframe-pop-render)))
+      (gts-translate my-translator-posframe)))
 #+end_src
-** fanyi
-#+begin_src elisp
-(setup (:pkg fanyi))
-#+end_src
-** google translate
 ** english-teacher
 #+begin_src elisp
   (setup (:pkg english-teacher :host github
