@@ -786,7 +786,7 @@ This keyword causes a body to be executed after other packages/features are load
       (:bind [tab] corfu-next
              [backtab] corfu-previous
              "<escape>" corfu-quit))
-        (corfu-global-mode)
+    (corfu-global-mode)
     )
   ;; corfu backend
   (setup (:pkg cape)
@@ -966,13 +966,22 @@ popper 用来控制临时buffer 的弹出, 保证它们不会破坏已有的 win
     )
 #+end_src
 * shell
-** aweshell
+** aweeshell
 #+begin_src elisp
   (setup (:pkg aweshell :host github :repo "manateelazycat/aweshell")
-    (:option epe-path-stype 'single)
     (:autoload aweshell-toggle)
     (:autoload aweshell-dedicated-toggle)
     )
+
+   (add-hook 'eshell-mode-hook
+          (lambda ()
+            (setq-local corfu-quit-at-boundary t
+                        corfu-quit-no-match t
+                        corfu-auto nil)
+            (corfu-mode)))
+  ;;   (setup (:pkg pcmpl-args)
+  ;;     (:load-after eshell-mode)
+  ;;     )
 #+end_src
 ** vterm
 #+begin_src elisp
