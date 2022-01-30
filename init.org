@@ -530,14 +530,16 @@ This keyword causes a body to be executed after other packages/features are load
 * UI
 ** Font
 #+begin_src elisp
-    ;; (set-face-attribute 'default nil :family "yaheiInconsolata" :height 140)
-    (set-face-attribute 'default nil :family "InconsolataGo QiHei NF" :height 140)
-    ;; Proportionately spaced typeface
-    ;; (set-face-attribute 'variable-pitch nil :family "Helvetica" :height 1.0)
+  ;; (set-face-attribute 'default nil :family "yaheiInconsolata" :height 140)
+  ;; (set-face-attribute 'default nil :family "InconsolataGo QiHei NF" :height 140)
+  (set-face-attribute 'default nil :family "Sarasa Mono SC Nerd" :height 140)
+  ;; Proportionately spaced typeface
+  ;; (set-face-attribute 'variable-pitch nil :family "Helvetica" :height 1.0)
 
-    ;; Monospaced typeface
-    ;; (set-face-attribute 'fixed-pitch nil :family "yaheiInconsolata" :height 1.0)
-    (set-face-attribute 'fixed-pitch nil :family "InconsolataGo QiHei NF" :height 1.0)
+  ;; Monospaced typeface
+  ;; (set-face-attribute 'fixed-pitch nil :family "yaheiInconsolata" :height 1.0)
+  ;; (set-face-attribute 'fixed-pitch nil :family "InconsolataGo QiHei NF" :height 1.0)
+  (set-face-attribute 'fixed-pitch nil :family "Sarasa Mono SC Nerd" :height 1.0)
 #+end_src
 ** Theme
 #+begin_src elisp
@@ -614,15 +616,13 @@ This keyword causes a body to be executed after other packages/features are load
 ** rainbow-delimiters
 #+begin_src elisp
   (setup (:pkg rainbow-delimiters)
-    (:hook-into prog-mode)
-    )
+    (:hook-into prog-mode))
 #+end_src
 ** diff-hl
 #+begin_src elisp
   (setup (:pkg diff-hl)
     (global-diff-hl-mode)
-    (diff-hl-margin-mode)
-    )
+    (diff-hl-margin-mode))
 #+end_src
 ** emacs-dashboard
 #+begin_src elisp
@@ -636,9 +636,7 @@ This keyword causes a body to be executed after other packages/features are load
              dashboard-center-content t
              dashboard-set-init-info t
              )
-    (dashboard-setup-startup-hook)
-    ;; (add-to-list 'dashboard-items '(agenda) t)
-    )
+    (dashboard-setup-startup-hook))
 #+end_src
 ** doom-modeline
 #+begin_src elisp
@@ -649,8 +647,7 @@ This keyword causes a body to be executed after other packages/features are load
              ;; doom-modeline-icon nil
              doom-modeline-unicode-fallback t
              )
-    (:hook-into after-init)
-    )
+    (:hook-into after-init))
 #+end_src
 * General Configuration
 ** backup, super-save
@@ -661,8 +658,7 @@ This keyword causes a body to be executed after other packages/features are load
   (setup (:pkg super-save)
     ;; (:delay)
     (super-save-mode 1)
-    (setq super-save-auto-save-when-idle t)
-    )
+    (setq super-save-auto-save-when-idle t))
 #+end_src
 ** 自动换行
 #+begin_src elisp
@@ -696,8 +692,7 @@ This keyword causes a body to be executed after other packages/features are load
     (:option vertico-cycle t)
     (:with-mode vertico
       (:bind [backspace] vertico-directory-delete-char))
-    (vertico-mode)
-    )
+    (vertico-mode))
 #+end_src
 ** Orderless
 #+begin_src elisp
@@ -841,8 +836,7 @@ popper 用来控制临时buffer 的弹出, 保证它们不会破坏已有的 win
              "C-M-`" popper-toggle-type
              )
     (popper-mode +1)
-    (popper-echo-mode +1)
-    )
+    (popper-echo-mode +1))
 #+end_src
 ** 移动
 *** avy
@@ -979,12 +973,8 @@ popper 用来控制临时buffer 的弹出, 保证它们不会破坏已有的 win
                               (setq-local corfu-quit-at-boundary t
                                           corfu-quit-no-match t
                                           corfu-auto nil)
-                              (corfu-mode)))
-                  )
+                              (corfu-mode))))
     )
-  ;;   (setup (:pkg pcmpl-args)
-  ;;     (:load-after eshell-mode)
-  ;;     )
 #+end_src
 ** vterm
 #+begin_src elisp
@@ -1269,7 +1259,7 @@ popper 用来控制临时buffer 的弹出, 保证它们不会破坏已有的 win
                                                       :bar-color "#4C4A4D")
              org-bars-stars '(:empty "◉"
                                      :invisible "▶"
-                                     :visible "∇"))
+                                     :visible "▼"))
     (:load-after org)
     (:hook-into org-mode)
     )
@@ -1532,28 +1522,23 @@ popper 用来控制临时buffer 的弹出, 保证它们不会破坏已有的 win
 #+begin_src elisp
   (setup (:pkg go-translate)
     (:option gts-translate-list '(("en" "zh")))
-    (defun my-gts-translate-posframe ()
-      (interactive)
-      (if (not (featurep 'go-translate))
-          (require 'go-translate))
-      (defvar my-translator-posframe
-        (gts-translator
-                        :picker (gts-noprompt-picker)
-                        :engines (gts-google-rpc-engine)
-                        :render (gts-posframe-pop-render)))
-      (gts-translate my-translator-posframe)))
+    ;; (defun my-gts-translate-posframe ()
+    ;;   (interactive)
+    ;;   (if (not (featurep 'go-translate))
+    ;;       (require 'go-translate))
+    ;;   (defvar my-translator-posframe
+    ;;     (gts-translator
+    ;;                     :picker (gts-noprompt-picker)
+    ;;                     :engines (gts-google-rpc-engine)
+    ;;                     :render (gts-posframe-pop-render)))
+    ;;   (gts-translate my-translator-posframe))
+    )
 #+end_src
 ** english-teacher
 #+begin_src elisp
   (setup (:pkg english-teacher :host github
                :repo "loyalpartner/english-teacher.el")
     )
-#+end_src
-** insert-translated-name
-#+begin_src elisp
-  (setup (:pkg insert-translated-name :host github :repo "manateelazycat/insert-translated-name")
-    (:autoload insert-translated-name-insert)
-    (:autoload insert-translated-name-replace))
 #+end_src
 ** company-english-helper
 #+begin_src elisp
@@ -1593,6 +1578,11 @@ popper 用来控制临时buffer 的弹出, 保证它们不会破坏已有的 win
      org-noter-doc-split-percentage '(0.6 . 0.4)
      )
     )
+#+end_src
+* games
+** asm-blox
+#+begin_src elisp
+(setup (:pkg asm-blox))
 #+end_src
 * tools
 ** restart-emacs
