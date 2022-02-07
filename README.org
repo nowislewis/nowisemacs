@@ -1,58 +1,68 @@
 * Introduction to nowisemacs
-nowisemacs 是一个倾向于在容易维护的基础上, 满足日常绝大部分场景使用的配置
-** 理念
-*** TL;NR
-简洁 + 容易维护
-*** 详细说明
-**** 从系统架构的角度理解 emacs
-1. Emacs 可以看做 lisp 语言的虚拟机，虚拟机的核心工作是管理内存。
-2. Emacs定义的内建变量和函数, 与用户定义的函数统统放在一起, 而在Lisp里函数与变量是等价的.
-因此, 用户对 emacs 的绝大部分操作, 都对应着 emacs 的某个函数或者命令, 用户可以修改外部和内置的所有变量和函数. 换句话讲,
-用户应将自己看做这个操作系统的内部调度者, 而不是外部使用者.
+Nowisemacs is a configuration that tends to be used in the vast majority of everyday scenarios on an easy-to-maintain basis.
+** Ideas
+*** TL ; NR
+Concise + High maintainability
+*** Description in detail
+**** Understand emacs from the perspective of system architecture
+1. Emacs can be regarded as a virtual machine of the lisp language. And the core function of a virtual machine is to
+   manage memory.
+2. The built-in variables and functions defined by Emacs are set together with the user-defined functins, and they are
+   all equivalent as First-class citizen.
+3. Therefore, most of the user's operation on emacs correspond to a function, and users can modify all external or
+   built-in variables and functions. In other words, users should regard themselves as internal schedulers of the
+   systerm, not external users.
+**** Packages and related configurations should be simple
+Simplicity doesn't mean that the number of packages used is few or the interface is ugly, but that the following
+concepts should be met as far as possible:
+1. Try to use built-in functions to reduce redundancy. The rational use of these APIs can greatly reduce the external
+   maintenance burden.
+2. Packages should be designed simple and flexible, which will reduce dependences.
+3. Packages with less code or active updates will have higher priority.
+4. Try to use the default configurtion or select packages with enought default configuration to avoid the update burden
+   caused by a large number of hacks.
+**** Easy to maintain
+I like rich functionality, which allows me to have suitable solutions for various scenarios. Usually add a functionality
+will increase the complexity of configurations. Nowisemacs looks for a balance between functionality and complexity by
+"concise" choices.
+** How to use
+Nowisemacs uses a single org file to manage all configurations. To reduce the startup time of emacs, users need to
+generae =.el= configuration files before the first startup:
+1. =mv ~/.emacs.d/ .emacs.d.back= ;; Backup your original configuration
+2. =mkdir ~/.emacs.d= ;; Make the emacs configuration folder.
+3. =git clone https://github.com/nowislewis/nowisemacs ~/nowisemacs=;; Download nowisemacs
+4. =emacs ~/nowisemacs/init.org= ;; Open init.org
+5. Sequentially press "Ctrl-c Ctrl-v t", or ~Alt-x~ =org-babel-tangle= to generate init.el
+6. =emacs= ;; Launch emacs, the download, installation and configuration of packages will be done automatically.
+* Disadvantages
+** Radical
+1. Nowisemacs use the latest emacs repo and compile it locally, so there may be some incompatible when you use an older version.
+2. Fast iteration, no option of "all" packages. If there is a package with a cleaner code implementation than the one
+   used now, or less dependencies, or better functionality, only *one* will be left.
+** Sacrifice for simplicity
+The code will be kept iteratively updated and thus less stable, because any duplicated or useless code will be
+   updated or optimized immediately, with little consideration for compatibility.
+** Beginners are encouraged to access package website
+Many functions provided by packages are invoked manually as APIs with =M-x= with few key bindings. Users are encouraged to
+access the website of packages to get a comprehensive understanding.
+* Advantages
+1. Tiling, less abstract.
+2. Richly configured for emacs espacially org mode but with a relatively small amount of codes.
+* Optinal reading
+** Why setup instead of simpler manual configuration or full-blown use-package?
+As mentioned above, nowieemacs hoped to reduce the abstractin level of configuration as much as possible while meeting
+practical requirements, so as the facilitate the understanding of configuration maintenance code.
 
-这里的差别在于, 用户的命令并不是层层转译, 而是直接下达.
-**** "简洁"
-简洁并不是指使用包数量寥寥无几或者界面"清真", 而是在满足所需功能的前提下,尽量满足如下理念:
-1. 尽量使用built-in 功能, 降低冗余性. emacs 的内置命令已经相当丰富, 合理利用这些 api 可以大大降低外部维护负担.
-2. 尽可能选用设计简单的包, 比如尽可能复用原有功能, 或者思路简洁灵活, 代码量小
-3. 选用代码质量较高或近期仍有更新的包
-4. (除org mode外)尽量使用默认配置或者选择默认配置足够的包, 避免大量hack 带来的更新负担
-**** 容易维护
-我喜欢丰富的功能, 这让我在面对各种场景都有合适的解决方案. 通常增加功能性会提高配置的复杂度, 增大维
-护负担. 但在简洁的理念下, nowisemacs 寻找的功能性和复杂度的一个平衡点
-** 如何使用
-nowisemacs 使用一个 org 文件管理所有配置, 但为了不影响启动时间, 因此在第一次启动前需要生成 =.el= 配置文件.
-1. =mv ~/.emacs.d/ .emacs.d.back= ;; 备份原来配置
-2. =mkdir ~/.emacs.d= ;; 安装
-3. =git clone https://github.com/nowislewis/nowisemacs ~/nowisemacs=;; 下载 nowisemacs
-4. =emacs ~/nowisemacs/init.org= ;; 打开 init.org
-5. 依次按下 "Ctrl-c Ctrl-v t", 或者 Alt-x =org-babel-tangle= 生成 init.el
-6. =emacs= ;; 启动emacs, 会自动完成包的下载, 安装和配置
-* 缺点
-** 激进
-1. 一般会使用最新的emacs repo 并自己编译, 因此可能有些配置和功能无法在较老的emacs 版本上使用
-2. 配置快速迭代, 因为有一个包比现在用的有更简洁的代码实现, 或者更少的依赖, 或者更好的功能, 我一般会两个一起用几天, 直到
-   去除一个. 因此并不会给用户留下" 两个都要" 的选项
-这样让自己的配置始终保持简洁和清晰
-** 代码"洁癖"
-1. 我不喜欢看到重复或者无用的的代码, 会带来冗余的维护, 因此代码会处于保持迭代更新.
-2. 若两个或多个包有类似的功能, 会经过权衡后只留下一个( 主要考虑代码是否依赖更少, 实现思路是否更简洁, 功能是否更完善, 维护者是否可靠等).
-** 默认配置
-对包的hack 较少, 许多功能仅借助 =M-x= 将其作为 api 手动调用的, 初入门用户需具备去包的主页察看说明的意识
-* 优点
-1. 平铺性, 容易理解, emacs 配置抽象程度较低
-2. org mode 配置丰富
-3. 满足功能的前提下, 代码量相对较少
-* 适合人群
-因很强的个人性, 因此不太适合作为一般用户的主力配置, 建议仅借鉴配置的思路, 但欢迎使用和提出建议
-* 选读环节
-** 为什么nowisemacs使用 setup 而不是更简单的手动配置或成熟的use-package?
-正如前文所述, nowisemacs 希望在满足实用需求的情况下，尽可能降低配置的抽象等级，方便理解配置维护代码。
+After heavy use for a period of time, I gave up use-package and leaf. They have a high degree of abstraction and thus
+complex mechanisms, which is not conducive to understanding and debugging.
 
-因此在重度使用了一段时间后, 我放弃了use-package和leaf，他们的机制相对复杂，抽象程度较高, 不利于理解和调试。
+At the suggestion of Lazycat, a great emacs contributor, I have used the native way to configure emacs for a while. I
+really like this idea, it is clear and easy to drill down. No black box here.
 
-受懒猫的建议，我用过一段时间原生方式配置代码，很喜欢这种方式，清晰明确，我清楚我的每一行代码是什么，他们的在干什么，不存在黑盒子。
+But if you use the native way, you will find that there is a lot of duplicated codes, which make the work tedious and
+increase the maintenance work. =setup= conmes into view. First, =setup= is almost indistinguishable from the native
+way at the level of abstraction. =setup= is actually a bunch of simple macros to generate code. And the code generated
+after macro-expand is almost the same as native methods. So =setup= is also clear and easy to drill down as native way.
 
-setup 进入了视野，它和原生配置在我看来近乎没有抽象层级的区别。setup其实就是一堆很简单的宏，套在代码上，expand后生成的代码和手动管理一摸一样。因此setup近乎具备手动管理的大部分优点
-
-因为很多手动配置代码都是重复的，eval-after之类的，用的很多，写起来重复。我不喜欢大量重复的代码，这会增加出错风险，setup的作用仅仅是把这些重复的手动配置代码变成了一个个非常简单的call，相当于定义一处，却能处处使用，如果有问题比如升级和修改我一般需要更改定义的地方就好了。
+The function of =setup= is to turn these repeated codes into simple calls, which are equivalent to defining one place, but
+can be used everywhere.
