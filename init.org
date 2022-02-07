@@ -211,16 +211,10 @@ Use straight-pull-report to get detailed messages after update.
 *** :delay
 #+begin_src elisp
   (setup-define :delay
-    (lambda (&rest time)
-      `(run-with-idle-timer ,(or time 1)
-                            nil ;; Don't repeat
-                            (lambda () (require ',(setup-get 'feature)))))
-    :documentation "Delay loading the feature until a certain amount of idle time has passed.")
-  (run-with-idle-timer
-   (2)
-   nil
-   #'(lambda nil
-       (require 'lisp)))
+  (lambda (&optional time)
+    `(run-with-idle-timer ,(or time 1) nil
+                          (lambda () (require ',(setup-get 'feature)))))
+  :documentation "Delay loading the feature until a certain amount of idle time has passed.")
 #+end_src
 *** :disabled
 Used to disable a package configuration, similar to =:disabled= in =use-package=.
