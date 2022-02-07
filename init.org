@@ -216,11 +216,14 @@ Use straight-pull-report to get detailed messages after update.
                             nil ;; Don't repeat
                             (lambda () (require ',(setup-get 'feature)))))
     :documentation "Delay loading the feature until a certain amount of idle time has passed.")
+  (run-with-idle-timer
+   (2)
+   nil
+   #'(lambda nil
+       (require 'lisp)))
 #+end_src
 *** :disabled
-
 Used to disable a package configuration, similar to =:disabled= in =use-package=.
-
 #+begin_src elisp
   (setup-define :disabled
     (lambda ()
@@ -645,8 +648,7 @@ This keyword causes a body to be executed after other packages/features are load
              doom-modeline-height 20
              doom-modeline-hud t
              ;; doom-modeline-icon nil
-             doom-modeline-unicode-fallback t
-             )
+             doom-modeline-unicode-fallback t)
     (:hook-into after-init))
 #+end_src
 * General Configuration
@@ -1148,8 +1150,7 @@ popper 用来控制临时buffer 的弹出, 保证它们不会破坏已有的 win
 ** beancount
 #+begin_src elisp
   (setup (:pkg beancount :host github :repo "beancount/beancount-mode")
-    (:file-match "\\.beancount\\'")
-    )
+    (:file-match "\\.beancount\\'"))
 #+end_src
 ** latex
 #+begin_src elisp
@@ -1304,6 +1305,7 @@ popper 用来控制临时buffer 的弹出, 保证它们不会破坏已有的 win
     (:when-loaded
       (org-roam-db-autosync-mode)
 
+      ;; Codes blow are used to general a hierachy for title nodes that under a file
       (cl-defmethod org-roam-node-doom-filetitle ((node org-roam-node))
         "Return the value of \"#+title:\" (if any) from file that NODE resides in.
   If there's no file-level title in the file, return empty string."
@@ -1356,6 +1358,8 @@ popper 用来控制临时buffer 的弹出, 保证它们不会破坏已有的 win
     )
 #+end_src
 *** org-roam-agenda
+The main purpose for this section is to add every node that has a "TODO" into org-agenda, so I can see all the "TODO"s
+among all the files in org-roam in a single agenda-view. The code was borrowed from vulpea.
 #+begin_src elisp
   (defun vulpea-project-p ()
     "Return non-nil if current buffer has any todo entry.
@@ -1503,8 +1507,7 @@ popper 用来控制临时buffer 的弹出, 保证它们不会破坏已有的 win
 ** ox-hugo
 #+begin_src elisp
   (setup (:pkg ox-hugo)
-    (:load-after ox)
-    )
+    (:load-after ox))
 #+end_src
 ** org-transclusion
 #+begin_src elisp
@@ -1589,7 +1592,7 @@ popper 用来控制临时buffer 的弹出, 保证它们不会破坏已有的 win
 #+begin_src elisp
   (setup (:pkg restart-emacs))
 #+end_src
-** keycast
+** kecast
 #+begin_src elisp
   (setup (:pkg keycast)
     ;; This works with doom-modeline, inspired by this comment:
@@ -1606,8 +1609,13 @@ popper 用来控制临时buffer 的弹出, 保证它们不会破坏已有的 win
   ;; (add-to-list 'global-mode-string '("" mode-line-keycast " ")))
 
 #+end_src
-
+** darkroom
+#+begin_src elisp
+(setup (:pkg darkroom))
+#+end_src
 ** Simulate company with corfu
+Company is wide-used, but I use corfu for its simplity. So I add a simulation for some packages which use
+company. Currently, These codes are test only with English-helper, which is a great package helping writing English.
 #+begin_src elisp
   (defvaralias 'company-candidates 'corfu--candidates)
   (defalias 'company-mode 'corfu-mode) ;; should be deleted
