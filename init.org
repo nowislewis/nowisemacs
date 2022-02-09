@@ -295,6 +295,7 @@ This keyword causes a body to be executed after other packages/features are load
                                             (keypad . "K")
                                             (insert . "I"))
              meow-use-enhanced-selection-effect t
+             ;; meow-keypad-leader-dispatch "C-c"
              )
     (defun meow-setup()
       (setq meow-cheatsheet-layout meow-cheatsheet-layout-qwerty)
@@ -815,7 +816,7 @@ This keyword causes a body to be executed after other packages/features are load
   (winner-mode t)
 #+end_src
 ** popper
-popper 用来控制临时buffer 的弹出, 保证它们不会破坏已有的 windows 结构
+popper 用来控制临时 buffer 的弹出, 保证它们不会破坏已有的 windows 结构
 #+begin_src elisp
   (setup (:pkg popper)
     (:option popper-reference-buffers         '("\\*Messages\\*"
@@ -1150,6 +1151,19 @@ popper 用来控制临时buffer 的弹出, 保证它们不会破坏已有的 win
 #+begin_src elisp
   (setup (:pkg cdlatex))
   (setup (:pkg auctex))
+#+end_src
+** eglot-ltex
+eglot client leveraging LTEX Language Server.
+#+begin_src elisp
+  (setup (:pkg eglot-ltex :host github :repo "emacs-languagetool/eglot-ltex")
+      (:option eglot-languagetool-server-path "~/Downloads/ltex-ls/")
+      (:with-hook text-mode-hook
+        (:hook (lambda ()
+                       (require 'eglot-ltex)
+                       ;; (call-interactively #'eglot)
+                       ))
+        )
+      )
 #+end_src
 * Org Mode
 ** org-mode
@@ -1605,30 +1619,33 @@ among all the files in org-roam in a single agenda-view. The code was borrowed f
 #+end_src
 ** darkroom
 #+begin_src elisp
-(setup (:pkg darkroom))
+  (setup (:pkg darkroom))
 #+end_src
 ** Simulate company with corfu
 Company is wide-used, but I use corfu for its simplity. So I add a simulation for some packages which use
 company. Currently, These codes are test only with English-helper, which is a great package helping writing English.
 #+begin_src elisp
-  (defvaralias 'company-candidates 'corfu--candidates)
-  (defalias 'company-mode 'corfu-mode) ;; should be deleted
-  (defvaralias 'company-mode 'corfu-mode) ;; should be deleted
-  (setq company-backends '())
-  (setq completion-at-point-functions-backup completion-at-point-functions)
-  (provide 'company)
+  (defun simulate-company-with-corfu()
+    (interactive)
+    (defvaralias 'company-candidates 'corfu--candidates)
+    (defalias 'company-mode 'corfu-mode) ;; should be deleted
+    (defvaralias 'company-mode 'corfu-mode) ;; should be deleted
+    (setq company-backends '())
+    (setq completion-at-point-functions-backup completion-at-point-functions)
+    (provide 'company)
 
-  (defun set-completion-functions ()
-    (setq completion-at-point-functions (cl-concatenate 'list (mapcar #'cape-company-to-capf company-backends) completion-at-point-functions-backup)))
+    (defun set-completion-functions ()
+      (setq completion-at-point-functions (cl-concatenate 'list (mapcar #'cape-company-to-capf company-backends) completion-at-point-functions-backup)))
 
-  (defun company-grab-symbol ()
-    "If point is at the end of a symbol, return it.
+    (defun company-grab-symbol ()
+      "If point is at the end of a symbol, return it.
     Otherwise, if point is not inside a symbol, return an empty string."
-    (if (looking-at "\\_>")
-        (buffer-substring (point) (save-excursion (skip-syntax-backward "w_")
-                                                  (point)))
-      (unless (and (char-after) (memq (char-syntax (char-after)) '(?w ?_)))
-        "")))
-  (advice-add 'toggle-company-english-helper :after #'set-completion-functions)
+      (if (looking-at "\\_>")
+          (buffer-substring (point) (save-excursion (skip-syntax-backward "w_")
+                                                    (point)))
+        (unless (and (char-after) (memq (char-syntax (char-after)) '(?w ?_)))
+          "")))
+    (advice-add 'toggle-company-english-helper :after #'set-completion-functions)
+    )
 
 #+end_src

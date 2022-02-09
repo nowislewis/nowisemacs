@@ -4,30 +4,30 @@ Nowisemacs is a configuration that tends to be used in the vast majority of ever
 *** TL ; NR
 Concise + High maintainability
 *** Description in detail
-**** Understand emacs from the perspective of system architecture
+**** Understand Emacs from the perspective of system architecture
 1. Emacs can be regarded as a virtual machine of the lisp language. And the core function of a virtual machine is to
    manage memory.
-2. The built-in variables and functions defined by Emacs are set together with the user-defined functins, and they are
+2. The built-in variables and functions defined by Emacs are set together with the user-defined functions, and they are
    all equivalent as First-class citizen.
-3. Therefore, most of the user's operation on emacs correspond to a function, and users can modify all external or
+3. Therefore, most of the user's operation on Emacs correspond to a function, and users can modify all external or
    built-in variables and functions. In other words, users should regard themselves as internal schedulers of the
-   systerm, not external users.
+   system, not external users.
 **** Packages and related configurations should be simple
-Simplicity doesn't mean that the number of packages used is few or the interface is ugly, but that the following
+Simplicity doesn't mean that the number of packages used is few, or the interface is ugly, but that the following
 concepts should be met as far as possible:
 1. Try to use built-in functions to reduce redundancy. The rational use of these APIs can greatly reduce the external
    maintenance burden.
-2. Packages should be designed simple and flexible, which will reduce dependences.
+2. Packages should be designed simple and flexible, which will reduce dependencies.
 3. Packages with less code or active updates will have higher priority.
-4. Try to use the default configurtion or select packages with enought default configuration to avoid the update burden
-   caused by a large number of hacks.
+4. Try to use the default configuration or select packages with enough default configuration to avoid the update burden
+   caused by numerous hacks.
 **** Easy to maintain
 I like rich functionality, which allows me to have suitable solutions for various scenarios. Usually add a functionality
 will increase the complexity of configurations. Nowisemacs looks for a balance between functionality and complexity by
 "concise" choices.
 ** How to use
 Nowisemacs uses a single org file to manage all configurations. To reduce the startup time of emacs, users need to
-generae =.el= configuration files before the first startup:
+generate =.el= configuration files before the first startup:
 1. =mv ~/.emacs.d/ .emacs.d.back= ;; Backup your original configuration
 2. =mkdir ~/.emacs.d= ;; Make the emacs configuration folder.
 3. =git clone https://github.com/nowislewis/nowisemacs ~/nowisemacs=;; Download nowisemacs
@@ -38,7 +38,7 @@ generae =.el= configuration files before the first startup:
 ** Radical
 1. Nowisemacs use the latest emacs repo and compile it locally, so there may be some incompatible when you use an older version.
 2. Fast iteration, no option of "all" packages. If there is a package with a cleaner code implementation than the one
-   used now, or less dependencies, or better functionality, only *one* will be left.
+   used now, or fewer dependencies, or better functionality, only *one* will be left.
 ** Sacrifice for simplicity
 The code will be kept iteratively updated and thus less stable, because any duplicated or useless code will be
    updated or optimized immediately, with little consideration for compatibility.
@@ -47,20 +47,20 @@ Many functions provided by packages are invoked manually as APIs with =M-x= with
 access the website of packages to get a comprehensive understanding.
 * Advantages
 1. Tiling, less abstract.
-2. Richly configured for emacs espacially org mode but with a relatively small amount of codes.
+2. Richly configured for Emacs especially org mode but with a relatively small amount of codes.
 * Optinal reading
 ** Why setup instead of simpler manual configuration or full-blown use-package?
-As mentioned above, nowieemacs hoped to reduce the abstractin level of configuration as much as possible while meeting
-practical requirements, so as the facilitate the understanding of configuration maintenance code.
+As mentioned above, nowisemacs hoped to reduce the abstraction level of configuration as much as possible while meeting
+practical requirements, so as they facilitate the understanding of configuration maintenance code.
 
 After heavy use for a period of time, I gave up use-package and leaf. They have a high degree of abstraction and thus
 complex mechanisms, which is not conducive to understanding and debugging.
 
-At the suggestion of Lazycat, a great emacs contributor, I have used the native way to configure emacs for a while. I
+At the suggestion of Lazycat, a great Emacs contributor, I have used the native way to configure Emacs for a while. I
 really like this idea, it is clear and easy to drill down. No black box here.
 
 But if you use the native way, you will find that there is a lot of duplicated codes, which make the work tedious and
-increase the maintenance work. =setup= conmes into view. First, =setup= is almost indistinguishable from the native
+increase the maintenance work. =setup= comes into view. First, =setup= is almost indistinguishable from the native
 way at the level of abstraction. =setup= is actually a bunch of simple macros to generate code. And the code generated
 after macro-expand is almost the same as native methods. So =setup= is also clear and easy to drill down as native way.
 
