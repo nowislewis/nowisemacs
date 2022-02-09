@@ -1586,9 +1586,7 @@ among all the files in org-roam in a single agenda-view. The code was borrowed f
      org-noter-notes-search-path (list org-directory)
      org-noter-auto-save-last-location t
      org-noter-separate-notes-from-heading nil
-     org-noter-doc-split-percentage '(0.6 . 0.4)
-     )
-    )
+     org-noter-doc-split-percentage '(0.6 . 0.4)))
 #+end_src
 * games
 ** asm-blox
