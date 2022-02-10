@@ -978,6 +978,9 @@ popper 用来控制临时 buffer 的弹出, 保证它们不会破坏已有的 wi
   (setup (:pkg vterm))
 #+end_src
 ** dtache
+#+begin_src elisp
+(setup (:pkg dtache))
+#+end_src
 * git
 ** magit
 #+begin_src elisp
