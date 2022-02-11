@@ -8,7 +8,7 @@ It's designed by following principles:
 + *Easy to use and modify*.
   Generally, the
   higher degree of abstraction, the stronger the applicability of programs. But the abstraction will increase the
-  distance between users and native codes and make it more difficult for users to maintain codes. Nowiemacs try to solve this problems in two ways:
+  distance between users and native codes and make it more difficult for users to maintain codes. Nowiemacs trys to solve this problems in two ways:
   1. Nowisemacs uses a tiling scheme to avoid high level code abstraction, and uses an org-structure to combine all
      components to avoid the code confusion caused by the tile scheme. Thus, nowisemacs separate the code structure and
      functional structure. Users are supposed to focus only on the functional structure when using it, and focus only on code structure
@@ -44,7 +44,7 @@ concepts should be met as far as possible:
 4. Try to use the default configuration or select packages with enough default configuration to avoid the update burden
    caused by numerous hacks.
 **** Easy to maintain
-I like rich functionality, which allows me to have suitable solutions for various scenarios. Usually add a functionality
+I like rich functionality, which allows me to have suitable solutions for various scenarios. Usually adding a functionality
 will increase the complexity of configurations. Nowisemacs looks for a balance between functionality and complexity by
 "concise" choices.
 ** How to use
@@ -56,9 +56,9 @@ generate =.el= configuration files before the first startup:
 4. =emacs ~/nowisemacs/init.org= ;; Open init.org
 5. Sequentially press "Ctrl-c Ctrl-v t", or ~Alt-x~ =org-babel-tangle= to generate init.el
 6. =emacs= ;; Launch emacs, the download, installation and configuration of packages will be done automatically.
-* Disadvantages
+* Things you must know before going deeper
 ** Radical
-1. Nowisemacs use the latest emacs repo and compile it locally, so there may be some incompatible when you use an older version.
+1. Nowisemacs uses the latest emacs repo and compile it locally, so there may be some incompatible when you use an older version.
 2. Fast iteration, no option of "all" packages. If there is a package with a cleaner code implementation than the one
    used now, or fewer dependencies, or better functionality, only *one* will be left.
 ** Sacrifice for simplicity
