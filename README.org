@@ -15,7 +15,7 @@ It's designed by following principles:
      when modifying code.
   2. Nowisemacs provides many simple macros to simplify the daily configuration of users. With the help of =setup=, users
      can quickly handle the configuration cycle of a new or existing package. At the same time, users are encouraged to get the real native code
-     everywhere by using =emacs-lisp-macroexpand=. For example:
+     everywhere by using =emacs-lisp-macroexpand=.
 ** Features
 + Affected by lazycat-emacs, there is a clear process chain in nowisemacs
 + Writing on the fly with a full configured org-mode, includes beautiful interfaces, a deep integration with org-roam
