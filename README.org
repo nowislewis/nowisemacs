@@ -19,7 +19,7 @@ It's designed by following principles:
 ** Features
 + Affected by lazycat-emacs, there is a clear process chain in nowisemacs
 + Writing on the fly with a full configured org-mode, includes beautiful interfaces, a deep integration with org-roam
-  and org-agenda, many useful English auxiliary writing tools and so on.
+  and org-agenda to help take back-notes and manage daily work, many useful English auxiliary writing tools and so on.
 + Universal programming solution including completion, jump, search under different path or files. With the help of *Language Server Protocol* powered by Microsoft and the great ctags
   front-end *citre*, users can easily use and expand almost all programming languages under emacs.
 ** Ideas behind nowisemacs
@@ -43,7 +43,7 @@ concepts should be met as far as possible:
 3. Packages with less code or active updates will have higher priority.
 4. Try to use the default configuration or select packages with enough default configuration to avoid the update burden
    caused by numerous hacks.
-**** Easy to maintain
+**** Balance
 I like rich functionality, which allows me to have suitable solutions for various scenarios. Usually adding a functionality
 will increase the complexity of configurations. Nowisemacs looks for a balance between functionality and complexity by
 "concise" choices.
@@ -58,7 +58,7 @@ generate =.el= configuration files before the first startup:
 6. =emacs= ;; Launch emacs, the download, installation and configuration of packages will be done automatically.
 * Things you must know before going deeper
 ** Radical
-1. Nowisemacs uses the latest emacs repo and compile it locally, so there may be some incompatible when you use an older version.
+1. Nowisemacs always uses the latest emacs version and compile it locally, so there may be some incompatible when you use an older version.
 2. Fast iteration, no option of "all" packages. If there is a package with a cleaner code implementation than the one
    used now, or fewer dependencies, or better functionality, only *one* will be left.
 ** Sacrifice for simplicity
@@ -85,6 +85,25 @@ after macro-expand is almost the same as native methods. So =setup= is also clea
 
 The function of =setup= is to turn these repeated codes into simple calls, which are equivalent to defining one place, but
 can be used everywhere.
+** How to become a proficient user in emacs
+I would like to first give my thought process through these difficulties for beginners:
+
+1. I have been using doom emacs for a long time, which is a great configuration framework for vim users. During that, I
+   was mainly familiar with various cool or practical functions of emacs, which greatly aroused interest and made it
+   clear what an excellent emacs should be and what does it look like.
+2. Then I found I need some personal features for my daily work, but it's hard to achieve an end because it's always
+   easy to get stuck in a lot of code traps. I don't know how to sort out my own process.
+3. After some time I found a very native configuration, lazycat-emacs, and learned how to configure all the code in the lowest-level way, including manually managing packages, manually controlling the loading order, etc.
+4. After understanding what I need to set after startup. Things I needed to figure out became clear again:
+   + First, to implement whatever features I need.
+   + Second, to control the abstraction level of the configuration so as not to increase maintenance pressure.
+
+The configuration of nowisemacs is not there all at once. There is an article "Understanding emacs from the perspective of operating system architecture" that gave me a good inspiration, let me try to use emacs from the perspective of an emacs itself rather than an emacs user. As an emacs, how can I meet user needs?
+
++ First, when users give me requirements, I need to know how to combine existing functions to achieve this requirement;
++ Second, I can find or implement these functions.
+
+With this idea in mind, nowisemacs tries to separate functional structure and code structure to solve this problem.
 * Related great solutions
 + [[https://github.com/hlissner/doom-emacs][doom emacs]]
 + [[https://github.com/manateelazycat/lazycat-emacs][lazycat-emacs]]
