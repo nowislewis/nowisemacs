@@ -1,6 +1,28 @@
 * Introduction to nowisemacs
-Nowisemacs is a configuration that tends to be used in the vast majority of everyday scenarios on an easy-to-maintain basis.
-** Ideas
+Nowisemacs is a configuration framework for GNU Emacs that tends to be used in everyday scenarios with a wealth of
+features but on an easy-to-maintain
+basis.
+
+It's designed by following principles:
++ *Close to metal*. As a core idea of nowisemacs, there should be less between users and vanilla emacs.
++ *Easy to use and modify*.
+  Generally, the
+  higher degree of abstraction, the stronger the applicability of programs. But the abstraction will increase the
+  distance between users and native codes and make it more difficult for users to maintain codes. Nowiemacs try to solve this problems in two ways:
+  1. Nowisemacs uses a tiling scheme to avoid high level code abstraction, and uses an org-structure to combine all
+     components to avoid the code confusion caused by the tile scheme. Thus, nowisemacs separate the code structure and
+     functional structure. Users are supposed to focus only on the functional structure when using it, and focus only on code structure
+     when modifying code.
+  2. Nowisemacs provides many simple macros to simplify the daily configuration of users. With the help of =setup=, users
+     can quickly handle the configuration cycle of a new or existing package. At the same time, users are encouraged to get the real native code
+     everywhere by using =emacs-lisp-macroexpand=. For example:
+** Features
++ Affected by lazycat-emacs, there is a clear process chain in nowisemacs
++ Writing on the fly with a full configured org-mode, includes beautiful interfaces, a deep integration with org-roam
+  and org-agenda, many useful English auxiliary writing tools and so on.
++ Universal programming solution including completion, jump, search under different path or files. With the help of *Language Server Protocol* powered by Microsoft and the great ctags
+  front-end *citre*, users can easily use and expand almost all programming languages under emacs.
+** Ideas behind nowisemacs
 *** TL ; NR
 Concise + High maintainability
 *** Description in detail
@@ -45,9 +67,6 @@ The code will be kept iteratively updated and thus less stable, because any dupl
 ** Beginners are encouraged to access package website
 Many functions provided by packages are invoked manually as APIs with =M-x= with few key bindings. Users are encouraged to
 access the website of packages to get a comprehensive understanding.
-* Advantages
-1. Tiling, less abstract.
-2. Richly configured for Emacs especially org mode but with a relatively small amount of codes.
 * Optinal reading
 ** Why setup instead of simpler manual configuration or full-blown use-package?
 As mentioned above, nowisemacs hoped to reduce the abstraction level of configuration as much as possible while meeting
@@ -66,4 +85,7 @@ after macro-expand is almost the same as native methods. So =setup= is also clea
 
 The function of =setup= is to turn these repeated codes into simple calls, which are equivalent to defining one place, but
 can be used everywhere.
-* Related
+* Related great solutions
++ [[https://github.com/hlissner/doom-emacs][doom emacs]]
++ [[https://github.com/manateelazycat/lazycat-emacs][lazycat-emacs]]
++ [[https://github.com/seagle0128/.emacs.d][centaur emacs]]
