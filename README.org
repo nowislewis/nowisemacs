@@ -86,7 +86,7 @@ after macro-expand is almost the same as native methods. So =setup= is also clea
 The function of =setup= is to turn these repeated codes into simple calls, which are equivalent to defining one place, but
 can be used everywhere.
 ** How to become a proficient user in emacs
-I would like to first give my thought process through these difficulties for beginners:
+I would like to first give my own experience through these difficulties for beginners:
 
 1. I have been using doom emacs for a long time, which is a great configuration framework for vim users. During that, I
    was mainly familiar with various cool or practical functions of emacs, which greatly aroused interest and made it
