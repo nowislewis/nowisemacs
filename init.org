@@ -1648,6 +1648,10 @@ among all the files in org-roam in a single agenda-view. The code was borrowed f
 #+begin_src elisp
   (setup (:pkg darkroom))
 #+end_src
+** edit with emacs everywhere
+#+begin_src elisp
+(load "~/.hammerspoon/Spoons/editWithEmacs.spoon/hammerspoon.el")
+#+end_src
 ** Simulate company with corfu
 Company is wide-used, but I use corfu for its simplity. So I add a simulation for some packages which use
 company. Currently, These codes are test only with English-helper, which is a great package helping writing English.
