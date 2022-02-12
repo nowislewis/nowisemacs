@@ -294,8 +294,17 @@ This keyword causes a body to be executed after other packages/features are load
                                             (motion . "M")
                                             (keypad . "K")
                                             (insert . "I"))
-             meow-use-enhanced-selection-effect t
-             ;; meow-keypad-leader-dispatch "C-c"
+             ;; meow-use-enhanced-selection-effect t
+             ;; leader-map
+             lewis-leader-map (make-sparse-keymap)
+             meow-keymap-alist
+             `((insert . ,meow-insert-state-keymap)
+               (normal . ,meow-normal-state-keymap)
+               (keypad . ,meow-keypad-state-keymap)
+               (motion . ,meow-motion-state-keymap)
+               (beacon . ,meow-beacon-state-keymap)
+               (leader . ,lewis-leader-map))
+
              )
     (defun meow-setup()
       (setq meow-cheatsheet-layout meow-cheatsheet-layout-qwerty)
@@ -337,12 +346,12 @@ This keyword causes a body to be executed after other packages/features are load
                               '("b" . meow-back-word)
                               '("B" . meow-back-symbol)
                               '("c" . meow-change)
-                              '("C" . meow-change-save)
+                              ;; '("C" . meow-change-save)
                               '("d" . meow-kill)
                               '("e" . meow-next-word)
                               '("E" . meow-next-symbol)
                               '("f" . meow-find)
-                              '("F" . meow-find-expand)
+                              ;; '("F" . meow-find-expand)
 
                               '("g d" . xref-find-definitions)
                               '("g D" . xref-find-references)
@@ -362,7 +371,6 @@ This keyword causes a body to be executed after other packages/features are load
                               '("m" . meow-mark-word)
                               '("M" . meow-mark-symbol)
                               '("n" . meow-search)
-                              ;; '("N" . meow-pop-search)
                               '("N" . meow-pop-selection)
 
                               '("o" . meow-open-below)
@@ -376,7 +384,6 @@ This keyword causes a body to be executed after other packages/features are load
                               '("s" . meow-line)
                               '("S" . meow-kmacro-lines)
                               '("t" . meow-till)
-                              '("T" . meow-till-expand)
                               '("u" . meow-undo)
                               '("U" . undo-redo)
                               '("v" . meow-visit)
@@ -386,9 +393,16 @@ This keyword causes a body to be executed after other packages/features are load
                               '("x" . meow-delete)
                               '("X" . meow-backward-delete)
                               '("y" . meow-save)
-                              '("Y" . meow-sync-grab)
-                              '("z" . meow-pop-all-selection)
-                              '("Z" . meow-pop-search)
+                              ;; '("Y" . meow-sync-grab)
+                              '("z a" . origami-recursively-toggle-node)
+                              ;; '("z r" .)
+                              ;; '("z m" .)
+                              '("z R" . origami-open-all-nodes)
+                              '("z M" . origami-close-all-nodes)
+                              ;; '("z R" .)
+                              ;; '("z M" .)
+                              ;; '("z" . meow-pop-all-selection)
+                              ;; '("Z" . meow-pop-search)
                               '("&" . meow-query-replace)
                               '("%" . meow-query-replace-regexp)
                               '("-" . negative-argument)
@@ -397,9 +411,7 @@ This keyword causes a body to be executed after other packages/features are load
                               '("}" . meow-bounds-of-thing)
                               '("[" . meow-beginning-of-thing)
                               '("]" . meow-end-of-thing)
-                              '("<" . sort-tab-select-prev-tab)
-                              '(">" . sort-tab-select-next-tab)
-                              '("." . repeat)
+                              ;; '("." . repeat)
                               '("," . meow-join)
                               '("\\" . quoted-insert)
                               ;; '("<escape>" . meow-cancel)
@@ -430,11 +442,6 @@ This keyword causes a body to be executed after other packages/features are load
 #+begin_src elisp
   ;; lewisliu
   (meow-leader-define-key
-   ;; youdao
-   ;; '("e y p" . youdao-dictionary-search-at-point-posframe)
-   ;; '("e y s" . youdao-dictionary-search)
-   ;; '("e y i" . youdao-dictionary-search-from-input)
-   ;; '("e y r" . youdao-dictionary-search-and-replace)
    '("e y p" . my-gts-translate-posframe)
    '("e y i" . gts-do-translate)
    ;; citre
@@ -1004,9 +1011,10 @@ popper 用来控制临时 buffer 的弹出, 保证它们不会破坏已有的 wi
              blamer-min-offset 70)
     )
 #+end_src
-* 程序语言
-** elisp
-*** helpful
+* Program
+** Language
+*** elisp
+**** helpful
 #+begin_src elisp
   (setup (:pkg helpful)
     (if (version< emacs-version "28.1")
@@ -1020,23 +1028,44 @@ popper 用来控制临时 buffer 的弹出, 保证它们不会破坏已有的 wi
              "C-h F" #'helpful-function
              "C-h C" #'helpful-command))
 #+end_src
-*** elisp-demos
+**** elisp-demos
 #+begin_src elisp
   (setup (:pkg elisp-demos)
     (advice-add 'helpful-update :after #'elisp-demos-advice-helpful-update)
     )
 #+end_src
-*** elispfl
+**** elispfl
 #+begin_src elisp
   (setup (:pkg elispfl :host github :repo "cireu/elispfl")
     (:hook-into emacs-lisp-mode ielm)
     )
 #+end_src
-** quickrun
+*** graphviz-dot-mode
+#+begin_src elisp
+  (setup (:pkg graphviz-dot-mode)
+    (:file-match "\\.dot\\'")
+    (:option graphviz-dot-indent-width 4)
+    (:when-loaded
+      (require 'company-graphviz-dot)
+      )
+    )
+#+end_src
+*** beancount
+#+begin_src elisp
+  (setup (:pkg beancount :host github :repo "beancount/beancount-mode")
+    (:file-match "\\.beancount\\'"))
+#+end_src
+*** latex
+#+begin_src elisp
+  (setup (:pkg cdlatex))
+  (setup (:pkg auctex))
+#+end_src
+** Useful programing tools
+*** quickrun
 #+begin_src elisp
   (setup (:pkg quickrun))
 #+end_src
-** tree-sitter
+*** tree-sitter
 #+begin_src elisp :tangle no
   (setup (:pkg tree-sitter)
     ;; (:hook-into prog-mode)
@@ -1048,8 +1077,8 @@ popper 用来控制临时 buffer 的弹出, 保证它们不会破坏已有的 wi
     (setup (:pkg tree-sitter-langs))
 
 #+end_src
-** lsp mode
-*** eglot
+*** lsp mode
+**** eglot
 #+begin_src elisp
   ;; use built-in package dep
   (setup (:pkg project :type built-in))
@@ -1076,7 +1105,7 @@ popper 用来控制临时 buffer 的弹出, 保证它们不会破坏已有的 wi
   ;;     ))
 
 #+end_src
-*** lsp-org-special
+**** lsp-org-special
 #+begin_src elisp :tangle no
   (cl-defmacro lsp-org-babel-enable (lang)
     "Support LANG in org source code block."
@@ -1107,7 +1136,7 @@ popper 用来控制临时 buffer 的弹出, 保证它们不会破坏已有的 wi
   (dolist (lang org-babel-lang-list)
     (eval `(lsp-org-babel-enable ,lang)))
 #+end_src
-** conda
+*** conda
 #+begin_src elisp
   (setup (:pkg conda)
     ;; (:delay)
@@ -1129,7 +1158,7 @@ popper 用来控制临时 buffer 的弹出, 保证它们不会破坏已有的 wi
       )
     )
 #+end_src
-** citre
+*** citre
 #+begin_src elisp
   (setup (:pkg citre)
     ;; This is needed in `:init' block for lazy load to work.
@@ -1144,33 +1173,13 @@ popper 用来控制临时 buffer 的弹出, 保证它们不会破坏已有的 wi
      ;; certain modes (like `prog-mode'), set it like this.
      citre-auto-enable-citre-mode-modes '(prog-mode)))
 #+end_src
-** symbol-overlay
+*** symbol-overlay
 #+begin_src elisp
   (setup (:pkg symbol-overlay)
     (:autoload symbol-overlay-put)
     )
 #+end_src
-** graphviz-dot-mode
-#+begin_src elisp
-  (setup (:pkg graphviz-dot-mode)
-    (:file-match "\\.dot\\'")
-    (:option graphviz-dot-indent-width 4)
-    (:when-loaded
-      (require 'company-graphviz-dot)
-      )
-    )
-#+end_src
-** beancount
-#+begin_src elisp
-  (setup (:pkg beancount :host github :repo "beancount/beancount-mode")
-    (:file-match "\\.beancount\\'"))
-#+end_src
-** latex
-#+begin_src elisp
-  (setup (:pkg cdlatex))
-  (setup (:pkg auctex))
-#+end_src
-** eglot-ltex
+*** eglot-ltex
 eglot client leveraging LTEX Language Server.
 #+begin_src elisp
   (setup (:pkg eglot-ltex :host github :repo "emacs-languagetool/eglot-ltex")
@@ -1181,6 +1190,13 @@ eglot client leveraging LTEX Language Server.
                        ))
         )
       )
+#+end_src
+*** Code toggle with origami
+#+begin_src elisp
+  (setup (:pkg origami)
+    (:autoload origami-recursively-toggle-node)
+    (:when-loaded
+      (global-origami-mode)))
 #+end_src
 * Org Mode
 ** org-mode
