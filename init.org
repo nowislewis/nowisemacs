@@ -429,7 +429,6 @@ This keyword causes a body to be executed after other packages/features are load
     ;; 如果你需要自动的 mode-line 设置（如果需要自定义见下文对 `meow-indicator' 说明）
     ;; (meow-setup-indicator)
     ;; (setq which-key-show-transient-maps t)
-
     )
 #+end_src
 ** which-key
@@ -639,8 +638,7 @@ This keyword causes a body to be executed after other packages/features are load
                                )
              ;; dashboard-set-heading-icons t
              dashboard-center-content t
-             dashboard-set-init-info t
-             )
+             dashboard-set-init-info t)
     (dashboard-setup-startup-hook))
 #+end_src
 ** doom-modeline
@@ -733,8 +731,7 @@ This keyword causes a body to be executed after other packages/features are load
     (setq consult-project-root-function
           (lambda ()
             (when-let (project (project-current))
-              (car (project-roots project)))))
-    )
+              (car (project-roots project))))))
 #+end_src
 *** search other cwd
 #+begin_src elisp
@@ -781,8 +778,7 @@ This keyword causes a body to be executed after other packages/features are load
      corfu-quit-no-match t        ;; Automatically quit if there is no match
      corfu-preview-current nil    ;; Disable current candidate preview
      corfu-echo-documentation nil ;; Disable documentation in the echo area
-     corfu-auto-prefix 2
-     )
+     corfu-auto-prefix 2)
     (:with-map corfu-map
       (:bind [tab] corfu-next
              [backtab] corfu-previous
