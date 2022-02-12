@@ -1584,9 +1584,7 @@ among all the files in org-roam in a single agenda-view. The code was borrowed f
 #+begin_src elisp
   (setup (:pkg company-english-helper :host github
                :repo "manateelazycat/company-english-helper")
-    (:autoload toggle-company-english-helper)
-    (:when-loaded
-      (simulate-company-with-corfu))
+    (:autoload toggle-company-english-helper))
 #+end_src
 * 阅读
 ** pdf-tools
