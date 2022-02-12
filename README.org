@@ -17,11 +17,13 @@ It's designed by following principles:
      can quickly handle the configuration cycle of a new or existing package. At the same time, users are encouraged to get the real native code
      everywhere by using =emacs-lisp-macroexpand=.
 ** Features
-+ Affected by lazycat-emacs, there is a clear process chain in nowisemacs
-+ Writing on the fly with a full configured org-mode, includes beautiful interfaces, a deep integration with org-roam
++ Affected by lazycat-emacs, there is a clear process chain in nowisemacs.
++ Easy to expand new features, easy to understand the framework.
++ Writing on the fly with a full configured org-mode, includes beautiful interfaces, a deep integration with org-roam.
   and org-agenda to help take back-notes and manage daily work, many useful English auxiliary writing tools and so on.
 + Universal programming solution including completion, jump, search under different path or files. With the help of *Language Server Protocol* powered by Microsoft and the great ctags
   front-end *citre*, users can easily use and expand almost all programming languages under emacs.
++ Pinyin search everywhere powered by PYIM, orderless completion.
 ** Ideas behind nowisemacs
 *** TL ; NR
 Concise + High maintainability
