@@ -87,6 +87,9 @@ after macro-expand is almost the same as native methods. So =setup= is also clea
 
 The function of =setup= is to turn these repeated codes into simple calls, which are equivalent to defining one place, but
 can be used everywhere.
+
+What's more, =setup= can easily change the code context such as keymap context or hook context. It's easy to get complex
+configuration clear.
 ** How to become a proficient user in emacs
 I would like to first give my own experience through these difficulties for beginners:
 
