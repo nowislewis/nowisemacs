@@ -888,17 +888,6 @@ popper 用来控制临时 buffer 的弹出, 保证它们不会破坏已有的 wi
 #+begin_src elisp
   (setup (:pkg diredfl)
     (:hook-into dired-mode))
-
-  (progn
-    (add-hook 'diredfl-mode-hook #'dirvish)
-    (progn
-      (autoload 'test-command "diredfl" nil t))
-    (eval-after-load 'diredfl
-      #'(lambda nil
-          (define-key diredfl-mode-map "h" #'test-command)))
-    (eval-after-load 'diredfl
-      #'(lambda nil
-          (define-key dired-mode-map "	" #'dired-subtree-cycle))))
 #+end_src
 *** dired-subtree
 #+begin_src elisp
@@ -906,9 +895,7 @@ popper 用来控制临时 buffer 的弹出, 保证它们不会破坏已有的 wi
     (:load-after dired)
     (:option dired-subtree-line-prefix "     ")
     (:with-map dired-mode-map
-      (:bind "TAB" dired-subtree-cycle)
-      )
-    )
+      (:bind "TAB" dired-subtree-cycle)))
 #+end_src
 *** fd-dired
 #+begin_src elisp
