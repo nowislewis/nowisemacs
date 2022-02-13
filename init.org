@@ -519,8 +519,7 @@ This keyword causes a body to be executed after other packages/features are load
   ;; (set-face-attribute 'default nil :family "yaheiInconsolata" :height 140)
   ;; (set-face-attribute 'default nil :family "InconsolataGo QiHei NF" :height 140)
   (set-face-attribute 'default nil :family "Sarasa Mono SC Nerd" :height 140)
-  ;; Proportionately spaced typeface
-  ;; (set-face-attribute 'variable-pitch nil :family "Helvetica" :height 1.0)
+  ;; (set-face-attribute 'default nil :family "Helvetica" :height 140)
 
   ;; Monospaced typeface
   ;; (set-face-attribute 'fixed-pitch nil :family "yaheiInconsolata" :height 1.0)
@@ -956,7 +955,7 @@ popper 用来控制临时 buffer 的弹出, 保证它们不会破坏已有的 wi
     )
 #+end_src
 * shell
-** aweeshell
+** aweshell
 #+begin_src elisp
   (setup (:pkg aweshell :host github :repo "manateelazycat/aweshell")
     (:autoload aweshell-toggle)
