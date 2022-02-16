@@ -28,7 +28,7 @@
 
   ;; (global-display-line-numbers-mode 1)         ; 在 Window 显示行号
   (setq display-line-numbers-width-start t)
-  ;; (pixel-scroll-precision-mode t)
+  ;; (pixel-scroll-precision-mode t) ;; 最近发现和 pdf-continuous-view-mode 工作不协调
 #+end_src
 ** Startup Performance
 Make startup faster by reducing the frequency of garbage collection
