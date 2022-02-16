@@ -28,7 +28,7 @@
 
   ;; (global-display-line-numbers-mode 1)         ; 在 Window 显示行号
   (setq display-line-numbers-width-start t)
-  (pixel-scroll-precision-mode t)
+  ;; (pixel-scroll-precision-mode t)
 #+end_src
 ** Startup Performance
 Make startup faster by reducing the frequency of garbage collection
@@ -236,12 +236,9 @@ This keyword causes a body to be executed after other packages/features are load
           (add-to-list 'body 'progn))
         body))
     :documentation "Load the current feature after FEATURES.")
-
-  ;; (setup (:pkg company-english-helper :host github
-  ;;            :repo "manateelazycat/company-english-helper")
-  ;;        (:autoload "company-english-helper" toggle-english-helper))
 #+end_src
 * gcmh
+Enforce a sneaky Garbage Collection strategy to minimize GC interference with user activity.
 #+begin_src elisp
   (setup (:pkg gcmh)
     (:option gcmh-idle-delay 5
@@ -249,6 +246,7 @@ This keyword causes a body to be executed after other packages/features are load
     (gcmh-mode 1))
 #+end_src
 * Keyboard Bindings
+I used to be a vim(evil) user, but now I use meow to manage all my keys
 ** meow
 #+begin_src elisp
   (setup (:pkg meow)
@@ -457,7 +455,8 @@ This keyword causes a body to be executed after other packages/features are load
    '("s b" . consult-buffer)
    '("s d" . consult-ripgrep)
    '("s D" . lewis/ripgrep-search-other-dir)
-   '("s f" . consult-find))
+   '("s f" . consult-find)
+   '("s F" . lewis/find-file-other-dir))
 
 
   (defun find-config-file()
@@ -507,7 +506,7 @@ This keyword causes a body to be executed after other packages/features are load
    )
   (meow-leader-define-key
    ;; time
-   '("t t" . org-pomodoro)
+   ;; '("t t" . org-pomodoro)
    ;;a agenda
    '("a a" . org-agenda)
    ;;w workspace
@@ -519,14 +518,18 @@ This keyword causes a body to be executed after other packages/features are load
   ;; (set-face-attribute 'default nil :family "yaheiInconsolata" :height 140)
   ;; (set-face-attribute 'default nil :family "InconsolataGo QiHei NF" :height 140)
   (set-face-attribute 'default nil :family "Sarasa Mono SC Nerd" :height 140)
+  ;; (set-face-attribute 'default nil :family "Consolas" :height 140)
   ;; (set-face-attribute 'default nil :family "Helvetica" :height 140)
 
   ;; Monospaced typeface
   ;; (set-face-attribute 'fixed-pitch nil :family "yaheiInconsolata" :height 1.0)
   ;; (set-face-attribute 'fixed-pitch nil :family "InconsolataGo QiHei NF" :height 1.0)
   (set-face-attribute 'fixed-pitch nil :family "Sarasa Mono SC Nerd" :height 1.0)
+  ;; (set-face-attribute 'fixed-pitch nil :family "Consolas" :height 1.0)
+
 #+end_src
 ** Theme
+Modus-themes is great especailly for org mode
 #+begin_src elisp
   (setup (:pkg modus-themes :type built-in)
     (:option modus-themes-org-blocks 'tinted-background
@@ -540,6 +543,7 @@ This keyword causes a body to be executed after other packages/features are load
     (load-theme 'modus-vivendi))
 #+end_src
 ** line number
+only enable line number in some modes, borrowed from lazycat-emacs
 #+begin_src elisp
   (setq line-number-display-limit large-file-warning-threshold)
   (setq line-number-display-limit-width 1000)
@@ -590,6 +594,7 @@ This keyword causes a body to be executed after other packages/features are load
     (add-hook hook (lambda () (display-line-numbers-mode))))
 #+end_src
 ** all-the-icons
+I'm thinking about removing this package, but it's pretty good so far
 *** all-the-icons
 #+begin_src elisp
   (setup (:pkg all-the-icons)
@@ -599,11 +604,13 @@ This keyword causes a body to be executed after other packages/features are load
     (add-hook 'marginalia-mode-hook #'all-the-icons-completion-marginalia-setup))
 #+end_src
 ** rainbow-delimiters
+rainbow-delimiters is a "rainbow parentheses"-like mode which highlights delimiters such as parentheses, brackets or braces according to their depth.
 #+begin_src elisp
   (setup (:pkg rainbow-delimiters)
     (:hook-into prog-mode))
 #+end_src
 ** diff-hl
+diff-hl-mode highlights uncommitted changes on the left side of the window (area also known as the "gutter"), allows you to jump between and revert them selectively.
 #+begin_src elisp
   (setup (:pkg diff-hl)
     (global-diff-hl-mode)
@@ -720,6 +727,12 @@ This keyword causes a body to be executed after other packages/features are load
     (interactive)
     (let ((current-prefix-arg '(-1)))
       (call-interactively 'consult-ripgrep)))
+
+  (defun lewis/find-file-other-dir()
+    (interactive)
+    (let ((current-prefix-arg '(-1)))
+      (call-interactively 'consult-find)))
+
 #+end_src
 ** Marginalia
 #+begin_src elisp
@@ -800,7 +813,7 @@ This keyword causes a body to be executed after other packages/features are load
   (winner-mode t)
 #+end_src
 ** popper
-popper 用来控制临时 buffer 的弹出, 保证它们不会破坏已有的 windows 结构
+Popper is a minor-mode to tame the flood of ephemeral windows Emacs produces, while still keeping them within arm’s reach.
 #+begin_src elisp
   (setup (:pkg popper)
     (:option popper-reference-buffers         '("\\*Messages\\*"
@@ -819,14 +832,15 @@ popper 用来控制临时 buffer 的弹出, 保证它们不会破坏已有的 wi
     (popper-mode +1)
     (popper-echo-mode +1))
 #+end_src
-** 移动
+** Move
 *** avy
-全局任意位置跳跃
+Jump anywhere in the world
 #+begin_src elisp
   (setup (:pkg avy)
     (:global "M-j" avy-goto-word-1))
 #+end_src
 *** jump-back
+borrowed from citre, now you can always jump-back use "M-,"
 #+begin_src elisp
   (defun my--push-point-to-xref-marker-stack (&rest r)
     (xref-push-marker-stack (point-marker))) ;; must autoload this command in xref
@@ -839,7 +853,7 @@ popper 用来控制临时 buffer 的弹出, 保证它们不会破坏已有的 wi
                   citre-jump))
     (advice-add func :before 'my--push-point-to-xref-marker-stack))
 #+end_src
-* 输入
+* Input
 ** pyim
 #+begin_src elisp
   (setup (:pkg posframe))
@@ -879,12 +893,14 @@ popper 用来控制临时 buffer 的弹出, 保证它们不会破坏已有的 wi
 * File and Browsing
 ** file browsing
 *** dirvish
+Dirvish is a minimalistic file manager based on Dired. It's fast
 #+begin_src elisp
   (setup (:pkg dirvish)
     (:when-loaded
       (dirvish-override-dired-mode)))
 #+end_src
 *** diredfl
+This is adapted from the extra font lock rules provided by Drew Adams' dired+ package, but published via a modern means, and with support for older Emacsen removed.
 #+begin_src elisp
   (setup (:pkg diredfl)
     (:hook-into dired-mode))
@@ -898,6 +914,7 @@ popper 用来控制临时 buffer 的弹出, 保证它们不会破坏已有的 wi
       (:bind "TAB" dired-subtree-cycle)))
 #+end_src
 *** fd-dired
+I rarely used this package recently, I used consult-file instead.
 #+begin_src elisp
   (setup (:pkg fd-dired))
 #+end_src
@@ -922,7 +939,6 @@ popper 用来控制临时 buffer 的弹出, 保证它们不会破坏已有的 wi
   (setup (:pkg perspective)
     (:option persp-initial-frame-name "Main"
              persp-mode-prefix-key ""
-             ;; persp-mode-prefix-key
              )
     ;; Running `persp-mode' multiple times resets the perspective list...
     (unless (equal persp-mode t)
@@ -934,12 +950,6 @@ popper 用来控制临时 buffer 的弹出, 保证它们不会破坏已有的 wi
 (setq global-auto-revert-non-file-buffers t)
 ;; Revert buffers when the underlying file has changed
 (global-auto-revert-mode 1)
-#+end_src
-** bufler
-#+begin_src elisp
-  (setup (:pkg bufler :host github :repo "alphapapa/bufler.el")
-    (:global "C-x C-b" #'bufler)
-    )
 #+end_src
 * shell
 ** aweshell
@@ -960,6 +970,7 @@ popper 用来控制临时 buffer 的弹出, 保证它们不会破坏已有的 wi
   (setup (:pkg vterm))
 #+end_src
 ** dtache
+Run and interact with detached shell commands
 #+begin_src elisp
 (setup (:pkg dtache))
 #+end_src
@@ -969,6 +980,7 @@ popper 用来控制临时 buffer 的弹出, 保证它们不会破坏已有的 wi
   (setup (:pkg magit))
 #+end_src
 ** blamer
+Show git blame info about current line
 #+begin_src elisp
   (setup (:pkg blamer :host github :repo "artawower/blamer.el")
     (:option blamer-idle-time 0.3
@@ -983,7 +995,7 @@ popper 用来控制临时 buffer 的弹出, 保证它们不会破坏已有的 wi
     (if (version< emacs-version "28.1")
         ;; REVIEW See Wilfred/elisp-refs#35. Remove once fixed upstream.
         nil
-      (defvar read-symbol-positions-list nil))
+      (defvar read-symbol-positions-list nil));; to fix issue
     (:global "C-h f" #'helpful-callable
              "C-h v" #'helpful-variable
              "C-h k" #'helpful-key
@@ -1013,6 +1025,7 @@ popper 用来控制临时 buffer 的弹出, 保证它们不会破坏已有的 wi
     )
 #+end_src
 *** beancount
+Emacs major-mode to work with Beancount ledger files
 #+begin_src elisp
   (setup (:pkg beancount :host github :repo "beancount/beancount-mode")
     (:file-match "\\.beancount\\'"))
@@ -1053,6 +1066,7 @@ popper 用来控制临时 buffer 的弹出, 保证它们不会破坏已有的 wi
   (setup (:pkg eglot))
 #+end_src
 **** lsp-org-special
+enable eglot in org-src mode
 #+begin_src elisp
   (cl-defmacro lsp-org-babel-enable (lang)
     "Support LANG in org source code block."
@@ -1105,6 +1119,7 @@ popper 用来控制临时 buffer 的弹出, 保证它们不会破坏已有的 wi
       ))
 #+end_src
 *** citre
+Citre is an advanced Ctags (or actually, readtags) frontend for Emacs.
 #+begin_src elisp
   (setup (:pkg citre)
     ;; This is needed in `:init' block for lazy load to work.
@@ -1120,6 +1135,7 @@ popper 用来控制临时 buffer 的弹出, 保证它们不会破坏已有的 wi
      citre-auto-enable-citre-mode-modes '(prog-mode)))
 #+end_src
 *** symbol-overlay
+Highlight symbols with keymap-enabled overlays
 #+begin_src elisp
   (setup (:pkg symbol-overlay)
     (:autoload symbol-overlay-put))
@@ -1483,7 +1499,7 @@ among all the files in org-roam in a single agenda-view. The code was borrowed f
 #+end_src
 
 ** org-pomodoro
-#+begin_src elisp
+#+begin_src elisp :tangle no
   (setup (:pkg org-pomodoro)
     (:option org-pomodoro-finished-sound "~/Documents/emacs/pyim-dict/applaud.wav")
     )
@@ -1549,8 +1565,9 @@ among all the files in org-roam in a single agenda-view. The code was borrowed f
   (add-hook 'TeX-after-compilation-finished-functions
             #'TeX-revert-document-buffer)
 
-  (setup (:pkg pdf-continuous-scroll-mode :host github :repo "dalanicolai/pdf-continuous-scroll-mode.el")
-    (add-hook 'pdf-view-mode-hook 'pdf-continuous-scroll-mode))
+  (setup (:pkg pdf-continuous-scroll-mode :host github :repo "dalanicolai/pdf-continuous-scroll-mode.el"))
+  (require 'pdf-continuous-scroll-mode)
+
 #+end_src
 ** org-noter
 #+begin_src elisp
@@ -1589,12 +1606,13 @@ among all the files in org-roam in a single agenda-view. The code was borrowed f
 
 #+end_src
 ** darkroom
+Simple distraction-free editing. I use darkroom instead of writeroom because it's more simple
 #+begin_src elisp
   (setup (:pkg darkroom))
 #+end_src
 ** edit with emacs everywhere
 #+begin_src elisp
-    (load "~/.hammerspoon/Spoons/editWithEmacs.spoon/hammerspoon.el")
+  (load "~/.hammerspoon/Spoons/editWithEmacs.spoon/hammerspoon.el")
   (setq hammerspoon-buffer-mode 'org-mode)
 #+end_src
 ** Simulate company with corfu
