@@ -45,17 +45,20 @@ Make startup faster by reducing the frequency of garbage collection
 #+end_src
 ** generic
 #+begin_src elisp
-  ;; 定义一些启动目录，方便下次迁移修改
-  (defvar nowisemacs-root-dir (file-truename "~/nowisemacs/"))
-  (defvar nowisemacs-config-dir (concat nowisemacs-root-dir "init.org"))
-  (defvar nowisemacs-extension-dir (concat nowisemacs-root-dir "/extensions"))
+    ;; 定义一些启动目录，方便下次迁移修改
+    (defvar nowisemacs-root-dir (file-truename "~/nowisemacs/"))
+    (defvar nowisemacs-config-dir (concat nowisemacs-root-dir "init.org"))
+    (defvar nowisemacs-extension-dir (concat nowisemacs-root-dir "/extensions"))
 
-  (recentf-mode t)
-  (setq use-short-answers t)
-  (blink-cursor-mode -1)                  ;指针不闪动
-  (setq ring-bell-function 'ignore)       ;关闭烦人的出错时的提示声
-  (set-default-coding-systems 'utf-8)
-  (global-hl-line-mode)
+    (recentf-mode t)
+    (setq use-short-answers t)
+    (blink-cursor-mode -1)                  ;指针不闪动
+    (setq ring-bell-function 'ignore)       ;关闭烦人的出错时的提示声
+    (set-default-coding-systems 'utf-8)
+    (global-hl-line-mode)
+
+    (setq-default indent-tabs-mode nil)
+  	(setq-default tab-width 4)
 #+end_src
 The following content is not enabled yet, because I want to minimize unnecessary settings as much as possible
 #+begin_src elisp :tangle no
@@ -538,8 +541,7 @@ Modus-themes is great especailly for org mode
              modus-themes-intense-markup t
              modus-themes-hl-line '(intense accented)
              modus-themes-paren-match '(intense bold underline)
-             modus-themes-subtle-line-numbers t
-             )
+             modus-themes-subtle-line-numbers t)
     (load-theme 'modus-vivendi))
 #+end_src
 ** line number
@@ -639,6 +641,90 @@ diff-hl-mode highlights uncommitted changes on the left side of the window (area
              doom-modeline-unicode-fallback t)
     (:hook-into after-init))
 #+end_src
+** The built-in tab line mode
+Borrowed from https://github.com/jixiuf/vmacs/blob/master/conf/conf-tabs.el
+#+begin_src elisp
+  (setup tab-line-mode
+    (:option tab-line-new-button-show nil  ;; do not show add-new button
+             tab-line-close-button-show nil  ;; do not show close button
+             tab-line-separator (propertize ">" 'face  '(foreground-color . "cyan")))
+    (global-tab-line-mode t))
+  (global-set-key  (kbd "s-C-M-j") 'vmacs-prev-tab) ;H-k default C-x left
+  (global-set-key  (kbd "s-C-M-k") 'vmacs-next-tab)     ;H-j default C-x right
+  (defun vmacs-prev-tab()
+    (interactive)
+    (let ((buffers (tab-line-tabs-window-buffers)))
+      (if (eq (car (last buffers)) (current-buffer))
+          (tab-line-select-tab-buffer (nth 0 buffers)(selected-window))
+        (call-interactively 'previous-buffer))))
+
+  (defun vmacs-next-tab()
+    (interactive)
+    (let ((buffers (tab-line-tabs-window-buffers)))
+      (if (eq (nth 0 buffers) (current-buffer))
+          (tab-line-select-tab-buffer (car (last buffers)) (selected-window))
+        (call-interactively 'next-buffer))))
+
+  (setq switch-to-prev-buffer-skip #'vmacs-switch-to-prev-buffer-skip)
+  ;; switch-to-prev-buffer 与 switch-to-next-buffer 时 skip 特定的buffers
+  ;;而 tab-line-switch-to-prev/next-tab 恰好使用了上面两个函数
+  (defun vmacs-switch-to-prev-buffer-skip(win buf bury-or-kill)
+    (when (member this-command '(next-buffer previous-buffer
+                                             vmacs-prev-tab
+                                             vmacs-next-tab
+                                             tab-line-switch-to-prev-tab
+                                             tab-line-switch-to-next-tab))
+      (cond
+       ((vmacs-vterm-p)                ;当前buffer是vterm
+        (not (vmacs-vterm-p buf)))     ;若buf 不是vterm,则skip
+       ((vmacs-boring-buffer-p (current-buffer))
+        (not (vmacs-boring-buffer-p buf)))
+       (t                                 ;当前buffer是正常buffer
+        (or (vmacs-boring-buffer-p buf)   ;若buf 是boring buf 或vterm，则跳过
+            (vmacs-vterm-p buf))))))
+  (defadvice tab-line-tabs-window-buffers (around skip-buffer activate)
+    "Return a list of tabs that should be displayed in the tab line
+  but skip uninterested buffers."
+    (let ((buffers (reverse ad-do-it)))
+      (cond
+       ((vmacs-vterm-p)               ;当前buffer是vterm
+        ;; 只返回vterm buffer 作为当前tab group 的tab
+        (setq ad-return-value (seq-filter #'vmacs-vterm-p buffers)))
+       ((vmacs-boring-buffer-p (current-buffer))
+        (setq ad-return-value (seq-filter #'vmacs-boring-buffer-p buffers)))
+       (t
+        ;; skip boring buffer 及vterm
+        (setq buffers (seq-remove #'vmacs-boring-buffer-p buffers))
+        (setq ad-return-value  (seq-remove #'vmacs-vterm-p buffers))))))
+
+  (defun vmacs-vterm-p(&optional buf)
+    (eq (buffer-local-value 'major-mode (or buf (current-buffer))) 'vterm-mode))
+
+  (defun vmacs-boring-buffer-p(&optional buf)
+    (string-match-p (rx (or
+                         "\*Async-native-compile-log\*"
+                         "magit"
+                         "\*company-documentation\*"
+                         "\*eaf" "\*eldoc" "\*Launch " "*dap-"
+                         "*EGLOT " "\*Flymake log\*"
+                         "\*gopls::stderr\*" "\*gopls\*"
+                         "\*Compile-Log\*" "*Backtrace*"
+                         "*Package-Lint*" "\*sdcv\*" "\*tramp"
+                         "\*lsp-log\*" "\*tramp" "\*Ibuffer\*"
+                         "\*Help\*" "\*ccls" "\*vc"
+                         "\*xref" "\*Warnings*" "\*Http"
+                         "\*Async Shell Command\*"
+                         "\*Shell Command Output\*"
+                         "\*Calculator\*" "\*Calc "
+                         "\*Flycheck error messages\*"
+                         "\*Gofmt Errors\*"
+                         "\*Ediff" "\*sdcv\*"
+                         "\*Org PDF LaTex Output\*"
+                         "\*Org Export"
+                         "\*osx-dictionary\*" "\*Messages\*"
+                         ))
+                    (buffer-name buf)))
+#+end_src
 * General Configuration
 ** backup, super-save
 #+begin_src elisp
@@ -674,7 +760,6 @@ diff-hl-mode highlights uncommitted changes on the left side of the window (area
     (when (memq window-system '(mac ns x))
       (exec-path-from-shell-initialize)))
 #+end_src
-
 * 补全
 ** Completions with Vertico
 #+begin_src elisp
@@ -827,8 +912,7 @@ Popper is a minor-mode to tame the flood of ephemeral windows Emacs produces, wh
              )
     (:global "C-`" popper-toggle-latest
              "M-`" popper-cycle
-             "C-M-`" popper-toggle-type
-             )
+             "C-M-`" popper-toggle-type)
     (popper-mode +1)
     (popper-echo-mode +1))
 #+end_src
@@ -991,17 +1075,17 @@ Show git blame info about current line
 *** elisp
 **** helpful
 #+begin_src elisp
-  (setup (:pkg helpful)
-    (if (version< emacs-version "28.1")
-        ;; REVIEW See Wilfred/elisp-refs#35. Remove once fixed upstream.
-        nil
-      (defvar read-symbol-positions-list nil));; to fix issue
-    (:global "C-h f" #'helpful-callable
-             "C-h v" #'helpful-variable
-             "C-h k" #'helpful-key
-             "C-c C-d" #'helpful-at-point
-             "C-h F" #'helpful-function
-             "C-h C" #'helpful-command))
+  ;; (setup (:pkg helpful)
+  ;;   (if (version< emacs-version "28.1")
+  ;;       ;; REVIEW See Wilfred/elisp-refs#35. Remove once fixed upstream.
+  ;;       nil
+  ;;     (defvar read-symbol-positions-list nil));; to fix issue
+  ;;   (:global "C-h f" #'helpful-callable
+  ;;            "C-h v" #'helpful-variable
+  ;;            "C-h k" #'helpful-key
+  ;;            "C-c C-d" #'helpful-at-point
+  ;;            "C-h F" #'helpful-function
+             ;; "C-h C" #'helpful-command))
 #+end_src
 **** elisp-demos
 #+begin_src elisp
