@@ -651,7 +651,7 @@ Borrowed from https://github.com/jixiuf/vmacs/blob/master/conf/conf-tabs.el
   (setup tab-line-mode
     (:option tab-line-new-button-show nil  ;; do not show add-new button
              tab-line-close-button-show nil  ;; do not show close button
-             tab-line-separator (propertize ">" 'face  '(foreground-color . "cyan")))
+             tab-line-separator (propertize "|" 'face  '(foreground-color . "cyan")))
     (global-tab-line-mode t))
   (global-set-key  (kbd "s-C-M-j") 'vmacs-prev-tab) ;H-k default C-x left
   (global-set-key  (kbd "s-C-M-k") 'vmacs-next-tab)     ;H-j default C-x right
@@ -725,7 +725,7 @@ Borrowed from https://github.com/jixiuf/vmacs/blob/master/conf/conf-tabs.el
                          "\*Ediff" "\*sdcv\*"
                          "\*Org PDF LaTex Output\*"
                          "\*Org Export"
-                         "\*osx-dictionary\*" "\*Messages\*"
+                         "\*osx-dictionary\*" "\*Messages\*" "\*"
                          ))
                     (buffer-name buf)))
 #+end_src
@@ -941,13 +941,17 @@ borrowed from citre, now you can always jump-back use "M-,"
                   citre-jump))
     (advice-add func :before 'my--push-point-to-xref-marker-stack))
 #+end_src
+*** bookmark
+#+begin_src elisp
+  (setq bookmark-default-file "~/Documents/emacs/other-files/bookmarks")
+#+end_src
 * Input
 ** pyim
 #+begin_src elisp
   (setup (:pkg posframe))
   (setup (:pkg pyim)
-    (:option pyim-dicts '((:name "lewis_pyim_dict" :file "~/Documents/emacs/pyim-dict/lewis_pyim_dict.pyim")
-                          (:name "lewis_big_dict" :file "~/Documents/emacs/pyim-dict/pyim-bigdict.pyim.gz"))
+    (:option pyim-dicts '((:name "lewis_pyim_dict" :file "~/Documents/emacs/other-files/lewis_pyim_dict.pyim")
+                          (:name "lewis_big_dict" :file "~/Documents/emacs/other-files/pyim-bigdict.pyim.gz"))
              pyim-default-scheme 'quanpin
              pyim-punctuation-translate-p '(no yes auto)
              pyim-page-tooltip 'posframe
@@ -1577,7 +1581,7 @@ among all the files in org-roam in a single agenda-view. The code was borrowed f
 ** org-pomodoro
 #+begin_src elisp :tangle no
   (setup (:pkg org-pomodoro)
-    (:option org-pomodoro-finished-sound "~/Documents/emacs/pyim-dict/applaud.wav"))
+    (:option org-pomodoro-finished-sound "~/Documents/emacs/other-files/applaud.wav"))
 #+end_src
 ** ox-hugo
 #+begin_src elisp
