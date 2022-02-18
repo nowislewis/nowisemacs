@@ -1,6 +1,5 @@
 #+TITLE: Emacs Configuration
 #+PROPERTY: header-args:elisp :tangle ~/.emacs.d/init.el
-
 "Simulate company with corfu" is at the end of this file.
 * Startup config
 ** UI speed up
@@ -641,6 +640,11 @@ diff-hl-mode highlights uncommitted changes on the left side of the window (area
              doom-modeline-unicode-fallback t)
     (:hook-into after-init))
 #+end_src
+** hl-todo
+#+begin_src elisp
+  (setup (:pkg hl-todo)
+    (global-hl-todo-mode))
+#+end_src
 ** The built-in tab line mode
 Borrowed from https://github.com/jixiuf/vmacs/blob/master/conf/conf-tabs.el
 #+begin_src elisp
@@ -948,7 +952,7 @@ borrowed from citre, now you can always jump-back use "M-,"
              pyim-punctuation-translate-p '(no yes auto)
              pyim-page-tooltip 'posframe
              pyim-page-length 5
-             ;;              (setq-default pyim-punctuation-translate-p '(yes no auto))   ;使用全角标点。
+             ;; (setq-default pyim-punctuation-translate-p '(yes no auto))   ;使用全角标点。
              ;; (setq-default pyim-punctuation-translate-p '(no yes auto))   ;使用半角标点。
              ;; (setq-default pyim-punctuation-translate-p '(auto yes no))   ;中文使用全角标点，英文使用半角标点。
              )
@@ -971,8 +975,7 @@ borrowed from citre, now you can always jump-back use "M-,"
               (pyim-cregexp-build result))))
       (advice-add 'orderless-regexp :around #'my-orderless-regexp)
       )
-    (setq default-input-method "pyim")
-    )
+    (setq default-input-method "pyim"))
 #+end_src
 * File and Browsing
 ** file browsing
@@ -1009,9 +1012,7 @@ I rarely used this package recently, I used consult-file instead.
     (:autoload imenu-list-smart-toggle)
     (:option imenu-list-focus-after-activate t
              imenu-list-auto-resize t
-             imenu-list-position 'left
-             )
-    )
+             imenu-list-position 'left))
 #+end_src
 *** outshine
 #+begin_src elisp
@@ -1022,8 +1023,7 @@ I rarely used this package recently, I used consult-file instead.
 #+begin_src elisp
   (setup (:pkg perspective)
     (:option persp-initial-frame-name "Main"
-             persp-mode-prefix-key ""
-             )
+             persp-mode-prefix-key "")
     ;; Running `persp-mode' multiple times resets the perspective list...
     (unless (equal persp-mode t)
       (persp-mode)))
@@ -1046,8 +1046,7 @@ I rarely used this package recently, I used consult-file instead.
                               (setq-local corfu-quit-at-boundary t
                                           corfu-quit-no-match t
                                           corfu-auto nil)
-                              (corfu-mode))))
-    )
+                              (corfu-mode)))))
 #+end_src
 ** vterm
 #+begin_src elisp
@@ -1104,9 +1103,7 @@ Show git blame info about current line
     (:file-match "\\.dot\\'")
     (:option graphviz-dot-indent-width 4)
     (:when-loaded
-      (require 'company-graphviz-dot)
-      )
-    )
+      (require 'company-graphviz-dot)))
 #+end_src
 *** beancount
 Emacs major-mode to work with Beancount ledger files
@@ -1188,8 +1185,7 @@ enable eglot in org-src mode
     (:when-loaded
       (when (eq system-type 'darwin)
         (custom-set-variables '(conda-anaconda-home "/Users/liuyi/miniforge3"))
-        (setq conda-env-home-directory (expand-file-name "~/miniforge3/"))
-        )
+        (setq conda-env-home-directory (expand-file-name "~/miniforge3/")))
       (when (eq system-type 'gnu/linux)
         ;; 要用绝对路径
         (custom-set-variables '(conda-anaconda-home "/home/lewisliu/miniconda3"))
@@ -1231,9 +1227,7 @@ eglot client leveraging LTEX Language Server.
       (:option eglot-languagetool-server-path "~/Downloads/ltex-ls/")
       (:with-hook text-mode-hook
         (:hook (lambda ()
-                       (require 'eglot-ltex)
-                       ))
-        ))
+                       (require 'eglot-ltex)))))
 #+end_src
 *** Code toggle with origami
 #+begin_src elisp
@@ -1354,8 +1348,7 @@ eglot client leveraging LTEX Language Server.
 ** org-appear
 #+begin_src elisp
   (setup (:pkg org-appear :host github :repo "awth13/org-appear")
-    (:hook-into org-mode)
-    )
+    (:hook-into org-mode))
 #+end_src
 ** org-download
 #+begin_src elisp
@@ -1417,7 +1410,6 @@ eglot client leveraging LTEX Language Server.
             (t (concat (propertize filetitle 'face '(shadow italic))
                        separator (propertize (string-join olp " > ") 'face '(shadow italic))
                        separator title)))))
-
 
       (add-to-list 'display-buffer-alist
                    '("\\*org-roam\\*"
@@ -1585,8 +1577,7 @@ among all the files in org-roam in a single agenda-view. The code was borrowed f
 ** org-pomodoro
 #+begin_src elisp :tangle no
   (setup (:pkg org-pomodoro)
-    (:option org-pomodoro-finished-sound "~/Documents/emacs/pyim-dict/applaud.wav")
-    )
+    (:option org-pomodoro-finished-sound "~/Documents/emacs/pyim-dict/applaud.wav"))
 #+end_src
 ** ox-hugo
 #+begin_src elisp
@@ -1651,7 +1642,6 @@ among all the files in org-roam in a single agenda-view. The code was borrowed f
 
   (setup (:pkg pdf-continuous-scroll-mode :host github :repo "dalanicolai/pdf-continuous-scroll-mode.el"))
   (require 'pdf-continuous-scroll-mode)
-
 #+end_src
 ** org-noter
 #+begin_src elisp
