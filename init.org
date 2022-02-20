@@ -653,81 +653,6 @@ Borrowed from https://github.com/jixiuf/vmacs/blob/master/conf/conf-tabs.el
              tab-line-close-button-show nil  ;; do not show close button
              tab-line-separator (propertize "|" 'face  '(foreground-color . "cyan")))
     (global-tab-line-mode t))
-  (global-set-key  (kbd "s-C-M-j") 'vmacs-prev-tab) ;H-k default C-x left
-  (global-set-key  (kbd "s-C-M-k") 'vmacs-next-tab)     ;H-j default C-x right
-  (defun vmacs-prev-tab()
-    (interactive)
-    (let ((buffers (tab-line-tabs-window-buffers)))
-      (if (eq (car (last buffers)) (current-buffer))
-          (tab-line-select-tab-buffer (nth 0 buffers)(selected-window))
-        (call-interactively 'previous-buffer))))
-
-  (defun vmacs-next-tab()
-    (interactive)
-    (let ((buffers (tab-line-tabs-window-buffers)))
-      (if (eq (nth 0 buffers) (current-buffer))
-          (tab-line-select-tab-buffer (car (last buffers)) (selected-window))
-        (call-interactively 'next-buffer))))
-
-  (setq switch-to-prev-buffer-skip #'vmacs-switch-to-prev-buffer-skip)
-  ;; switch-to-prev-buffer 与 switch-to-next-buffer 时 skip 特定的buffers
-  ;;而 tab-line-switch-to-prev/next-tab 恰好使用了上面两个函数
-  (defun vmacs-switch-to-prev-buffer-skip(win buf bury-or-kill)
-    (when (member this-command '(next-buffer previous-buffer
-                                             vmacs-prev-tab
-                                             vmacs-next-tab
-                                             tab-line-switch-to-prev-tab
-                                             tab-line-switch-to-next-tab))
-      (cond
-       ((vmacs-vterm-p)                ;当前buffer是vterm
-        (not (vmacs-vterm-p buf)))     ;若buf 不是vterm,则skip
-       ((vmacs-boring-buffer-p (current-buffer))
-        (not (vmacs-boring-buffer-p buf)))
-       (t                                 ;当前buffer是正常buffer
-        (or (vmacs-boring-buffer-p buf)   ;若buf 是boring buf 或vterm，则跳过
-            (vmacs-vterm-p buf))))))
-  (defadvice tab-line-tabs-window-buffers (around skip-buffer activate)
-    "Return a list of tabs that should be displayed in the tab line
-  but skip uninterested buffers."
-    (let ((buffers (reverse ad-do-it)))
-      (cond
-       ((vmacs-vterm-p)               ;当前buffer是vterm
-        ;; 只返回vterm buffer 作为当前tab group 的tab
-        (setq ad-return-value (seq-filter #'vmacs-vterm-p buffers)))
-       ((vmacs-boring-buffer-p (current-buffer))
-        (setq ad-return-value (seq-filter #'vmacs-boring-buffer-p buffers)))
-       (t
-        ;; skip boring buffer 及vterm
-        (setq buffers (seq-remove #'vmacs-boring-buffer-p buffers))
-        (setq ad-return-value  (seq-remove #'vmacs-vterm-p buffers))))))
-
-  (defun vmacs-vterm-p(&optional buf)
-    (eq (buffer-local-value 'major-mode (or buf (current-buffer))) 'vterm-mode))
-
-  (defun vmacs-boring-buffer-p(&optional buf)
-    (string-match-p (rx (or
-                         "\*Async-native-compile-log\*"
-                         "magit"
-                         "\*company-documentation\*"
-                         "\*eaf" "\*eldoc" "\*Launch " "*dap-"
-                         "*EGLOT " "\*Flymake log\*"
-                         "\*gopls::stderr\*" "\*gopls\*"
-                         "\*Compile-Log\*" "*Backtrace*"
-                         "*Package-Lint*" "\*sdcv\*" "\*tramp"
-                         "\*lsp-log\*" "\*tramp" "\*Ibuffer\*"
-                         "\*Help\*" "\*ccls" "\*vc"
-                         "\*xref" "\*Warnings*" "\*Http"
-                         "\*Async Shell Command\*"
-                         "\*Shell Command Output\*"
-                         "\*Calculator\*" "\*Calc "
-                         "\*Flycheck error messages\*"
-                         "\*Gofmt Errors\*"
-                         "\*Ediff" "\*sdcv\*"
-                         "\*Org PDF LaTex Output\*"
-                         "\*Org Export"
-                         "\*osx-dictionary\*" "\*Messages\*" "\*"
-                         ))
-                    (buffer-name buf)))
 #+end_src
 * General Configuration
 ** backup, super-save
@@ -833,22 +758,23 @@ Borrowed from https://github.com/jixiuf/vmacs/blob/master/conf/conf-tabs.el
 #+end_src
 ** embark
 #+begin_src elisp
-  (setup (:pkg embark-consult)
-    (add-hook 'embark-collect-mode-hook #'consult-preview-at-point-mode)
-    )
+    (setup (:pkg embark-consult)
+      (add-hook 'embark-collect-mode-hook #'consult-preview-at-point-mode)
+      )
 
-  (setup (:pkg embark)
-    (:also-load embark-consult)
-    (:global "C-S-a" embark-act)
+    (setup (:pkg embark)
+      (:also-load embark-consult)
+      (:global "C-S-a" embark-act)
 
-    ;; Show Embark actions via which-key
-    (setq embark-action-indicator
-          (lambda (map)
-            (which-key--show-keymap "Embark" map nil nil 'no-paging)
-            #'which-key--hide-popup-ignore-command)
-          embark-become-indicator embark-action-indicator))
+      ;; Show Embark actions via which-key
+      (setq embark-action-indicator
+            (lambda (map)
+              (which-key--show-keymap "Embark" map nil nil 'no-paging)
+              #'which-key--hide-popup-ignore-command)
+            embark-become-indicator embark-action-indicator))
 
-  (setup (:pkg wgrep))
+    (setup (:pkg wgrep :host github :repo "mhayashi1120/Emacs-wgrep")
+      (require 'wgrep))
 #+end_src
 ** corfu(instead of company)
 #+begin_src elisp
@@ -866,8 +792,7 @@ Borrowed from https://github.com/jixiuf/vmacs/blob/master/conf/conf-tabs.el
       (:bind [tab] corfu-next
              [backtab] corfu-previous
              "<escape>" corfu-quit))
-    (corfu-global-mode)
-    )
+    (corfu-global-mode))
   ;; corfu backend
   (setup (:pkg cape)
     (add-to-list 'completion-at-point-functions #'cape-file)
@@ -1045,12 +970,13 @@ I rarely used this package recently, I used consult-file instead.
   (setup (:pkg aweshell :host github :repo "manateelazycat/aweshell")
     (:autoload aweshell-toggle)
     (:autoload aweshell-dedicated-toggle)
-    (:when-loaded (add-hook 'eshell-mode-hook
-                            (lambda ()
-                              (setq-local corfu-quit-at-boundary t
-                                          corfu-quit-no-match t
-                                          corfu-auto nil)
-                              (corfu-mode)))))
+    ;; (:when-loaded (add-hook 'eshell-mode-hook
+    ;;                         (lambda ()
+    ;;                           (setq-local corfu-quit-at-boundary t
+    ;;                                       corfu-quit-no-match t
+    ;;                                       corfu-auto nil)
+    ;;                           (corfu-mode))))
+    )
 #+end_src
 ** vterm
 #+begin_src elisp
