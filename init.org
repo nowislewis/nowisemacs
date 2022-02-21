@@ -392,7 +392,6 @@ I used to be a vim(evil) user, but now I use meow to manage all my keys
                               '("[" . meow-beginning-of-thing)
                               '("]" . meow-end-of-thing)
                               ;; '("." . repeat)
-                              '("," . meow-join)
                               '("\\" . quoted-insert)
                               ;; '("<escape>" . meow-cancel)
                               '("<escape>" . ignore)
@@ -401,8 +400,8 @@ I used to be a vim(evil) user, but now I use meow to manage all my keys
                               '("#" . symbol-overlay-put)
                               '("&" . meow-query-replace)
                               '("%" . meow-query-replace-regexp)
+                              '("^" . meow-join)
                               '("-" . negative-argument)
-
                               '("'" . meow-comment)
                               '("/" . meow-last-buffer)))
     (meow-global-mode 1)
