@@ -20,6 +20,7 @@
   ;; (setq make-backup-files nil)                 ; 关闭文件自动备份
   (electric-pair-mode t)                       ; 自动补全括号
   ;; (add-hook 'prog-mode-hook #'show-paren-mode) ; 编程模式下，光标在括号上时高亮另一个括号
+  ;; (setq show-paren-style 'expression)
   (column-number-mode t)                       ; 在 Mode line 上显示列号
   (global-auto-revert-mode t)                  ; 当另一程序修改了文件时，让 Emacs 及时刷新 Buffer
   (delete-selection-mode t)                    ; 选中文本后输入文本会替换文本（更符合我们习惯了的其它编辑器的逻辑）
@@ -370,8 +371,8 @@ I used to be a vim(evil) user, but now I use meow to manage all my keys
                               '("U" . undo-redo)
                               '("v" . meow-visit)
                               '("V" . meow-kmacro-matches)
-                              '("w" . meow-block)
-                              '("W" . meow-to-block)
+                              '("w" . meow-next-word)
+                              '("W" . meow-block)
                               '("x" . meow-delete)
                               '("X" . meow-backward-delete)
                               '("y" . meow-save)
@@ -385,9 +386,6 @@ I used to be a vim(evil) user, but now I use meow to manage all my keys
                               ;; '("z M" .)
                               ;; '("z" . meow-pop-all-selection)
                               ;; '("Z" . meow-pop-search)
-                              '("&" . meow-query-replace)
-                              '("%" . meow-query-replace-regexp)
-                              '("-" . negative-argument)
                               '(";" . meow-reverse)
                               '("{" . meow-inner-of-thing)
                               '("}" . meow-bounds-of-thing)
@@ -400,17 +398,17 @@ I used to be a vim(evil) user, but now I use meow to manage all my keys
                               '("<escape>" . ignore)
                               '("!" . meow-start-kmacro-or-insert-counter)
                               '("@" . meow-end-or-call-kmacro)
+                              '("#" . symbol-overlay-put)
+                              '("&" . meow-query-replace)
+                              '("%" . meow-query-replace-regexp)
+                              '("-" . negative-argument)
+
                               '("'" . meow-comment)
                               '("/" . meow-last-buffer)))
     (meow-global-mode 1)
 
     ;; meow-setup 用于自定义按键绑定，可以直接使用下文中的示例
     (meow-setup)
-    ;; 如果你需要在 NORMAL 下使用相对行号（基于 display-line-numbers-mode）
-    ;; (meow-setup-line-number)
-    ;; 如果你需要自动的 mode-line 设置（如果需要自定义见下文对 `meow-indicator' 说明）
-    ;; (meow-setup-indicator)
-    ;; (setq which-key-show-transient-maps t)
     )
 #+end_src
 ** which-key
