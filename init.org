@@ -554,7 +554,6 @@ only enable line number in some modes, borrowed from lazycat-emacs
                  'lisp-mode-hook
                  'java-mode-hook
                  'asm-mode-hook
-
                  'haskell-mode-hook
                  'rcirc-mode-hook
                  'erc-mode-hook
@@ -618,7 +617,6 @@ diff-hl-mode highlights uncommitted changes on the left side of the window (area
 #+begin_src elisp
   (setup (:pkg dashboard)
     (:option dashboard-items '((recents . 5)
-                               ;; (agenda . 5)
                                (bookmarks . 5)
                                ;; (projects . 5)
                                )
@@ -743,7 +741,6 @@ Borrowed from https://github.com/jixiuf/vmacs/blob/master/conf/conf-tabs.el
     (interactive)
     (let ((current-prefix-arg '(-1)))
       (call-interactively 'consult-find)))
-
 #+end_src
 ** Marginalia
 #+begin_src elisp
@@ -756,8 +753,7 @@ Borrowed from https://github.com/jixiuf/vmacs/blob/master/conf/conf-tabs.el
 ** embark
 #+begin_src elisp
     (setup (:pkg embark-consult)
-      (add-hook 'embark-collect-mode-hook #'consult-preview-at-point-mode)
-      )
+      (add-hook 'embark-collect-mode-hook #'consult-preview-at-point-mode))
 
     (setup (:pkg embark)
       (:also-load embark-consult)
@@ -878,9 +874,6 @@ borrowed from citre, now you can always jump-back use "M-,"
              pyim-punctuation-translate-p '(no yes auto)
              pyim-page-tooltip 'posframe
              pyim-page-length 5
-             ;; (setq-default pyim-punctuation-translate-p '(yes no auto))   ;使用全角标点。
-             ;; (setq-default pyim-punctuation-translate-p '(no yes auto))   ;使用半角标点。
-             ;; (setq-default pyim-punctuation-translate-p '(auto yes no))   ;中文使用全角标点，英文使用半角标点。
              )
     (:when-loaded
       (set-default 'pyim-punctuation-half-width-functions
