@@ -453,6 +453,7 @@ I used to be a vim(evil) user, but now I use meow to manage all my keys
    '("s s" . consult-line)
    '("s b" . consult-buffer)
    '("s d" . consult-ripgrep)
+   '("s g" . deadgrep)
    '("s D" . lewis/ripgrep-search-other-dir)
    '("s f" . consult-find)
    '("s F" . lewis/find-file-other-dir))
@@ -818,6 +819,10 @@ Borrowed from https://github.com/jixiuf/vmacs/blob/master/conf/conf-tabs.el
     (yas-global-mode 1))
   (setup (:pkg yasnippet-snippets))
 #+end_src
+** deadgrep
+#+begin_src elisp
+  (setup (:pkg deadgrep))
+#+end_src
 * Window Management
 ** winner-mode
 #+begin_src elisp
@@ -1001,17 +1006,17 @@ Show git blame info about current line
 *** elisp
 **** helpful
 #+begin_src elisp
-  ;; (setup (:pkg helpful)
-  ;;   (if (version< emacs-version "28.1")
-  ;;       ;; REVIEW See Wilfred/elisp-refs#35. Remove once fixed upstream.
-  ;;       nil
-  ;;     (defvar read-symbol-positions-list nil));; to fix issue
-  ;;   (:global "C-h f" #'helpful-callable
-  ;;            "C-h v" #'helpful-variable
-  ;;            "C-h k" #'helpful-key
-  ;;            "C-c C-d" #'helpful-at-point
-  ;;            "C-h F" #'helpful-function
-             ;; "C-h C" #'helpful-command))
+  (setup (:pkg helpful)
+    (if (version< emacs-version "28.1")
+        ;; REVIEW See Wilfred/elisp-refs#35. Remove once fixed upstream.
+        nil
+      (defvar read-symbol-positions-list nil));; to fix issue
+    (:global "C-h f" #'helpful-callable
+             "C-h v" #'helpful-variable
+             "C-h k" #'helpful-key
+             "C-c C-d" #'helpful-at-point
+             "C-h F" #'helpful-function
+             "C-h C" #'helpful-command))
 #+end_src
 **** elisp-demos
 #+begin_src elisp
@@ -1129,16 +1134,10 @@ enable eglot in org-src mode
 Citre is an advanced Ctags (or actually, readtags) frontend for Emacs.
 #+begin_src elisp
   (setup (:pkg citre)
-    ;; This is needed in `:init' block for lazy load to work.
     (require 'citre-config)
     (:option
-     ;; citre-project-root-function #'projectile-project-root
-     ;; See the "Create tags file" section above to know these options
      citre-use-project-root-when-creating-tags t
      citre-prompt-language-for-ctags-command t
-     ;; By default, when you open any file, and a tags file can be found for it,
-     ;; `citre-mode' is automatically enabled.  If you only want this to work for
-     ;; certain modes (like `prog-mode'), set it like this.
      citre-auto-enable-citre-mode-modes '(prog-mode)))
 #+end_src
 *** symbol-overlay
@@ -1513,13 +1512,23 @@ among all the files in org-roam in a single agenda-view. The code was borrowed f
 #+end_src
 ** org-transclusion
 #+begin_src elisp
-
 #+end_src
 ** org-elp for latex live preview
 #+begin_src elisp
   (setup (:pkg org-elp)
     (:option org-elp-idle-time 0.5
              org-elp-split-fraction 0.25))
+#+end_src
+** org-arbeitszeit
+#+begin_src elisp
+  (setup (:pkg org-arbeitszeit)
+    ;; You only work 4 days per week...
+    (:option org-arbeitszeit-days-per-week 5
+          ;; ... but 10 hours on each day.
+          org-arbeitszeit-hours-per-day 10
+          ;; Don't include worked clocked on headlines that are tagged
+          ;; with break, nonwork or private
+          org-arbeitszeit-match "-break-nonwork-private"))
 #+end_src
 * 翻译
 ** go-translate
