@@ -506,11 +506,11 @@ I used to be a vim(evil) user, but now I use meow to manage all my keys
    )
   (meow-leader-define-key
    ;; time
-   ;; '("t t" . org-pomodoro)
+   '("t t" . org-pomodoro)
    ;;a agenda
    '("a a" . org-agenda)
    ;;w workspace
-   '("w". perspective-map))
+   '("TAB". perspective-map))
 #+end_src
 * UI
 ** Font
@@ -667,8 +667,9 @@ Borrowed from https://github.com/jixiuf/vmacs/blob/master/conf/conf-tabs.el
 #+begin_src elisp
   (setq fill-column 120)          ;默认显示 100列就换行
   (setq word-wrap t)
+  (setq word-wrap-by-category t)
   (add-hook 'text-mode-hook 'visual-line-mode)
-  (add-hook 'org-mode-hook 'turn-on-auto-fill)
+  ;; (add-hook 'org-mode-hook 'turn-on-auto-fill)
 #+end_src
 ** TRAMP
 #+begin_src elisp
@@ -944,11 +945,6 @@ I rarely used this package recently, I used consult-file instead.
     (:option imenu-list-focus-after-activate t
              imenu-list-auto-resize t
              imenu-list-position 'left))
-#+end_src
-*** outshine
-#+begin_src elisp
-  (setup (:pkg outshine :host github :repo "alphapapa/outshine")
-    (:option outline-minor-mode-prefix "\M-#"))
 #+end_src
 ** perspective
 #+begin_src elisp
@@ -1496,11 +1492,6 @@ among all the files in org-roam in a single agenda-view. The code was borrowed f
         (split-string-and-unquote value separators))))
 #+end_src
 
-** org-pomodoro
-#+begin_src elisp :tangle no
-  (setup (:pkg org-pomodoro)
-    (:option org-pomodoro-finished-sound "~/Documents/emacs/other-files/applaud.wav"))
-#+end_src
 ** ox-hugo
 #+begin_src elisp
   (setup (:pkg ox-hugo)
@@ -1515,7 +1506,13 @@ among all the files in org-roam in a single agenda-view. The code was borrowed f
     (:option org-elp-idle-time 0.5
              org-elp-split-fraction 0.25))
 #+end_src
-** org-arbeitszeit
+** org-clock
+*** org-pomodoro
+#+begin_src elisp
+  (setup (:pkg org-pomodoro)
+    (:option org-pomodoro-finished-sound "~/Documents/emacs/other-files/applaud.wav"))
+#+end_src
+*** org-arbeitszeit
 #+begin_src elisp
   (setup (:pkg org-arbeitszeit)
     ;; You only work 4 days per week...
