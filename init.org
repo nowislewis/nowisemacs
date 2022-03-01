@@ -533,13 +533,14 @@ Modus-themes is great especailly for org mode
 #+begin_src elisp
   (setup (:pkg modus-themes :type built-in)
     (:option modus-themes-org-blocks 'tinted-background
-             modus-themes-headings '((t . (background overline rainbow)))
+             ;; modus-themes-headings '((t . (background overline rainbow)))
              modus-themes-mode-line '(3d)
-             modus-themes-intense-markup t
+             ;; modus-themes-intense-markup t
              modus-themes-hl-line '(intense accented)
              modus-themes-paren-match '(intense bold underline)
              modus-themes-subtle-line-numbers t)
-    (load-theme 'modus-vivendi))
+    ;; (load-theme 'modus-vivendi))
+    (load-theme 'modus-operandi))
 #+end_src
 ** line number
 only enable line number in some modes, borrowed from lazycat-emacs
@@ -637,6 +638,10 @@ diff-hl-mode highlights uncommitted changes on the left side of the window (area
              ;; doom-modeline-icon nil
              doom-modeline-unicode-fallback t)
     (:hook-into after-init))
+#+end_src
+** a
+#+begin_src elisp
+(setup (:pkg awesome-tray :host github :repo "manateelazycat/awesome-tray"))
 #+end_src
 ** hl-todo
 #+begin_src elisp
@@ -968,12 +973,6 @@ I rarely used this package recently, I used consult-file instead.
   (setup (:pkg aweshell :host github :repo "manateelazycat/aweshell")
     (:autoload aweshell-toggle)
     (:autoload aweshell-dedicated-toggle)
-    ;; (:when-loaded (add-hook 'eshell-mode-hook
-    ;;                         (lambda ()
-    ;;                           (setq-local corfu-quit-at-boundary t
-    ;;                                       corfu-quit-no-match t
-    ;;                                       corfu-auto nil)
-    ;;                           (corfu-mode))))
     )
 #+end_src
 ** vterm
@@ -1157,13 +1156,14 @@ eglot client leveraging LTEX Language Server.
 * Org Mode
 ** org-mode
 #+begin_src elisp
-  (setq-default prettify-symbols-alist '(("#+BEGIN_SRC" . "ℱ")
-                                         ("#+END_SRC" . "Ⅎ")
-                                         ("#+begin_src" . "ℱ")
-                                         ("#+end_src" . "Ⅎ")))
+  ;; (setq-default prettify-symbols-alist '(("#+BEGIN_SRC" . "ℱ")
+  ;;                                        ("#+END_SRC" . "Ⅎ")
+  ;;                                        ("#+begin_src" . "ℱ")
+  ;;                                        ("#+end_src" . "Ⅎ")))
   (setup (:pkg org :type built-in)
     (setq org-directory "~/Documents/emacs/orgmode/")
-    (:option org-adapt-indentation t
+    (:option
+     org-adapt-indentation t
              org-startup-indented t
              org-hide-emphasis-markers t
              org-imenu-depth 5
@@ -1182,7 +1182,8 @@ eglot client leveraging LTEX Language Server.
              org-refile-targets '(("~/Documents/emacs/orgmode/roam/20211204000712-refile_index.org" . (:maxlevel . 9))
                                   ))
     (:file-match "\\.org\\'")
-    (:hook 'prettify-symbols-mode org-num-mode)
+    ;; (:hook 'prettify-symbols-mode org-num-mode)
+    (:hook org-num-mode)
     (:when-loaded
       (require 'org-tempo) ;; so that <s is useful
       (setq-default org-todo-keywords
@@ -1253,7 +1254,7 @@ eglot client leveraging LTEX Language Server.
     ))
 #+end_src
 ** org-bars
-#+begin_src elisp
+#+begin_src elisp :tangle no
   (setup (:pkg org-bars :host github :repo "tonyaldon/org-bars")
     (:option org-bars-color-options '(:only-one-color t
                                                       :bar-color "#4C4A4D")
@@ -1262,6 +1263,12 @@ eglot client leveraging LTEX Language Server.
                                      :visible "▼"))
     (:load-after org)
     (:hook-into org-mode))
+#+end_src
+** org-modern
+#+begin_src elisp
+  (setup (:pkg org-modern)
+    (:hook-into org-mode-hook
+    ))
 #+end_src
 ** org-appear
 #+begin_src elisp
