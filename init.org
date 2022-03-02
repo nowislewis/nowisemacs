@@ -536,12 +536,17 @@ Modus-themes is great especailly for org mode
              ;; modus-themes-headings '((t . (background overline rainbow)))
              modus-themes-mode-line '(3d)
              ;; modus-themes-intense-markup t
-             modus-themes-hl-line '(intense accented)
+             ;; modus-themes-hl-line '(intense accented)
+             modus-themes-hl-line '(intense)
              modus-themes-paren-match '(intense bold underline)
              modus-themes-subtle-line-numbers t)
-    ;; (load-theme 'modus-vivendi))
-    (load-theme 'modus-operandi))
+    (load-theme 'modus-vivendi))
+    ;; (load-theme 'modus-operandi))
 #+end_src
+
+#+RESULTS:
+: t
+
 ** line number
 only enable line number in some modes, borrowed from lazycat-emacs
 #+begin_src elisp
@@ -1064,7 +1069,7 @@ Emacs major-mode to work with Beancount ledger files
   (setup (:pkg jsonrpc :type built-in))
   (setup (:pkg eldoc :type built-in))
 
-  (setup (:pkg markdown-mode))
+  ;; (setup (:pkg markdown-mode))
   (setup (:pkg eldoc-box)
     (add-hook 'eglot--managed-mode-hook #'eldoc-box-hover-at-point-mode t))
   (setup (:pkg eglot))
