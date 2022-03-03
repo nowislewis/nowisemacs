@@ -351,7 +351,6 @@ I used to be a vim(evil) user, but now I use meow to manage all my keys
                               '("x" . meow-delete)
                               '("X" . meow-backward-delete)
                               '("y" . meow-save)
-                              ;; '("Y" . meow-sync-grab)
                               '("z a" . hs-toggle-hiding)
                               '("z c" . hs-hide-block)
                               '("z o" . hs-show-block)
@@ -362,9 +361,7 @@ I used to be a vim(evil) user, but now I use meow to manage all my keys
                               '("}" . meow-bounds-of-thing)
                               '("[" . meow-beginning-of-thing)
                               '("]" . meow-end-of-thing)
-                              ;; '("." . repeat)
                               '("\\" . quoted-insert)
-                              ;; '("<escape>" . meow-cancel)
                               '("<escape>" . ignore)
                               '("!" . meow-start-kmacro-or-insert-counter)
                               '("@" . meow-end-or-call-kmacro)
@@ -389,6 +386,19 @@ I used to be a vim(evil) user, but now I use meow to manage all my keys
 #+end_src
 ** keybinding
 #+begin_src elisp
+  ;; buffer
+    (meow-leader-define-key
+   '("b b" . persp-switch-to-buffer)
+   '("b B" . switch-to-buffer)
+   '("b i" . ibuffer)
+   '("b k" . kill-current-buffer)
+   '("b l" . meow-last-buffer)
+   '("b m" . bookmark-set)
+   '("b M" . bookmark-delete)
+   '("b n" . next-buffer)
+   '("b p" . previous-buffer)
+   '("b r" . revert-buffer))
+
   ;; lewisliu
   (meow-leader-define-key
    '("e y p" . my-gts-translate-posframe)
@@ -428,7 +438,6 @@ I used to be a vim(evil) user, but now I use meow to manage all my keys
    '("s D" . lewis/ripgrep-search-other-dir)
    '("s f" . consult-find)
    '("s F" . lewis/find-file-other-dir))
-
 
   (defun find-config-file()
     (interactive)
