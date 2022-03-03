@@ -623,10 +623,6 @@ diff-hl-mode highlights uncommitted changes on the left side of the window (area
              doom-modeline-unicode-fallback t)
     (:hook-into after-init))
 #+end_src
-** awesome-tray
-#+begin_src elisp
-(setup (:pkg awesome-tray :host github :repo "manateelazycat/awesome-tray"))
-#+end_src
 ** hl-todo
 #+begin_src elisp
   (setup (:pkg hl-todo)
@@ -1496,9 +1492,6 @@ among all the files in org-roam in a single agenda-view. The code was borrowed f
 #+begin_src elisp
   (setup (:pkg ox-hugo)
     (:load-after ox))
-#+end_src
-** org-transclusion
-#+begin_src elisp
 #+end_src
 ** org-elp for latex live preview
 #+begin_src elisp
