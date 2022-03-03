@@ -201,14 +201,6 @@ Use straight-pull-report to get detailed messages after update.
                           (lambda () (require ',(setup-get 'feature)))))
   :documentation "Delay loading the feature until a certain amount of idle time has passed.")
 #+end_src
-*** :disabled
-Used to disable a package configuration, similar to =:disabled= in =use-package=.
-#+begin_src elisp
-  (setup-define :disabled
-    (lambda ()
-      `,(setup-quit))
-    :documentation "Always stop evaluating the body.")
-#+end_src
 *** :load-after
 This keyword causes a body to be executed after other packages/features are loaded:
 #+begin_src elisp
@@ -377,15 +369,11 @@ I used to be a vim(evil) user, but now I use meow to manage all my keys
                               '("X" . meow-backward-delete)
                               '("y" . meow-save)
                               ;; '("Y" . meow-sync-grab)
-                              '("z a" . origami-recursively-toggle-node)
-                              ;; '("z r" .)
-                              ;; '("z m" .)
-                              '("z R" . origami-open-all-nodes)
-                              '("z M" . origami-close-all-nodes)
-                              ;; '("z R" .)
-                              ;; '("z M" .)
-                              ;; '("z" . meow-pop-all-selection)
-                              ;; '("Z" . meow-pop-search)
+                              '("z a" . hs-toggle-hiding)
+                              '("z c" . hs-hide-block)
+                              '("z o" . hs-show-block)
+                              '("z m" . hs-hide-all)
+                              '("z r" . hs-show-all)
                               '(";" . meow-reverse)
                               '("{" . meow-inner-of-thing)
                               '("}" . meow-bounds-of-thing)
@@ -512,6 +500,12 @@ I used to be a vim(evil) user, but now I use meow to manage all my keys
    ;;w workspace
    '("TAB". perspective-map))
 #+end_src
+** minibuffer-modifier-keys
+#+begin_src elisp
+  (setup (:pkg minibuffer-modifier-keys)
+    (require 'minibuffer-modifier-keys)
+   (minibuffer-modifier-keys-setup t))
+#+end_src
 * UI
 ** Font
 #+begin_src elisp
@@ -543,9 +537,6 @@ Modus-themes is great especailly for org mode
     (load-theme 'modus-vivendi))
     ;; (load-theme 'modus-operandi))
 #+end_src
-
-#+RESULTS:
-: t
 
 ** line number
 only enable line number in some modes, borrowed from lazycat-emacs
@@ -644,7 +635,7 @@ diff-hl-mode highlights uncommitted changes on the left side of the window (area
              doom-modeline-unicode-fallback t)
     (:hook-into after-init))
 #+end_src
-** a
+** awesome-tray
 #+begin_src elisp
 (setup (:pkg awesome-tray :host github :repo "manateelazycat/awesome-tray"))
 #+end_src
@@ -942,11 +933,6 @@ This is adapted from the extra font lock rules provided by Drew Adams' dired+ pa
     (:with-map dired-mode-map
       (:bind "TAB" dired-subtree-cycle)))
 #+end_src
-*** fd-dired
-I rarely used this package recently, I used consult-file instead.
-#+begin_src elisp
-  (setup (:pkg fd-dired))
-#+end_src
 ** structure browsing
 *** imenu-list
 #+begin_src elisp
@@ -1151,12 +1137,11 @@ eglot client leveraging LTEX Language Server.
         (:hook (lambda ()
                        (require 'eglot-ltex)))))
 #+end_src
-*** Code toggle with origami
+*** Code toggle with hideshow
 #+begin_src elisp
-  (setup (:pkg origami)
-    (:autoload origami-recursively-toggle-node)
-    (:when-loaded
-      (global-origami-mode)))
+  (setup hideshow
+    (:with-hook prog-mode-hook
+      (:hook hs-minor-mode)))
 #+end_src
 * Org Mode
 ** org-mode
@@ -1272,8 +1257,7 @@ eglot client leveraging LTEX Language Server.
 ** org-modern
 #+begin_src elisp
   (setup (:pkg org-modern)
-    (:hook-into org-mode-hook
-    ))
+    (:hook-into org-mode-hook))
 #+end_src
 ** org-appear
 #+begin_src elisp
@@ -1618,7 +1602,6 @@ among all the files in org-roam in a single agenda-view. The code was borrowed f
       (add-to-list 'global-mode-string '("" mode-line-keycast))))
 
   ;; (add-to-list 'global-mode-string '("" mode-line-keycast " ")))
-
 #+end_src
 ** darkroom
 Simple distraction-free editing. I use darkroom instead of writeroom because it's more simple
@@ -1627,8 +1610,9 @@ Simple distraction-free editing. I use darkroom instead of writeroom because it'
 #+end_src
 ** edit with emacs everywhere
 #+begin_src elisp
+(when (eq system-type 'darwin)
   (load "~/.hammerspoon/Spoons/editWithEmacs.spoon/hammerspoon.el")
-  (setq hammerspoon-buffer-mode 'org-mode)
+  (setq hammerspoon-buffer-mode 'org-mode))
 #+end_src
 ** Simulate company with corfu
 Company is wide-used, but I use corfu for its simplity. So I add a simulation for some packages which use
