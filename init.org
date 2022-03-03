@@ -17,17 +17,6 @@
    package--init-file-ensured t
    inhibit-startup-message t             ; 关闭启动 Emacs 时的欢迎界面
    )
-  ;; (setq make-backup-files nil)                 ; 关闭文件自动备份
-  (electric-pair-mode t)                       ; 自动补全括号
-  ;; (add-hook 'prog-mode-hook #'show-paren-mode) ; 编程模式下，光标在括号上时高亮另一个括号
-  ;; (setq show-paren-style 'expression)
-  (column-number-mode t)                       ; 在 Mode line 上显示列号
-  (global-auto-revert-mode t)                  ; 当另一程序修改了文件时，让 Emacs 及时刷新 Buffer
-  (delete-selection-mode t)                    ; 选中文本后输入文本会替换文本（更符合我们习惯了的其它编辑器的逻辑）
-  (add-hook 'prog-mode-hook #'hs-minor-mode)   ; 编程模式下，可以折叠代码块
-
-  ;; (global-display-line-numbers-mode 1)         ; 在 Window 显示行号
-  (setq display-line-numbers-width-start t)
   ;; (pixel-scroll-precision-mode t) ;; 最近发现和 pdf-continuous-view-mode 工作不协调
 #+end_src
 ** Startup Performance
@@ -45,30 +34,30 @@ Make startup faster by reducing the frequency of garbage collection
 #+end_src
 ** generic
 #+begin_src elisp
-    ;; 定义一些启动目录，方便下次迁移修改
-    (defvar nowisemacs-root-dir (file-truename "~/nowisemacs/"))
-    (defvar nowisemacs-config-dir (concat nowisemacs-root-dir "init.org"))
-    (defvar nowisemacs-extension-dir (concat nowisemacs-root-dir "/extensions"))
+  (electric-pair-mode t)                       ; 自动补全括号
+  (global-auto-revert-mode t)                  ; 当另一程序修改了文件时，让 Emacs 及时刷新 Buffer
+  (delete-selection-mode t)                    ; 选中文本后输入文本会替换文本（更符合我们习惯了的其它编辑器的逻辑）
 
-    (recentf-mode t)
-    (setq use-short-answers t)
-    (blink-cursor-mode -1)                  ;指针不闪动
-    (setq ring-bell-function 'ignore)       ;关闭烦人的出错时的提示声
-    (set-default-coding-systems 'utf-8)
-    (global-hl-line-mode)
+  ;; 定义一些启动目录，方便下次迁移修改
+  (defvar nowisemacs-root-dir (file-truename "~/nowisemacs/"))
+  (defvar nowisemacs-config-dir (concat nowisemacs-root-dir "init.org"))
+  (defvar nowisemacs-extension-dir (concat nowisemacs-root-dir "/extensions"))
 
-    (setq-default indent-tabs-mode nil)
-  	(setq-default tab-width 4)
+  (recentf-mode t)
+  (setq use-short-answers t)
+  (blink-cursor-mode -1)                  ;指针不闪动
+  (setq ring-bell-function 'ignore)       ;关闭烦人的出错时的提示声
+  (set-default-coding-systems 'utf-8)
+  (global-hl-line-mode)
+
+  (setq-default indent-tabs-mode nil)
+  (setq-default tab-width 4)
 #+end_src
 The following content is not enabled yet, because I want to minimize unnecessary settings as much as possible
 #+begin_src elisp :tangle no
   ;; Restore emacs session.
   (setq initial-buffer-choice t)
   (run-with-timer 1 nil #'(lambda () (bury-buffer)))
-
-  ;; 增加长行处理性能
-  (setq bidi-inhibit-bpa t)
-  (setq-default bidi-paragraph-direction 'left-to-right)
 
   ;; 增加IO性能
   (setq process-adaptive-read-buffering nil)
@@ -541,6 +530,11 @@ Modus-themes is great especailly for org mode
 ** line number
 only enable line number in some modes, borrowed from lazycat-emacs
 #+begin_src elisp
+  (setup simple
+    (:with-hook after-init-hook
+      (:hook line-number-mode column-number-mode size-indication-mode)))
+
+  (setq display-line-numbers-width-start t)
   (setq line-number-display-limit large-file-warning-threshold)
   (setq line-number-display-limit-width 1000)
 
@@ -660,7 +654,6 @@ Borrowed from https://github.com/jixiuf/vmacs/blob/master/conf/conf-tabs.el
   (setq auto-save-default nil)
 
   (setup (:pkg super-save)
-    ;; (:delay)
     (super-save-mode 1)
     (setq super-save-auto-save-when-idle t))
 #+end_src
@@ -671,6 +664,12 @@ Borrowed from https://github.com/jixiuf/vmacs/blob/master/conf/conf-tabs.el
   (setq word-wrap-by-category t)
   (add-hook 'text-mode-hook 'visual-line-mode)
   ;; (add-hook 'org-mode-hook 'turn-on-auto-fill)
+#+end_src
+** so-long
+解决长行卡死问题
+#+begin_src elisp
+  (setup so-long
+    (global-so-long-mode 1))
 #+end_src
 ** TRAMP
 #+begin_src elisp
