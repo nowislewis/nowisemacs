@@ -34,24 +34,21 @@ Make startup faster by reducing the frequency of garbage collection
 #+end_src
 ** generic
 #+begin_src elisp
-  (electric-pair-mode t)                       ; 自动补全括号
-  (global-auto-revert-mode t)                  ; 当另一程序修改了文件时，让 Emacs 及时刷新 Buffer
-  (delete-selection-mode t)                    ; 选中文本后输入文本会替换文本（更符合我们习惯了的其它编辑器的逻辑）
-
   ;; 定义一些启动目录，方便下次迁移修改
   (defvar nowisemacs-root-dir (file-truename "~/nowisemacs/"))
   (defvar nowisemacs-config-dir (concat nowisemacs-root-dir "init.org"))
   (defvar nowisemacs-extension-dir (concat nowisemacs-root-dir "/extensions"))
 
-  (recentf-mode t)
   (setq use-short-answers t)
-  (blink-cursor-mode -1)                  ;指针不闪动
+
   (setq ring-bell-function 'ignore)       ;关闭烦人的出错时的提示声
   (set-default-coding-systems 'utf-8)
-  (global-hl-line-mode)
-
   (setq-default indent-tabs-mode nil)
   (setq-default tab-width 4)
+    ;; 平滑地进行半屏滚动，避免滚动后recenter操作
+  (setq scroll-step 1
+        scroll-conservatively 10000)
+
 #+end_src
 The following content is not enabled yet, because I want to minimize unnecessary settings as much as possible
 #+begin_src elisp :tangle no
@@ -92,9 +89,6 @@ The following content is not enabled yet, because I want to minimize unnecessary
   (setq ad-redefinition-action 'accept)   ;不要烦人的 redefine warning
   (setq frame-resize-pixelwise t) ;设置缩放的模式,避免Mac平台最大化窗口以后右边和下边有空隙
 
-  ;; 平滑地进行半屏滚动，避免滚动后recenter操作
-  (setq scroll-step 1
-        scroll-conservatively 10000)
 #+end_src
 
 * Package Management
@@ -648,6 +642,17 @@ Borrowed from https://github.com/jixiuf/vmacs/blob/master/conf/conf-tabs.el
     (global-tab-line-mode t))
 #+end_src
 * General Configuration
+** general modes
+#+begin_src elisp
+  (setup save-place
+    (:hook-into after-init-hook))
+  (electric-pair-mode t)                       ; 自动补全括号
+  (global-auto-revert-mode t)                  ; 当另一程序修改了文件时，让 Emacs 及时刷新 Buffer
+  (delete-selection-mode t)                    ; 选中文本后输入文本会替换文本（更符合我们习惯了的其它编辑器的逻辑）
+  (global-hl-line-mode)
+  (recentf-mode t)
+  (blink-cursor-mode -1)                  ;指针不闪动
+#+end_src
 ** backup, super-save
 #+begin_src elisp
   (setq make-backup-files nil)
@@ -1523,16 +1528,16 @@ among all the files in org-roam in a single agenda-view. The code was borrowed f
 #+begin_src elisp
   (setup (:pkg go-translate)
     (:option gts-translate-list '(("en" "zh")))
-    ;; (defun my-gts-translate-posframe ()
-    ;;   (interactive)
-    ;;   (if (not (featurep 'go-translate))
-    ;;       (require 'go-translate))
-    ;;   (defvar my-translator-posframe
-    ;;     (gts-translator
-    ;;                     :picker (gts-noprompt-picker)
-    ;;                     :engines (gts-google-rpc-engine)
-    ;;                     :render (gts-posframe-pop-render)))
-    ;;   (gts-translate my-translator-posframe))
+    (defun my-gts-translate-posframe ()
+      (interactive)
+      (if (not (featurep 'go-translate))
+          (require 'go-translate))
+      (defvar my-translator-posframe
+        (gts-translator
+                        :picker (gts-noprompt-picker)
+                        :engines (gts-google-rpc-engine)
+                        :render (gts-posframe-pop-render)))
+      (gts-translate my-translator-posframe))
     )
 #+end_src
 ** english-teacher
