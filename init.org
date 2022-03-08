@@ -481,6 +481,12 @@ I used to be a vim(evil) user, but now I use meow to manage all my keys
    '("a a" . org-agenda)
    ;;w workspace
    '("TAB". perspective-map))
+
+  ;;oj
+  (meow-leader-define-key
+   '("o p" . oj-prepare)
+   '("o t" . oj-test)
+   '("o h" . oj-open-home-dir))
 #+end_src
 ** minibuffer-modifier-keys
 #+begin_src elisp
@@ -841,7 +847,6 @@ Popper is a minor-mode to tame the flood of ephemeral windows Emacs produces, wh
                                                 "Output\\*$"
                                                 "\\*Async Shell Command\\*"
                                                 "Go-Translate"
-                                                "\\*oj - /bin/zsh\\*"
                                                 help-mode
                                                 helpful-mode
                                                 compilation-mode
