@@ -256,8 +256,6 @@ I used to be a vim(evil) user, but now I use meow to manage all my keys
       (meow-motion-overwrite-define-key '("j" . meow-next)
                                         '("k" . meow-prev)
                                         '("<escape>" . ignore)
-                                        ;; '("<" . sort-tab-select-prev-tab)
-                                        ;; '(">" . sort-tab-select-next-tab)
                                         )
       (meow-leader-define-key
        ;; SPC j/k will run the original command in MOTION state.
@@ -303,7 +301,7 @@ I used to be a vim(evil) user, but now I use meow to manage all my keys
                               '("g m" . consult-mark)
                               '("g a" . eglot-code-actions)
                               '("g r" . eglot-rename)
-                              '("g =" . eglot-format)
+                              '("g f" . eglot-format)
 
                               '("G" . meow-grab)
                               '("h" . meow-left)
