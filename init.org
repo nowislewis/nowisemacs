@@ -229,21 +229,7 @@ I used to be a vim(evil) user, but now I use meow to manage all my keys
 #+begin_src elisp
   (setup (:pkg meow)
     (require 'meow)
-    (:option meow-char-thing-table '(
-                                     (?\( . round)
-                                     (?\[ . square)
-                                     (?\{ . curly)
-                                     (?\" . string)
-                                     (?e . symbol)
-                                     (?w . window)
-                                     (?b . buffer)
-                                     (?p . paragraph)
-                                     (?l . line)
-                                     (?d . defun)
-                                     (?i . indent)
-                                     (?x . extend)
-                                     )
-             meow-use-keypad-when-execute-kbd nil
+    (:option meow-use-keypad-when-execute-kbd nil
              meow-expand-exclude-mode-list nil
              meow-use-clipboard t
              meow-cursor-type-normal '(bar . 5)
@@ -642,7 +628,7 @@ diff-hl-mode highlights uncommitted changes on the left side of the window (area
 #+end_src
 ** The built-in tab line mode
 Borrowed from https://github.com/jixiuf/vmacs/blob/master/conf/conf-tabs.el
-#+begin_src elisp
+#+begin_src elisp :tangle no
   (setup tab-line-mode
     (:option tab-line-new-button-show nil  ;; do not show add-new button
              tab-line-close-button-show nil  ;; do not show close button
