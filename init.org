@@ -314,6 +314,9 @@ I used to be a vim(evil) user, but now I use meow to manage all my keys
                               '("g d" . xref-find-definitions)
                               '("g D" . xref-find-references)
                               '("g m" . consult-mark)
+                              '("g a" . eglot-code-actions)
+                              '("g r" . eglot-rename)
+                              '("g =" . eglot-format)
 
                               '("G" . meow-grab)
                               '("h" . meow-left)
@@ -698,6 +701,10 @@ Borrowed from https://github.com/jixiuf/vmacs/blob/master/conf/conf-tabs.el
     (when (memq window-system '(mac ns x))
       (exec-path-from-shell-initialize)))
 #+end_src
+** vundo for undo tree
+#+begin_src elisp
+(setup (:pkg vundo :host github :repo "casouri/vundo"))
+#+end_src
 * 补全
 ** Completions with Vertico
 #+begin_src elisp
@@ -847,6 +854,7 @@ Popper is a minor-mode to tame the flood of ephemeral windows Emacs produces, wh
                                                 "Output\\*$"
                                                 "\\*Async Shell Command\\*"
                                                 "Go-Translate"
+                                                "\\*oj - /bin/zsh\\*"
                                                 help-mode
                                                 helpful-mode
                                                 compilation-mode
@@ -1563,6 +1571,10 @@ among all the files in org-roam in a single agenda-view. The code was borrowed f
       (:bind "h" pdf-annot-add-highlight-markup-annotation))
     (pdf-loader-install)
     (add-hook 'pdf-view-mode-hook (lambda() (linum-mode -1))))
+  (setup (:pkg pdf-continuous-scroll-mode :host github :repo "dalanicolai/pdf-continuous-scroll-mode.el"))
+  (defun load-pdf-continuous-mode()
+    (interactive)
+    (require 'pdf-continuous-scroll-mode))
 
   (setq TeX-view-program-selection '((output-pdf "PDF Tools"))
         TeX-view-program-list '(("PDF Tools" TeX-pdf-tools-sync-view))
@@ -1571,8 +1583,6 @@ among all the files in org-roam in a single agenda-view. The code was borrowed f
   (add-hook 'TeX-after-compilation-finished-functions
             #'TeX-revert-document-buffer)
 
-  (setup (:pkg pdf-continuous-scroll-mode :host github :repo "dalanicolai/pdf-continuous-scroll-mode.el"))
-  (require 'pdf-continuous-scroll-mode)
 #+end_src
 ** org-noter
 #+begin_src elisp
@@ -1616,9 +1626,16 @@ Simple distraction-free editing. I use darkroom instead of writeroom because it'
 #+end_src
 ** edit with emacs everywhere
 #+begin_src elisp
-(when (eq system-type 'darwin)
-  (load "~/.hammerspoon/Spoons/editWithEmacs.spoon/hammerspoon.el")
-  (setq hammerspoon-buffer-mode 'org-mode))
+  (when (eq system-type 'darwin)
+    ;; (load "~/.hammerspoon/Spoons/editWithEmacs.spoon/hammerspoon.el")
+    (setq hammerspoon-buffer-mode 'org-mode)
+    )
+#+end_src
+** oj.el for online program contest
+#+begin_src elisp
+    (setup (:pkg oj)
+      (:option oj-default-online-judge  'codeforces
+               oj-compiler-c "g++"))
 #+end_src
 ** Simulate company with corfu
 Company is wide-used, but I use corfu for its simplity. So I add a simulation for some packages which use
