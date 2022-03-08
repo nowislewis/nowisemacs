@@ -227,6 +227,7 @@ Enforce a sneaky Garbage Collection strategy to minimize GC interference with us
 I used to be a vim(evil) user, but now I use meow to manage all my keys
 ** meow
 #+begin_src elisp
+  ;;setup (:pkg evil))
   (setup (:pkg meow)
     (require 'meow)
     (:option meow-use-keypad-when-execute-kbd nil
