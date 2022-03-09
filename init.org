@@ -1635,6 +1635,7 @@ Simple distraction-free editing. I use darkroom instead of writeroom because it'
   (setq eaf--mac-enable-rosetta t)
   (setup eaf-browser
     (:autoload eaf-open-browser))
+  (require 'eaf-pdf-viewer)
 #+end_src
 ** Simulate company with corfu
 Company is wide-used, but I use corfu for its simplity. So I add a simulation for some packages which use
