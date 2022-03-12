@@ -497,6 +497,7 @@ I used to be a vim(evil) user, but now I use meow to manage all my keys
 #+begin_src elisp
   ;; (set-face-attribute 'default nil :family "yaheiInconsolata" :height 140)
   ;; (set-face-attribute 'default nil :family "InconsolataGo QiHei NF" :height 140)
+  ;; (set-face-attribute 'default nil :family "SF Mono SC" :height 140)
   (set-face-attribute 'default nil :family "Sarasa Mono SC Nerd" :height 140)
   ;; (set-face-attribute 'default nil :family "Consolas" :height 140)
   ;; (set-face-attribute 'default nil :family "Helvetica" :height 140)
@@ -785,40 +786,50 @@ Borrowed from https://github.com/jixiuf/vmacs/blob/master/conf/conf-tabs.el
 #+end_src
 ** corfu(instead of company)
 #+begin_src elisp
-  (setup (:pkg corfu)
-    (:option
-     ;; Optional customizations
-     corfu-cycle t                ;; Enable cycling for `corfu-next/previous'
-     corfu-auto t                 ;; Enable auto completion
-     ;; (corfu-quit-at-boundary t)     ;; Automatically quit at word boundary
-     corfu-quit-no-match t        ;; Automatically quit if there is no match
-     corfu-preview-current nil    ;; Disable current candidate preview
-     corfu-echo-documentation nil ;; Disable documentation in the echo area
-     corfu-auto-prefix 2)
-    (:with-map corfu-map
-      (:bind [tab] corfu-next
-             [backtab] corfu-previous
-             "<escape>" corfu-quit))
-    (corfu-global-mode))
-  ;; corfu backend
-  (setup (:pkg cape)
-    (add-to-list 'completion-at-point-functions #'cape-file)
-    ;; (add-to-list 'completion-at-point-functions #'cape-tex)
-    ;; (add-to-list 'completion-at-point-functions #'cape-dabbrev)
-    ;; (add-to-list 'completion-at-point-functions #'cape-keyword)
-    )
+    (setup (:pkg corfu)
+      (:option
+       ;; Optional customizations
+       corfu-cycle t                ;; Enable cycling for `corfu-next/previous'
+       corfu-auto t                 ;; Enable auto completion
+       ;; (corfu-quit-at-boundary t)     ;; Automatically quit at word boundary
+       corfu-quit-no-match t        ;; Automatically quit if there is no match
+       corfu-preview-current nil    ;; Disable current candidate preview
+       corfu-echo-documentation nil ;; Disable documentation in the echo area
+       corfu-auto-prefix 2)
+      (:with-map corfu-map
+        (:bind
+         ;; [tab] corfu-next
+         ;;       [backtab] corfu-previous
+               "<escape>" corfu-quit))
+      (corfu-global-mode))
 
-  ;; Enable Corfu completion UI
-  (setup (:pkg corfu-doc :host github :repo "galeo/corfu-doc")
-    (:hook-into corfu-mode))
+  (defun corfu-enable-always-in-minibuffer ()
+    "Enable Corfu in the minibuffer if Vertico/Mct are not active."
+    (unless (or (bound-and-true-p mct--active)
+                (bound-and-true-p vertico--input))
+      ;; (setq-local corfu-auto nil) Enable/disable auto completion
+      (corfu-mode 1)))
+  (add-hook 'minibuffer-setup-hook #'corfu-enable-always-in-minibuffer 1)
 
-  ;; (setup (:pkg svg-lib :type built-in)) ;; built-in has little icons
-  (setup (:pkg kind-icon)
-    (:load-after corfu)
-    (:option kind-icon-default-face 'corfu-default) ; to compute blended backgrounds correctly
-    (:when-loaded
-      (add-to-list 'corfu-margin-formatters #'kind-icon-margin-formatter)
-      ))
+    ;; corfu backend
+    (setup (:pkg cape)
+      (add-to-list 'completion-at-point-functions #'cape-file)
+      ;; (add-to-list 'completion-at-point-functions #'cape-tex)
+      ;; (add-to-list 'completion-at-point-functions #'cape-dabbrev)
+      ;; (add-to-list 'completion-at-point-functions #'cape-keyword)
+      )
+
+    ;; Enable Corfu completion UI
+    (setup (:pkg corfu-doc :host github :repo "galeo/corfu-doc")
+      (:hook-into corfu-mode))
+
+    ;; (setup (:pkg svg-lib :type built-in)) ;; built-in has little icons
+    (setup (:pkg kind-icon)
+      (:load-after corfu)
+      (:option kind-icon-default-face 'corfu-default) ; to compute blended backgrounds correctly
+      (:when-loaded
+        (add-to-list 'corfu-margin-formatters #'kind-icon-margin-formatter)
+        ))
 #+end_src
 ** yasnippet
 #+begin_src elisp
@@ -1635,7 +1646,7 @@ Simple distraction-free editing. I use darkroom instead of writeroom because it'
   (setq eaf--mac-enable-rosetta t)
   (setup eaf-browser
     (:autoload eaf-open-browser))
-  (require 'eaf-pdf-viewer)
+  ;; (require 'eaf-pdf-viewer)
 #+end_src
 ** Simulate company with corfu
 Company is wide-used, but I use corfu for its simplity. So I add a simulation for some packages which use
