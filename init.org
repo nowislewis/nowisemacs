@@ -1077,6 +1077,7 @@ Emacs major-mode to work with Beancount ledger files
   (setup (:pkg eldoc-box)
     (add-hook 'eglot--managed-mode-hook #'eldoc-box-hover-at-point-mode t))
   (setup (:pkg eglot))
+  (setq c-basic-offset 4)
 #+end_src
 **** lsp-org-special
 enable eglot in org-src mode
