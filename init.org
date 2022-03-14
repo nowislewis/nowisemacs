@@ -495,18 +495,33 @@ I used to be a vim(evil) user, but now I use meow to manage all my keys
 * UI
 ** Font
 #+begin_src elisp
-  ;; (set-face-attribute 'default nil :family "yaheiInconsolata" :height 140)
-  ;; (set-face-attribute 'default nil :family "InconsolataGo QiHei NF" :height 140)
-  ;; (set-face-attribute 'default nil :family "SF Mono SC" :height 140)
-  (set-face-attribute 'default nil :family "Sarasa Mono SC Nerd" :height 140)
-  ;; (set-face-attribute 'default nil :family "Consolas" :height 140)
-  ;; (set-face-attribute 'default nil :family "Helvetica" :height 140)
+  (defun font-installed-p (font-name)
+    "Check if font with FONT-NAME is available."
+    (find-font (font-spec :name font-name)))
 
-  ;; Monospaced typeface
-  ;; (set-face-attribute 'fixed-pitch nil :family "yaheiInconsolata" :height 1.0)
-  ;; (set-face-attribute 'fixed-pitch nil :family "InconsolataGo QiHei NF" :height 1.0)
-  (set-face-attribute 'fixed-pitch nil :family "Sarasa Mono SC Nerd" :height 1.0)
-  ;; (set-face-attribute 'fixed-pitch nil :family "Consolas" :height 1.0)
+  (when (display-graphic-p)
+    ;; Set default font
+    (cl-loop for font in '("Sarasa Mono SC Nerd"
+                           "InconsolataGo QiHei NF"
+                           "yaheiInconsolata"
+                           "Monaco"
+                           "Consolas")
+             when (font-installed-p font)
+             return (progn
+                      (set-face-attribute 'default nil :family font :height 140)
+                      (set-face-attribute 'fixed-pitch nil :family font :height 1.0))))
+
+    ;; Specify font for all unicode characters
+    ;; (cl-loop for font in '("Apple Color Emoji" "Segoe UI Symbol" "Symbola" "Symbol")
+    ;;          when (font-installed-p font)
+    ;;          return(set-fontset-font t 'unicode font nil 'prepend))
+
+    ;; ;; Specify font for Chinese characters
+    ;; (cl-loop for font in '("WenQuanYi Micro Hei" "Microsoft Yahei")
+    ;;          when (font-installed-p font)
+    ;;          return (set-fontset-font t '(#x4e00 . #x9fff) font)))
+
+    ;; (set-face-attribute 'default nil :family "yaheiInconsolata" :height 140)
 
 #+end_src
 ** Theme
