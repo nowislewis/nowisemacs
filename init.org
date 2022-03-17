@@ -249,7 +249,6 @@ I used to be a vim(evil) user, but now I use meow to manage all my keys
                (motion . ,meow-motion-state-keymap)
                (beacon . ,meow-beacon-state-keymap)
                (leader . ,lewis-leader-map))
-
              )
     (defun meow-setup()
       (setq meow-cheatsheet-layout meow-cheatsheet-layout-qwerty)
@@ -331,7 +330,8 @@ I used to be a vim(evil) user, but now I use meow to manage all my keys
                               '("S" . meow-kmacro-lines)
                               '("t" . meow-till)
                               '("u" . meow-undo)
-                              '("U" . undo-redo)
+                              ;; '("U" . undo-redo)
+                              '("U" . vundo)
                               '("v v" . meow-visit)
                               '("V" . meow-kmacro-matches)
                               '("w" . meow-next-word)
@@ -646,15 +646,6 @@ diff-hl-mode highlights uncommitted changes on the left side of the window (area
 #+begin_src elisp
   (setup (:pkg hl-todo)
     (global-hl-todo-mode))
-#+end_src
-** The built-in tab line mode
-Borrowed from https://github.com/jixiuf/vmacs/blob/master/conf/conf-tabs.el
-#+begin_src elisp :tangle no
-  (setup tab-line-mode
-    (:option tab-line-new-button-show nil  ;; do not show add-new button
-             tab-line-close-button-show nil  ;; do not show close button
-             tab-line-separator (propertize "|" 'face  '(foreground-color . "cyan")))
-    (global-tab-line-mode t))
 #+end_src
 * General Configuration
 ** general modes
@@ -995,6 +986,7 @@ This is adapted from the extra font lock rules provided by Drew Adams' dired+ pa
 ** aweshell
 #+begin_src elisp
   (setup (:pkg aweshell :host github :repo "manateelazycat/aweshell")
+    (:option aweshell-auto-suggestion-p nil)
     (:autoload aweshell-toggle)
     (:autoload aweshell-dedicated-toggle)
     )
@@ -1066,7 +1058,15 @@ Emacs major-mode to work with Beancount ledger files
 ** Useful programing tools
 *** quickrun
 #+begin_src elisp
-  (setup (:pkg quickrun))
+  (setup (:pkg quickrun)
+    ;; Use this parameter as C++ default
+    ;; (quickrun-add-command "c++/20"
+    ;;   '((:command . "g++")
+    ;;     (:exec    . ("%c -std=c++20 %o -o %e %s"
+    ;;                  "%e %a"))
+    ;;     (:remove  . ("%e")))
+    ;;   :default "c++")
+    )
 #+end_src
 *** tree-sitter
 #+begin_src elisp :tangle no
@@ -1276,17 +1276,6 @@ eglot client leveraging LTEX Language Server.
        ;; (jupyter . t)
        ))
     ))
-#+end_src
-** org-bars
-#+begin_src elisp :tangle no
-  (setup (:pkg org-bars :host github :repo "tonyaldon/org-bars")
-    (:option org-bars-color-options '(:only-one-color t
-                                                      :bar-color "#4C4A4D")
-             org-bars-stars '(:empty "◉"
-                                     :invisible "▶"
-                                     :visible "▼"))
-    (:load-after org)
-    (:hook-into org-mode))
 #+end_src
 ** org-modern
 #+begin_src elisp
@@ -1650,12 +1639,12 @@ Simple distraction-free editing. I use darkroom instead of writeroom because it'
 #+end_src
 ** oj.el for online program contest
 #+begin_src elisp
-    (setup (:pkg oj)
-      (:option oj-default-online-judge  'codeforces
-               oj-compiler-c "g++"))
+      (setup (:pkg oj)
+        (:option oj-default-online-judge  'codeforces
+                 ))
 #+end_src
 ** eaf
-#+begin_src elisp
+#+begin_src elisp :tangle no
   (setup (:pkg eaf :host github :repo "emacs-eaf/emacs-application-framework" :files ("*.el")))
   (add-to-list 'load-path "~/.emacs.d/straight/repos/emacs-application-framework")
   (require 'eaf)
