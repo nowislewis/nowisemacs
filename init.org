@@ -372,7 +372,6 @@ I used to be a vim(evil) user, but now I use meow to manage all my keys
   (meow-leader-define-key
    '("b b" . persp-switch-to-buffer)
    '("b B" . switch-to-buffer)
-   '("b i" . ibuffer)
    '("b k" . kill-current-buffer)
    '("b l" . meow-last-buffer)
    '("b m" . bookmark-set)
@@ -892,6 +891,11 @@ borrowed from citre, now you can always jump-back use "M-,"
 *** bookmark
 #+begin_src elisp
   (setq bookmark-default-file "~/Documents/emacs/other-files/bookmarks")
+#+end_src
+* ibuffer
+#+begin_src elisp
+  (setup ibuffer
+    (:global [remap list-buffers] #'ibuffer))
 #+end_src
 * Input
 ** pyim
