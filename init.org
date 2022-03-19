@@ -16,7 +16,7 @@
   ;; Inhibit resizing frame
   (setq frame-inhibit-implied-resize t)
 
-   (add-to-list 'default-frame-alist '(undecorated . t))
+   ;; (add-to-list 'default-frame-alist '(undecorated . t))
   ;; Faster to disable these here (before they've been initialized)
   (push '(menu-bar-lines . 0) default-frame-alist)
   (push '(tool-bar-lines . 0) default-frame-alist)
@@ -253,8 +253,9 @@ I used to be a vim(evil) user, but now I use meow to manage all my keys
                                               (insert . "I")
                                               (beacon . "B")
                                               )
-               ;; meow-use-enhanced-selection-effect t
+               meow-use-enhanced-selection-effect t
                )
+      (:global "C-/" #'meow-comment)
       (defun meow-setup()
         (setq meow-cheatsheet-layout meow-cheatsheet-layout-qwerty)
         (meow-motion-overwrite-define-key '("j" . meow-next)
@@ -363,11 +364,12 @@ I used to be a vim(evil) user, but now I use meow to manage all my keys
                                 '("%" . meow-query-replace-regexp)
                                 '("^" . meow-join)
                                 '("-" . negative-argument)
-                                '("'" . meow-comment)
+                                ;; '("'" . meow-comment)
+                                '("'" . consult-register-load)
+                                '("\"" . consult-register-store)
                                 '("/" . meow-last-buffer)))
       (meow-global-mode 1)
 
-      ;
   ; meow-setup 用于自定义按键绑定，可以直接使用下文中的示例
       (meow-setup)
       )
@@ -1653,18 +1655,18 @@ Simple distraction-free editing. I use darkroom instead of writeroom because it'
 #+end_src
 ** eaf
 #+begin_src elisp
-  (setup (:pkg eaf :host github :repo "emacs-eaf/emacs-application-framework" :files ("*.el"))
-    (:option eaf--mac-enable-rosetta t)
-    (add-to-list 'load-path "~/.emacs.d/straight/repos/emacs-application-framework")
-    (require 'eaf)
-    )
+    (setup (:pkg eaf :host github :repo "emacs-eaf/emacs-application-framework" :files ("*.el"))
+      (:option eaf--mac-enable-rosetta t)
+      (add-to-list 'load-path "~/.emacs.d/straight/repos/emacs-application-framework")
+      (require 'eaf)
+      )
 
-  (setup eaf-browser
-    (:autoload eaf-open-browser))
-  (setup eaf-pdf-viewer
-    (:autoload eaf-open-pdf-from-history))
-  (setup eaf-rss-reader
-    (:autoload eaf-open-rss-reader))
+    (setup eaf-browser
+      (:autoload eaf-open-browser))
+    (setup eaf-pdf-viewer
+      (:autoload eaf-open-pdf-from-history))
+    (setup eaf-rss-reader
+      (:autoload eaf-open-rss-reader))
 #+end_src
 ** Simulate company with corfu
 Company is wide-used, but I use corfu for its simplity. So I add a simulation for some packages which use
