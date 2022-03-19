@@ -30,6 +30,7 @@
      package--init-file-ensured t
      inhibit-startup-message t             ; 关闭启动 Emacs 时的欢迎界面
      )
+
     ;; (pixel-scroll-precision-mode t) ;; 最近发现和 pdf-continuous-view-mode 工作不协调
 #+end_src
 ** Native Compilation(disabled)
@@ -41,20 +42,25 @@
 #+end_src
 ** generic
 #+begin_src elisp
-  ;; 定义一些启动目录，方便下次迁移修改
-  (defvar nowisemacs-root-dir (file-truename "~/nowisemacs/"))
-  (defvar nowisemacs-config-file (concat nowisemacs-root-dir "init.org"))
-  (defvar nowisemacs-extension-dir (concat nowisemacs-root-dir "/extensions"))
+    ;; 定义一些启动目录，方便下次迁移修改
+    (defvar nowisemacs-root-dir (file-truename "~/nowisemacs/"))
+    (defvar nowisemacs-config-file (concat nowisemacs-root-dir "init.org"))
+    (defvar nowisemacs-extension-dir (concat nowisemacs-root-dir "/extensions"))
 
-  (setq use-short-answers t)
+    (setq use-short-answers t)
 
-  (setq ring-bell-function 'ignore)       ;关闭烦人的出错时的提示声
-  (set-default-coding-systems 'utf-8)
-  (setq-default indent-tabs-mode nil)
-  (setq-default tab-width 4)
-    ;; 平滑地进行半屏滚动，避免滚动后recenter操作
-  (setq scroll-step 1
-        scroll-conservatively 10000)
+    (setq frame-resize-pixelwise t) ;设置缩放的模式,避免Mac平台最大化窗口以后右边和下边有空隙
+    (set-frame-parameter nil 'fullscreen 'maximized)
+
+    (setq ring-bell-function 'ignore)       ;关闭烦人的出错时的提示声
+    (set-default-coding-systems 'utf-8)
+    (setq-default indent-tabs-mode nil)
+
+    (setq-default tab-width 4)
+      ;; 平滑地进行半屏滚动，避免滚动后recenter操作
+    (setq scroll-step 1
+          scroll-conservatively 10000)
+  ;; (server-start)
 
 #+end_src
 The following content is not enabled yet, because I want to minimize unnecessary settings as much as possible
@@ -94,7 +100,6 @@ The following content is not enabled yet, because I want to minimize unnecessary
   ;; (add-hook 'find-file-hook 'highlight-parentheses-mode t) ;增强的括号高亮
 
   (setq ad-redefinition-action 'accept)   ;不要烦人的 redefine warning
-  (setq frame-resize-pixelwise t) ;设置缩放的模式,避免Mac平台最大化窗口以后右边和下边有空隙
 
 #+end_src
 
