@@ -506,8 +506,10 @@ I used to be a vim(evil) user, but now I use meow to manage all my keys
 
   (when (display-graphic-p)
     ;; Set default font
-    (cl-loop for font in '("Sarasa Mono SC Nerd"
+    (cl-loop for font in '(
+                           ;; "JetBrains Mono"
                            "InconsolataGo QiHei NF"
+                           ;; "Sarasa Mono SC Nerd"
                            "yaheiInconsolata"
                            "Monaco"
                            "Consolas")
@@ -1610,6 +1612,23 @@ among all the files in org-roam in a single agenda-view. The code was borrowed f
      org-noter-auto-save-last-location t
      org-noter-separate-notes-from-heading nil
      org-noter-doc-split-percentage '(0.6 . 0.4)))
+#+end_src
+** elfeed
+#+begin_src elisp
+(setup (:pkg elfeed)
+  (setq elfeed-feeds
+        '("http://ruzkuku.com/all.atom"
+          "https://karthinks.com/index.xml"
+          "https://shom.dev/index.xml"
+          "https://blog.benoitj.ca/posts/index.xml"
+          "https://protesilaos.com/codelog.xml"
+          "https://sachachua.com/blog/feed/"
+          "https://nullprogram.com/feed/"
+          "https://irreal.org/blog/?feed=rss2"
+          "https://ambrevar.xyz/atom.xml"
+          "https://guix.gnu.org/feeds/blog.atom"
+          "https://valdyas.org/fading/feed/"
+          "https://www.reddit.com/r/emacs/.rss")))
 #+end_src
 * tools
 ** restart-emacs
