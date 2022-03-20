@@ -255,7 +255,6 @@ I used to be a vim(evil) user, but now I use meow to manage all my keys
                                               )
                meow-use-enhanced-selection-effect t
                )
-      (:global "C-/" #'meow-comment)
       (defun meow-setup()
         (setq meow-cheatsheet-layout meow-cheatsheet-layout-qwerty)
         (meow-motion-overwrite-define-key '("j" . meow-next)
@@ -336,7 +335,6 @@ I used to be a vim(evil) user, but now I use meow to manage all my keys
                                 '("S" . meow-kmacro-lines)
                                 '("t" . meow-till)
                                 '("u" . meow-undo)
-                                ;; '("U" . undo-redo)
                                 '("U" . vundo)
                                 '("v v" . meow-visit)
                                 '("V" . meow-kmacro-matches)
@@ -364,7 +362,6 @@ I used to be a vim(evil) user, but now I use meow to manage all my keys
                                 '("%" . meow-query-replace-regexp)
                                 '("^" . meow-join)
                                 '("-" . negative-argument)
-                                ;; '("'" . meow-comment)
                                 '("'" . consult-register-load)
                                 '("\"" . consult-register-store)
                                 '("/" . meow-last-buffer)))
@@ -1654,19 +1651,19 @@ Simple distraction-free editing. I use darkroom instead of writeroom because it'
                  ))
 #+end_src
 ** eaf
-#+begin_src elisp
-    (setup (:pkg eaf :host github :repo "emacs-eaf/emacs-application-framework" :files ("*.el"))
-      (:option eaf--mac-enable-rosetta t)
-      (add-to-list 'load-path "~/.emacs.d/straight/repos/emacs-application-framework")
-      (require 'eaf)
-      )
+#+begin_src elisp :tangle no
+  (setup (:pkg eaf :host github :repo "emacs-eaf/emacs-application-framework" :files ("*.el"))
+    (:option eaf--mac-enable-rosetta t)
+    (add-to-list 'load-path "~/.emacs.d/straight/repos/emacs-application-framework")
+    (require 'eaf)
+    )
 
-    (setup eaf-browser
-      (:autoload eaf-open-browser))
-    (setup eaf-pdf-viewer
-      (:autoload eaf-open-pdf-from-history))
-    (setup eaf-rss-reader
-      (:autoload eaf-open-rss-reader))
+  (setup eaf-browser
+    (:autoload eaf-open-browser))
+  (setup eaf-pdf-viewer
+    (:autoload eaf-open-pdf-from-history))
+  (setup eaf-rss-reader
+    (:autoload eaf-open-rss-reader))
 #+end_src
 ** Simulate company with corfu
 Company is wide-used, but I use corfu for its simplity. So I add a simulation for some packages which use
