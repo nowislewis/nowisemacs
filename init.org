@@ -1198,13 +1198,18 @@ eglot client leveraging LTEX Language Server.
   ;;                                        ("#+end_src" . "Ⅎ")))
   (setup (:pkg org :type built-in)
     (setq org-directory "~/Documents/emacs/orgmode/")
-    (:option
-     org-adapt-indentation t
+    (:option org-adapt-indentation t
              org-startup-indented t
              org-hide-emphasis-markers t
              org-imenu-depth 5
              ;; org-startup-folded t
+
              org-return-follows-link t
+             org-link-frame-setup '((vm . vm-visit-folder-other-frame)
+                                    (vm-imap . vm-visit-imap-folder-other-frame)
+                                    (gnus . org-gnus-no-new-news)
+                                    (file . find-file)
+                                    (wl . wl-other-frame))
              fill-column 120
              org-log-done 'time ;; 记录完成时间
              org-blank-before-new-entry '((heading . nil)
@@ -1274,20 +1279,20 @@ eglot client leveraging LTEX Language Server.
               ("=" org-verbatim verbatim)
               ("~" org-code verbatim)
               ("+" (:strike-through t))
-            ))
+              ))
 
-    (org-babel-do-load-languages
-     'org-babel-load-languages
-     '((emacs-lisp . t)
-       (julia . t)
-       (python . t)
-       (dot . t)
-       (latex . t)
-       (C . t)
-       ;; (Cpp . t)
-       ;; (jupyter . t)
-       ))
-    ))
+      (org-babel-do-load-languages
+       'org-babel-load-languages
+       '((emacs-lisp . t)
+         (julia . t)
+         (python . t)
+         (dot . t)
+         (latex . t)
+         (C . t)
+         ;; (Cpp . t)
+         ;; (jupyter . t)
+         ))
+      ))
 #+end_src
 ** org-modern
 #+begin_src elisp
@@ -1328,48 +1333,47 @@ eglot client leveraging LTEX Language Server.
              org-roam-completion-everywhere t
              org-roam-db-gc-threshold most-positive-fixnum
              org-roam-node-display-template "${doom-hierarchy:*} ${tags:37}"
-             )
-    (:when-loaded
-      (org-roam-db-autosync-mode)
+    )
+  (:when-loaded
+    (org-roam-db-autosync-mode)
 
-      ;; Codes blow are used to general a hierachy for title nodes that under a file
-      (cl-defmethod org-roam-node-doom-filetitle ((node org-roam-node))
-        "Return the value of \"#+title:\" (if any) from file that NODE resides in.
+    ;; Codes blow are used to general a hierachy for title nodes that under a file
+    (cl-defmethod org-roam-node-doom-filetitle ((node org-roam-node))
+      "Return the value of \"#+title:\" (if any) from file that NODE resides in.
   If there's no file-level title in the file, return empty string."
-        (or (if (= (org-roam-node-level node) 0)
-                (org-roam-node-title node)
-              (org-roam-get-keyword "TITLE" (org-roam-node-file node)))
-            ""))
-
-      (cl-defmethod org-roam-node-doom-hierarchy ((node org-roam-node))
-        "Return hierarchy for NODE, constructed of its file title, OLP and direct title.
+      (or (if (= (org-roam-node-level node) 0)
+              (org-roam-node-title node)
+            (org-roam-get-keyword "TITLE" (org-roam-node-file node)))
+          ""))
+    (cl-defmethod org-roam-node-doom-hierarchy ((node org-roam-node))
+      "Return hierarchy for NODE, constructed of its file title, OLP and direct title.
     If some elements are missing, they will be stripped out."
-        (let ((title     (org-roam-node-title node))
-              (olp       (org-roam-node-olp   node))
-              (level     (org-roam-node-level node))
-              (filetitle (org-roam-node-doom-filetitle node))
-              (separator (propertize " > " 'face 'shadow)))
-          (cl-case level
-            ;; node is a top-level file
-            (0 filetitle)
-            ;; node is a level 1 heading
-            (1 (concat (propertize filetitle 'face '(shadow italic))
-                       separator title))
-            ;; node is a heading with an arbitrary outline path
-            (t (concat (propertize filetitle 'face '(shadow italic))
-                       separator (propertize (string-join olp " > ") 'face '(shadow italic))
-                       separator title)))))
+      (let ((title     (org-roam-node-title node))
+            (olp       (org-roam-node-olp   node))
+            (level     (org-roam-node-level node))
+            (filetitle (org-roam-node-doom-filetitle node))
+            (separator (propertize " > " 'face 'shadow)))
+        (cl-case level
+          ;; node is a top-level file
+          (0 filetitle)
+          ;; node is a level 1 heading
+          (1 (concat (propertize filetitle 'face '(shadow italic))
+                     separator title))
+          ;; node is a heading with an arbitrary outline path
+          (t (concat (propertize filetitle 'face '(shadow italic))
+                     separator (propertize (string-join olp " > ") 'face '(shadow italic))
+                     separator title)))))
 
-      (add-to-list 'display-buffer-alist
-                   '("\\*org-roam\\*"
-                     (display-buffer-in-side-window)
-                     (side . right)
-                     (slot . 0)
-                     (window-width . 0.25)
-                     (window-parameters . ((no-other-window . t)
-                                           (no-delete-other-windows . t)))))
-      (org-roam-buffer-toggle)
-      ))
+    (add-to-list 'display-buffer-alist
+                 '("\\*org-roam\\*"
+                   (display-buffer-in-side-window)
+                   (side . right)
+                   (slot . 0)
+                   (window-width . 0.25)
+                   (window-parameters . ((no-other-window . t)
+                                         (no-delete-other-windows . t)))))
+    (org-roam-buffer-toggle)
+    ))
 #+end_src
 *** org-roam-ui
 #+begin_src elisp
@@ -1637,6 +1641,7 @@ among all the files in org-roam in a single agenda-view. The code was borrowed f
 ** org-media-note
 #+begin_src elisp :tangle no
   (setup (:pkg mpv))
+  (mpv start)
   (setup (:pkg pretty-hydra))
   (setup (:pkg org-media-note :host github :repo "yuchen-lea/org-media-note")
     (:option org-media-note-screenshot-image-dir "~/Documents/emacs/orgmode/PicturesForAll/org_media_imgs/")
@@ -1646,8 +1651,12 @@ among all the files in org-roam in a single agenda-view. The code was borrowed f
 #+end_src
 ** ebib
 ebib doesn't work well with vertico now, so tangle no at this time.
-#+begin_src elisp :tangle no`
+#+begin_src elisp :tangle no
     (setup (:pkg ebib))
+#+end_src
+** delve
+#+begin_src elisp
+(setup (:pkg delve :host github :repo "publicimageltd/delve"))
 #+end_src
 * tools
 ** restart-emacs
