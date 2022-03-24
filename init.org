@@ -706,9 +706,16 @@ diff-hl-mode highlights uncommitted changes on the left side of the window (area
     (when (memq window-system '(mac ns x))
       (exec-path-from-shell-initialize)))
 #+end_src
-** vundo for undo tree
+** Undo
+*** vundo for undo history
 #+begin_src elisp
 (setup (:pkg vundo :host github :repo "casouri/vundo"))
+#+end_src
+*** undo-hl flashes the to-be-deleted text before deleting
+#+begin_src elisp
+  (setup (:pkg undo-hl :host github :repo "casouri/undo-hl")
+    (:autoload undo-hl-mode)
+    (:hook-into text-mode-hook))
 #+end_src
 * 补全
 ** Completions with Vertico
