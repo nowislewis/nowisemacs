@@ -364,7 +364,7 @@ I used to be a vim(evil) user, but now I use meow to manage all my keys
                                 '("-" . negative-argument)
                                 '("'" . consult-register-load)
                                 '("\"" . consult-register-store)
-                                '("/" . meow-last-buffer)))
+                                '("/" . meow-comment)))
       (meow-global-mode 1)
 
   ; meow-setup 用于自定义按键绑定，可以直接使用下文中的示例
@@ -508,8 +508,8 @@ I used to be a vim(evil) user, but now I use meow to manage all my keys
     ;; Set default font
     (cl-loop for font in '(
                            ;; "JetBrains Mono"
-                           "InconsolataGo QiHei NF"
-                           ;; "Sarasa Mono SC Nerd"
+                           ;; "InconsolataGo QiHei NF"
+                           "Sarasa Mono SC Nerd"
                            "yaheiInconsolata"
                            "Monaco"
                            "Consolas")
@@ -779,23 +779,23 @@ diff-hl-mode highlights uncommitted changes on the left side of the window (area
 #+end_src
 ** embark
 #+begin_src elisp
-    (setup (:pkg embark-consult)
-      (add-hook 'embark-collect-mode-hook #'consult-preview-at-point-mode)
-      )
+  (setup (:pkg embark-consult)
+    (add-hook 'embark-collect-mode-hook #'consult-preview-at-point-mode)
+    )
 
-    (setup (:pkg embark)
-      (:also-load embark-consult)
-      (:global "C-S-a" embark-act)
+  (setup (:pkg embark)
+    (:also-load embark-consult)
+    (:global "C-S-a" embark-act)
 
-      ;; Show Embark actions via which-key
-      (setq embark-action-indicator
-            (lambda (map)
-              (which-key--show-keymap "Embark" map nil nil 'no-paging)
-              #'which-key--hide-popup-ignore-command)
-            embark-become-indicator embark-action-indicator))
+    ;; Show Embark actions via which-key
+    (setq embark-action-indicator
+          (lambda (map)
+            (which-key--show-keymap "Embark" map nil nil 'no-paging)
+            #'which-key--hide-popup-ignore-command)
+          embark-become-indicator embark-action-indicator))
 
-    (setup (:pkg wgrep :host github :repo "mhayashi1120/Emacs-wgrep")
-      (require 'wgrep))
+  (setup (:pkg wgrep :host github :repo "mhayashi1120/Emacs-wgrep")
+    (require 'wgrep))
 #+end_src
 ** corfu(instead of company)
 #+begin_src elisp
@@ -1333,47 +1333,47 @@ eglot client leveraging LTEX Language Server.
              org-roam-completion-everywhere t
              org-roam-db-gc-threshold most-positive-fixnum
              org-roam-node-display-template "${doom-hierarchy:*} ${tags:37}"
-    )
-  (:when-loaded
-    (org-roam-db-autosync-mode)
+             )
+    (:when-loaded
+      (org-roam-db-autosync-mode)
 
-    ;; Codes blow are used to general a hierachy for title nodes that under a file
-    (cl-defmethod org-roam-node-doom-filetitle ((node org-roam-node))
-      "Return the value of \"#+title:\" (if any) from file that NODE resides in.
+      ;; Codes blow are used to general a hierachy for title nodes that under a file
+      (cl-defmethod org-roam-node-doom-filetitle ((node org-roam-node))
+        "Return the value of \"#+title:\" (if any) from file that NODE resides in.
   If there's no file-level title in the file, return empty string."
-      (or (if (= (org-roam-node-level node) 0)
-              (org-roam-node-title node)
-            (org-roam-get-keyword "TITLE" (org-roam-node-file node)))
-          ""))
-    (cl-defmethod org-roam-node-doom-hierarchy ((node org-roam-node))
-      "Return hierarchy for NODE, constructed of its file title, OLP and direct title.
+        (or (if (= (org-roam-node-level node) 0)
+                (org-roam-node-title node)
+              (org-roam-get-keyword "TITLE" (org-roam-node-file node)))
+            ""))
+      (cl-defmethod org-roam-node-doom-hierarchy ((node org-roam-node))
+        "Return hierarchy for NODE, constructed of its file title, OLP and direct title.
     If some elements are missing, they will be stripped out."
-      (let ((title     (org-roam-node-title node))
-            (olp       (org-roam-node-olp   node))
-            (level     (org-roam-node-level node))
-            (filetitle (org-roam-node-doom-filetitle node))
-            (separator (propertize " > " 'face 'shadow)))
-        (cl-case level
-          ;; node is a top-level file
-          (0 filetitle)
-          ;; node is a level 1 heading
-          (1 (concat (propertize filetitle 'face '(shadow italic))
-                     separator title))
-          ;; node is a heading with an arbitrary outline path
-          (t (concat (propertize filetitle 'face '(shadow italic))
-                     separator (propertize (string-join olp " > ") 'face '(shadow italic))
-                     separator title)))))
+        (let ((title     (org-roam-node-title node))
+              (olp       (org-roam-node-olp   node))
+              (level     (org-roam-node-level node))
+              (filetitle (org-roam-node-doom-filetitle node))
+              (separator (propertize " > " 'face 'shadow)))
+          (cl-case level
+            ;; node is a top-level file
+            (0 filetitle)
+            ;; node is a level 1 heading
+            (1 (concat (propertize filetitle 'face '(shadow italic))
+                       separator title))
+            ;; node is a heading with an arbitrary outline path
+            (t (concat (propertize filetitle 'face '(shadow italic))
+                       separator (propertize (string-join olp " > ") 'face '(shadow italic))
+                       separator title)))))
 
-    (add-to-list 'display-buffer-alist
-                 '("\\*org-roam\\*"
-                   (display-buffer-in-side-window)
-                   (side . right)
-                   (slot . 0)
-                   (window-width . 0.25)
-                   (window-parameters . ((no-other-window . t)
-                                         (no-delete-other-windows . t)))))
-    (org-roam-buffer-toggle)
-    ))
+      (add-to-list 'display-buffer-alist
+                   '("\\*org-roam\\*"
+                     (display-buffer-in-side-window)
+                     (side . right)
+                     (slot . 0)
+                     (window-width . 0.25)
+                     (window-parameters . ((no-other-window . t)
+                                           (no-delete-other-windows . t)))))
+      (org-roam-buffer-toggle)
+      ))
 #+end_src
 *** org-roam-ui
 #+begin_src elisp
