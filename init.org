@@ -934,7 +934,7 @@ borrowed from citre, now you can always jump-back use "M-,"
   (setup (:pkg pyim)
     (:option pyim-dicts '((:name "lewis_pyim_dict" :file "~/Documents/emacs/other-files/lewis_pyim_dict.pyim")
                           (:name "lewis_big_dict" :file "~/Documents/emacs/other-files/pyim-bigdict.pyim.gz"))
-             pyim-default-scheme 'quanpin
+             pyim-default-scheme 'xiaohe-shuangpin
              pyim-punctuation-translate-p '(no yes auto)
              pyim-page-tooltip 'posframe
              pyim-page-length 5
@@ -968,9 +968,7 @@ borrowed from citre, now you can always jump-back use "M-,"
 *** dirvish
 Dirvish is a minimalistic file manager based on Dired. It's fast
 #+begin_src elisp
-  (setup (:pkg dirvish)
-    (:when-loaded
-      (dirvish-override-dired-mode)))
+    (setup (:pkg dirvish))
 #+end_src
 *** diredfl
 This is adapted from the extra font lock rules provided by Drew Adams' dired+ package, but published via a modern means, and with support for older Emacsen removed.
@@ -1017,8 +1015,7 @@ This is adapted from the extra font lock rules provided by Drew Adams' dired+ pa
   (setup (:pkg aweshell :host github :repo "manateelazycat/aweshell")
     (:option aweshell-auto-suggestion-p nil)
     (:autoload aweshell-toggle)
-    (:autoload aweshell-dedicated-toggle)
-    )
+    (:autoload aweshell-dedicated-toggle))
 #+end_src
 ** vterm
 #+begin_src elisp
@@ -1057,8 +1054,7 @@ Show git blame info about current line
 **** elisp-demos
 #+begin_src elisp
   (setup (:pkg elisp-demos)
-    (advice-add 'helpful-update :after #'elisp-demos-advice-helpful-update)
-    )
+    (advice-add 'helpful-update :after #'elisp-demos-advice-helpful-update))
 #+end_src
 **** elispfl
 #+begin_src elisp
@@ -1087,15 +1083,7 @@ Emacs major-mode to work with Beancount ledger files
 ** Useful programing tools
 *** quickrun
 #+begin_src elisp
-  (setup (:pkg quickrun)
-    ;; Use this parameter as C++ default
-    ;; (quickrun-add-command "c++/20"
-    ;;   '((:command . "g++")
-    ;;     (:exec    . ("%c -std=c++20 %o -o %e %s"
-    ;;                  "%e %a"))
-    ;;     (:remove  . ("%e")))
-    ;;   :default "c++")
-    )
+  (setup (:pkg quickrun))
 #+end_src
 *** tree-sitter
 #+begin_src elisp :tangle no
@@ -1156,7 +1144,8 @@ enable eglot in org-src mode
     (eval `(lsp-org-babel-enable ,lang)))
 #+end_src
 *** conda
-#+begin_src elisp
+don't use conda any more for a better integration with EAF
+#+begin_src elisp :tangle no
   (setup (:pkg conda)
     ;; (:delay)
     (:when-loaded
@@ -1219,8 +1208,6 @@ eglot client leveraging LTEX Language Server.
              org-startup-indented t
              org-hide-emphasis-markers t
              org-imenu-depth 5
-             ;; org-startup-folded t
-
              org-return-follows-link t
              org-link-frame-setup '((vm . vm-visit-folder-other-frame)
                                     (vm-imap . vm-visit-imap-folder-other-frame)
@@ -1397,11 +1384,6 @@ eglot client leveraging LTEX Language Server.
   (setup (:pkg websocket))
   (setup (:pkg simple-httpd))
   (setup (:pkg org-roam-ui :host github :repo "org-roam/org-roam-ui" :files ("*.el" "out")))
-#+end_src
-*** org-roam-timestamps
-#+begin_src elisp
-  (setup (:pkg org-roam-timestamps)
-    (:hook-into org-roam-mode))
 #+end_src
 *** org-roam-agenda
 The main purpose for this section is to add every node that has a "TODO" into org-agenda, so I can see all the "TODO"s
@@ -1654,20 +1636,22 @@ among all the files in org-roam in a single agenda-view. The code was borrowed f
 #+end_src
 ** elfeed
 #+begin_src elisp
-(setup (:pkg elfeed)
-  (setq elfeed-feeds
-        '("http://ruzkuku.com/all.atom"
-          "https://karthinks.com/index.xml"
-          "https://shom.dev/index.xml"
-          "https://blog.benoitj.ca/posts/index.xml"
-          "https://protesilaos.com/codelog.xml"
-          "https://sachachua.com/blog/feed/"
-          "https://nullprogram.com/feed/"
-          "https://irreal.org/blog/?feed=rss2"
-          "https://ambrevar.xyz/atom.xml"
-          "https://guix.gnu.org/feeds/blog.atom"
-          "https://valdyas.org/fading/feed/"
-          "https://www.reddit.com/r/emacs/.rss")))
+  (setup (:pkg elfeed)
+    (setq elfeed-feeds
+          '("http://ruzkuku.com/all.atom"
+            "https://karthinks.com/index.xml"
+            "https://shom.dev/index.xml"
+            "https://blog.benoitj.ca/posts/index.xml"
+            "https://protesilaos.com/codelog.xml"
+            "https://sachachua.com/blog/feed/"
+            "https://nullprogram.com/feed/"
+            "https://irreal.org/blog/?feed=rss2"
+            "https://ambrevar.xyz/atom.xml"
+            "https://guix.gnu.org/feeds/blog.atom"
+            "https://valdyas.org/fading/feed/"
+            "https://www.reddit.com/r/emacs/.rss"
+            "https://manateelazycat.github.io/feed.xml"
+  )))
 #+end_src
 ** ebib
 ebib doesn't work well with vertico now, so tangle no at this time.
