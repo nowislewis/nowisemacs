@@ -24,6 +24,16 @@ It's designed by following principles:
 + Universal programming solution including completion, jump, search under different path or files. With the help of *Language Server Protocol* powered by Microsoft and the great ctags
   front-end *citre*, users can easily use and expand almost all programming languages under emacs.
 + Pinyin search everywhere powered by PYIM, orderless completion.
+** How to use
+All configs can be seen [[file:init.org][here]] .
+Nowisemacs uses a single org file to manage all configurations. To reduce the startup time of emacs, users need to
+generate =.el= configuration files before the first startup:
+1. =mv ~/.emacs.d/ .emacs.d.back= ;; Backup your original configuration
+2. =mkdir ~/.emacs.d= ;; Make the emacs configuration folder.
+3. =git clone https://github.com/nowislewis/nowisemacs ~/nowisemacs=;; Download nowisemacs
+4. =emacs ~/nowisemacs/init.org= ;; Open init.org
+5. Sequentially press "Ctrl-c Ctrl-v t", or ~Alt-x~ =org-babel-tangle= to generate init.el
+6. =emacs= ;; Launch emacs, the download, installation and configuration of packages will be done automatically.
 ** Ideas behind nowisemacs
 *** TL ; NR
 Concise + High maintainability
@@ -49,16 +59,6 @@ concepts should be met as far as possible:
 I like rich functionality, which allows me to have suitable solutions for various scenarios. Usually adding a functionality
 will increase the complexity of configurations. Nowisemacs looks for a balance between functionality and complexity by
 "concise" choices.
-** How to use
-All configs can be seen [[file:init.org][here]] .
-Nowisemacs uses a single org file to manage all configurations. To reduce the startup time of emacs, users need to
-generate =.el= configuration files before the first startup:
-1. =mv ~/.emacs.d/ .emacs.d.back= ;; Backup your original configuration
-2. =mkdir ~/.emacs.d= ;; Make the emacs configuration folder.
-3. =git clone https://github.com/nowislewis/nowisemacs ~/nowisemacs=;; Download nowisemacs
-4. =emacs ~/nowisemacs/init.org= ;; Open init.org
-5. Sequentially press "Ctrl-c Ctrl-v t", or ~Alt-x~ =org-babel-tangle= to generate init.el
-6. =emacs= ;; Launch emacs, the download, installation and configuration of packages will be done automatically.
 * Things you must know before going deeper
 ** Radical
 1. Nowisemacs always uses the latest emacs version and compile it locally, so there may be some incompatible when you use an older version.
