@@ -352,6 +352,17 @@ I used to be a vim(evil) user, but now I use meow to manage all my keys
                               '("z r" . hs-show-all)
                               '("v i" . meow-inner-of-thing)
                               '("v a" . meow-bounds-of-thing)
+
+
+                              '("v \'" . insert-quotations)
+                              '("v \"" . insert-quotes)
+                              '("v \`" . insert-backquote)
+                              '("v *" . insert-star)
+                              '("v (" . insert-parentheses)
+                              '("v [" . insert-bracket)
+                              '("v {" . insert-curly)
+                              '("v =" . insert-equation)
+
                               '("<escape>" . ignore)
 
                               '("!" . meow-start-kmacro-or-insert-counter)
@@ -506,6 +517,81 @@ I used to be a vim(evil) user, but now I use meow to manage all my keys
   (setup (:pkg minibuffer-modifier-keys)
     (require 'minibuffer-modifier-keys)
    (minibuffer-modifier-keys-setup t))
+#+end_src
+** insert-pair
+#+begin_src elisp
+  (defun insert-quotations (&optional arg)
+    "Enclose following ARG sexps in quotation marks.
+    Leave point after open-paren."
+    (interactive "*P")
+    (insert-pair arg ?\' ?\'))
+
+  (defun insert-quotes (&optional arg)
+    "Enclose following ARG sexps in quotes.
+    Leave point after open-quote."
+    (interactive "*P")
+    (insert-pair arg ?\" ?\"))
+
+  (defun insert-backquote (&optional arg)
+    "Enclose following ARG sexps in quotations with backquote.
+    Leave point after open-quotation."
+    (interactive "*P")
+    (insert-pair arg ?\` ?\'))
+
+  (defun insert-star (&optional arg)
+    "Enclose following ARG sexps in stars.
+  Leave point after open-quotation."
+    (interactive "*P")
+    (insert-pair arg ?\* ?\*))
+
+  (defun insert-bracket (&optional arg)
+    "Enclose following ARG sexps in brackets.
+  Leave point after open-quotation."
+    (interactive "*P")
+    (insert-pair arg ?\[ ?\]))
+
+  (defun insert-curly (&optional arg)
+    "Enclose following ARG sexps in curly braces.
+  Leave point after open-quotation."
+    (interactive "*P")
+    (insert-pair arg ?\{ ?\}))
+
+  (defun insert-equate (&optional arg)
+    "Enclose following ARG sexps in equations.
+  Leave point after open-quotation."
+    (interactive "*P")
+    (insert-pair arg ?\= ?\=))
+#+end_src
+
+** awesome-pair
+#+begin_src elisp :tangle no
+  (setup (:pkg awesome-pair :host github :repo "manateelazycat/awesome-pair")
+    (:hook-into prog-mode-hook text-mode-hook)
+    (:bind
+     ;; (kbd "(") awesome-pair-open-round
+     ;; (kbd "[") awesome-pair-open-bracket
+     ;; (kbd "{") awesome-pair-open-curly
+     (kbd ")") awesome-pair-close-round
+     (kbd "]") awesome-pair-close-bracket
+     (kbd "}") awesome-pair-close-curly
+     ;; (kbd "=") 'awesome-pair-equal
+     (kbd "%") awesome-pair-match-paren
+     (kbd "\"") awesome-pair-double-quote
+     ;; (kbd "SPC") awesome-pair-space
+     ;; (kbd "RET") awesome-pair-newline
+     ;; "M-o" awesome-pair-backward-delete
+     ;; "C-d" awesome-pair-forward-delete
+     ;; "C-k" awesome-pair-kill
+     ;; (kbd "M-\"") 'awesome-pair-wrap-double-quote
+     ;; (kbd "M-[") 'awesome-pair-wrap-bracket
+     ;; (kbd "M-{") 'awesome-pair-wrap-curly
+     ;; (kbd "M-(") 'awesome-pair-wrap-round
+     (kbd "M-)") awesome-pair-unwrap
+
+     ;; (kbd "M-p") awesome-pair-jump-right
+     ;; (kbd "M-n") awesome-pair-jump-left
+     ;; (kbd "M-:") awesome-pair-jump-out-pair-and-newline
+     ))
 #+end_src
 * UI
 ** Font
@@ -669,7 +755,7 @@ diff-hl-mode highlights uncommitted changes on the left side of the window (area
 #+begin_src elisp
   (setup save-place
     (:hook-into after-init-hook))
-  (electric-pair-mode t)                       ; 自动补全括号
+  ;;(electric-pair-mode t)                       ; 自动补全括号
   (global-auto-revert-mode t)                  ; 当另一程序修改了文件时，让 Emacs 及时刷新 Buffer
   (delete-selection-mode t)                    ; 选中文本后输入文本会替换文本（更符合我们习惯了的其它编辑器的逻辑）
   (global-hl-line-mode)
@@ -934,7 +1020,8 @@ borrowed from citre, now you can always jump-back use "M-,"
   (setup (:pkg pyim)
     (:option pyim-dicts '((:name "lewis_pyim_dict" :file "~/Documents/emacs/other-files/lewis_pyim_dict.pyim")
                           (:name "lewis_big_dict" :file "~/Documents/emacs/other-files/pyim-bigdict.pyim.gz"))
-             pyim-default-scheme 'xiaohe-shuangpin
+             ;; pyim-default-scheme 'xiaohe-shuangpin
+             pyim-default-scheme 'quanpin
              pyim-punctuation-translate-p '(no yes auto)
              pyim-page-tooltip 'posframe
              pyim-page-length 5
@@ -1194,6 +1281,22 @@ eglot client leveraging LTEX Language Server.
   (setup hideshow
     (:with-hook prog-mode-hook
       (:hook hs-minor-mode)))
+#+end_src
+*** project
+borrowed from https://emacstalk.github.io/post/010/
+#+begin_src elisp :tangle no
+(defun my/project-try-local (dir)
+  "Determine if DIR is a non-Git project."
+  (catch 'ret
+    (let ((pr-flags '((".project")
+                      ("go.mod" "Cargo.toml" "project.clj" "pom.xml" "package.json") ;; higher priority
+                      ("Makefile" "README.org" "README.md"))))
+      (dolist (current-level pr-flags)
+        (dolist (f current-level)
+          (when-let ((root (locate-dominating-file dir f)))
+            (throw 'ret (cons 'local root))))))))
+
+(setq project-find-functions '(my/project-try-local project-try-vc))
 #+end_src
 * Org Mode
 ** org-mode

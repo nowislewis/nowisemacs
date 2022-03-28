@@ -50,6 +50,7 @@ I like rich functionality, which allows me to have suitable solutions for variou
 will increase the complexity of configurations. Nowisemacs looks for a balance between functionality and complexity by
 "concise" choices.
 ** How to use
+All configs can be seen [[file:init.org][here]] .
 Nowisemacs uses a single org file to manage all configurations. To reduce the startup time of emacs, users need to
 generate =.el= configuration files before the first startup:
 1. =mv ~/.emacs.d/ .emacs.d.back= ;; Backup your original configuration
