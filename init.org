@@ -815,7 +815,8 @@ diff-hl-mode highlights uncommitted changes on the left side of the window (area
   (setup (:pkg exec-path-from-shell)
     ;; (:delay)
     (when (memq window-system '(mac ns x))
-      (exec-path-from-shell-initialize)))
+      (exec-path-from-shell-initialize))
+      )
 #+end_src
 ** Undo
 *** vundo for undo history
@@ -925,7 +926,7 @@ diff-hl-mode highlights uncommitted changes on the left side of the window (area
        ;; (corfu-quit-at-boundary t)     ;; Automatically quit at word boundary
        corfu-quit-no-match t        ;; Automatically quit if there is no match
        corfu-preview-current nil    ;; Disable current candidate preview
-       corfu-echo-documentation nil ;; Disable documentation in the echo area
+       ;; corfu-echo-documentation nil ;; Disable documentation in the echo area
        corfu-auto-prefix 2)
       (:with-map corfu-map
         (:bind
@@ -1182,6 +1183,46 @@ Emacs major-mode to work with Beancount ledger files
   (setup (:pkg cdlatex))
   (setup (:pkg auctex))
 #+end_src
+*** python
+**** python
+#+begin_src elisp
+  (setup python
+    (:with-hook inferior-python-mode-hook
+      (:hook (lambda ()
+               (process-query-on-exit-flag
+                (get-process "Python")))))
+    (:when-loaded
+      (when (and (executable-find "python3")
+                 (string= python-shell-interpreter "python"))
+        (setq python-shell-interpreter "python3"))
+      (with-eval-after-load 'exec-path-from-shell
+        (exec-path-from-shell-copy-env "PYTHONPATH"))
+      (setup (:pkg live-py-mode))
+      )
+    )
+
+#+end_src
+**** conda
+don't use conda any more for a better integration with EAF
+#+begin_src elisp :tangle no
+  (setup (:pkg conda)
+    ;; (:delay)
+    (:when-loaded
+      (when (eq system-type 'darwin)
+        (custom-set-variables '(conda-anaconda-home "/Users/liuyi/miniforge3"))
+        (setq conda-env-home-directory (expand-file-name "~/miniforge3/")))
+      (when (eq system-type 'gnu/linux)
+        ;; 要用绝对路径
+        (custom-set-variables '(conda-anaconda-home "/home/lewisliu/miniconda3"))
+        (setq conda-env-home-directory (expand-file-name "/home/lewisliu/miniconda3/"))
+        )
+      ;; interactivate shell support
+      (conda-env-initialize-interactive-shells)
+      ;; eshell support
+      (conda-env-initialize-eshell)
+      ;; (conda-env-autoactivate-mode t)
+      ))
+#+end_src
 ** Useful programing tools
 *** quickrun
 #+begin_src elisp
@@ -1210,7 +1251,13 @@ Emacs major-mode to work with Beancount ledger files
   ;; (setup (:pkg markdown-mode))
   (setup (:pkg eldoc-box)
     (add-hook 'eglot--managed-mode-hook #'eldoc-box-hover-at-point-mode t))
+
+  (setq xref-search-program 'ripgrep)
+  (setq read-process-output-max (* 1024 1024))
   (setup (:pkg eglot))
+  (setup eldoc
+    (:option eldoc-echo-area-use-multiline-p 3
+          eldoc-echo-area-display-truncation-message nil))
   (setq c-basic-offset 4)
 #+end_src
 **** lsp-org-special
@@ -1244,27 +1291,6 @@ enable eglot in org-src mode
     '("python" "C++" "C"))
   (dolist (lang org-babel-lang-list)
     (eval `(lsp-org-babel-enable ,lang)))
-#+end_src
-*** conda
-don't use conda any more for a better integration with EAF
-#+begin_src elisp :tangle no
-  (setup (:pkg conda)
-    ;; (:delay)
-    (:when-loaded
-      (when (eq system-type 'darwin)
-        (custom-set-variables '(conda-anaconda-home "/Users/liuyi/miniforge3"))
-        (setq conda-env-home-directory (expand-file-name "~/miniforge3/")))
-      (when (eq system-type 'gnu/linux)
-        ;; 要用绝对路径
-        (custom-set-variables '(conda-anaconda-home "/home/lewisliu/miniconda3"))
-        (setq conda-env-home-directory (expand-file-name "/home/lewisliu/miniconda3/"))
-        )
-      ;; interactivate shell support
-      (conda-env-initialize-interactive-shells)
-      ;; eshell support
-      (conda-env-initialize-eshell)
-      ;; (conda-env-autoactivate-mode t)
-      ))
 #+end_src
 *** citre
 Citre is an advanced Ctags (or actually, readtags) frontend for Emacs.
