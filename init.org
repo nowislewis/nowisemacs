@@ -616,7 +616,7 @@ I used to be a vim(evil) user, but now I use meow to manage all my keys
                       (set-face-attribute 'fixed-pitch nil :family font :height 1.0)))
 
     ;; variable-pitch
-    (cl-loop for font in '("Arial" "Helvetica" "Times New Roman")
+    (cl-loop for font in '("Noto Sans CJK SC" "Arial" "Helvetica" "Times New Roman")
              when (font-installed-p font)
              return (set-face-attribute 'variable-pitch nil :family font :height 1.0)))
 
