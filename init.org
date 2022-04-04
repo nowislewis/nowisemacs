@@ -649,8 +649,8 @@ Modus-themes is great especailly for org mode
              ;; modus-themes-hl-line '(intense)
              modus-themes-paren-match '(intense bold underline)
              modus-themes-subtle-line-numbers t)
-    (load-theme 'modus-vivendi))
-    ;; (load-theme 'modus-operandi))
+    ;; (load-theme 'modus-vivendi))
+    (load-theme 'modus-operandi))
 #+end_src
 
 ** line number
@@ -1197,7 +1197,7 @@ Emacs major-mode to work with Beancount ledger files
         (setq python-shell-interpreter "python3"))
       (with-eval-after-load 'exec-path-from-shell
         (exec-path-from-shell-copy-env "PYTHONPATH"))
-      (setup (:pkg live-py-mode))
+      ;; (setup (:pkg live-py-mode))
       )
     )
 
@@ -1326,34 +1326,34 @@ eglot client leveraging LTEX Language Server.
 * Org Mode
 ** org-mode
 #+begin_src elisp
-    ;; (setq-default prettify-symbols-alist '(("#+BEGIN_SRC" . "ℱ")
-    ;;                                        ("#+END_SRC" . "Ⅎ")
-    ;;                                        ("#+begin_src" . "ℱ")
-    ;;                                        ("#+end_src" . "Ⅎ")))
-    (setup (:pkg org :type built-in)
-      (setq org-directory "~/Documents/emacs/orgmode/")
-      (:option org-adapt-indentation t
-               org-startup-indented t
-               org-hide-emphasis-markers t
-               org-imenu-depth 5
-               org-return-follows-link t
-               org-link-frame-setup '((vm . vm-visit-folder-other-frame)
-                                      (vm-imap . vm-visit-imap-folder-other-frame)
-                                      (gnus . org-gnus-no-new-news)
-                                      (file . find-file)
-                                      (wl . wl-other-frame))
-               fill-column 120
-               org-log-done 'time ;; 记录完成时间
-               org-blank-before-new-entry '((heading . nil)
-                                            (plain-list-item . nil))
+  ;; (setq-default prettify-symbols-alist '(("#+BEGIN_SRC" . "ℱ")
+  ;;                                        ("#+END_SRC" . "Ⅎ")
+  ;;                                        ("#+begin_src" . "ℱ")
+  ;;                                        ("#+end_src" . "Ⅎ")))
+  (setup (:pkg org :type built-in)
+    (setq org-directory "~/Documents/emacs/orgmode/")
+    (:option org-adapt-indentation t
+             org-startup-indented t
+             org-hide-emphasis-markers t
+             org-imenu-depth 5
+             org-return-follows-link t
+             org-link-frame-setup '((vm . vm-visit-folder-other-frame)
+                                    (vm-imap . vm-visit-imap-folder-other-frame)
+                                    (gnus . org-gnus-no-new-news)
+                                    (file . find-file)
+                                    (wl . wl-other-frame))
+             fill-column 120
+             org-log-done 'time ;; 记录完成时间
+             org-blank-before-new-entry '((heading . nil)
+                                          (plain-list-item . nil))
 
-               org-image-actual-width 600
-               org-preview-latex-image-directory "~/.cache/ltximg/"
+             org-image-actual-width 600
+             org-preview-latex-image-directory "~/.cache/ltximg/"
 
-               org-confirm-babel-evaluate nil
-               org-src-window-setup 'split-window-below
-               org-refile-targets '(("~/Documents/emacs/orgmode/roam/20211204000712-refile_index.org" . (:maxlevel . 9)))
-      )
+             org-confirm-babel-evaluate nil
+             org-src-window-setup 'split-window-below
+             org-refile-targets '(("~/Documents/emacs/orgmode/roam/20211204000712-refile_index.org" . (:maxlevel . 9)))
+             )
     (:file-match "\\.org\\'")
     ;; (:hook 'prettify-symbols-mode org-num-mode)
     (:hook org-num-mode)
@@ -1420,14 +1420,18 @@ eglot client leveraging LTEX Language Server.
          (dot . t)
          (latex . t)
          (C . t)
+         ;; (C++ . t)
+         ;; (bash . t)
          ))
-      ))
+  ))
 #+end_src
 ** org-modern
 #+begin_src elisp
   ;; Enable org-modern-mode
     (setup (:pkg org-modern)
-    ;; (:option org-modern-variable-pitch nil)
+    (:option org-modern-list '((?+ . "➤")
+                               (?- . "–")
+                               (?* . "•")))
       (:hook-into org-mode-hook)
       (add-hook 'org-agenda-finalize-hook #'org-modern-agenda)
       )
@@ -1463,7 +1467,7 @@ eglot client leveraging LTEX Language Server.
                    #'org-roam-reflinks-section
                    ;; #'org-roam-unlinked-references-section
                    )
-             org-roam-completion-everywhere t
+             org-roam-completion-everywhere nil
              org-roam-db-gc-threshold most-positive-fixnum
              org-roam-node-display-template "${doom-hierarchy:*} ${tags:37}"
              )
@@ -1772,7 +1776,6 @@ among all the files in org-roam in a single agenda-view. The code was borrowed f
   )))
 #+end_src
 ** ebib
-ebib doesn't work well with vertico now, so tangle no at this time.
 #+begin_src elisp
   (setup (:pkg ebib)
     (:option ebib-default-directory "~/Documents/emacs/orgmode/bibliography/"

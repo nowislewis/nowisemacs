@@ -34,6 +34,11 @@ generate =.el= configuration files before the first startup:
 4. =emacs ~/nowisemacs/init.org= ;; Open init.org
 5. Sequentially press "Ctrl-c Ctrl-v t", or ~Alt-x~ =org-babel-tangle= to generate init.el
 6. =emacs= ;; Launch emacs, the download, installation and configuration of packages will be done automatically.
+
+** How to customize
+Every time you want to change some configs, do that in =~/nowisemacs/init.org= (eg, write down =<s= and then use =tab= to get a expanded src code) and run =org-babel-tangle=. This will overwrite =~/.emacs.d/init.el=. Nowisemacs use this method to guarantee the =init.el= will not be changed by mistake =custom-group= or something else.
+
+And nowisemacs use =setup.el= to config all the configuration but you can also use built-in methods, =setup= is just a simple wrapper of these methods. You can get a clear understand in anywhere by typing =M-x emacs-lisp-macroexpand=, and the =setup= code will be expanded to normal built-in methods.
 ** Ideas behind nowisemacs
 *** TL ; NR
 Concise + High maintainability
