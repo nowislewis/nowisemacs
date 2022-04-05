@@ -837,6 +837,10 @@ diff-hl-mode highlights uncommitted changes on the left side of the window (area
     (:with-mode vertico
       (:bind [backspace] vertico-directory-delete-char))
     (vertico-mode))
+
+  (setup (:pkg vertico-posframe)
+    (vertico-posframe-mode 1)
+    )
 #+end_src
 ** Orderless
 #+begin_src elisp
@@ -897,6 +901,7 @@ diff-hl-mode highlights uncommitted changes on the left side of the window (area
     (marginalia-mode))
 #+end_src
 ** embark
+should be check after reading the embark.el manual
 #+begin_src elisp
   (setup (:pkg embark-consult)
     (add-hook 'embark-collect-mode-hook #'consult-preview-at-point-mode)
@@ -904,6 +909,7 @@ diff-hl-mode highlights uncommitted changes on the left side of the window (area
 
   (setup (:pkg embark)
     (:also-load embark-consult)
+    (:option prefix-help-command 'embark-prefix-help-command)
     (:global "C-S-a" embark-act)
 
     ;; Show Embark actions via which-key
@@ -1790,6 +1796,16 @@ Simple distraction-free editing. I use darkroom instead of writeroom because it'
 ** restart-emacs
 #+begin_src elisp
   (setup (:pkg restart-emacs))
+#+end_src
+** xwidget
+#+begin_src elisp
+  (defun lewis/url-browser-new-buffer(url &optional new-session)
+      (interactive (progn
+                 (require 'browse-url)
+                 (browse-url-interactive-arg "xwidget-webkit URL: ")))
+      (xwidget-webkit-browse-url url t))
+
+  (setq browse-url-browser-function 'lewis/url-browser-new-buffer)
 #+end_src
 ** kecast
 #+begin_src elisp :tangle no
