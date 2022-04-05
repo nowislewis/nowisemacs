@@ -1846,6 +1846,8 @@ Simple distraction-free editing. I use darkroom instead of writeroom because it'
 ** Simulate company with corfu
 Company is wide-used, but I use corfu for its simplity. So I add a simulation for some packages which use
 company. Currently, These codes are test only with English-helper, which is a great package helping writing English.
+
+Everytime you want to use a command that relys on =company-mode= such as =toggle-company-english-helper=, you should first call =simulate-company-with-corfu= using =M-x= manually.
 #+begin_src elisp
   (defun simulate-company-with-corfu()
     (interactive)
