@@ -331,7 +331,7 @@ I used to be a vim(evil) user, but now I use meow to manage all my keys
                               '("p" . meow-yank)
                               '("P" . meow-yank-pop)
                               '("q" . meow-quit)
-                              '("Q" . meow-goto-line)
+                              '("Q" . goto-line)
                               '("r" . meow-replace)
                               '("R" . meow-swap-grab)
                               '("s" . meow-line)
@@ -1023,6 +1023,7 @@ borrowed from citre, now you can always jump-back use "M-,"
                   consult-line
                   consult-find
                   find-file
+                  goto-line
                   citre-jump))
     (advice-add func :before 'my--push-point-to-xref-marker-stack))
 #+end_src
@@ -1468,29 +1469,43 @@ eglot client leveraging LTEX Language Server.
   (setq org-roam-directory "~/Documents/emacs/orgmode/roam/")
   (setq org-roam-dailies-directory "~/Documents/emacs/orgmode/roam")
   (setup (:pkg org-roam)
-    (:option org-roam-mode-section-functions
-             (list #'org-roam-backlinks-section
-                   #'org-roam-reflinks-section
-                   ;; #'org-roam-unlinked-references-section
-                   )
-             org-roam-completion-everywhere nil
+    (:option org-roam-mode-section-functions (list #'org-roam-backlinks-section
+                                                   #'org-roam-reflinks-section
+                                                   ;; #'org-roam-unlinked-references-section
+                                                   )
              org-roam-db-gc-threshold most-positive-fixnum
-             org-roam-node-display-template "${doom-hierarchy:*} ${tags:37}"
-             )
+             ;; org-roam-node-display-template "${doom-hierarchy:*} ${tags:37}"
+             org-roam-node-display-template (concat "${type:15} ${doom-hierarchy:80} " (propertize "${tags:*}" 'face 'org-tag))
+             org-roam-capture-templates '(("m" "main" plain "%?"
+                                           :if-new
+                                           (file+head "main/%<%Y-%m-%d>-${slug}.org"
+                                                      "#+title: ${title}\n* Action notes\n* Idea notes\n* Sealed notes")
+                                           ;; :immediate-finish t
+                                           :unnarrowed t)
+                                          ("r" "reference" plain "%?"
+                                           :if-new
+                                           (file+head "reference/%<%Y-%m-%d>-${title}.org"
+                                                      "#+title: ${title}\n* Action notes\n* Idea notes\n* Sealed notes")
+                                           :unnarrowed t)
+                                          ("a" "article" plain "%?"
+                                           :if-new
+                                           (file+head "articles/%<%Y-%m-%d>-${title}.org"
+                                                      "#+title: ${title}\n* Action notes\n* Idea notes\n* Sealed notes")
+                                           :unnarrowed t)))
     (:when-loaded
       (org-roam-db-autosync-mode)
 
       ;; Codes blow are used to general a hierachy for title nodes that under a file
       (cl-defmethod org-roam-node-doom-filetitle ((node org-roam-node))
         "Return the value of \"#+title:\" (if any) from file that NODE resides in.
-  If there's no file-level title in the file, return empty string."
+    If there's no file-level title in the file, return empty string."
         (or (if (= (org-roam-node-level node) 0)
                 (org-roam-node-title node)
               (org-roam-get-keyword "TITLE" (org-roam-node-file node)))
             ""))
       (cl-defmethod org-roam-node-doom-hierarchy ((node org-roam-node))
         "Return hierarchy for NODE, constructed of its file title, OLP and direct title.
-    If some elements are missing, they will be stripped out."
+      If some elements are missing, they will be stripped out."
         (let ((title     (org-roam-node-title node))
               (olp       (org-roam-node-olp   node))
               (level     (org-roam-node-level node))
@@ -1506,6 +1521,15 @@ eglot client leveraging LTEX Language Server.
             (t (concat (propertize filetitle 'face '(shadow italic))
                        separator (propertize (string-join olp " > ") 'face '(shadow italic))
                        separator title)))))
+
+      (cl-defmethod org-roam-node-type ((node org-roam-node))
+        "Return the TYPE of NODE."
+        (condition-case nil
+            (file-name-nondirectory
+             (directory-file-name
+              (file-name-directory
+               (file-relative-name (org-roam-node-file node) org-roam-directory))))
+          (error "")))
 
       (add-to-list 'display-buffer-alist
                    '("\\*org-roam\\*"
@@ -1777,7 +1801,6 @@ among all the files in org-roam in a single agenda-view. The code was borrowed f
             "https://ambrevar.xyz/atom.xml"
             "https://guix.gnu.org/feeds/blog.atom"
             "https://valdyas.org/fading/feed/"
-            "https://www.reddit.com/r/emacs/.rss"
             "https://manateelazycat.github.io/feed.xml"
   )))
 #+end_src
@@ -1806,22 +1829,6 @@ Simple distraction-free editing. I use darkroom instead of writeroom because it'
       (xwidget-webkit-browse-url url t))
 
   (setq browse-url-browser-function 'lewis/url-browser-new-buffer)
-#+end_src
-** kecast
-#+begin_src elisp :tangle no
-  (setup (:pkg keycast)
-    ;; This works with doom-modeline, inspired by this comment:
-    (define-minor-mode keycast-mode
-      "Show current command and its key binding in the mode line."
-      :global t
-      (require 'keycast)
-      (if keycast-mode
-          (add-hook 'pre-command-hook 'keycast--update t)
-        (remove-hook 'pre-command-hook 'keycast--update)))
-    (:when-loaded
-      (add-to-list 'global-mode-string '("" mode-line-keycast))))
-
-  ;; (add-to-list 'global-mode-string '("" mode-line-keycast " ")))
 #+end_src
 ** oj.el for online program contest
 #+begin_src elisp
