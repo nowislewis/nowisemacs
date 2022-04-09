@@ -61,6 +61,7 @@
       ;; 平滑地进行半屏滚动，避免滚动后recenter操作
     (setq scroll-step 1
           scroll-conservatively 10000)
+  (setq completions-detailed t) //useful in emacs 28
   ;; (server-start)
 
 #+end_src
@@ -1209,26 +1210,9 @@ Emacs major-mode to work with Beancount ledger files
     )
 
 #+end_src
-**** conda
-don't use conda any more for a better integration with EAF
-#+begin_src elisp :tangle no
-  (setup (:pkg conda)
-    ;; (:delay)
-    (:when-loaded
-      (when (eq system-type 'darwin)
-        (custom-set-variables '(conda-anaconda-home "/Users/liuyi/miniforge3"))
-        (setq conda-env-home-directory (expand-file-name "~/miniforge3/")))
-      (when (eq system-type 'gnu/linux)
-        ;; 要用绝对路径
-        (custom-set-variables '(conda-anaconda-home "/home/lewisliu/miniconda3"))
-        (setq conda-env-home-directory (expand-file-name "/home/lewisliu/miniconda3/"))
-        )
-      ;; interactivate shell support
-      (conda-env-initialize-interactive-shells)
-      ;; eshell support
-      (conda-env-initialize-eshell)
-      ;; (conda-env-autoactivate-mode t)
-      ))
+*** cpp
+#+begin_src elisp
+(setup (:pkg cmake-mode))
 #+end_src
 ** Useful programing tools
 *** quickrun
@@ -1427,6 +1411,7 @@ eglot client leveraging LTEX Language Server.
          (dot . t)
          (latex . t)
          (C . t)
+         (jupyter . t)
          ;; (C++ . t)
          ;; (bash . t)
          ))
@@ -1716,17 +1701,6 @@ among all the files in org-roam in a single agenda-view. The code was borrowed f
   (setup (:pkg org-pomodoro)
     (:option org-pomodoro-finished-sound "~/Documents/emacs/other-files/applaud.wav"))
 #+end_src
-*** org-arbeitszeit
-#+begin_src elisp
-  (setup (:pkg org-arbeitszeit)
-    ;; You only work 4 days per week...
-    (:option org-arbeitszeit-days-per-week 5
-             ;; ... but 10 hours on each day.
-             org-arbeitszeit-hours-per-day 10
-             ;; Don't include worked clocked on headlines that are tagged
-             ;; with break, nonwork or private
-             org-arbeitszeit-match "-break-nonwork-private"))
-#+end_src
 ** org-noter
 #+begin_src elisp
   (setup (:pkg org-noter)
@@ -1840,12 +1814,6 @@ among all the files in org-roam in a single agenda-view. The code was borrowed f
             "https://valdyas.org/fading/feed/"
             "https://manateelazycat.github.io/feed.xml"
   )))
-#+end_src
-** ebib
-#+begin_src elisp
-  (setup (:pkg ebib)
-    (:option ebib-default-directory "~/Documents/emacs/orgmode/bibliography/"
-             ebib-bibtex-dialect 'biblatex))
 #+end_src
 ** darkroom
 Simple distraction-free editing. I use darkroom instead of writeroom because it's more simple
