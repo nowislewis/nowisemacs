@@ -61,7 +61,7 @@
       ;; 平滑地进行半屏滚动，避免滚动后recenter操作
     (setq scroll-step 1
           scroll-conservatively 10000)
-  (setq completions-detailed t) //useful in emacs 28
+  (setq completions-detailed t) ;;useful in emacs 28
   ;; (server-start)
 
 #+end_src
@@ -1411,7 +1411,6 @@ eglot client leveraging LTEX Language Server.
          (dot . t)
          (latex . t)
          (C . t)
-         (jupyter . t)
          ;; (C++ . t)
          ;; (bash . t)
          ))
