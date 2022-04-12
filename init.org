@@ -1043,7 +1043,7 @@ Show git blame info about current line
 #+end_src
 *** beancount
 Emacs major-mode to work with Beancount ledger files
-#+begin_src elisp
+#+begin_src elisp :tangle no
   (setup beancount
     (:file-match "\\.beancount\\'"))
 #+end_src
