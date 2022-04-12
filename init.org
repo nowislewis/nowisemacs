@@ -51,6 +51,11 @@
           ("git@gitlab.com:" . "https://gitlab.com/")))
   (borg-initialize)
 
+  ;; 定义一些启动目录，方便下次迁移修改
+  (defvar nowisemacs-root-dir (file-truename "~/.emacs.d/"))
+  (defvar nowisemacs-config-file (concat nowisemacs-root-dir "init.org"))
+  (defvar nowisemacs-extension-dir (concat nowisemacs-root-dir "/extensions"))
+
   (setq use-short-answers t)
 
   (setq frame-resize-pixelwise t) ;设置缩放的模式,避免Mac平台最大化窗口以后右边和下边有空隙
@@ -110,10 +115,31 @@ The following content is not enabled yet, because I want to minimize unnecessary
 #+end_src
 
 * Package Management
+I use borg to manage packages, so setup.el is only used to config packages quickly
 ** Configuration with setup.el
+*** :delay
+#+begin_src elisp
+  (require 'setup)
+  (setup-define :delay
+    (lambda (&optional time)
+      `(run-with-idle-timer ,(or time 1) nil
+                            (lambda () (require ',(setup-get 'feature)))))
+    :documentation "Delay loading the feature until a certain amount of idle time has passed.")
+#+end_src
+*** :load-after
+This keyword causes a body to be executed after other packages/features are loaded:
+#+begin_src elisp
+  (setup-define :load-after
+    (lambda (&rest features)
+      (let ((body `(require ',(setup-get 'feature))))
+        (dolist (feature (nreverse features))
+          (setq body `(with-eval-after-load ',feature ,body)))
+        body))
+    :documentation "Load the current feature after FEATURES.")
+#+end_src
 *** :if-system
 #+begin_src elisp
-(require 'setup)
+
   (setup-define :if-system
     (lambda (systemtype)
       `(unless (eq system-type ,systemtype)
@@ -146,7 +172,7 @@ I used to be a vim(evil) user, but now I use meow to manage all my keys
 #+begin_src elisp
   ;;setup (:pkg evil))
   (setup meow
-(require 'meow)
+    (require 'meow)
     (:option meow-use-keypad-when-execute-kbd nil
              meow-expand-exclude-mode-list nil
              meow-use-clipboard t
@@ -419,7 +445,6 @@ I used to be a vim(evil) user, but now I use meow to manage all my keys
    '("o h" . oj-open-home-dir))
 #+end_src
 
-
 ** minibuffer-modifier-keys
 #+begin_src elisp
    (require 'minibuffer-modifier-keys)
@@ -604,8 +629,9 @@ rainbow-delimiters is a "rainbow parentheses"-like mode which highlights delimit
 ** diff-hl
 diff-hl-mode highlights uncommitted changes on the left side of the window (area also known as the "gutter"), allows you to jump between and revert them selectively.
 #+begin_src elisp
-  (global-diff-hl-mode)
-  (diff-hl-margin-mode)
+  (setup diff-hl
+    (global-diff-hl-mode)
+    (diff-hl-margin-mode))
     #+end_src
 ** emacs-dashboard
 #+begin_src elisp
@@ -656,8 +682,9 @@ diff-hl-mode highlights uncommitted changes on the left side of the window (area
   (setq make-backup-files nil)
   (setq auto-save-default nil)
 
+  (setup super-save
     (super-save-mode 1)
-    (setq super-save-auto-save-when-idle t)
+    (setq super-save-auto-save-when-idle t))
 #+end_src
 ** 自动换行
 #+begin_src elisp
@@ -684,13 +711,14 @@ diff-hl-mode highlights uncommitted changes on the left side of the window (area
 ** exec-path-from-shell
 #+begin_src elisp
   ;; 可以优化速度, 建议看一下官网的一篇文章
+  (setup exec-path-from-shell
     (when (memq window-system '(mac ns x))
-      (exec-path-from-shell-initialize))
+      (exec-path-from-shell-initialize)))
 #+end_src
 ** Undo
 *** vundo for undo history
 #+begin_src elisp
-;;(setup (:pkg vundo :host github :repo "casouri/vundo"))
+(setup vundo)
 #+end_src
 *** undo-hl flashes the to-be-deleted text before deleting
 #+begin_src elisp
@@ -711,9 +739,11 @@ diff-hl-mode highlights uncommitted changes on the left side of the window (area
 #+end_src
 ** Orderless
 #+begin_src elisp
+  (setup orderless
+    (require 'orderless)
     (setq completion-styles '(orderless)
           completion-category-defaults nil
-          completion-category-overrides '((file (styles . (partial-completion)))))
+          completion-category-overrides '((file (styles . (partial-completion))))))
 #+end_src
 ** savehist
 #+begin_src elisp
@@ -767,7 +797,8 @@ diff-hl-mode highlights uncommitted changes on the left side of the window (area
 ** embark
 should be check after reading the embark.el manual
 #+begin_src elisp
-  (add-hook 'embark-collect-mode-hook #'consult-preview-at-point-mode)
+  (setup embark-consult
+    (add-hook 'embark-collect-mode-hook #'consult-preview-at-point-mode))
 
   (setup embark
     (:option prefix-help-command 'embark-prefix-help-command)
@@ -780,7 +811,8 @@ should be check after reading the embark.el manual
             #'which-key--hide-popup-ignore-command)
           embark-become-indicator embark-action-indicator))
 
-    (require 'wgrep)
+  (setup wgrep
+    (require 'wgrep))
 #+end_src
 ** corfu(instead of company)
 #+begin_src elisp
@@ -836,7 +868,7 @@ should be check after reading the embark.el manual
 #+end_src
 ** deadgrep
 #+begin_src elisp
-  (setup (:pkg deadgrep))
+  (setup deadgrep)
 #+end_src
 * Window Management
 ** winner-mode
@@ -946,11 +978,12 @@ This is adapted from the extra font lock rules provided by Drew Adams' dired+ pa
 #+end_src
 *** dired-subtree
 #+begin_src elisp :tangle no
-  (setup (:pkg dired-subtree)
-       (:load-after dired)
-      (:option dired-subtree-line-prefix "     ")
-      (:with-map dired-mode-map
-        (:bind "TAB" dired-subtree-cycle)))
+  ;; this is in dired-hacks
+  (setup dired-subtree
+    (:load-after dired)
+    (:option dired-subtree-line-prefix "     ")
+    (:with-map dired-mode-map
+      (:bind "TAB" dired-subtree-cycle)))
 #+end_src
 ** structure browsing
 *** imenu-list
@@ -1025,8 +1058,8 @@ Show git blame info about current line
     (advice-add 'helpful-update :after #'elisp-demos-advice-helpful-update))
 #+end_src
 **** elispfl
-#+begin_src elisp :tangle no
-  (setup (:pkg elispfl :host github :repo "cireu/elispfl")
+#+begin_src elisp
+  (setup elispfl
     (:hook-into emacs-lisp-mode ielm))
 #+end_src
 *** graphviz-dot-mode
@@ -1044,9 +1077,9 @@ Emacs major-mode to work with Beancount ledger files
     (:file-match "\\.beancount\\'"))
 #+end_src
 *** latex
-#+begin_src elisp :tangle no
-  (setup (:pkg cdlatex))
-  (setup (:pkg auctex))
+#+begin_src elisp
+  (setup auctex)
+  (setup cdlatex)
 #+end_src
 *** python
 **** python
@@ -1068,8 +1101,8 @@ Emacs major-mode to work with Beancount ledger files
 
 #+end_src
 *** cpp
-#+begin_src elisp :tangle no
-(setup (:pkg cmake-mode))
+#+begin_src elisp
+(setup cmake-mode)
 #+end_src
 ** Useful programing tools
 *** quickrun
@@ -1087,22 +1120,22 @@ Emacs major-mode to work with Beancount ledger files
 #+end_src
 *** lsp mode
 **** eglot
-#+begin_src elisp :tangle no
+#+begin_src elisp
   ;; use built-in package dep
-  (setup (:pkg project :type built-in))
-  (setup (:pkg xref :type built-in)
+  (setup project)
+  (setup xref
     (:autoload xref-push-marker-stack)) ;; autoload this command for jump-back
-  (setup (:pkg flymake :type built-in))
-  (setup (:pkg jsonrpc :type built-in))
-  (setup (:pkg eldoc :type built-in))
+  ;; (setup (:pkg flymake :type built-in))
+  ;; (setup (:pkg jsonrpc :type built-in))
+  ;; (setup (:pkg eldoc :type built-in))
 
   ;; (setup (:pkg markdown-mode))
-  (setup (:pkg eldoc-box)
+  (setup eldoc-box
     (add-hook 'eglot--managed-mode-hook #'eldoc-box-hover-at-point-mode t))
 
   (setq xref-search-program 'ripgrep)
   (setq read-process-output-max (* 1024 1024))
-  (setup (:pkg eglot))
+  (setup eglot)
   (setup eldoc
     (:option eldoc-echo-area-use-multiline-p 3
           eldoc-echo-area-display-truncation-message nil))
@@ -1159,7 +1192,7 @@ Highlight symbols with keymap-enabled overlays
 *** eglot-ltex
 eglot client leveraging LTEX Language Server.
 #+begin_src elisp :tangle no
-  (setup (:pkg eglot-ltex :host github :repo "emacs-languagetool/eglot-ltex")
+  (setup eglot-ltex
       (:option eglot-languagetool-server-path "~/Downloads/ltex-ls/")
       (:with-hook text-mode-hook
         (:hook (lambda ()
@@ -1276,13 +1309,13 @@ eglot client leveraging LTEX Language Server.
 ** org-modern
 #+begin_src elisp
   ;; Enable org-modern-mode
-    (setup org-modern
+  (setup org-modern
     (:option org-modern-list '((?+ . "➤")
                                (?- . "–")
                                (?* . "•")))
-      (:hook-into org-mode-hook)
-      (add-hook 'org-agenda-finalize-hook #'org-modern-agenda)
-      )
+    (:hook-into org-mode)
+    (add-hook 'org-agenda-finalize-hook #'org-modern-agenda)
+    )
 #+end_src
 ** org-appear
 #+begin_src elisp
@@ -1536,8 +1569,8 @@ among all the files in org-roam in a single agenda-view. The code was borrowed f
         (split-string-and-unquote value separators))))
 #+end_src
 *** delve
-#+begin_src elisp :tangle no
-(setup (:pkg delve :host github :repo "publicimageltd/delve"))
+#+begin_src elisp
+(setup delve)
 #+end_src
 
 ** ox-hugo
@@ -1621,9 +1654,8 @@ among all the files in org-roam in a single agenda-view. The code was borrowed f
     )
 #+end_src
 ** company-english-helper
-#+begin_src elisp :tangle no
-  (setup (:pkg company-english-helper :host github
-               :repo "manateelazycat/company-english-helper")
+#+begin_src elisp
+  (setup company-english-helper
     (:autoload toggle-company-english-helper))
 #+end_src
 * 阅读

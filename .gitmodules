@@ -13,6 +13,15 @@
 [submodule "async"]
 	path = lib/async
 	url = https://github.com/jwiegley/emacs-async.git
+[submodule "auctex"]
+	path = lib/auctex
+	url = https://github.com/emacsmirror/auctex
+    build-step = ./autogen.sh
+	build-step = ./configure
+	build-step = make
+	# build-step = make install
+    build-step = "(borg-update-autoloads \"auctex\")"
+	info-path = doc
 [submodule "avy"]
 	path = lib/avy
 	url = https://github.com/abo-abo/avy.git
@@ -31,6 +40,9 @@
 [submodule "cape"]
 	path = lib/cape
 	url = https://github.com/minad/cape.git
+[submodule "cdlatex"]
+	path = lib/cdlatex
+	url = https://github.com/cdominik/cdlatex.git
 [submodule "citar"]
 	path = lib/citar
 	url = https://github.com/bdarcus/citar.git
@@ -43,6 +55,13 @@
 [submodule "closql"]
 	path = lib/closql
 	url = git@github.com:emacscollective/closql.git
+[submodule "cmake-mode"]
+	path = lib/cmake-mode
+	url = https://github.com/emacsmirror/cmake-mode.git
+[submodule "company-english-helper"]
+	path = lib/company-english-helper
+	url = https://github.com/manateelazycat/company-english-helper
+    no-byte-compile = company-english-helper.el
 [submodule "consult"]
 	path = lib/consult
 	url = https://github.com/minad/consult.git
@@ -64,9 +83,15 @@
 [submodule "deadgrep"]
 	path = lib/deadgrep
 	url = https://github.com/Wilfred/deadgrep.git
+[submodule "delve"]
+	path = lib/delve
+	url = https://github.com/publicimageltd/delve
 [submodule "diff-hl"]
 	path = lib/diff-hl
 	url = https://github.com/dgutov/diff-hl.git
+[submodule "dired-hacks"]
+	path = lib/dired-hacks
+	url = https://github.com/Fuco1/dired-hacks.git
 [submodule "diredfl"]
 	path = lib/diredfl
 	url = https://github.com/purcell/diredfl.git
@@ -79,6 +104,15 @@
 [submodule "eglot"]
 	path = lib/eglot
 	url = https://github.com/joaotavora/eglot.git
+[submodule "eglot-ltex"]
+	path = lib/eglot-ltex
+	url = https://github.com/emacs-languagetool/eglot-ltex
+[submodule "eimp"]
+	path = lib/eimp
+	url = https://github.com/nicferrier/eimp.git
+[submodule "eldoc-box"]
+	path = lib/eldoc-box
+	url = https://github.com/casouri/eldoc-box.git
 [submodule "elfeed"]
 	path = lib/elfeed
 	url = https://github.com/skeeto/elfeed.git
@@ -88,6 +122,9 @@
 [submodule "elisp-refs"]
 	path = lib/elisp-refs
 	url = https://github.com/Wilfred/elisp-refs.git
+[submodule "elispfl"]
+	path = lib/elispfl
+	url = https://github.com/cireu/elispfl
 [submodule "emacsql"]
 	path = lib/emacsql
 	url = git@github.com:skeeto/emacsql.git
@@ -110,6 +147,9 @@
 [submodule "go-translate"]
 	path = lib/go-translate
 	url = https://github.com/lorniu/go-translate.git
+[submodule "graphviz-dot-mode"]
+	path = lib/graphviz-dot-mode
+	url = https://github.com/ppareit/graphviz-dot-mode.git
 [submodule "helpful"]
 	path = lib/helpful
 	url = https://github.com/Wilfred/helpful.git
@@ -125,6 +165,9 @@
 [submodule "libgit"]
 	path = lib/libgit
 	url = https://github.com/magit/libegit2.git
+[submodule "lister"]
+	path = lib/lister
+	url = https://github.com/publicimageltd/lister.git
 [submodule "magit"]
 	path = lib/magit
 	url = https://github.com/magit/magit.git
@@ -137,6 +180,9 @@
 [submodule "minibuffer-modifier-keys"]
 	path = lib/minibuffer-modifier-keys
 	url = https://github.com/SpringHan/minibuffer-modifier-keys.git
+[submodule "mixed-pitch"]
+	path = lib/mixed-pitch
+	url = https://gitlab.com/jabranham/mixed-pitch.git
 [submodule "oj"]
 	path = lib/oj
 	url = https://github.com/conao3/oj.el.git
@@ -167,6 +213,11 @@
 [submodule "org-roam"]
 	path = lib/org-roam
 	url = https://github.com/org-roam/org-roam.git
+    load-path = .
+	load-path = extensions
+[submodule "org-roam-ui"]
+	path = lib/org-roam-ui
+	url = https://github.com/org-roam/org-roam-ui.git
 [submodule "ox-hugo"]
 	path = lib/ox-hugo
 	url = https://github.com/kaushalmodi/ox-hugo.git
@@ -209,6 +260,9 @@
 [submodule "shrink-path"]
 	path = lib/shrink-path
 	url = https://gitlab.com/bennya/shrink-path.el.git
+[submodule "simple-httpd"]
+	path = lib/simple-httpd
+	url = https://github.com/skeeto/emacs-web-server.git
 [submodule "spinner"]
 	path = lib/spinner
 	url = https://github.com/Malabarba/spinner.el.git
@@ -235,9 +289,15 @@
 [submodule "vertico-posframe"]
 	path = lib/vertico-posframe
 	url = https://github.com/tumashu/vertico-posframe.git
+[submodule "vterm"]
+	path = lib/vterm
+	url = https://github.com/akermu/emacs-libvterm.git
 [submodule "vundo"]
 	path = lib/vundo
 	url = https://github.com/casouri/vundo
+[submodule "websocket"]
+	path = lib/websocket
+	url = https://github.com/ahyatt/emacs-websocket.git
 [submodule "wgrep"]
 	path = lib/wgrep
 	url = https://github.com/mhayashi1120/Emacs-wgrep.git
