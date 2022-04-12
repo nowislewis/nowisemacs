@@ -830,7 +830,7 @@ should be check after reading the embark.el manual
 ** yasnippet
 #+begin_src elisp
   (setup yasnippet
-    (:option yas-snippet-dirs '("~/.emacs.d/snippets"))
+    (:option yas-snippet-dirs '("~/.emacs.d/etc/snippets"))
     (yas-global-mode 1))
   ;;(setup yasnippet-snippets)
 #+end_src
