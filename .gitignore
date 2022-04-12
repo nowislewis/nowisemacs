@@ -1,0 +1,8 @@
+/*
+!.gitignore
+!.gitmodules
+!Makefile
+!init.org
+!README.org
+!/snippets/
+!/lib/

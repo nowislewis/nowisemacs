@@ -1,4 +1,4 @@
-#+TITLE: Emacs Configuration
+ #+TITLE: Emacs Configuration
 #+PROPERTY: header-args:elisp :tangle ~/.emacs.d/init.el
 "Simulate company with corfu" is at the end of this file.
 
@@ -43,28 +43,36 @@
 #+end_src
 ** generic
 #+begin_src elisp
-    ;; 定义一些启动目录，方便下次迁移修改
-    (defvar nowisemacs-root-dir (file-truename "~/nowisemacs/"))
-    (defvar nowisemacs-config-file (concat nowisemacs-root-dir "init.org"))
-    (defvar nowisemacs-extension-dir (concat nowisemacs-root-dir "/extensions"))
+  ;; -*- lexical-binding: t; -*-
+  (add-to-list 'load-path (expand-file-name "lib/borg" user-emacs-directory))
+  (require 'borg)
+  (setq borg-rewrite-urls-alist
+        '(("git@github.com:" . "https://github.com/")
+          ("git@gitlab.com:" . "https://gitlab.com/")))
+  (borg-initialize)
 
-    (setq use-short-answers t)
+  ;; 定义一些启动目录，方便下次迁移修改
+  (defvar nowisemacs-root-dir (file-truename "~/.emacs.d/"))
+  (defvar nowisemacs-config-file (concat nowisemacs-root-dir "init.org"))
 
-    (setq frame-resize-pixelwise t) ;设置缩放的模式,避免Mac平台最大化窗口以后右边和下边有空隙
-    (set-frame-parameter nil 'fullscreen 'maximized)
+  (setq use-short-answers t)
 
-    (setq ring-bell-function 'ignore)       ;关闭烦人的出错时的提示声
-    (set-default-coding-systems 'utf-8)
-    (setq-default indent-tabs-mode nil)
+  (setq frame-resize-pixelwise t) ;设置缩放的模式,避免Mac平台最大化窗口以后右边和下边有空隙
+  (set-frame-parameter nil 'fullscreen 'maximized)
 
-    (setq-default tab-width 4)
-      ;; 平滑地进行半屏滚动，避免滚动后recenter操作
-    (setq scroll-step 1
-          scroll-conservatively 10000)
+  (setq ring-bell-function 'ignore)       ;关闭烦人的出错时的提示声
+  (set-default-coding-systems 'utf-8)
+  (setq-default indent-tabs-mode nil)
+
+  (setq-default tab-width 4)
+  ;; 平滑地进行半屏滚动，避免滚动后recenter操作
+  (setq scroll-step 1
+        scroll-conservatively 10000)
   (setq completions-detailed t) ;;useful in emacs 28
   ;; (server-start)
 
 #+end_src
+
 The following content is not enabled yet, because I want to minimize unnecessary settings as much as possible
 #+begin_src elisp :tangle no
   ;; Restore emacs session.
@@ -106,111 +114,10 @@ The following content is not enabled yet, because I want to minimize unnecessary
 #+end_src
 
 * Package Management
-** straight
-#+begin_src elisp
-  (unless (featurep 'straight)
-    ;; Bootstrap straight.el
-    (defvar bootstrap-version)
-    (let ((bootstrap-file
-           (expand-file-name "straight/repos/straight.el/bootstrap.el" user-emacs-directory))
-          (bootstrap-version 5))
-      (unless (file-exists-p bootstrap-file)
-        (with-current-buffer
-            (url-retrieve-synchronously
-             "https://raw.githubusercontent.com/raxod502/straight.el/develop/install.el"
-             'silent 'inhibit-cookies)
-          (goto-char (point-max))
-          (eval-print-last-sexp)))
-      (load bootstrap-file nil 'nomessage)))
-  (setq straight-vc-git-default-clone-depth 1)
-#+end_src
-** straight print
-Use straight-pull-report to get detailed messages after update.
-#+begin_src elisp
-  (defun straight-pull-report (&rest _)
-    "Show fetched commit summary."
-    (interactive)
-    (with-current-buffer (get-buffer-create "*straight-fetch-report*")
-      (read-only-mode -1)
-      (erase-buffer)
-      (let ((updates nil))
-        (straight--map-repos
-         (lambda (recipe)
-           (straight--with-plist recipe (package local-repo)
-             (let* ((default-directory (straight--repos-dir local-repo))
-                    (commits (straight--process-output "git" "log" "..@{u}" "--oneline")))
-               (unless (string-empty-p commits)
-                 (push (cons package (split-string commits "\n")) updates))))))
-        (mapc (lambda (update)
-                (let* ((commits (cdr update)))
-                  (insert
-                   (propertize
-                    (format "%s [%s commit%s]\n"
-                            (car update)
-                            (number-to-string (length commits))
-                            (if (cdr commits) "s" ""))
-                    'face 'font-lock-constant-face)
-                   (format "  %s\n" (string-join (cdr update) "\n  ")))))
-              (cl-sort updates #'string< :key #'car))
-        (special-mode)
-        (pop-to-buffer (current-buffer)))))
-  ;; (advice-add #'straight-fetch-all :after #'straight-fetch-report)
-#+end_src
 ** Configuration with setup.el
-#+begin_src elisp
-  (straight-use-package '(setup :type git :host nil :repo "https://git.sr.ht/~pkal/setup"))
-  (require 'setup)
-#+end_src
-*** :pkg
-#+begin_src elisp
-  ;; Recipe is always a list
-  ;; Install via Guix if length == 1 or :guix t is present
-
-  (defvar dw/guix-emacs-packages '()
-    "Contains a list of all Emacs package names that must be
-  installed via Guix.")
-
-  (defun dw/filter-straight-recipe (recipe)
-    (let* ((plist (cdr recipe))
-           (name (plist-get plist
-                            :straight)))
-      (cons (if (and name
-                     (not (equal name t))) name (car recipe))
-            (plist-put plist
-                       :straight nil))))
-
-  (setup-define :pkg (lambda
-                       (&rest
-                        recipe)
-                       `(add-to-list 'dw/guix-emacs-packages ,(or (plist-get recipe
-                                                                             :guix)
-                                                                  (concat "emacs-" (symbol-name (car
-                                                                                                 recipe)))))
-                       `(straight-use-package ',(dw/filter-straight-recipe recipe)))
-                :documentation "Install RECIPE via Guix or straight.el"
-                :shorthand #'cadr)
-#+end_src
-*** :delay
-#+begin_src elisp
-  (setup-define :delay
-  (lambda (&optional time)
-    `(run-with-idle-timer ,(or time 1) nil
-                          (lambda () (require ',(setup-get 'feature)))))
-  :documentation "Delay loading the feature until a certain amount of idle time has passed.")
-#+end_src
-*** :load-after
-This keyword causes a body to be executed after other packages/features are loaded:
-#+begin_src elisp
-  (setup-define :load-after
-    (lambda (&rest features)
-      (let ((body `(require ',(setup-get 'feature))))
-        (dolist (feature (nreverse features))
-          (setq body `(with-eval-after-load ',feature ,body)))
-        body))
-    :documentation "Load the current feature after FEATURES.")
-#+end_src
 *** :if-system
 #+begin_src elisp
+(require 'setup)
   (setup-define :if-system
     (lambda (systemtype)
       `(unless (eq system-type ,systemtype)
@@ -232,7 +139,7 @@ This keyword causes a body to be executed after other packages/features are load
 * gcmh
 Enforce a sneaky Garbage Collection strategy to minimize GC interference with user activity.
 #+begin_src elisp
-  (setup (:pkg gcmh)
+  (setup gcmh
     (:option gcmh-idle-delay 5
              gcmh-high-cons-threshold #x1000000) ; 16MB
     (gcmh-mode 1))
@@ -242,8 +149,8 @@ I used to be a vim(evil) user, but now I use meow to manage all my keys
 ** meow
 #+begin_src elisp
   ;;setup (:pkg evil))
-  (setup (:pkg meow)
-    (require 'meow)
+  (setup meow
+(require 'meow)
     (:option meow-use-keypad-when-execute-kbd nil
              meow-expand-exclude-mode-list nil
              meow-use-clipboard t
@@ -394,9 +301,10 @@ I used to be a vim(evil) user, but now I use meow to manage all my keys
     (meow-setup)
     )
 #+end_src
+
 ** which-key
 #+begin_src elisp
-  (setup (:pkg which-key)
+  (setup which-key
     (which-key-mode)
     (setq which-key-idle-delay 0.1))
 #+end_src
@@ -514,11 +422,12 @@ I used to be a vim(evil) user, but now I use meow to manage all my keys
    '("o t" . oj-test)
    '("o h" . oj-open-home-dir))
 #+end_src
+
+
 ** minibuffer-modifier-keys
 #+begin_src elisp
-  (setup (:pkg minibuffer-modifier-keys)
-    (require 'minibuffer-modifier-keys)
-   (minibuffer-modifier-keys-setup t))
+   (require 'minibuffer-modifier-keys)
+   (minibuffer-modifier-keys-setup t)
 #+end_src
 ** insert-pair
 #+begin_src elisp
@@ -565,36 +474,6 @@ I used to be a vim(evil) user, but now I use meow to manage all my keys
     (insert-pair arg ?\= ?\=))
 #+end_src
 
-** awesome-pair
-#+begin_src elisp :tangle no
-  (setup (:pkg awesome-pair :host github :repo "manateelazycat/awesome-pair")
-    (:hook-into prog-mode-hook text-mode-hook)
-    (:bind
-     (kbd "(") awesome-pair-open-round
-     (kbd "[") awesome-pair-open-bracket
-     (kbd "{") awesome-pair-open-curly
-     (kbd ")") awesome-pair-close-round
-     (kbd "]") awesome-pair-close-bracket
-     (kbd "}") awesome-pair-close-curly
-     (kbd "=") 'awesome-pair-equal
-     (kbd "%") awesome-pair-match-paren
-     (kbd "\"") awesome-pair-double-quote
-     ;; (kbd "SPC") awesome-pair-space
-     ;; (kbd "RET") awesome-pair-newline
-     ;; "M-o" awesome-pair-backward-delete
-     ;; "C-d" awesome-pair-forward-delete
-     ;; "C-k" awesome-pair-kill
-     ;; (kbd "M-\"") 'awesome-pair-wrap-double-quote
-     ;; (kbd "M-[") 'awesome-pair-wrap-bracket
-     ;; (kbd "M-{") 'awesome-pair-wrap-curly
-     ;; (kbd "M-(") 'awesome-pair-wrap-round
-     (kbd "M-)") awesome-pair-unwrap
-
-     ;; (kbd "M-p") awesome-pair-jump-right
-     ;; (kbd "M-n") awesome-pair-jump-left
-     ;; (kbd "M-:") awesome-pair-jump-out-pair-and-newline
-     ))
-#+end_src
 * UI
 ** Font
 #+begin_src elisp
@@ -633,15 +512,15 @@ I used to be a vim(evil) user, but now I use meow to manage all my keys
 
   ;; (set-face-attribute 'default nil :family "yaheiInconsolata" :height 140)
 
-  (setup (:pkg mixed-pitch)
-    (:hook-into text-mode)
-    )
+  (setup mixed-pitch
+    (:hook-into text-mode))
   ;; 需要等宽的把face 添加到 mixed-pitch-fixed-pitch-faces
 #+end_src
+
 ** Theme
 Modus-themes is great especailly for org mode
 #+begin_src elisp
-  (setup (:pkg modus-themes :type built-in)
+  (setup modus-themes
     (:option modus-themes-org-blocks 'tinted-background
              ;; modus-themes-headings '((t . (background overline rainbow)))
              modus-themes-mode-line '(3d)
@@ -714,28 +593,27 @@ only enable line number in some modes, borrowed from lazycat-emacs
 I'm thinking about removing this package, but it's pretty good so far
 *** all-the-icons
 #+begin_src elisp
-  (setup (:pkg all-the-icons)
-    (:option all-the-icons-scale-factor 1.0)
-    )
-  (setup (:pkg all-the-icons-completion)
+  (setup all-the-icons
+    (:option all-the-icons-scale-factor 1.0))
+  (setup all-the-icons-completion
     (add-hook 'marginalia-mode-hook #'all-the-icons-completion-marginalia-setup))
 #+end_src
+
 ** rainbow-delimiters
 rainbow-delimiters is a "rainbow parentheses"-like mode which highlights delimiters such as parentheses, brackets or braces according to their depth.
 #+begin_src elisp
-  (setup (:pkg rainbow-delimiters)
+  (setup rainbow-delimiters
     (:hook-into prog-mode))
 #+end_src
 ** diff-hl
 diff-hl-mode highlights uncommitted changes on the left side of the window (area also known as the "gutter"), allows you to jump between and revert them selectively.
 #+begin_src elisp
-  (setup (:pkg diff-hl)
-    (global-diff-hl-mode)
-    (diff-hl-margin-mode))
-#+end_src
+  (global-diff-hl-mode)
+  (diff-hl-margin-mode)
+    #+end_src
 ** emacs-dashboard
 #+begin_src elisp
-  (setup (:pkg dashboard)
+  (setup dashboard
     (:option dashboard-items '((recents . 5)
                                ;; (agenda . 5)
                                (bookmarks . 5)
@@ -748,7 +626,7 @@ diff-hl-mode highlights uncommitted changes on the left side of the window (area
 #+end_src
 ** doom-modeline
 #+begin_src elisp
-  (setup (:pkg doom-modeline)
+  (setup doom-modeline
     (:option doom-modeline-window-width-limit fill-column
              doom-modeline-height 20
              doom-modeline-hud t
@@ -758,8 +636,7 @@ diff-hl-mode highlights uncommitted changes on the left side of the window (area
 #+end_src
 ** hl-todo
 #+begin_src elisp
-  (setup (:pkg hl-todo)
-    (global-hl-todo-mode))
+    (global-hl-todo-mode)
 #+end_src
 * General Configuration
 ** general modes
@@ -783,9 +660,8 @@ diff-hl-mode highlights uncommitted changes on the left side of the window (area
   (setq make-backup-files nil)
   (setq auto-save-default nil)
 
-  (setup (:pkg super-save)
     (super-save-mode 1)
-    (setq super-save-auto-save-when-idle t))
+    (setq super-save-auto-save-when-idle t)
 #+end_src
 ** 自动换行
 #+begin_src elisp
@@ -798,8 +674,7 @@ diff-hl-mode highlights uncommitted changes on the left side of the window (area
 ** so-long
 解决长行卡死问题
 #+begin_src elisp
-  (setup so-long
-    (global-so-long-mode 1))
+    (global-so-long-mode 1)
 #+end_src
 ** TRAMP
 #+begin_src elisp
@@ -807,59 +682,51 @@ diff-hl-mode highlights uncommitted changes on the left side of the window (area
 #+end_src
 ** Automatically clean whitespace
 #+begin_src elisp
-  (setup (:pkg ws-butler)
+  (setup ws-butler
     (:hook-into text-mode prog-mode))
 #+end_src
 ** exec-path-from-shell
 #+begin_src elisp
   ;; 可以优化速度, 建议看一下官网的一篇文章
-  (setup (:pkg exec-path-from-shell)
-    ;; (:delay)
     (when (memq window-system '(mac ns x))
       (exec-path-from-shell-initialize))
-      )
 #+end_src
 ** Undo
 *** vundo for undo history
 #+begin_src elisp
-(setup (:pkg vundo :host github :repo "casouri/vundo"))
+;;(setup (:pkg vundo :host github :repo "casouri/vundo"))
 #+end_src
 *** undo-hl flashes the to-be-deleted text before deleting
 #+begin_src elisp
-  (setup (:pkg undo-hl :host github :repo "casouri/undo-hl")
+  (setup undo-hl
     (:autoload undo-hl-mode)
     (:hook-into text-mode-hook))
 #+end_src
+
 * 补全
 ** Completions with Vertico
 #+begin_src elisp
-  (setup (:pkg vertico :host github :repo "minad/vertico" :files ("*.el" "extensions/*.el"))
+  (setup vertico
     (:option vertico-cycle t)
     (:with-mode vertico
       (:bind [backspace] vertico-directory-delete-char))
     (vertico-mode))
-
-  (setup (:pkg vertico-posframe)
-    (vertico-posframe-mode 1)
-    )
+  (vertico-posframe-mode 1)
 #+end_src
 ** Orderless
 #+begin_src elisp
-  (setup (:pkg orderless)
-    (require 'orderless)
     (setq completion-styles '(orderless)
           completion-category-defaults nil
-          completion-category-overrides '((file (styles . (partial-completion))))))
+          completion-category-overrides '((file (styles . (partial-completion)))))
 #+end_src
 ** savehist
 #+begin_src elisp
-  (setup savehist
-    (savehist-mode))
+    (savehist-mode)
 #+end_src
 ** Consult Commands
 *** consult
 #+begin_src elisp
-  (setup (:pkg consult)
+  (setup consult
     (:with-map minibuffer-local-map
       (:bind "C-r" consult-history))
     ;; Optionally configure the register formatting. This improves the register
@@ -895,7 +762,7 @@ diff-hl-mode highlights uncommitted changes on the left side of the window (area
 #+end_src
 ** Marginalia
 #+begin_src elisp
-  (setup (:pkg marginalia)
+  (setup marginalia
     (:option marginalia-annotators '(marginalia-annotators-heavy
                                      marginalia-annotators-light
                                      nil))
@@ -904,12 +771,9 @@ diff-hl-mode highlights uncommitted changes on the left side of the window (area
 ** embark
 should be check after reading the embark.el manual
 #+begin_src elisp
-  (setup (:pkg embark-consult)
-    (add-hook 'embark-collect-mode-hook #'consult-preview-at-point-mode)
-    )
+  (add-hook 'embark-collect-mode-hook #'consult-preview-at-point-mode)
 
-  (setup (:pkg embark)
-    (:also-load embark-consult)
+  (setup embark
     (:option prefix-help-command 'embark-prefix-help-command)
     (:global "C-S-a" embark-act)
 
@@ -920,12 +784,11 @@ should be check after reading the embark.el manual
             #'which-key--hide-popup-ignore-command)
           embark-become-indicator embark-action-indicator))
 
-  (setup (:pkg wgrep :host github :repo "mhayashi1120/Emacs-wgrep")
-    (require 'wgrep))
+    (require 'wgrep)
 #+end_src
 ** corfu(instead of company)
 #+begin_src elisp
-    (setup (:pkg corfu)
+    (setup corfu
       (:option
        ;; Optional customizations
        corfu-cycle t                ;; Enable cycling for `corfu-next/previous'
@@ -951,7 +814,7 @@ should be check after reading the embark.el manual
   (add-hook 'minibuffer-setup-hook #'corfu-enable-always-in-minibuffer 1)
 
     ;; corfu backend
-    (setup (:pkg cape)
+    (setup cape
       (add-to-list 'completion-at-point-functions #'cape-file)
       ;; (add-to-list 'completion-at-point-functions #'cape-tex)
       ;; (add-to-list 'completion-at-point-functions #'cape-dabbrev)
@@ -959,28 +822,25 @@ should be check after reading the embark.el manual
       )
 
     ;; Enable Corfu completion UI
-    (setup (:pkg corfu-doc :host github :repo "galeo/corfu-doc")
+    (setup corfu-doc
       (:hook-into corfu-mode))
 
     ;; (setup (:pkg svg-lib :type built-in)) ;; built-in has little icons
-    (setup (:pkg kind-icon)
-      (:load-after corfu)
+    (setup kind-icon
       (:option kind-icon-default-face 'corfu-default) ; to compute blended backgrounds correctly
-      (:when-loaded
         (add-to-list 'corfu-margin-formatters #'kind-icon-margin-formatter)
-        ))
+        )
 #+end_src
 ** yasnippet
 #+begin_src elisp
-  (setup (:pkg yasnippet)
-    (require 'yasnippet)
-    (:option yas-snippet-dirs '("~/nowisemacs/snippets"))
+  (setup yasnippet
+    (:option yas-snippet-dirs '("~/.emacs.d/snippets"))
     (yas-global-mode 1))
-  (setup (:pkg yasnippet-snippets))
+  (setup yasnippet-snippets)
 #+end_src
 ** deadgrep
 #+begin_src elisp
-  (setup (:pkg deadgrep))
+  ;; (setup (:pkg deadgrep))
 #+end_src
 * Window Management
 ** winner-mode
@@ -990,7 +850,7 @@ should be check after reading the embark.el manual
 ** popper
 Popper is a minor-mode to tame the flood of ephemeral windows Emacs produces, while still keeping them within arm’s reach.
 #+begin_src elisp
-  (setup (:pkg popper)
+  (setup popper
     (:option popper-reference-buffers         '("\\*Messages\\*"
                                                 "Output\\*$"
                                                 "\\*Async Shell Command\\*"
@@ -1010,12 +870,12 @@ Popper is a minor-mode to tame the flood of ephemeral windows Emacs produces, wh
 *** avy
 Jump anywhere in the world
 #+begin_src elisp
-  (setup (:pkg avy)
+  (setup avy
     (:global "M-j" avy-goto-word-1))
 #+end_src
 *** jump-back
 borrowed from citre, now you can always jump-back use "M-,"
-#+begin_src elisp
+#+begin_src elisp :tangle no
   (defun my--push-point-to-xref-marker-stack (&rest r)
     (xref-push-marker-stack (point-marker))) ;; must autoload this command in xref
   (dolist (func '(find-function
@@ -1025,7 +885,8 @@ borrowed from citre, now you can always jump-back use "M-,"
                   consult-find
                   find-file
                   goto-line
-                  citre-jump))
+;;                  citre-jump
+))
     (advice-add func :before 'my--push-point-to-xref-marker-stack))
 #+end_src
 *** bookmark
@@ -1040,8 +901,8 @@ borrowed from citre, now you can always jump-back use "M-,"
 * Input
 ** pyim
 #+begin_src elisp
-  (setup (:pkg posframe))
-  (setup (:pkg pyim)
+  (setup posframe)
+  (setup pyim
     (:option pyim-dicts '((:name "lewis_pyim_dict" :file "~/Documents/emacs/other-files/lewis_pyim_dict.pyim")
                           (:name "lewis_big_dict" :file "~/Documents/emacs/other-files/pyim-bigdict.pyim.gz"))
              ;; pyim-default-scheme 'xiaohe-shuangpin
@@ -1079,16 +940,16 @@ borrowed from citre, now you can always jump-back use "M-,"
 *** dirvish
 Dirvish is a minimalistic file manager based on Dired. It's fast
 #+begin_src elisp
-    (setup (:pkg dirvish))
+(setup dirvish)
 #+end_src
 *** diredfl
 This is adapted from the extra font lock rules provided by Drew Adams' dired+ package, but published via a modern means, and with support for older Emacsen removed.
 #+begin_src elisp
-  (setup (:pkg diredfl)
+  (setup diredfl
     (:hook-into dired-mode))
 #+end_src
 *** dired-subtree
-#+begin_src elisp
+#+begin_src elisp :tangle no
   (setup (:pkg dired-subtree)
     (:load-after dired)
     (:option dired-subtree-line-prefix "     ")
@@ -1098,7 +959,7 @@ This is adapted from the extra font lock rules provided by Drew Adams' dired+ pa
 ** structure browsing
 *** imenu-list
 #+begin_src elisp
-  (setup (:pkg imenu-list)
+  (setup imenu-list
     (:autoload imenu-list-smart-toggle)
     (:option imenu-list-focus-after-activate t
              imenu-list-auto-resize t
@@ -1106,7 +967,7 @@ This is adapted from the extra font lock rules provided by Drew Adams' dired+ pa
 #+end_src
 ** perspective
 #+begin_src elisp
-  (setup (:pkg perspective)
+  (setup perspective
     (:option persp-initial-frame-name "Main"
              persp-mode-prefix-key "")
     ;; Running `persp-mode' multiple times resets the perspective list...
@@ -1123,29 +984,29 @@ This is adapted from the extra font lock rules provided by Drew Adams' dired+ pa
 * shell
 ** aweshell
 #+begin_src elisp
-  (setup (:pkg aweshell :host github :repo "manateelazycat/aweshell")
+  (setup aweshell
     (:option aweshell-auto-suggestion-p nil)
     (:autoload aweshell-toggle)
     (:autoload aweshell-dedicated-toggle))
 #+end_src
 ** vterm
 #+begin_src elisp
-  (setup (:pkg vterm))
+  (setup vterm)
 #+end_src
 ** dtache
 Run and interact with detached shell commands
-#+begin_src elisp
+#+begin_src elisp :tangle no
 (setup (:pkg dtache))
 #+end_src
 * git
 ** magit
 #+begin_src elisp
-  (setup (:pkg magit))
+  (setup magit)
 #+end_src
 ** blamer
 Show git blame info about current line
 #+begin_src elisp
-  (setup (:pkg blamer :host github :repo "artawower/blamer.el")
+  (setup blamer
     (:option blamer-idle-time 0.3
              blamer-min-offset 70))
 #+end_src
@@ -1154,7 +1015,7 @@ Show git blame info about current line
 *** elisp
 **** helpful
 #+begin_src elisp
-  (setup (:pkg helpful)
+  (setup helpful
     (:global "C-h f" #'helpful-callable
              "C-h v" #'helpful-variable
              "C-h k" #'helpful-key
@@ -1164,16 +1025,16 @@ Show git blame info about current line
 #+end_src
 **** elisp-demos
 #+begin_src elisp
-  (setup (:pkg elisp-demos)
+  (setup elisp-demos
     (advice-add 'helpful-update :after #'elisp-demos-advice-helpful-update))
 #+end_src
 **** elispfl
-#+begin_src elisp
+#+begin_src elisp :tangle no
   (setup (:pkg elispfl :host github :repo "cireu/elispfl")
     (:hook-into emacs-lisp-mode ielm))
 #+end_src
 *** graphviz-dot-mode
-#+begin_src elisp
+#+begin_src elisp :tangle no
   (setup (:pkg graphviz-dot-mode)
     (:file-match "\\.dot\\'")
     (:option graphviz-dot-indent-width 4)
@@ -1183,11 +1044,11 @@ Show git blame info about current line
 *** beancount
 Emacs major-mode to work with Beancount ledger files
 #+begin_src elisp
-  (setup (:pkg beancount :host github :repo "beancount/beancount-mode")
+  (setup beancount
     (:file-match "\\.beancount\\'"))
 #+end_src
 *** latex
-#+begin_src elisp
+#+begin_src elisp :tangle no
   (setup (:pkg cdlatex))
   (setup (:pkg auctex))
 #+end_src
@@ -1211,13 +1072,13 @@ Emacs major-mode to work with Beancount ledger files
 
 #+end_src
 *** cpp
-#+begin_src elisp
+#+begin_src elisp :tangle no
 (setup (:pkg cmake-mode))
 #+end_src
 ** Useful programing tools
 *** quickrun
 #+begin_src elisp
-  (setup (:pkg quickrun))
+  (setup quickrun)
 #+end_src
 *** tree-sitter
 #+begin_src elisp :tangle no
@@ -1230,7 +1091,7 @@ Emacs major-mode to work with Beancount ledger files
 #+end_src
 *** lsp mode
 **** eglot
-#+begin_src elisp
+#+begin_src elisp :tangle no
   ;; use built-in package dep
   (setup (:pkg project :type built-in))
   (setup (:pkg xref :type built-in)
@@ -1286,7 +1147,7 @@ enable eglot in org-src mode
 *** citre
 Citre is an advanced Ctags (or actually, readtags) frontend for Emacs.
 #+begin_src elisp
-  (setup (:pkg citre)
+  (setup citre
     (require 'citre-config)
     (:option
      citre-use-project-root-when-creating-tags t
@@ -1296,12 +1157,12 @@ Citre is an advanced Ctags (or actually, readtags) frontend for Emacs.
 *** symbol-overlay
 Highlight symbols with keymap-enabled overlays
 #+begin_src elisp
-  (setup (:pkg symbol-overlay)
+  (setup symbol-overlay
     (:autoload symbol-overlay-put))
 #+end_src
 *** eglot-ltex
 eglot client leveraging LTEX Language Server.
-#+begin_src elisp
+#+begin_src elisp :tangle no
   (setup (:pkg eglot-ltex :host github :repo "emacs-languagetool/eglot-ltex")
       (:option eglot-languagetool-server-path "~/Downloads/ltex-ls/")
       (:with-hook text-mode-hook
@@ -1321,7 +1182,7 @@ eglot client leveraging LTEX Language Server.
   ;;                                        ("#+END_SRC" . "Ⅎ")
   ;;                                        ("#+begin_src" . "ℱ")
   ;;                                        ("#+end_src" . "Ⅎ")))
-  (setup (:pkg org :type built-in)
+  (setup org
     (setq org-directory "~/Documents/emacs/orgmode/")
     (:option org-adapt-indentation t
              org-startup-indented t
@@ -1419,7 +1280,7 @@ eglot client leveraging LTEX Language Server.
 ** org-modern
 #+begin_src elisp
   ;; Enable org-modern-mode
-    (setup (:pkg org-modern)
+    (setup org-modern
     (:option org-modern-list '((?+ . "➤")
                                (?- . "–")
                                (?* . "•")))
@@ -1429,12 +1290,12 @@ eglot client leveraging LTEX Language Server.
 #+end_src
 ** org-appear
 #+begin_src elisp
-  (setup (:pkg org-appear :host github :repo "awth13/org-appear")
+  (setup org-appear
     (:hook-into org-mode))
 #+end_src
 ** org-download
 #+begin_src elisp
-  (setup (:pkg org-download)
+  (setup org-download
     (:option org-download-method 'directory
              org-download-screenshot-basename "screenshot.jpg"
              org-download-image-dir "~/Documents/emacs/orgmode/PicturesForAll/org_download_images")
@@ -1448,11 +1309,11 @@ eglot client leveraging LTEX Language Server.
 ** org-roam
 *** org-roam
 #+begin_src elisp
-  (setup (:pkg emacsql))
+  ;; (setup (:pkg emacsql))
   (setq org-roam-v2-ack t)
   (setq org-roam-directory "~/Documents/emacs/orgmode/roam/")
   (setq org-roam-dailies-directory "~/Documents/emacs/orgmode/roam")
-  (setup (:pkg org-roam)
+  (setup org-roam
     (:option org-roam-mode-section-functions (list #'org-roam-backlinks-section
                                                    #'org-roam-reflinks-section
                                                    ;; #'org-roam-unlinked-references-section
@@ -1534,9 +1395,9 @@ eglot client leveraging LTEX Language Server.
 #+end_src
 *** org-roam-ui
 #+begin_src elisp
-  (setup (:pkg websocket))
-  (setup (:pkg simple-httpd))
-  (setup (:pkg org-roam-ui :host github :repo "org-roam/org-roam-ui" :files ("*.el" "out")))
+  ;; (setup (:pkg websocket))
+  ;; (setup (:pkg simple-httpd))
+  ;; (setup (:pkg org-roam-ui :host github :repo "org-roam/org-roam-ui" :files ("*.el" "out")))
 #+end_src
 *** org-roam-agenda
 The main purpose for this section is to add every node that has a "TODO" into org-agenda, so I can see all the "TODO"s
@@ -1677,205 +1538,4 @@ among all the files in org-roam in a single agenda-view. The code was borrowed f
     (let ((value (vulpea-buffer-prop-get name)))
       (when (and value (not (string-empty-p value)))
         (split-string-and-unquote value separators))))
-#+end_src
-*** delve
-#+begin_src elisp
-(setup (:pkg delve :host github :repo "publicimageltd/delve"))
-#+end_src
-
-** ox-hugo
-#+begin_src elisp
-  (setup (:pkg ox-hugo)
-    (:load-after ox))
-#+end_src
-** org-elp for latex live preview
-#+begin_src elisp
-  (setup (:pkg org-elp)
-    (:option org-elp-idle-time 0.5
-             org-elp-split-fraction 0.25))
-#+end_src
-** org-clock
-*** org-pomodoro
-#+begin_src elisp
-  (setup (:pkg org-pomodoro)
-    (:option org-pomodoro-finished-sound "~/Documents/emacs/other-files/applaud.wav"))
-#+end_src
-** org-noter
-#+begin_src elisp
-  (setup (:pkg org-noter)
-    (:option
-     org-noter-notes-search-path (list org-directory)
-     org-noter-auto-save-last-location t
-     org-noter-separate-notes-from-heading nil
-     org-noter-doc-split-percentage '(0.6 . 0.4)))
-#+end_src
-** org-present
-#+begin_src elisp
-(setup (:pkg org-present))
-#+end_src
-** org-citar
-#+begin_src elisp
-  (setup (:pkg citar)
-    (:option org-cite-global-bibliography '("~/Documents/emacs/orgmode/bibliography/better_zotero_bib.bib")
-             org-cite-insert-processor 'citar
-             org-cite-follow-processor 'citar
-             org-cite-activate-processor 'citar
-             citar-bibliography org-cite-global-bibliography))
-
-  ;; borrowed from https://jethrokuan.github.io/org-roam-guide/ as a method for insert notes for reference
-  (defun lewis/org-roam-node-from-cite (keys-entries)
-    (interactive (list (citar-select-ref :multiple nil :rebuild-cache t)))
-    (let ((title (citar--format-entry-no-widths (cdr keys-entries)
-                                                "${author editor}::${title}")))
-      (org-roam-capture- :templates
-                         '(("r" "reference" plain "%?" :if-new
-                            (file+head "reference/${citekey}.org"
-                                       ":PROPERTIES:
-  :ROAM_REFS: [cite:@${citekey}]
-  :END:
-  ,#+title: ${title}\n")
-                            :unnarrowed t))
-                         :info (list :citekey (car keys-entries))
-                         :node (org-roam-node-create :title title)
-                         :props '(:finalize find-file))))
-#+end_src
-
-* 翻译
-** go-translate
-#+begin_src elisp
-  (setup (:pkg go-translate)
-    (:option gts-translate-list '(("en" "zh")))
-    (defun my-gts-translate-posframe ()
-      (interactive)
-      (if (not (featurep 'go-translate))
-          (require 'go-translate))
-      (defvar my-translator-posframe
-        (gts-translator
-                        :picker (gts-noprompt-picker)
-                        :engines (gts-google-rpc-engine)
-                        :render (gts-posframe-pop-render)))
-      (gts-translate my-translator-posframe))
-    )
-#+end_src
-** english-teacher
-#+begin_src elisp
-  (setup (:pkg english-teacher :host github
-               :repo "loyalpartner/english-teacher.el")
-    )
-#+end_src
-** company-english-helper
-#+begin_src elisp
-  (setup (:pkg company-english-helper :host github
-               :repo "manateelazycat/company-english-helper")
-    (:autoload toggle-company-english-helper))
-#+end_src
-* 阅读
-** pdf-tools
-#+begin_src elisp
-  (setup (:pkg pdf-tools :host github :repo "vedang/pdf-tools")
-    (:option pdf-view-use-scaling t)
-    (:with-map pdf-view-mode-map
-      (:bind "h" pdf-annot-add-highlight-markup-annotation))
-    (pdf-loader-install)
-    (add-hook 'pdf-view-mode-hook (lambda() (linum-mode -1))))
-  ;; (setup (:pkg pdf-continuous-scroll-mode :host github :repo "dalanicolai/pdf-continuous-scroll-mode.el")
-  ;;   (:option book-scroll-fraction 16)
-  ;;   )
-  ;; (defun load-pdf-continuous-mode()
-  ;;   (interactive)
-    ;; (require 'pdf-continuous-scroll-mode))
-
-  (setq TeX-view-program-selection '((output-pdf "PDF Tools"))
-        TeX-view-program-list '(("PDF Tools" TeX-pdf-tools-sync-view))
-        TeX-source-correlate-start-server t)
-
-  (add-hook 'TeX-after-compilation-finished-functions
-            #'TeX-revert-document-buffer)
-#+end_src
-** elfeed
-#+begin_src elisp
-  (setup (:pkg elfeed)
-    (setq elfeed-feeds
-          '("http://ruzkuku.com/all.atom"
-            "https://karthinks.com/index.xml"
-            "https://shom.dev/index.xml"
-            "https://blog.benoitj.ca/posts/index.xml"
-            "https://protesilaos.com/codelog.xml"
-            "https://sachachua.com/blog/feed/"
-            "https://nullprogram.com/feed/"
-            "https://irreal.org/blog/?feed=rss2"
-            "https://ambrevar.xyz/atom.xml"
-            "https://guix.gnu.org/feeds/blog.atom"
-            "https://valdyas.org/fading/feed/"
-            "https://manateelazycat.github.io/feed.xml"
-  )))
-#+end_src
-** darkroom
-Simple distraction-free editing. I use darkroom instead of writeroom because it's more simple
-#+begin_src elisp
-  (setup (:pkg darkroom))
-#+end_src
-* tools
-** restart-emacs
-#+begin_src elisp
-  (setup (:pkg restart-emacs))
-#+end_src
-** xwidget
-#+begin_src elisp
-  (defun lewis/url-browser-new-buffer(url &optional new-session)
-      (interactive (progn
-                 (require 'browse-url)
-                 (browse-url-interactive-arg "xwidget-webkit URL: ")))
-      (xwidget-webkit-browse-url url t))
-
-  (setq browse-url-browser-function 'lewis/url-browser-new-buffer)
-#+end_src
-** oj.el for online program contest
-#+begin_src elisp
-      (setup (:pkg oj)
-        (:option oj-default-online-judge 'codeforces))
-#+end_src
-** eaf
-#+begin_src elisp :tangle no
-  (setup (:pkg eaf :host github :repo "emacs-eaf/emacs-application-framework" :files ("*.el"))
-    (:option eaf--mac-enable-rosetta t)
-    (add-to-list 'load-path "~/.emacs.d/straight/repos/emacs-application-framework")
-    (require 'eaf)
-    )
-
-  (setup eaf-browser
-    (:autoload eaf-open-browser))
-  (setup eaf-pdf-viewer
-    (:autoload eaf-open-pdf-from-history))
-  (setup eaf-rss-reader
-    (:autoload eaf-open-rss-reader))
-#+end_src
-** Simulate company with corfu
-Company is wide-used, but I use corfu for its simplity. So I add a simulation for some packages which use
-company. Currently, These codes are test only with English-helper, which is a great package helping writing English.
-
-Everytime you want to use a command that relys on =company-mode= such as =toggle-company-english-helper=, you should first call =simulate-company-with-corfu= using =M-x= manually.
-#+begin_src elisp
-  (defun simulate-company-with-corfu()
-    (interactive)
-    (defvaralias 'company-candidates 'corfu--candidates)
-    (defalias 'company-mode 'corfu-mode) ;; should be deleted
-    (defvaralias 'company-mode 'corfu-mode) ;; should be deleted
-    (setq company-backends '())
-    (setq completion-at-point-functions-backup completion-at-point-functions)
-    (provide 'company)
-
-    (defun set-completion-functions ()
-      (setq completion-at-point-functions (cl-concatenate 'list (mapcar #'cape-company-to-capf company-backends) completion-at-point-functions-backup)))
-
-    (defun company-grab-symbol ()
-      "If point is at the end of a symbol, return it.
-    Otherwise, if point is not inside a symbol, return an empty string."
-      (if (looking-at "\\_>")
-          (buffer-substring (point) (save-excursion (skip-syntax-backward "w_")
-                                                    (point)))
-        (unless (and (char-after) (memq (char-syntax (char-after)) '(?w ?_)))
-          "")))
-    (advice-add 'toggle-company-english-helper :after #'set-completion-functions)
-    )
 #+end_src
