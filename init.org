@@ -51,10 +51,6 @@
           ("git@gitlab.com:" . "https://gitlab.com/")))
   (borg-initialize)
 
-  ;; 定义一些启动目录，方便下次迁移修改
-  (defvar nowisemacs-root-dir (file-truename "~/.emacs.d/"))
-  (defvar nowisemacs-config-file (concat nowisemacs-root-dir "init.org"))
-
   (setq use-short-answers t)
 
   (setq frame-resize-pixelwise t) ;设置缩放的模式,避免Mac平台最大化窗口以后右边和下边有空隙
@@ -836,11 +832,11 @@ should be check after reading the embark.el manual
   (setup yasnippet
     (:option yas-snippet-dirs '("~/.emacs.d/snippets"))
     (yas-global-mode 1))
-  (setup yasnippet-snippets)
+  ;;(setup yasnippet-snippets)
 #+end_src
 ** deadgrep
 #+begin_src elisp
-  ;; (setup (:pkg deadgrep))
+  (setup (:pkg deadgrep))
 #+end_src
 * Window Management
 ** winner-mode
@@ -885,7 +881,7 @@ borrowed from citre, now you can always jump-back use "M-,"
                   consult-find
                   find-file
                   goto-line
-;;                  citre-jump
+                  citre-jump
 ))
     (advice-add func :before 'my--push-point-to-xref-marker-stack))
 #+end_src
@@ -951,10 +947,10 @@ This is adapted from the extra font lock rules provided by Drew Adams' dired+ pa
 *** dired-subtree
 #+begin_src elisp :tangle no
   (setup (:pkg dired-subtree)
-    (:load-after dired)
-    (:option dired-subtree-line-prefix "     ")
-    (:with-map dired-mode-map
-      (:bind "TAB" dired-subtree-cycle)))
+       (:load-after dired)
+      (:option dired-subtree-line-prefix "     ")
+      (:with-map dired-mode-map
+        (:bind "TAB" dired-subtree-cycle)))
 #+end_src
 ** structure browsing
 *** imenu-list
@@ -1043,7 +1039,7 @@ Show git blame info about current line
 #+end_src
 *** beancount
 Emacs major-mode to work with Beancount ledger files
-#+begin_src elisp :tangle no
+#+begin_src elisp
   (setup beancount
     (:file-match "\\.beancount\\'"))
 #+end_src
@@ -1538,4 +1534,205 @@ among all the files in org-roam in a single agenda-view. The code was borrowed f
     (let ((value (vulpea-buffer-prop-get name)))
       (when (and value (not (string-empty-p value)))
         (split-string-and-unquote value separators))))
+#+end_src
+*** delve
+#+begin_src elisp :tangle no
+(setup (:pkg delve :host github :repo "publicimageltd/delve"))
+#+end_src
+
+** ox-hugo
+#+begin_src elisp
+  (setup ox-hugo
+    (:load-after ox))
+#+end_src
+** org-elp for latex live preview
+#+begin_src elisp
+  (setup org-elp
+    (:option org-elp-idle-time 0.5
+             org-elp-split-fraction 0.25))
+#+end_src
+** org-clock
+*** org-pomodoro
+#+begin_src elisp
+  (setup org-pomodoro
+    (:option org-pomodoro-finished-sound "~/Documents/emacs/other-files/applaud.wav"))
+#+end_src
+** org-noter
+#+begin_src elisp
+  (setup org-noter
+    (:option
+     org-noter-notes-search-path (list org-directory)
+     org-noter-auto-save-last-location t
+     org-noter-separate-notes-from-heading nil
+     org-noter-doc-split-percentage '(0.6 . 0.4)))
+#+end_src
+** org-present
+#+begin_src elisp
+(setup org-present)
+#+end_src
+** org-citar
+#+begin_src elisp
+  (setup citar
+    (:option org-cite-global-bibliography '("~/Documents/emacs/orgmode/bibliography/better_zotero_bib.bib")
+             org-cite-insert-processor 'citar
+             org-cite-follow-processor 'citar
+             org-cite-activate-processor 'citar
+             citar-bibliography org-cite-global-bibliography))
+
+  ;; borrowed from https://jethrokuan.github.io/org-roam-guide/ as a method for insert notes for reference
+  (defun lewis/org-roam-node-from-cite (keys-entries)
+    (interactive (list (citar-select-ref :multiple nil :rebuild-cache t)))
+    (let ((title (citar--format-entry-no-widths (cdr keys-entries)
+                                                "${author editor}::${title}")))
+      (org-roam-capture- :templates
+                         '(("r" "reference" plain "%?" :if-new
+                            (file+head "reference/${citekey}.org"
+                                       ":PROPERTIES:
+  :ROAM_REFS: [cite:@${citekey}]
+  :END:
+  ,#+title: ${title}\n")
+                            :unnarrowed t))
+                         :info (list :citekey (car keys-entries))
+                         :node (org-roam-node-create :title title)
+                         :props '(:finalize find-file))))
+#+end_src
+
+* 翻译
+** go-translate
+#+begin_src elisp
+  (setup go-translate
+    (:option gts-translate-list '(("en" "zh")))
+    (defun my-gts-translate-posframe ()
+      (interactive)
+      (if (not (featurep 'go-translate))
+          (require 'go-translate))
+      (defvar my-translator-posframe
+        (gts-translator
+                        :picker (gts-noprompt-picker)
+                        :engines (gts-google-rpc-engine)
+                        :render (gts-posframe-pop-render)))
+      (gts-translate my-translator-posframe))
+    )
+#+end_src
+** english-teacher
+#+begin_src elisp :tangle no
+  (setup (:pkg english-teacher :host github
+               :repo "loyalpartner/english-teacher.el")
+    )
+#+end_src
+** company-english-helper
+#+begin_src elisp :tangle no
+  (setup (:pkg company-english-helper :host github
+               :repo "manateelazycat/company-english-helper")
+    (:autoload toggle-company-english-helper))
+#+end_src
+* 阅读
+** pdf-tools
+#+begin_src elisp
+  (setup pdf-tools
+    (:option pdf-view-use-scaling t)
+    (:with-map pdf-view-mode-map
+      (:bind "h" pdf-annot-add-highlight-markup-annotation))
+    (pdf-loader-install)
+    (add-hook 'pdf-view-mode-hook (lambda() (linum-mode -1))))
+  ;; (setup (:pkg pdf-continuous-scroll-mode :host github :repo "dalanicolai/pdf-continuous-scroll-mode.el")
+  ;;   (:option book-scroll-fraction 16)
+  ;;   )
+  ;; (defun load-pdf-continuous-mode()
+  ;;   (interactive)
+    ;; (require 'pdf-continuous-scroll-mode))
+
+  (setq TeX-view-program-selection '((output-pdf "PDF Tools"))
+        TeX-view-program-list '(("PDF Tools" TeX-pdf-tools-sync-view))
+        TeX-source-correlate-start-server t)
+
+  (add-hook 'TeX-after-compilation-finished-functions
+            #'TeX-revert-document-buffer)
+#+end_src
+** elfeed
+#+begin_src elisp
+  (setup elfeed
+    (setq elfeed-feeds
+          '("http://ruzkuku.com/all.atom"
+            "https://karthinks.com/index.xml"
+            "https://shom.dev/index.xml"
+            "https://blog.benoitj.ca/posts/index.xml"
+            "https://protesilaos.com/codelog.xml"
+            "https://sachachua.com/blog/feed/"
+            "https://nullprogram.com/feed/"
+            "https://irreal.org/blog/?feed=rss2"
+            "https://ambrevar.xyz/atom.xml"
+            "https://guix.gnu.org/feeds/blog.atom"
+            "https://valdyas.org/fading/feed/"
+            "https://manateelazycat.github.io/feed.xml"
+  )))
+#+end_src
+** darkroom
+Simple distraction-free editing. I use darkroom instead of writeroom because it's more simple
+#+begin_src elisp
+  (setup darkroom)
+#+end_src
+* tools
+** restart-emacs
+#+begin_src elisp
+  (setup restart-emacs)
+#+end_src
+** xwidget
+#+begin_src elisp
+  (defun lewis/url-browser-new-buffer(url &optional new-session)
+      (interactive (progn
+                 (require 'browse-url)
+                 (browse-url-interactive-arg "xwidget-webkit URL: ")))
+      (xwidget-webkit-browse-url url t))
+
+  (setq browse-url-browser-function 'lewis/url-browser-new-buffer)
+#+end_src
+** oj.el for online program contest
+#+begin_src elisp
+      (setup oj
+        (:option oj-default-online-judge 'codeforces))
+#+end_src
+** eaf
+#+begin_src elisp :tangle no
+  (setup (:pkg eaf :host github :repo "emacs-eaf/emacs-application-framework" :files ("*.el"))
+    (:option eaf--mac-enable-rosetta t)
+    (add-to-list 'load-path "~/.emacs.d/straight/repos/emacs-application-framework")
+    (require 'eaf)
+    )
+
+  (setup eaf-browser
+    (:autoload eaf-open-browser))
+  (setup eaf-pdf-viewer
+    (:autoload eaf-open-pdf-from-history))
+  (setup eaf-rss-reader
+    (:autoload eaf-open-rss-reader))
+#+end_src
+** Simulate company with corfu
+Company is wide-used, but I use corfu for its simplity. So I add a simulation for some packages which use
+company. Currently, These codes are test only with English-helper, which is a great package helping writing English.
+
+Everytime you want to use a command that relys on =company-mode= such as =toggle-company-english-helper=, you should first call =simulate-company-with-corfu= using =M-x= manually.
+#+begin_src elisp
+  (defun simulate-company-with-corfu()
+    (interactive)
+    (defvaralias 'company-candidates 'corfu--candidates)
+    (defalias 'company-mode 'corfu-mode) ;; should be deleted
+    (defvaralias 'company-mode 'corfu-mode) ;; should be deleted
+    (setq company-backends '())
+    (setq completion-at-point-functions-backup completion-at-point-functions)
+    (provide 'company)
+
+    (defun set-completion-functions ()
+      (setq completion-at-point-functions (cl-concatenate 'list (mapcar #'cape-company-to-capf company-backends) completion-at-point-functions-backup)))
+
+    (defun company-grab-symbol ()
+      "If point is at the end of a symbol, return it.
+    Otherwise, if point is not inside a symbol, return an empty string."
+      (if (looking-at "\\_>")
+          (buffer-substring (point) (save-excursion (skip-syntax-backward "w_")
+                                                    (point)))
+        (unless (and (char-after) (memq (char-syntax (char-after)) '(?w ?_)))
+          "")))
+    (advice-add 'toggle-company-english-helper :after #'set-completion-functions)
+    )
 #+end_src

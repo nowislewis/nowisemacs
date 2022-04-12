@@ -1,6 +1,9 @@
 [submodule "ag"]
 	path = lib/ag
 	url = https://github.com/Wilfred/ag.el.git
+[submodule "alert"]
+	path = lib/alert
+	url = https://github.com/jwiegley/alert.git
 [submodule "all-the-icons"]
 	path = lib/all-the-icons
 	url = https://github.com/domtronn/all-the-icons.el.git
@@ -16,12 +19,24 @@
 [submodule "aweshell"]
 	path = lib/aweshell
 	url = https://github.com/manateelazycat/aweshell
+[submodule "beancount-mode"]
+	path = lib/beancount-mode
+	url = https://github.com/beancount/beancount-mode
+[submodule "blamer"]
+	path = lib/blamer
+	url = https://github.com/Artawower/blamer.el.git
 [submodule "borg"]
 	path = lib/borg
 	url = git@github.com:emacscollective/borg.git
 [submodule "cape"]
 	path = lib/cape
 	url = https://github.com/minad/cape.git
+[submodule "citar"]
+	path = lib/citar
+	url = https://github.com/bdarcus/citar.git
+[submodule "citeproc"]
+	path = lib/citeproc
+	url = https://github.com/andras-simonyi/citeproc-el.git
 [submodule "citre"]
 	path = lib/citre
 	url = https://github.com/universal-ctags/citre.git
@@ -37,6 +52,9 @@
 [submodule "corfu-doc"]
 	path = lib/corfu-doc
 	url = https://github.com/galeo/corfu-doc.git
+[submodule "darkroom"]
+	path = lib/darkroom
+	url = https://github.com/joaotavora/darkroom.git
 [submodule "dash"]
 	path = lib/dash
 	url = https://github.com/magnars/dash.el.git
@@ -49,6 +67,9 @@
 [submodule "diff-hl"]
 	path = lib/diff-hl
 	url = https://github.com/dgutov/diff-hl.git
+[submodule "diredfl"]
+	path = lib/diredfl
+	url = https://github.com/purcell/diredfl.git
 [submodule "dirvish"]
 	path = lib/dirvish
 	url = https://github.com/alexluigit/dirvish.git
@@ -58,6 +79,9 @@
 [submodule "eglot"]
 	path = lib/eglot
 	url = https://github.com/joaotavora/eglot.git
+[submodule "elfeed"]
+	path = lib/elfeed
+	url = https://github.com/skeeto/elfeed.git
 [submodule "elisp-demos"]
 	path = lib/elisp-demos
 	url = https://github.com/xuchunyang/elisp-demos.git
@@ -83,6 +107,9 @@
 [submodule "gcmh"]
 	path = lib/gcmh
 	url = https://gitlab.com/koral/gcmh.git
+[submodule "go-translate"]
+	path = lib/go-translate
+	url = https://github.com/lorniu/go-translate.git
 [submodule "helpful"]
 	path = lib/helpful
 	url = https://github.com/Wilfred/helpful.git
@@ -110,6 +137,9 @@
 [submodule "minibuffer-modifier-keys"]
 	path = lib/minibuffer-modifier-keys
 	url = https://github.com/SpringHan/minibuffer-modifier-keys.git
+[submodule "oj"]
+	path = lib/oj
+	url = https://github.com/conao3/oj.el.git
 [submodule "orderless"]
 	path = lib/orderless
 	url = https://github.com/oantolin/orderless.git
@@ -119,12 +149,33 @@
 [submodule "org-download"]
 	path = lib/org-download
 	url = https://github.com/abo-abo/org-download.git
+[submodule "org-elp"]
+	path = lib/org-elp
+	url = https://github.com/guanyilun/org-elp.git
 [submodule "org-modern"]
 	path = lib/org-modern
 	url = https://github.com/minad/org-modern.git
+[submodule "org-noter"]
+	path = lib/org-noter
+	url = https://github.com/weirdNox/org-noter.git
+[submodule "org-pomodoro"]
+	path = lib/org-pomodoro
+	url = https://github.com/marcinkoziej/org-pomodoro.git
+[submodule "org-present"]
+	path = lib/org-present
+	url = https://github.com/rlister/org-present.git
 [submodule "org-roam"]
 	path = lib/org-roam
 	url = https://github.com/org-roam/org-roam.git
+[submodule "ox-hugo"]
+	path = lib/ox-hugo
+	url = https://github.com/kaushalmodi/ox-hugo.git
+[submodule "parsebib"]
+	path = lib/parsebib
+	url = https://github.com/joostkremers/parsebib.git
+[submodule "pdf-tools"]
+	path = lib/pdf-tools
+	url = https://github.com/vedang/pdf-tools.git
 [submodule "perspective"]
 	path = lib/perspective
 	url = https://github.com/nex3/perspective-el.git
@@ -137,12 +188,18 @@
 [submodule "pyim"]
 	path = lib/pyim
 	url = https://github.com/tumashu/pyim.git
+[submodule "queue"]
+	path = lib/queue
+	url = https://github.com/emacsmirror/queue.git
 [submodule "quickrun"]
 	path = lib/quickrun
 	url = https://github.com/emacsorphanage/quickrun.git
 [submodule "rainbow-delimiters"]
 	path = lib/rainbow-delimiters
 	url = https://github.com/Fanael/rainbow-delimiters.git
+[submodule "restart-emacs"]
+	path = lib/restart-emacs
+	url = https://github.com/iqbalansari/restart-emacs.git
 [submodule "s"]
 	path = lib/s
 	url = https://github.com/magnars/s.el.git
@@ -155,9 +212,18 @@
 [submodule "spinner"]
 	path = lib/spinner
 	url = https://github.com/Malabarba/spinner.el.git
+[submodule "string-inflection"]
+	path = lib/string-inflection
+	url = https://github.com/akicho8/string-inflection.git
 [submodule "super-save"]
 	path = lib/super-save
 	url = https://github.com/bbatsov/super-save.git
+[submodule "symbol-overlay"]
+	path = lib/symbol-overlay
+	url = https://github.com/wolray/symbol-overlay.git
+[submodule "tablist"]
+	path = lib/tablist
+	url = https://github.com/politza/tablist.git
 [submodule "undo-hl"]
 	path = lib/undo-hl
 	url = https://github.com/casouri/undo-hl
