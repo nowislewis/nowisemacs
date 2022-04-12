@@ -1459,7 +1459,7 @@ eglot client leveraging LTEX Language Server.
                                                    )
              org-roam-db-gc-threshold most-positive-fixnum
              ;; org-roam-node-display-template "${doom-hierarchy:*} ${tags:37}"
-             org-roam-node-display-template (concat "${type:15} ${doom-hierarchy:95} " (propertize "${tags:*}" 'face 'org-tag))
+             org-roam-node-display-template (concat "${type:15} ${doom-hierarchy:80} " (propertize "${tags:*}" 'face 'org-tag))
              org-roam-capture-templates '(("m" "main" plain "%?"
                                            :if-new
                                            (file+head "main/%<%Y-%m-%d>-${slug}.org"
@@ -1734,15 +1734,11 @@ among all the files in org-roam in a single agenda-view. The code was borrowed f
   :ROAM_REFS: [cite:@${citekey}]
   :END:
   ,#+title: ${title}\n")
-                            :immediate-finish t
                             :unnarrowed t))
                          :info (list :citekey (car keys-entries))
                          :node (org-roam-node-create :title title)
                          :props '(:finalize find-file))))
 #+end_src
-
-#+RESULTS:
-: lewis/org-roam-node-from-cite
 
 * 翻译
 ** go-translate
