@@ -19,9 +19,7 @@
     build-step = ./autogen.sh
 	build-step = ./configure
 	build-step = make
-	# build-step = make install
-    build-step = "(borg-update-autoloads \"auctex\")"
-	info-path = doc
+	build-step = make install
 [submodule "avy"]
 	path = lib/avy
 	url = https://github.com/abo-abo/avy.git
