@@ -33,10 +33,16 @@ generate =.el= configuration files before the first startup:
 3. =cd ~/.emacs.d=
 4. =make bootstrap-borg & make bootstrap= ;; download packages
 5. =emacs= ;; Launch emacs, the download, installation and configuration of packages will be done automatically.
+6. If you upgrade packages or install new packages, just run =make= in the =.emacs.d= dir.
 ** How to customize
-Every time you want to change some configs, do that in =~/.emacs.d/init.org= (eg, write down =<s= and then use =tab= to get a expanded src code) and run =org-babel-tangle= or =make tangle-init=. This will overwrite =~/.emacs.d/init.el= and =early-init.el=. Nowisemacs use this method to guarantee the =init.el= will not be changed by mistake =custom-group= or something else.
+Every time you want to change some configs, do that in =~/.emacs.d/init.org= (eg, write down =<s= and then use =tab= to get a expanded src code) and run =org-babel-tangle= or =make build-init=. This will overwrite =~/.emacs.d/init.el= and =early-init.el=. Nowisemacs use this method to guarantee the =init.el= will not be changed by mistake =custom-group= or something else.
 
-And nowisemacs use =setup.el= to config all the configuration but you can also use built-in methods, =setup= is just a simple wrapper of these methods. You can get a clear understand in anywhere by typing =M-x emacs-lisp-macroexpand=, and the =setup= code will be expanded to normal built-in methods.
+That't to say, after installation, there are only two commands you need to remember for everyday use:
+1. =make build-init= if you change =init.org= to add you own configs.
+2. =make= for everything else related to packages.
+It's suggested to  read the [[https://emacsmirror.net/manual/borg/][borg]] for more details.
+
+One last thing, nowisemacs use =setup.el= to config all the configuration but you can also use built-in methods, =setup= is just a simple wrapper of these methods. You can get a clear understand in anywhere by typing =M-x emacs-lisp-macroexpand=, and the =setup= code will be expanded to normal built-in methods.
 ** Ideas behind nowisemacs
 *** TL ; NR
 Concise + High maintainability
