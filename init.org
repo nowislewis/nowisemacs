@@ -1031,7 +1031,13 @@ Run and interact with detached shell commands
 * git
 ** magit
 #+begin_src elisp
-  (setup magit)
+  (setup magit
+    ;; (:when-loaded
+    ;;   (magit-add-section-hook 'magit-status-sections-hook
+    ;;                           'magit-insert-modules
+    ;;                           'magit-insert-stashes
+                              ;; 'append))
+    )
 #+end_src
 ** blamer
 Show git blame info about current line
