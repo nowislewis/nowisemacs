@@ -36,7 +36,7 @@
 	url = https://github.com/Artawower/blamer.el.git
 [submodule "borg"]
 	path = lib/borg
-	url = git@github.com:emacscollective/borg.git
+	url = https://github.com/emacscollective/borg.git
 [submodule "cape"]
 	path = lib/cape
 	url = https://github.com/minad/cape.git
@@ -54,7 +54,7 @@
 	url = https://github.com/universal-ctags/citre.git
 [submodule "closql"]
 	path = lib/closql
-	url = git@github.com:emacscollective/closql.git
+	url = https://github.com/emacscollective/closql.git
 [submodule "cmake-mode"]
 	path = lib/cmake-mode
 	url = https://github.com/emacsmirror/cmake-mode.git
@@ -127,14 +127,17 @@
 	url = https://github.com/cireu/elispfl
 [submodule "emacsql"]
 	path = lib/emacsql
-	url = git@github.com:skeeto/emacsql.git
+	url = https://github.com/skeeto/emacsql.git
 	no-byte-compile = emacsql-pg.el
 [submodule "embark"]
 	path = lib/embark
 	url = https://github.com/oantolin/embark.git
 [submodule "epkg"]
 	path = lib/epkg
-	url = git@github.com:emacscollective/epkg.git
+	url = https://github.com/emacscollective/epkg.git
+[submodule "epkg-marginalia"]
+	path = lib/epkg-marginalia
+	url = https://github.com/emacscollective/epkg-marginalia.git
 [submodule "exec-path-from-shell"]
 	path = lib/exec-path-from-shell
 	url = https://github.com/purcell/exec-path-from-shell.git
