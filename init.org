@@ -35,11 +35,13 @@
     ;; (pixel-scroll-precision-mode t) ;; 最近发现和 pdf-continuous-view-mode 工作不协调
 #+end_src
 ** Native Compilation(disabled)
-#+begin_src elisp :tangle no
-  ;; Silence compiler warnings as they can be pretty disruptive
-  (setq native-comp-async-report-warnings-errors nil)
-  ;; Set the right directory to store the native comp cache
-  (add-to-list 'native-comp-eln-load-path (expand-file-name "eln-cache/" user-emacs-directory))
+#+begin_src elisp
+    ;; Silence compiler warnings as they can be pretty disruptive
+  (when (native-comp-available-p)
+    (setq borg-compile-function #'native-compile))
+    ;; (setq native-comp-async-report-warnings-errors nil)
+    ;; ;; Set the right directory to store the native comp cache
+    ;; (add-to-list 'native-comp-eln-load-path (expand-file-name "eln-cache/" user-emacs-directory))
 #+end_src
 ** generic
 #+begin_src elisp
@@ -816,22 +818,22 @@ should be check after reading the embark.el manual
 #+end_src
 ** corfu(instead of company)
 #+begin_src elisp
-    (setup corfu
-      (:option
-       ;; Optional customizations
-       corfu-cycle t                ;; Enable cycling for `corfu-next/previous'
-       corfu-auto t                 ;; Enable auto completion
-       ;; (corfu-quit-at-boundary t)     ;; Automatically quit at word boundary
-       corfu-quit-no-match t        ;; Automatically quit if there is no match
-       corfu-preview-current nil    ;; Disable current candidate preview
-       ;; corfu-echo-documentation nil ;; Disable documentation in the echo area
-       corfu-auto-prefix 2)
-      (:with-map corfu-map
-        (:bind
-         ;; [tab] corfu-next
-         ;;       [backtab] corfu-previous
-               "<escape>" corfu-quit))
-      (corfu-global-mode))
+  (setup corfu
+    (:option
+     ;; Optional customizations
+     corfu-cycle t                ;; Enable cycling for `corfu-next/previous'
+     corfu-auto t                 ;; Enable auto completion
+     ;; (corfu-quit-at-boundary t)     ;; Automatically quit at word boundary
+     corfu-quit-no-match t        ;; Automatically quit if there is no match
+     corfu-preview-current nil    ;; Disable current candidate preview
+     ;; corfu-echo-documentation nil ;; Disable documentation in the echo area
+     corfu-auto-prefix 2)
+    (:with-map corfu-map
+      (:bind
+       ;; [tab] corfu-next
+       ;;       [backtab] corfu-previous
+       "<escape>" corfu-quit))
+    (corfu-global-mode))
 
   (defun corfu-enable-always-in-minibuffer ()
     "Enable Corfu in the minibuffer if Vertico/Mct are not active."
@@ -841,23 +843,22 @@ should be check after reading the embark.el manual
       (corfu-mode 1)))
   (add-hook 'minibuffer-setup-hook #'corfu-enable-always-in-minibuffer 1)
 
-    ;; corfu backend
-    (setup cape
-      (add-to-list 'completion-at-point-functions #'cape-file)
-      ;; (add-to-list 'completion-at-point-functions #'cape-tex)
-      ;; (add-to-list 'completion-at-point-functions #'cape-dabbrev)
-      ;; (add-to-list 'completion-at-point-functions #'cape-keyword)
-      )
+  ;; corfu backend
+  (setup cape
+    (add-to-list 'completion-at-point-functions #'cape-file)
+    ;; (add-to-list 'completion-at-point-functions #'cape-tex)
+    ;; (add-to-list 'completion-at-point-functions #'cape-dabbrev)
+    ;; (add-to-list 'completion-at-point-functions #'cape-keyword)
+    )
+  ;; Enable Corfu completion UI
+  (setup corfu-doc
+    (:hook-into corfu-mode))
 
-    ;; Enable Corfu completion UI
-    (setup corfu-doc
-      (:hook-into corfu-mode))
-
-    ;; (setup (:pkg svg-lib :type built-in)) ;; built-in has little icons
-    (setup kind-icon
-      (:option kind-icon-default-face 'corfu-default) ; to compute blended backgrounds correctly
-        (add-to-list 'corfu-margin-formatters #'kind-icon-margin-formatter)
-        )
+  (setup svg-lib) ;; built-in has little icons
+  (setup kind-icon
+    (:load-after corfu)
+    (:option kind-icon-default-face 'corfu-default) ; to compute blended backgrounds correctly
+    (add-to-list 'corfu-margin-formatters #'kind-icon-margin-formatter))
 #+end_src
 ** yasnippet
 #+begin_src elisp

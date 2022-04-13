@@ -28,15 +28,13 @@ It's designed by following principles:
 All configs can be seen [[file:init.org][here]] .
 Nowisemacs uses a single org file to manage all configurations. To reduce the startup time of emacs, users need to
 generate =.el= configuration files before the first startup:
-1. =mv ~/.emacs.d/ .emacs.d.back= ;; Backup your original configuration
-2. =mkdir ~/.emacs.d= ;; Make the emacs configuration folder.
-3. =git clone https://github.com/nowislewis/nowisemacs ~/nowisemacs=;; Download nowisemacs
-4. =emacs ~/nowisemacs/init.org= ;; Open init.org
-5. Sequentially press "Ctrl-c Ctrl-v t", or ~Alt-x~ =org-babel-tangle= to generate init.el
-6. =emacs= ;; Launch emacs, the download, installation and configuration of packages will be done automatically.
-
+1. =mv ~/.emacs.d ~/.emacs.d.back= ;; Backup your original configuration
+2. =git clone https://github.com/nowislewis/nowisemacs ~/.emacs.d= ;; Download nowisemacs
+3. =cd ~/.emacs.d=
+4. =make bootstrap-borg & make bootstrap= ;; download packages
+5. =emacs= ;; Launch emacs, the download, installation and configuration of packages will be done automatically.
 ** How to customize
-Every time you want to change some configs, do that in =~/nowisemacs/init.org= (eg, write down =<s= and then use =tab= to get a expanded src code) and run =org-babel-tangle=. This will overwrite =~/.emacs.d/init.el=. Nowisemacs use this method to guarantee the =init.el= will not be changed by mistake =custom-group= or something else.
+Every time you want to change some configs, do that in =~/.emacs.d/init.org= (eg, write down =<s= and then use =tab= to get a expanded src code) and run =org-babel-tangle= or =make tangle-init=. This will overwrite =~/.emacs.d/init.el= and =early-init.el=. Nowisemacs use this method to guarantee the =init.el= will not be changed by mistake =custom-group= or something else.
 
 And nowisemacs use =setup.el= to config all the configuration but you can also use built-in methods, =setup= is just a simple wrapper of these methods. You can get a clear understand in anywhere by typing =M-x emacs-lisp-macroexpand=, and the =setup= code will be expanded to normal built-in methods.
 ** Ideas behind nowisemacs

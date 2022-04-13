@@ -7,3 +7,5 @@ bootstrap-borg:
  --url git@github.com:emacscollective/borg.git
 	@cd $(DRONES_DIR)/borg; git symbolic-ref HEAD refs/heads/master
 	@cd $(DRONES_DIR)/borg; git reset --hard HEAD
+clean-init: init.el
+	@rm -f init.elc $(INIT_FILES:.el=.elc)
