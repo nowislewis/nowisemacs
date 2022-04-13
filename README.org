@@ -42,7 +42,7 @@ Every time you change some configs in =~/.emacs.d/init.org= (eg, write down =<s=
 *** Add/remove/upgrade packages
 + If you want to *add* a package such as PackageA, you should run =epkg-describe-package= to get a clear dependencies of PackageA, and then =borg-assimilate= to install its dependencies and itself.
 + If you want to *remove* packages, you should do the same thing when you add packages except for chaning =borg-assimilate= to =borg-remove=.
-+ If you want to *update* packages, you just need to run: =git submodule foreach --recursive git pull origin master=.
++ If you want to *update* packages, you just need to run: =git submodule foreach --recursive git pull origin remote=.
 No matter what you did to packages, you should always run =make= in =~/.emacs.d= after above commands.
 *** Everyday use
 That't to say, after installation, there are only two things you need to remember for everyday use:
