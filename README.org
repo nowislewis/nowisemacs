@@ -38,16 +38,16 @@ generate =.el= configuration files before the first startup:
 *** Change configurations
 Nowisemacs use =setup.el= to config all the configuration but you can also use built-in methods, =setup= is just a simple wrapper of these methods. You can get a clear understand in anywhere by typing =M-x emacs-lisp-macroexpand=, and the =setup= code will be expanded to normal built-in methods.
 
-Every time you change some configs in =~/.emacs.d/init.org= (eg, write down =<s= and then use =tab= to get a expanded src code), you should run =org-babel-tangle= or =make build-init=. This will overwrite =~/.emacs.d/init.el= and =early-init.el=. Nowisemacs use this method to guarantee the =init.el= will not be changed by mistake =custom-group= or something else.
+Every time you change some configs in =~/.emacs.d/init.org= (eg, write down =<s= and then use =tab= to get a expanded src code), you should run =org-babel-tangle= or =make build-init=. You can also just use =make= to config everything. This will overwrite =~/.emacs.d/init.el= and =early-init.el=. Nowisemacs use this method to guarantee the =init.el= will not be changed by mistake =custom-group= or something else.
 *** Add/remove/upgrade packages
-+ If you want to add a package such as PackageA, you should run =epkg-describe-package= to get a clear dependencies of PackageA, and then =borg-assimilate= to install its dependencies and itself.
-+ If you want to remove packages, you should do the same thing when you add packages except for chaning =borg-assimilate= to =borg-remove=.
-+ If you want to update packages, you just need to run: =git submodule foreach --recursive git pull origin master=.
++ If you want to *add* a package such as PackageA, you should run =epkg-describe-package= to get a clear dependencies of PackageA, and then =borg-assimilate= to install its dependencies and itself.
++ If you want to *remove* packages, you should do the same thing when you add packages except for chaning =borg-assimilate= to =borg-remove=.
++ If you want to *update* packages, you just need to run: =git submodule foreach --recursive git pull origin master=.
 No matter what you did to packages, you should always run =make= in =~/.emacs.d= after above commands.
 *** Everyday use
-That't to say, after installation, there are only two commands you need to remember for everyday use:
-1. =make build-init= if you change =init.org= to add you own configs.
-3. =make= for everything else related to packages.
+That't to say, after installation, there are only two things you need to remember for everyday use:
+1. =borg-assimilate= for install packages, and =borg-remove= for remove packages.
+2. =make= for everything else( eg, after you changed init.org, or changed packages, you can just run =make= to configure everything well) related to packages.
 
 *It's suggested to  read the [[https://emacsmirror.net/manual/borg/][borg]] for more details*.
 ** Ideas behind nowisemacs
