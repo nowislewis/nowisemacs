@@ -773,7 +773,7 @@ diff-hl-mode highlights uncommitted changes on the left side of the window (area
     (setq consult-project-root-function
           (lambda ()
             (when-let (project (project-current))
-              (car (project-root project))))))
+              (car (project-roots project))))))
 #+end_src
 *** search other cwd
 #+begin_src elisp
@@ -1382,7 +1382,7 @@ eglot client leveraging LTEX Language Server.
     If there's no file-level title in the file, return empty string."
         (or (if (= (org-roam-node-level node) 0)
                 (org-roam-node-title node)
-              (org-collect-keywords "TITLE" (org-roam-node-file node)))
+              (org-roam-get-keyword "TITLE" (org-roam-node-file node)))
             ""))
       (cl-defmethod org-roam-node-doom-hierarchy ((node org-roam-node))
         "Return hierarchy for NODE, constructed of its file title, OLP and direct title.
@@ -1439,6 +1439,7 @@ eglot client leveraging LTEX Language Server.
 The main purpose for this section is to add every node that has a "TODO" into org-agenda, so I can see all the "TODO"s
 among all the files in org-roam in a single agenda-view. The code was borrowed from vulpea.
 #+begin_src elisp
+
   (defun vulpea-project-p ()
     "Return non-nil if current buffer has any todo entry.
   TODO entries marked as done are ignored, meaning the this
