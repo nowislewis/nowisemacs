@@ -1358,19 +1358,19 @@ eglot client leveraging LTEX Language Server.
              ;; org-roam-node-display-template "${doom-hierarchy:*} ${tags:37}"
              org-roam-node-display-template (concat "${type:15} ${doom-hierarchy:80} " (propertize "${tags:*}" 'face 'org-tag))
              org-roam-capture-templates '(("m" "main" plain "%?"
-                                           :if-new
+                                           :target
                                            (file+head "main/%<%Y-%m-%d>-${slug}.org"
                                                       "#+title: ${title}\n* Action notes\n* Idea notes\n* Sealed notes")
-                                           ;; :immediate-finish t
                                            :unnarrowed t)
                                           ("r" "reference" plain "%?"
-                                           :if-new
-                                           (file+head "reference/%<%Y-%m-%d>-${title}.org"
+                                           :target
+                                           (file+head "reference/%<%Y-%m-%d>-${slug}.org"
                                                       "#+title: ${title}\n* Action notes\n* Idea notes\n* Sealed notes")
                                            :unnarrowed t)
                                           ("a" "article" plain "%?"
+                                           ;; :target
                                            :if-new
-                                           (file+head "articles/%<%Y-%m-%d>-${title}.org"
+                                           (file+head "articles/%<%Y-%m-%d>-${slug}.org"
                                                       "#+title: ${title}\n* Action notes\n* Idea notes\n* Sealed notes")
                                            :unnarrowed t)))
     (:when-loaded
