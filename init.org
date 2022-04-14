@@ -1034,10 +1034,10 @@ Run and interact with detached shell commands
 #+begin_src elisp
   (setup magit
     ;; (:when-loaded
-      (magit-add-section-hook 'magit-status-sections-hook
-                              'magit-insert-modules
-                              'magit-insert-stashes
-                              'append))
+      ;; (magit-add-section-hook 'magit-status-sections-hook
+      ;;                         'magit-insert-modules
+      ;;                         'magit-insert-stashes
+      ;;                         'append))
     )
 #+end_src
 ** blamer
