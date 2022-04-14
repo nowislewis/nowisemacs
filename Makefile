@@ -11,7 +11,7 @@ clean-init: init.el
 	@rm -f init.elc $(INIT_FILES:.el=.elc)
 # 更新到 remote 最新 commit
 update:
-	git submodule update --init --recursive --remote --depth=1
+	git submodule update --init --recursive --remote
 
 # 初始化下载，更新到 .gitmodules 中指定的 commit
 init:
