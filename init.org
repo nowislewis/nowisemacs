@@ -1074,9 +1074,9 @@ Show git blame info about current line
 #+begin_src elisp :tangle no
   (setup (:pkg graphviz-dot-mode)
     (:file-match "\\.dot\\'")
-    (:option graphviz-dot-indent-width 4)
-    (:when-loaded
-      (require 'company-graphviz-dot)))
+    (:option graphviz-dot-indent-width 4))
+    ;; (:when-loaded
+    ;;   (require 'company-graphviz-dot)))
 #+end_src
 *** beancount
 Emacs major-mode to work with Beancount ledger files
