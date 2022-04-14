@@ -449,8 +449,8 @@ I used to be a vim(evil) user, but now I use meow to manage all my keys
 
 ** minibuffer-modifier-keys
 #+begin_src elisp
-   (require 'minibuffer-modifier-keys)
-   (minibuffer-modifier-keys-setup t)
+  (require 'minibuffer-modifier-keys)
+  (minibuffer-modifier-keys-setup t)
 #+end_src
 ** insert-pair
 #+begin_src elisp
@@ -667,8 +667,6 @@ diff-hl-mode highlights uncommitted changes on the left side of the window (area
 #+begin_src elisp
   (setup save-place
     (:hook-into after-init-hook))
-
-                                          ; 自动补全括号
   (setup elec-pair
     (:option electric-pair-inhibit-predicate 'electric-pair-conservative-inhibit)
     (electric-pair-mode t))
@@ -742,7 +740,6 @@ diff-hl-mode highlights uncommitted changes on the left side of the window (area
 ** Orderless
 #+begin_src elisp
   (setup orderless
-    (require 'orderless)
     (setq completion-styles '(orderless)
           completion-category-defaults nil
           completion-category-overrides '((file (styles . (partial-completion))))))
@@ -807,6 +804,7 @@ should be check after reading the embark.el manual
     (add-hook 'embark-collect-mode-hook #'consult-preview-at-point-mode))
 
   (setup embark
+    (:also-load embark-consult)
     (:option prefix-help-command 'embark-prefix-help-command)
     (:global "C-S-a" embark-act)
 
@@ -817,8 +815,7 @@ should be check after reading the embark.el manual
             #'which-key--hide-popup-ignore-command)
           embark-become-indicator embark-action-indicator))
 
-  (setup wgrep
-    (require 'wgrep))
+  (setup wgrep)
 #+end_src
 ** corfu(instead of company)
 #+begin_src elisp
@@ -982,7 +979,7 @@ This is adapted from the extra font lock rules provided by Drew Adams' dired+ pa
     (:hook-into dired-mode))
 #+end_src
 *** dired-subtree
-#+begin_src elisp :tangle no
+#+begin_src elisp
   ;; this is in dired-hacks
   (setup dired-subtree
     (:load-after dired)
@@ -1037,10 +1034,10 @@ Run and interact with detached shell commands
 #+begin_src elisp
   (setup magit
     ;; (:when-loaded
-    ;;   (magit-add-section-hook 'magit-status-sections-hook
-    ;;                           'magit-insert-modules
-    ;;                           'magit-insert-stashes
-                              ;; 'append))
+      (magit-add-section-hook 'magit-status-sections-hook
+                              'magit-insert-modules
+                              'magit-insert-stashes
+                              'append))
     )
 #+end_src
 ** blamer
@@ -1144,7 +1141,7 @@ Emacs major-mode to work with Beancount ledger files
   (setup eldoc-box
     (add-hook 'eglot--managed-mode-hook #'eldoc-box-hover-at-point-mode t))
 
-  (setq xref-search-program 'ripgrep)
+  ;; (setq xref-search-program 'ripgrep)
   (setq read-process-output-max (* 1024 1024))
   (setup eglot)
   (setup eldoc
@@ -1246,7 +1243,7 @@ eglot client leveraging LTEX Language Server.
              org-src-window-setup 'split-window-below
              org-refile-targets '(("~/Documents/emacs/orgmode/roam/20211204000712-refile_index.org" . (:maxlevel . 9)))
              )
-    (:file-match "\\.org\\'")
+    ;; (:file-match "\\.org\\'")
     ;; (:hook 'prettify-symbols-mode org-num-mode)
     (:hook org-num-mode)
     (:when-loaded
