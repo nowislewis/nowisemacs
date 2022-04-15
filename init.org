@@ -89,7 +89,6 @@ The following content is not enabled yet, because I want to minimize unnecessary
   (transient-mark-mode 1)                 ;标记高亮
   (global-subword-mode 1)                 ;Word移动支持 FooBar 的格式
   (setq use-dialog-box nil)               ;never pop dialog
-  (setq inhibit-startup-screen t)         ;inhibit start screen
   (setq initial-scratch-message "") ;关闭启动空白buffer, 这个buffer会干扰session恢复
   (setq-default comment-style 'indent)    ;设定自动缩进的注释风格
   (setq ring-bell-function 'ignore)       ;关闭烦人的出错时的提示声
@@ -141,7 +140,6 @@ This keyword causes a body to be executed after other packages/features are load
 #+end_src
 *** :if-system
 #+begin_src elisp
-
   (setup-define :if-system
     (lambda (systemtype)
       `(unless (eq system-type ,systemtype)
