@@ -496,7 +496,6 @@ I used to be a vim(evil) user, but now I use meow to manage all my keys
     (interactive "*P")
     (insert-pair arg ?\= ?\=))
 #+end_src
-
 * UI
 ** Font
 #+begin_src elisp
@@ -545,7 +544,7 @@ Modus-themes is great especailly for org mode
 #+begin_src elisp
   (setup modus-themes
     (:option modus-themes-org-blocks 'tinted-background
-             ;; modus-themes-mode-line '(3d)
+             modus-themes-mode-line '(3d)
              modus-themes-hl-line '(intense accented)
              modus-themes-paren-match '(intense bold underline)
              modus-themes-subtle-line-numbers t)
@@ -645,8 +644,18 @@ diff-hl-mode highlights uncommitted changes on the left side of the window (area
              dashboard-set-init-info t)
     (dashboard-setup-startup-hook))
 #+end_src
-** awesome-tray
+** doom-modeline
 #+begin_src elisp
+(setup doom-modeline
+  (:option doom-modeline-window-width-limit fill-column
+           doom-modeline-height 20
+           doom-modeline-hud t
+           doom-modeline-icon nil
+           doom-modeline-unicode-fallback t)
+  (:hook-into after-init))
+#+end_src
+** awesome-tray
+#+begin_src elisp :tangle no
   (setup awesome-tray
     (:option
      ;; awesome-tray-file-path-show-filename t
@@ -656,6 +665,9 @@ diff-hl-mode highlights uncommitted changes on the left side of the window (area
              awesome-tray-buffer-name-max-length 30
              )
     (require 'awesome-tray)
+
+    (defvar lewis-awesome-tray-deli "  ")
+
     (defun pyim-awesome-tray()
       (concat current-input-method-title))
     (defun persp-awesome-tray()
@@ -665,7 +677,6 @@ diff-hl-mode highlights uncommitted changes on the left side of the window (area
       (car (nthcdr 2 (project-current))))
     (defun meow-awesome-tray()
       (concat "<" (meow-indicator) ">"))
-    (defvar lewis-awesome-tray-deli "  ")
 
      (add-to-list 'awesome-tray-module-alist '("meow" . (meow-awesome-tray awesome-tray-module-last-command-face)))
      (add-to-list 'awesome-tray-module-alist '("pyim" . (pyim-awesome-tray awesome-tray-module-input-method-face)))
@@ -1605,7 +1616,7 @@ among all the files in org-roam in a single agenda-view. The code was borrowed f
 #+end_src
 ** org-clock
 *** org-pomodoro
-#+begin_src elisp
+#+begin_src elisp :tangle no
   (setup org-pomodoro
     (:option org-pomodoro-finished-sound "~/Documents/emacs/other-files/applaud.wav"))
 #+end_src
