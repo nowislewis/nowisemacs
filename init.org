@@ -545,11 +545,8 @@ Modus-themes is great especailly for org mode
 #+begin_src elisp
   (setup modus-themes
     (:option modus-themes-org-blocks 'tinted-background
-             ;; modus-themes-headings '((t . (background overline rainbow)))
-             modus-themes-mode-line '(3d)
-             ;; modus-themes-intense-markup t
+             ;; modus-themes-mode-line '(3d)
              modus-themes-hl-line '(intense accented)
-             ;; modus-themes-hl-line '(intense)
              modus-themes-paren-match '(intense bold underline)
              modus-themes-subtle-line-numbers t)
     ;; (load-theme 'modus-vivendi))
@@ -648,15 +645,34 @@ diff-hl-mode highlights uncommitted changes on the left side of the window (area
              dashboard-set-init-info t)
     (dashboard-setup-startup-hook))
 #+end_src
-** doom-modeline
+** awesome-tray
 #+begin_src elisp
-  (setup doom-modeline
-    (:option doom-modeline-window-width-limit fill-column
-             doom-modeline-height 20
-             doom-modeline-hud t
-             doom-modeline-icon nil
-             doom-modeline-unicode-fallback t)
-    (:hook-into after-init))
+  (setup awesome-tray
+    (:option
+     ;; awesome-tray-file-path-show-filename t
+             awesome-tray-update-interval 0.2
+             awesome-tray-buffer-name-buffer-changed t
+             awesome-tray-file-path-truncate-dirname-levels 3
+             awesome-tray-buffer-name-max-length 30
+             )
+    (require 'awesome-tray)
+    (defun pyim-awesome-tray()
+      (concat current-input-method-title))
+    (defun persp-awesome-tray()
+      (concat "[" (persp-current-name) "]"))
+
+    (defun project-awesome-tray()
+      (car (nthcdr 2 (project-current))))
+    (defun meow-awesome-tray()
+      (concat "<" (meow-indicator) ">"))
+    (defvar lewis-awesome-tray-deli "  ")
+
+     (add-to-list 'awesome-tray-module-alist '("meow" . (meow-awesome-tray awesome-tray-module-last-command-face)))
+     (add-to-list 'awesome-tray-module-alist '("pyim" . (pyim-awesome-tray awesome-tray-module-input-method-face)))
+     (add-to-list 'awesome-tray-module-alist '("persp" . (persp-awesome-tray awesome-tray-module-location-face)))
+
+    (setq awesome-tray-active-modules (list "location" lewis-awesome-tray-deli "buffer-read-only" "file-path" "buffer-name" lewis-awesome-tray-deli "pyim"  "" "meow" lewis-awesome-tray-deli "persp" lewis-awesome-tray-deli "mode-name" "git"))
+    (awesome-tray-mode 1))
 #+end_src
 ** hl-todo
 #+begin_src elisp
@@ -712,21 +728,15 @@ diff-hl-mode highlights uncommitted changes on the left side of the window (area
 #+begin_src elisp
   ;; 可以优化速度, 建议看一下官网的一篇文章
   (setup exec-path-from-shell
-    (when (memq window-system '(mac ns x))
-      (exec-path-from-shell-initialize)))
+      (exec-path-from-shell-initialize))
+      ;; (when (memq window-system '(mac ns x))
+    ;;   (exec-path-from-shell-initialize)))
 #+end_src
 ** Undo
 *** vundo for undo history
 #+begin_src elisp
 (setup vundo)
 #+end_src
-*** undo-hl flashes the to-be-deleted text before deleting
-#+begin_src elisp
-  (setup undo-hl
-    (:autoload undo-hl-mode)
-    (:hook-into text-mode-hook))
-#+end_src
-
 * 补全
 ** Completions with Vertico
 #+begin_src elisp
@@ -1655,12 +1665,6 @@ among all the files in org-roam in a single agenda-view. The code was borrowed f
       (gts-translate my-translator-posframe))
     )
 #+end_src
-** english-teacher
-#+begin_src elisp :tangle no
-  (setup (:pkg english-teacher :host github
-               :repo "loyalpartner/english-teacher.el")
-    )
-#+end_src
 ** company-english-helper
 #+begin_src elisp
   (setup company-english-helper
@@ -1675,12 +1679,6 @@ among all the files in org-roam in a single agenda-view. The code was borrowed f
       (:bind "h" pdf-annot-add-highlight-markup-annotation))
     (pdf-loader-install)
     (add-hook 'pdf-view-mode-hook (lambda() (linum-mode -1))))
-  ;; (setup (:pkg pdf-continuous-scroll-mode :host github :repo "dalanicolai/pdf-continuous-scroll-mode.el")
-  ;;   (:option book-scroll-fraction 16)
-  ;;   )
-  ;; (defun load-pdf-continuous-mode()
-  ;;   (interactive)
-    ;; (require 'pdf-continuous-scroll-mode))
 
   (setq TeX-view-program-selection '((output-pdf "PDF Tools"))
         TeX-view-program-list '(("PDF Tools" TeX-pdf-tools-sync-view))

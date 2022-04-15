@@ -26,6 +26,9 @@
 [submodule "aweshell"]
 	path = lib/aweshell
 	url = https://github.com/manateelazycat/aweshell
+[submodule "awesome-tray"]
+	path = lib/awesome-tray
+	url = https://github.com/manateelazycat/awesome-tray
 [submodule "blamer"]
 	path = lib/blamer
 	url = https://github.com/Artawower/blamer.el.git
@@ -252,9 +255,6 @@
 [submodule "setup"]
 	path = lib/setup
 	url = https://github.com/emacsmirror/setup.git
-[submodule "shrink-path"]
-	path = lib/shrink-path
-	url = https://gitlab.com/bennya/shrink-path.el.git
 [submodule "simple-httpd"]
 	path = lib/simple-httpd
 	url = https://github.com/skeeto/emacs-web-server.git
@@ -276,9 +276,6 @@
 [submodule "tablist"]
 	path = lib/tablist
 	url = https://github.com/politza/tablist.git
-[submodule "undo-hl"]
-	path = lib/undo-hl
-	url = https://github.com/casouri/undo-hl
 [submodule "vertico"]
 	path = lib/vertico
 	url = https://github.com/minad/vertico.git
