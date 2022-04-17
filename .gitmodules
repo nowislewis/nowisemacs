@@ -145,6 +145,12 @@
 [submodule "gcmh"]
 	path = lib/gcmh
 	url = https://gitlab.com/koral/gcmh.git
+[submodule "geiser"]
+	path = lib/geiser
+	url = https://gitlab.com/emacs-geiser/geiser.git
+[submodule "geiser-guile"]
+	path = lib/geiser-guile
+	url = https://gitlab.com/emacs-geiser/guile.git
 [submodule "go-translate"]
 	path = lib/go-translate
 	url = https://github.com/lorniu/go-translate.git

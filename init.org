@@ -250,7 +250,7 @@ I used to be a vim(evil) user, but now I use meow to manage all my keys
                               ;; '("m" . meow-mark-word)
                               ;; '("M" . meow-mark-symbol)
                               '("m" . consult-register-store)
-                              '("M" . meow-block)
+                              '("M" . meow-mark-symbol)
                               '("n" . meow-search)
                               '("N" . meow-pop-selection)
 
@@ -269,8 +269,8 @@ I used to be a vim(evil) user, but now I use meow to manage all my keys
                               '("U" . vundo)
                               '("v v" . meow-visit)
                               '("V" . meow-kmacro-matches)
-                              '("w" . meow-mark-word)
-                              '("W" . meow-mark-symbol)
+                              '("w" . meow-block)
+                              '("W" . meow-block-expand)
                               '("x" . meow-delete)
                               '("X" . meow-backward-delete)
                               '("y" . meow-save)
@@ -652,7 +652,7 @@ diff-hl-mode highlights uncommitted changes on the left side of the window (area
   (:hook-into after-init))
 #+end_src
 ** awesome-tray
-#+begin_src elisp :tangle no
+#+begin_src elisp
   (setup awesome-tray
     (:option
      ;; awesome-tray-file-path-show-filename t
@@ -661,8 +661,9 @@ diff-hl-mode highlights uncommitted changes on the left side of the window (area
              awesome-tray-file-path-truncate-dirname-levels 3
              awesome-tray-buffer-name-max-length 30
              )
-    (require 'awesome-tray)
+    ;; (require 'awesome-tray)
 
+    (:when-loaded
     (defvar lewis-awesome-tray-deli "  ")
 
     (defun pyim-awesome-tray()
@@ -680,7 +681,8 @@ diff-hl-mode highlights uncommitted changes on the left side of the window (area
      (add-to-list 'awesome-tray-module-alist '("persp" . (persp-awesome-tray awesome-tray-module-location-face)))
 
     (setq awesome-tray-active-modules (list "location" lewis-awesome-tray-deli "buffer-read-only" "file-path" "buffer-name" lewis-awesome-tray-deli "pyim"  "" "meow" lewis-awesome-tray-deli "persp" lewis-awesome-tray-deli "mode-name" "git"))
-    (awesome-tray-mode 1))
+    ;; (awesome-tray-mode 1)
+    ))
 #+end_src
 ** hl-todo
 #+begin_src elisp
@@ -1327,6 +1329,7 @@ eglot client leveraging LTEX Language Server.
          (dot . t)
          (latex . t)
          (C . t)
+         (scheme . t)
          ;; (C++ . t)
          ;; (bash . t)
          ))
@@ -1652,11 +1655,12 @@ among all the files in org-roam in a single agenda-view. The code was borrowed f
                                        ":PROPERTIES:
   :ROAM_REFS: [cite:@${citekey}]
   :END:
-  ,#+title: ${title}\n")
+  ,#+title: ${title}\n* Action notes\n* Idea notes\n* Sealed notes")
                             :unnarrowed t))
                          :info (list :citekey (car keys-entries))
                          :node (org-roam-node-create :title title)
                          :props '(:finalize find-file))))
+
 #+end_src
 ** maple-preview
 #+begin_src elisp
