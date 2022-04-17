@@ -378,8 +378,9 @@ I used to be a vim(evil) user, but now I use meow to manage all my keys
    '("s s" . consult-line)
    '("s b" . consult-buffer)
    '("s d" . consult-ripgrep)
-   '("s g" . deadgrep)
    '("s D" . lewis/ripgrep-search-other-dir)
+   '("s g" . deadgrep)
+   '("s h" . consult-history)
    '("s f" . consult-find)
    '("s F" . lewis/find-file-other-dir))
 
@@ -1364,47 +1365,49 @@ eglot client leveraging LTEX Language Server.
 *** org-roam
 #+begin_src elisp
   ;; (setup (:pkg emacsql))
-  (setq org-roam-v2-ack t)
-  (setq org-roam-directory "~/Documents/emacs/orgmode/roam/")
-  (setq org-roam-dailies-directory "~/Documents/emacs/orgmode/roam")
   (setup org-roam
-    (:option org-roam-mode-section-functions (list #'org-roam-backlinks-section
-                                                   #'org-roam-reflinks-section
-                                                   ;; #'org-roam-unlinked-references-section
-                                                   )
-             org-roam-db-gc-threshold most-positive-fixnum
-             ;; org-roam-node-display-template "${doom-hierarchy:*} ${tags:37}"
-             org-roam-node-display-template (concat "${type:15} ${doom-hierarchy:80} " (propertize "${tags:*}" 'face 'org-tag))
-             org-roam-capture-templates '(("m" "main" plain "%?"
-                                           :target
-                                           (file+head "main/%<%Y-%m-%d>-${slug}.org"
-                                                      "#+title: ${title}\n* Action notes\n* Idea notes\n* Sealed notes")
-                                           :unnarrowed t)
-                                          ("r" "reference" plain "%?"
-                                           :target
-                                           (file+head "reference/%<%Y-%m-%d>-${slug}.org"
-                                                      "#+title: ${title}\n* Action notes\n* Idea notes\n* Sealed notes")
-                                           :unnarrowed t)
-                                          ("a" "article" plain "%?"
-                                           ;; :target
-                                           :if-new
-                                           (file+head "articles/%<%Y-%m-%d>-${slug}.org"
-                                                      "#+title: ${title}\n* Action notes\n* Idea notes\n* Sealed notes")
-                                           :unnarrowed t)))
+    (:option
+     org-roam-database-connector 'sqlite-builtin
+     org-roam-mode-section-functions (list #'org-roam-backlinks-section
+                                           #'org-roam-reflinks-section
+                                           ;; #'org-roam-unlinked-references-section
+                                           )
+     org-roam-directory "~/Documents/emacs/orgmode/roam/"
+     org-roam-dailies-directory "~/Documents/emacs/orgmode/roam"
+
+     org-roam-db-gc-threshold most-positive-fixnum
+     ;; org-roam-node-display-template "${doom-hierarchy:*} ${tags:37}"
+     org-roam-node-display-template (concat "${type:15} ${doom-hierarchy:80} " (propertize "${tags:*}" 'face 'org-tag))
+     org-roam-capture-templates '(("m" "main" plain "%?"
+                                   :target
+                                   (file+head "main/%<%Y-%m-%d>-${slug}.org"
+                                              "#+title: ${title}\n* Action notes\n* Idea notes\n* Sealed notes")
+                                   :unnarrowed t)
+                                  ("r" "reference" plain "%?"
+                                   :target
+                                   (file+head "reference/%<%Y-%m-%d>-${slug}.org"
+                                              "#+title: ${title}\n* Action notes\n* Idea notes\n* Sealed notes")
+                                   :unnarrowed t)
+                                  ("a" "article" plain "%?"
+                                   ;; :target
+                                   :if-new
+                                   (file+head "articles/%<%Y-%m-%d>-${slug}.org"
+                                              "#+title: ${title}\n* Action notes\n* Idea notes\n* Sealed notes")
+                                   :unnarrowed t)))
     (:when-loaded
       (org-roam-db-autosync-mode)
 
       ;; Codes blow are used to general a hierachy for title nodes that under a file
       (cl-defmethod org-roam-node-doom-filetitle ((node org-roam-node))
         "Return the value of \"#+title:\" (if any) from file that NODE resides in.
-    If there's no file-level title in the file, return empty string."
+      If there's no file-level title in the file, return empty string."
         (or (if (= (org-roam-node-level node) 0)
                 (org-roam-node-title node)
               (org-roam-get-keyword "TITLE" (org-roam-node-file node)))
             ""))
       (cl-defmethod org-roam-node-doom-hierarchy ((node org-roam-node))
         "Return hierarchy for NODE, constructed of its file title, OLP and direct title.
-      If some elements are missing, they will be stripped out."
+        If some elements are missing, they will be stripped out."
         (let ((title     (org-roam-node-title node))
               (olp       (org-roam-node-olp   node))
               (level     (org-roam-node-level node))
@@ -1654,6 +1657,18 @@ among all the files in org-roam in a single agenda-view. The code was borrowed f
                          :info (list :citekey (car keys-entries))
                          :node (org-roam-node-create :title title)
                          :props '(:finalize find-file))))
+#+end_src
+** maple-preview
+#+begin_src elisp
+  (setup maple-preview
+    (:autoload maple-preview-mode)
+    (defun maple-preview:open-browser ()
+      "Open browser."
+      (interactive)
+      (let ((browse-url-browser-function 'xwidget-webkit-browse-url))
+        (browse-url
+         (format "http://%s:%s/preview" maple-preview:host maple-preview:port))))
+    )
 #+end_src
 * 翻译
 ** go-translate

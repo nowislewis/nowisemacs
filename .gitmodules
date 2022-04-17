@@ -124,6 +124,9 @@
 	path = lib/emacsql
 	url = https://github.com/skeeto/emacsql.git
 	no-byte-compile = emacsql-pg.el
+[submodule "emacsql-sqlite-builtin"]
+	path = lib/emacsql-sqlite-builtin
+	url = https://github.com/emacscollective/emacsql-sqlite-builtin.git
 [submodule "embark"]
 	path = lib/embark
 	url = https://github.com/oantolin/embark.git
@@ -166,6 +169,9 @@
 [submodule "magit"]
 	path = lib/magit
 	url = https://github.com/magit/magit.git
+[submodule "maple-preview"]
+	path = lib/maple-preview
+	url = https://github.com/honmaple/emacs-maple-preview
 [submodule "marginalia"]
 	path = lib/marginalia
 	url = https://github.com/minad/marginalia.git
@@ -206,7 +212,7 @@
 	path = lib/org-roam
 	url = https://github.com/org-roam/org-roam.git
     load-path = .
-	load-path = extensions
+ 	load-path = extensions
 [submodule "org-roam-ui"]
 	path = lib/org-roam-ui
 	url = https://github.com/org-roam/org-roam-ui.git
@@ -258,6 +264,9 @@
 [submodule "spinner"]
 	path = lib/spinner
 	url = https://github.com/Malabarba/spinner.el.git
+[submodule "sqlite3"]
+	path = lib/sqlite3
+	url = https://github.com/pekingduck/emacs-sqlite3-api.git
 [submodule "string-inflection"]
 	path = lib/string-inflection
 	url = https://github.com/akicho8/string-inflection.git
