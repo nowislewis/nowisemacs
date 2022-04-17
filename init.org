@@ -1364,7 +1364,7 @@ eglot client leveraging LTEX Language Server.
 ** org-roam
 *** org-roam
 #+begin_src elisp
-  ;; (setup (:pkg emacsql))
+  ;; (setup emacs-sqlite-builtin)
   (setup org-roam
     (:option
      org-roam-database-connector 'sqlite-builtin

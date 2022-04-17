@@ -10,7 +10,7 @@ function pull() {
      if [ $CNT -ge 1 ]; then
 	echo skip
      else
-        git checkout main || git checkout master; git pull && echo $PN >> $FN;
+        git checkout master || git checkout main; git pull && echo $PN >> $FN;
      fi 
 }
 
