@@ -1133,6 +1133,11 @@ Emacs major-mode to work with Beancount ledger files
 #+begin_src elisp
 (setup cmake-mode)
 #+end_src
+*** scheme
+#+begin_src elisp
+(setup geiser)
+(setup geiser-guile)
+#+end_src
 ** Useful programing tools
 *** quickrun
 #+begin_src elisp
