@@ -31,15 +31,7 @@
    package--init-file-ensured t
    inhibit-startup-message t             ; 关闭启动 Emacs 时的欢迎界面
    )
-
   ;; (pixel-scroll-precision-mode t) ;; 最近发现和 pdf-continuous-view-mode 工作不协调
-#+end_src
-** Native Compilation(disabled)
-#+begin_src elisp :tangle no
-    ;; Silence compiler warnings as they can be pretty disruptive
-    ;; (setq native-comp-async-report-warnings-errors nil)
-    ;; ;; Set the right directory to store the native comp cache
-    ;; (add-to-list 'native-comp-eln-load-path (expand-file-name "eln-cache/" user-emacs-directory))
 #+end_src
 ** generic
 #+begin_src elisp
@@ -156,6 +148,14 @@ This keyword causes a body to be executed after other packages/features are load
         body))
     :documentation "Load the current feature after FEATURES.")
 #+end_src
+* benchmark-init
+#+begin_src elisp
+    (setup benchmark-init
+      ;; (benchmark-init/deactivate)
+  (require 'benchmark-init-loaddefs)
+      (require 'benchmark-init)
+      (add-hook 'after-init-hook 'benchmark-init/deactivate))
+#+end_src
 * gcmh
 Enforce a sneaky Garbage Collection strategy to minimize GC interference with user activity.
 #+begin_src elisp
@@ -270,7 +270,7 @@ I used to be a vim(evil) user, but now I use meow to manage all my keys
                               '("v v" . meow-visit)
                               '("V" . meow-kmacro-matches)
                               '("w" . meow-block)
-                              '("W" . meow-block-expand)
+                              '("W" . meow-to-block)
                               '("x" . meow-delete)
                               '("X" . meow-backward-delete)
                               '("y" . meow-save)
@@ -552,10 +552,6 @@ Modus-themes is great especailly for org mode
 ** line number
 only enable line number in some modes, borrowed from lazycat-emacs
 #+begin_src elisp
-  (setup simple
-    (:with-hook after-init-hook
-      (:hook line-number-mode column-number-mode size-indication-mode)))
-
   (setq display-line-numbers-width-start t)
   (setq line-number-display-limit large-file-warning-threshold)
   (setq line-number-display-limit-width 1000)
@@ -690,6 +686,22 @@ diff-hl-mode highlights uncommitted changes on the left side of the window (area
     (global-hl-todo-mode)
 #+end_src
 * General Configuration
+** simple
+#+begin_src elisp
+  ;; Show line/column number and more
+  (setup simple
+    ;; show line/column/filesize in modeline
+    (:option line-number-mode t
+             column-number-mode t
+             size-indication-mode t
+             ;; visual-line-fringe-indicators '(nil right-curly-arrow)
+             ;; eliminate duplicates
+             kill-do-not-save-duplicates t
+             ;; show cwd when `shell-command' and `async-shell-command'
+             shell-command-prompt-show-cwd t
+             ;; show the name of character in `what-cursor-position'
+             what-cursor-show-names t))
+#+end_src
 ** general modes
 #+begin_src elisp
   (setup save-place
@@ -893,6 +905,11 @@ should be check after reading the embark.el manual
 #+begin_src elisp
   (setup deadgrep)
 #+end_src
+#+begin_src elisp
+  (setup rg
+    (:when-loaded
+      (rg-enable-default-bindings)))
+#+end_src
 * Window Management
 ** winner-mode
 #+begin_src elisp
@@ -1025,6 +1042,15 @@ This is adapted from the extra font lock rules provided by Drew Adams' dired+ pa
     ;; Running `persp-mode' multiple times resets the perspective list...
     (unless (equal persp-mode t)
       (persp-mode)))
+#+end_src
+** tab-bar
+#+begin_src elisp :tangle no
+  (setup tab-bar
+    (:hook-into after-init)
+    (:option tab-bar-show nil
+             tab-bar-tab-hints t
+             tab-bar-close-button-show nil
+             tab-bar-tab-name-function 'tab-bar-tab-name-all))
 #+end_src
 ** auto-revert changed files
 #+begin_src elisp
@@ -1610,7 +1636,6 @@ among all the files in org-roam in a single agenda-view. The code was borrowed f
 #+begin_src elisp
 (setup delve)
 #+end_src
-
 ** ox-hugo
 #+begin_src elisp
   (setup ox-hugo
@@ -1669,7 +1694,7 @@ among all the files in org-roam in a single agenda-view. The code was borrowed f
 
 #+end_src
 ** maple-preview
-#+begin_src elisp
+#+begin_src elisp :tangle no
   (setup maple-preview
     (:autoload maple-preview-mode)
     (defun maple-preview:open-browser ()
@@ -1722,7 +1747,7 @@ among all the files in org-roam in a single agenda-view. The code was borrowed f
 ** gnus
 #+begin_src elisp :tangle ~/.gnus.el
     (setq user-mail-address	"1226228799@qq.com"
-	  user-full-name	"lewisliu")
+      user-full-name	"lewisliu")
   (defun my-gnus-group-list-subscribed-groups ()
     "List all subscribed groups with or without un-read messages"
     (interactive)
@@ -1731,6 +1756,23 @@ among all the files in org-roam in a single agenda-view. The code was borrowed f
   (define-key gnus-group-mode-map
     ;; list all the subscribed groups even they contain zero un-read messages
     (kbd "o") 'my-gnus-group-list-subscribed-groups)
+
+
+(setq gnus-select-method '(nntp "news.somewhere.edu"))
+
+  (setq gnus-secondary-select-methods
+        '((nntp "news.gwene.org")
+          ;; ;;  NOTE 2021-05-13: Switched to notmuch.
+          ;; (nnmaildir "prv" (directory "~/.mail/prv")
+          ;;  (gnus-search-engine gnus-search-notmuch ; this feature is from Emacs 28
+          ;;   		           (remove-prefix "~/.mail/prv")))
+          ;; (nnmaildir "inf" (directory "~/.mail/inf")
+          ;;  (gnus-search-engine gnus-search-notmuch
+          ;;   		           (remove-prefix "~/.mail/inf")))
+          ;; (nnmaildir "pub" (directory "~/.mail/pub")
+          ;;  (gnus-search-engine gnus-search-notmuch
+          ;;   		           (remove-prefix "~/.mail/pub")))
+          ))
 #+end_src
 ** elfeed
 #+begin_src elisp

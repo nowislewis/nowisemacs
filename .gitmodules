@@ -26,6 +26,10 @@
 [submodule "awesome-tray"]
 	path = lib/awesome-tray
 	url = https://github.com/manateelazycat/awesome-tray
+[submodule "benchmark-init"]
+	path = lib/benchmark-init
+	url = https://github.com/dholm/benchmark-init-el.git
+	build-step = make
 [submodule "blamer"]
 	path = lib/blamer
 	url = https://github.com/Artawower/blamer.el.git
@@ -175,9 +179,6 @@
 [submodule "magit"]
 	path = lib/magit
 	url = https://github.com/magit/magit.git
-[submodule "maple-preview"]
-	path = lib/maple-preview
-	url = https://github.com/honmaple/emacs-maple-preview
 [submodule "marginalia"]
 	path = lib/marginalia
 	url = https://github.com/minad/marginalia.git
@@ -255,6 +256,9 @@
 [submodule "restart-emacs"]
 	path = lib/restart-emacs
 	url = https://github.com/iqbalansari/restart-emacs.git
+[submodule "rg"]
+	path = lib/rg
+	url = https://github.com/dajva/rg.el.git
 [submodule "s"]
 	path = lib/s
 	url = https://github.com/magnars/s.el.git
