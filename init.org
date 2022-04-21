@@ -638,6 +638,7 @@ diff-hl-mode highlights uncommitted changes on the left side of the window (area
                                )
              ;; dashboard-set-heading-icons t
              dashboard-center-content t
+             dashboard-startup-banner "~/.emacs.d/etc/banner.txt"
              dashboard-set-init-info t)
     (dashboard-setup-startup-hook))
 #+end_src
@@ -1712,6 +1713,19 @@ among all the files in org-roam in a single agenda-view. The code was borrowed f
 
   (add-hook 'TeX-after-compilation-finished-functions
             #'TeX-revert-document-buffer)
+#+end_src
+** gnus
+#+begin_src elisp :tangle ~/.gnus.el
+    (setq user-mail-address	"1226228799@qq.com"
+	  user-full-name	"lewisliu")
+  (defun my-gnus-group-list-subscribed-groups ()
+    "List all subscribed groups with or without un-read messages"
+    (interactive)
+    (gnus-group-list-all-groups 5))
+
+  (define-key gnus-group-mode-map
+    ;; list all the subscribed groups even they contain zero un-read messages
+    (kbd "o") 'my-gnus-group-list-subscribed-groups)
 #+end_src
 ** elfeed
 #+begin_src elisp
