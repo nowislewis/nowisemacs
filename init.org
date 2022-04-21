@@ -148,14 +148,6 @@ This keyword causes a body to be executed after other packages/features are load
         body))
     :documentation "Load the current feature after FEATURES.")
 #+end_src
-* benchmark-init
-#+begin_src elisp
-    (setup benchmark-init
-      ;; (benchmark-init/deactivate)
-  (require 'benchmark-init-loaddefs)
-      (require 'benchmark-init)
-      (add-hook 'after-init-hook 'benchmark-init/deactivate))
-#+end_src
 * gcmh
 Enforce a sneaky Garbage Collection strategy to minimize GC interference with user activity.
 #+begin_src elisp

@@ -26,10 +26,6 @@
 [submodule "awesome-tray"]
 	path = lib/awesome-tray
 	url = https://github.com/manateelazycat/awesome-tray
-[submodule "benchmark-init"]
-	path = lib/benchmark-init
-	url = https://github.com/dholm/benchmark-init-el.git
-	build-step = make
 [submodule "blamer"]
 	path = lib/blamer
 	url = https://github.com/Artawower/blamer.el.git
