@@ -163,6 +163,9 @@
 [submodule "imenu-list"]
 	path = lib/imenu-list
 	url = https://github.com/bmag/imenu-list.git
+[submodule "insert-translated-name"]
+	path = lib/insert-translated-name
+	url = https://github.com/manateelazycat/insert-translated-name
 [submodule "kind-icon"]
 	path = lib/kind-icon
 	url = https://github.com/jdtsmith/kind-icon

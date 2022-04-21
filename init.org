@@ -911,14 +911,19 @@ should be check after reading the embark.el manual
 Popper is a minor-mode to tame the flood of ephemeral windows Emacs produces, while still keeping them within arm’s reach.
 #+begin_src elisp
   (setup popper
-    (:option popper-reference-buffers         '("\\*Messages\\*"
-                                                "Output\\*$"
-                                                "\\*Async Shell Command\\*"
-                                                "Go-Translate"
-                                                help-mode
-                                                helpful-mode
-                                                compilation-mode
-                                                youdao-dictionary-mode)
+    (:option popper-reference-buffers '("\\*Messages\\*"
+                                        "Output\\*$"
+                                        "\\*Async Shell Command\\*"
+                                        "Go-Translate"
+                                        help-mode
+                                        helpful-mode
+                                        compilation-mode
+                                        youdao-dictionary-mode)
+             popper-window-height  (lambda (win)
+                                     (fit-window-to-buffer
+                                      win
+                                      (floor (frame-height) 1)))
+
              )
     (:global "C-`" popper-toggle-latest
              "M-`" popper-cycle
@@ -1701,18 +1706,28 @@ among all the files in org-roam in a single agenda-view. The code was borrowed f
 ** go-translate
 #+begin_src elisp
   (setup go-translate
-    (:option gts-translate-list '(("en" "zh")))
+    (:option gts-translate-list '(("en" "zh"))
+             gts-default-translator (gts-translator
+                                     :picker (gts-prompt-picker)
+                                     :engines (list (gts-google-engine))
+                                     :render (gts-buffer-render)))
     (defun my-gts-translate-posframe ()
       (interactive)
       (if (not (featurep 'go-translate))
           (require 'go-translate))
       (defvar my-translator-posframe
         (gts-translator
-                        :picker (gts-noprompt-picker)
-                        :engines (gts-google-rpc-engine)
-                        :render (gts-posframe-pop-render)))
+         :picker (gts-noprompt-picker)
+         :engines (gts-google-engine)
+         :render (gts-posframe-pop-render)))
       (gts-translate my-translator-posframe))
     )
+#+end_src
+** insert-translated-name
+#+begin_src elisp
+    (setup insert-translated-name
+      (:autoload insert-translated-name-insert)
+      (:autoload insert-translated-name-replace))
 #+end_src
 ** company-english-helper
 #+begin_src elisp
