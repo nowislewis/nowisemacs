@@ -138,10 +138,10 @@ This keyword causes a body to be executed after other packages/features are load
 *** :autoload
 #+begin_src elisp
   (setup-define :autoload
-    (lambda (&rest load-func)
+    (lambda (load-func)
       (let ((body '())
             (feature-string (symbol-name (setup-get 'feature))))
-            `(autoload 'load-func ,feature-string nil t)))
+        `(autoload ',load-func ,feature-string nil t)))
     :documentation "Load the current feature after FEATURES.")
 #+end_src
 * gcmh
@@ -156,7 +156,6 @@ Enforce a sneaky Garbage Collection strategy to minimize GC interference with us
 I used to be a vim(evil) user, but now I use meow to manage all my keys
 ** meow
 #+begin_src elisp
-  ;;setup (:pkg evil))
   (setup meow
     (require 'meow)
     (:option meow-use-keypad-when-execute-kbd nil
@@ -168,17 +167,14 @@ I used to be a vim(evil) user, but now I use meow to manage all my keys
                                             (motion . "M")
                                             (keypad . "K")
                                             (insert . "I")
-                                            (beacon . "B")
-                                            )
-             meow-use-enhanced-selection-effect t
-             )
+                                            (beacon . "B"))
+             meow-use-enhanced-selection-effect t)
     (defun meow-setup()
       (setq meow-cheatsheet-layout meow-cheatsheet-layout-qwerty)
       (meow-motion-overwrite-define-key '("j" . meow-next)
                                         '("k" . meow-prev)
                                         '("<escape>" . ignore)
-                                        '("." . repeat)
-                                        )
+                                        '("." . repeat))
       (meow-leader-define-key
        ;; SPC j/k will run the original command in MOTION state.
        '("j" . "H-j")
@@ -308,8 +304,7 @@ I used to be a vim(evil) user, but now I use meow to manage all my keys
                               '("/" . consult-line)))
     (meow-global-mode 1)
                                           ; meow-setup 用于自定义按键绑定，可以直接使用下文中的示例
-    (meow-setup)
-    )
+    (meow-setup))
 #+end_src
 
 ** which-key
@@ -611,7 +606,6 @@ rainbow-delimiters is a "rainbow parentheses"-like mode which highlights delimit
 diff-hl-mode highlights uncommitted changes on the left side of the window (area also known as the "gutter"), allows you to jump between and revert them selectively.
 #+begin_src elisp
   (setup diff-hl
-    ;; (global-diff-hl-mode)
     (:hook-into text-mode prog-mode)
     (:when-loaded
     (diff-hl-margin-mode)))
@@ -632,13 +626,13 @@ diff-hl-mode highlights uncommitted changes on the left side of the window (area
 #+end_src
 ** doom-modeline
 #+begin_src elisp
-(setup doom-modeline
-  (:option doom-modeline-window-width-limit fill-column
-           doom-modeline-height 20
-           doom-modeline-hud t
-           doom-modeline-icon nil
-           doom-modeline-unicode-fallback t)
-  (:hook-into after-init))
+  (setup doom-modeline
+    (:option doom-modeline-window-width-limit fill-column
+             doom-modeline-height 20
+             doom-modeline-hud t
+             doom-modeline-icon nil
+             doom-modeline-unicode-fallback t)
+    (:hook-into after-init))
 #+end_src
 ** awesome-tray
 #+begin_src elisp
@@ -648,8 +642,7 @@ diff-hl-mode highlights uncommitted changes on the left side of the window (area
              awesome-tray-update-interval 0.2
              awesome-tray-buffer-name-buffer-changed t
              awesome-tray-file-path-truncate-dirname-levels 3
-             awesome-tray-buffer-name-max-length 30
-             )
+             awesome-tray-buffer-name-max-length 30)
     ;; (require 'awesome-tray)
 
     (:when-loaded
