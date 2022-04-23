@@ -75,9 +75,6 @@
 [submodule "dashboard"]
 	path = lib/dashboard
 	url = https://github.com/emacs-dashboard/emacs-dashboard.git
-[submodule "deadgrep"]
-	path = lib/deadgrep
-	url = https://github.com/Wilfred/deadgrep.git
 [submodule "delve"]
 	path = lib/delve
 	url = https://github.com/publicimageltd/delve
@@ -252,9 +249,6 @@
 [submodule "rainbow-delimiters"]
 	path = lib/rainbow-delimiters
 	url = https://github.com/Fanael/rainbow-delimiters.git
-[submodule "restart-emacs"]
-	path = lib/restart-emacs
-	url = https://github.com/iqbalansari/restart-emacs.git
 [submodule "rg"]
 	path = lib/rg
 	url = https://github.com/dajva/rg.el.git

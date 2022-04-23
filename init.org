@@ -50,8 +50,8 @@
 
   (setq use-short-answers t)
 
-  (setq frame-resize-pixelwise t) ;设置缩放的模式,避免Mac平台最大化窗口以后右边和下边有空隙
-  (set-frame-parameter nil 'fullscreen 'maximized)
+  ;; (setq frame-resize-pixelwise t) ;设置缩放的模式,避免Mac平台最大化窗口以后右边和下边有空隙
+  ;; (set-frame-parameter nil 'fullscreen 'maximized)
 
   (setq ring-bell-function 'ignore)       ;关闭烦人的出错时的提示声
   (set-default-coding-systems 'utf-8)
@@ -181,11 +181,13 @@ I used to be a vim(evil) user, but now I use meow to manage all my keys
       (meow-motion-overwrite-define-key '("j" . meow-next)
                                         '("k" . meow-prev)
                                         '("<escape>" . ignore)
+                                        '("." . repeat)
                                         )
       (meow-leader-define-key
        ;; SPC j/k will run the original command in MOTION state.
        '("j" . "H-j")
        '("k" . "H-k")
+       '("." . "H-.")
        ;; Use SPC (0-9) for digit arguments.
        '("1" . meow-digit-argument)
        '("2" . meow-digit-argument)
@@ -371,7 +373,7 @@ I used to be a vim(evil) user, but now I use meow to manage all my keys
    '("s b" . consult-buffer)
    '("s d" . consult-ripgrep)
    '("s D" . lewis/ripgrep-search-other-dir)
-   '("s g" . deadgrep)
+   '("s g" . rg)
    '("s h" . consult-history)
    '("s f" . consult-find)
    '("s F" . lewis/find-file-other-dir))
@@ -613,8 +615,10 @@ rainbow-delimiters is a "rainbow parentheses"-like mode which highlights delimit
 diff-hl-mode highlights uncommitted changes on the left side of the window (area also known as the "gutter"), allows you to jump between and revert them selectively.
 #+begin_src elisp
   (setup diff-hl
-    (global-diff-hl-mode)
-    (diff-hl-margin-mode))
+    ;; (global-diff-hl-mode)
+    (:hook-into text-mode prog-mode)
+    (:when-loaded
+    (diff-hl-margin-mode)))
     #+end_src
 ** emacs-dashboard
 #+begin_src elisp
@@ -675,7 +679,7 @@ diff-hl-mode highlights uncommitted changes on the left side of the window (area
 #+end_src
 ** hl-todo
 #+begin_src elisp
-    (global-hl-todo-mode)
+  (global-hl-todo-mode)
 #+end_src
 * General Configuration
 ** simple
@@ -894,13 +898,12 @@ should be check after reading the embark.el manual
   ;;(setup yasnippet-snippets)
 #+end_src
 ** deadgrep
-#+begin_src elisp
+#+begin_src elisp :tangle no
   (setup deadgrep)
 #+end_src
+** rg.el
 #+begin_src elisp
-  (setup rg
-    (:when-loaded
-      (rg-enable-default-bindings)))
+  (setup rg)
 #+end_src
 * Window Management
 ** winner-mode
@@ -1706,11 +1709,12 @@ among all the files in org-roam in a single agenda-view. The code was borrowed f
 ** go-translate
 #+begin_src elisp
   (setup go-translate
-    (:option gts-translate-list '(("en" "zh"))
-             gts-default-translator (gts-translator
+    (:option gts-translate-list '(("en" "zh")))
+    (:when-loaded
+             (setq gts-default-translator (gts-translator
                                      :picker (gts-prompt-picker)
                                      :engines (list (gts-google-engine))
-                                     :render (gts-buffer-render)))
+                                     :render (gts-buffer-render))))
     (defun my-gts-translate-posframe ()
       (interactive)
       (if (not (featurep 'go-translate))
@@ -1751,36 +1755,6 @@ among all the files in org-roam in a single agenda-view. The code was borrowed f
   (add-hook 'TeX-after-compilation-finished-functions
             #'TeX-revert-document-buffer)
 #+end_src
-** gnus
-#+begin_src elisp :tangle ~/.gnus.el
-    (setq user-mail-address	"1226228799@qq.com"
-      user-full-name	"lewisliu")
-  (defun my-gnus-group-list-subscribed-groups ()
-    "List all subscribed groups with or without un-read messages"
-    (interactive)
-    (gnus-group-list-all-groups 5))
-
-  (define-key gnus-group-mode-map
-    ;; list all the subscribed groups even they contain zero un-read messages
-    (kbd "o") 'my-gnus-group-list-subscribed-groups)
-
-
-(setq gnus-select-method '(nntp "news.somewhere.edu"))
-
-  (setq gnus-secondary-select-methods
-        '((nntp "news.gwene.org")
-          ;; ;;  NOTE 2021-05-13: Switched to notmuch.
-          ;; (nnmaildir "prv" (directory "~/.mail/prv")
-          ;;  (gnus-search-engine gnus-search-notmuch ; this feature is from Emacs 28
-          ;;   		           (remove-prefix "~/.mail/prv")))
-          ;; (nnmaildir "inf" (directory "~/.mail/inf")
-          ;;  (gnus-search-engine gnus-search-notmuch
-          ;;   		           (remove-prefix "~/.mail/inf")))
-          ;; (nnmaildir "pub" (directory "~/.mail/pub")
-          ;;  (gnus-search-engine gnus-search-notmuch
-          ;;   		           (remove-prefix "~/.mail/pub")))
-          ))
-#+end_src
 ** elfeed
 #+begin_src elisp
   (setup elfeed
@@ -1805,10 +1779,6 @@ Simple distraction-free editing. I use darkroom instead of writeroom because it'
   (setup darkroom)
 #+end_src
 * tools
-** restart-emacs
-#+begin_src elisp
-  (setup restart-emacs)
-#+end_src
 ** xwidget
 #+begin_src elisp
   (defun lewis/url-browser-new-buffer(url &optional new-session)
