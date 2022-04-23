@@ -314,9 +314,6 @@
 [submodule "ws-butler"]
 	path = lib/ws-butler
 	url = https://github.com/lewang/ws-butler.git
-[submodule "xeft"]
-	path = lib/xeft
-	url = https://github.com/casouri/xeft
 [submodule "xr"]
 	path = lib/xr
 	url = https://github.com/mattiase/xr.git
