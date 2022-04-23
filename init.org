@@ -1251,12 +1251,12 @@ Highlight symbols with keymap-enabled overlays
 #+end_src
 *** eglot-ltex
 eglot client leveraging LTEX Language Server.
-#+begin_src elisp :tangle no
+#+begin_src elisp
   (setup eglot-ltex
-      (:option eglot-languagetool-server-path "~/Downloads/ltex-ls/")
-      (:with-hook text-mode-hook
-        (:hook (lambda ()
-                       (require 'eglot-ltex)))))
+      (:option eglot-languagetool-server-path "~/Downloads/ltex-ls/"))
+      ;; (:with-hook text-mode-hook
+      ;;   (:hook (lambda ()
+      ;;                  (require 'eglot-ltex)))))
 #+end_src
 *** Code toggle with hideshow
 #+begin_src elisp
