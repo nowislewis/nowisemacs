@@ -743,7 +743,11 @@ diff-hl-mode highlights uncommitted changes on the left side of the window (area
 ** Undo
 *** vundo for undo history
 #+begin_src elisp
-(setup vundo)
+  (setup vundo
+    (:bind "l" vundo-forward
+           "h" vundo-backward
+           "j" vundo-next
+           "k" vundo-previous))
 #+end_src
 * 补全
 ** Completions with Vertico
@@ -758,7 +762,7 @@ diff-hl-mode highlights uncommitted changes on the left side of the window (area
 ** Orderless
 #+begin_src elisp
   (setup orderless
-    (setq completion-styles '(orderless)
+    (:option completion-styles '(orderless)
           completion-category-defaults nil
           completion-category-overrides '((file (styles . (partial-completion))))))
 #+end_src
@@ -801,7 +805,6 @@ diff-hl-mode highlights uncommitted changes on the left side of the window (area
     (interactive)
     (let ((current-prefix-arg '(-1)))
       (call-interactively 'consult-find)))
-
 #+end_src
 ** Marginalia
 #+begin_src elisp
@@ -943,7 +946,8 @@ borrowed from citre, now you can always jump-back use "M-,"
                   find-file
                   goto-line
                   citre-jump
-))
+                  isearch-forward
+                  ))
     (advice-add func :before 'my--push-point-to-xref-marker-stack))
 #+end_src
 *** bookmark
@@ -1032,15 +1036,6 @@ This is adapted from the extra font lock rules provided by Drew Adams' dired+ pa
     (unless (equal persp-mode t)
       (persp-mode)))
 #+end_src
-** tab-bar
-#+begin_src elisp :tangle no
-  (setup tab-bar
-    (:hook-into after-init)
-    (:option tab-bar-show nil
-             tab-bar-tab-hints t
-             tab-bar-close-button-show nil
-             tab-bar-tab-name-function 'tab-bar-tab-name-all))
-#+end_src
 ** auto-revert changed files
 #+begin_src elisp
 ;; Revert Dired and other buffers
@@ -1059,11 +1054,6 @@ This is adapted from the extra font lock rules provided by Drew Adams' dired+ pa
 ** vterm
 #+begin_src elisp
   (setup vterm)
-#+end_src
-** dtache
-Run and interact with detached shell commands
-#+begin_src elisp :tangle no
-(setup (:pkg dtache))
 #+end_src
 * git
 ** magit
@@ -1107,12 +1097,12 @@ Show git blame info about current line
     (:hook-into emacs-lisp-mode ielm))
 #+end_src
 *** graphviz-dot-mode
-#+begin_src elisp :tangle no
-  (setup (:pkg graphviz-dot-mode)
+#+begin_src elisp
+  (setup graphviz-dot-mode
     (:file-match "\\.dot\\'")
     (:option graphviz-dot-indent-width 4))
     ;; (:when-loaded
-    ;;   (require 'company-graphviz-dot)))
+    ;;   (require 'company-graphviz-dot))) ;;for now, just use highlight
 #+end_src
 *** beancount
 Emacs major-mode to work with Beancount ledger files

@@ -26,6 +26,9 @@
 [submodule "awesome-tray"]
 	path = lib/awesome-tray
 	url = https://github.com/manateelazycat/awesome-tray
+[submodule "beancount-mode"]
+	path = lib/beancount-mode
+	url = https://github.com/beancount/beancount-mode
 [submodule "blamer"]
 	path = lib/blamer
 	url = https://github.com/Artawower/blamer.el.git
@@ -151,6 +154,10 @@
 [submodule "go-translate"]
 	path = lib/go-translate
 	url = https://github.com/lorniu/go-translate.git
+[submodule "graphviz-dot-mode"]
+	path = lib/graphviz-dot-mode
+	url = https://github.com/ppareit/graphviz-dot-mode.git
+    no-byte-compile = company-graphviz-dot.el
 [submodule "helpful"]
 	path = lib/helpful
 	url = https://github.com/Wilfred/helpful.git
