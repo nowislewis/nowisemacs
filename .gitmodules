@@ -330,3 +330,6 @@
 [submodule "yasnippet"]
 	path = lib/yasnippet
 	url = https://github.com/joaotavora/yasnippet.git
+[submodule "compat"]
+	path = lib/compat
+	url = https://github.com/emacs-straight/compat

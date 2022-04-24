@@ -858,7 +858,7 @@ should be check after reading the embark.el manual
        ;; [tab] corfu-next
        ;;       [backtab] corfu-previous
        "<escape>" corfu-quit))
-    (corfu-global-mode))
+    (global-corfu-mode))
 
   (defun corfu-enable-always-in-minibuffer ()
     "Enable Corfu in the minibuffer if Vertico/Mct are not active."
