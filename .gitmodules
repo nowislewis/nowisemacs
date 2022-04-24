@@ -60,6 +60,9 @@
 	path = lib/company-english-helper
 	url = https://github.com/manateelazycat/company-english-helper
     no-byte-compile = company-english-helper.el
+[submodule "compat"]
+	path = lib/compat
+	url = https://github.com/emacs-straight/compat
 [submodule "consult"]
 	path = lib/consult
 	url = https://github.com/minad/consult.git
@@ -330,6 +333,3 @@
 [submodule "yasnippet"]
 	path = lib/yasnippet
 	url = https://github.com/joaotavora/yasnippet.git
-[submodule "compat"]
-	path = lib/compat
-	url = https://github.com/emacs-straight/compat
