@@ -1273,7 +1273,7 @@ eglot client leveraging LTEX Language Server.
 
              org-confirm-babel-evaluate nil
              org-src-window-setup 'split-window-below
-             org-refile-targets '(("~/Documents/emacs/orgmode/roam/20211204000712-refile_index.org" . (:maxlevel . 9)))
+             org-refile-targets '(("~/Documents/emacs/orgmode/roam/2022-04-25-org_refile_notes.org" . (:maxlevel . 9)))
              )
     ;; (:file-match "\\.org\\'")
     ;; (:hook 'prettify-symbols-mode org-num-mode)
@@ -1474,7 +1474,7 @@ eglot client leveraging LTEX Language Server.
 *** org-roam-agenda
 The main purpose for this section is to add every node that has a "TODO" into org-agenda, so I can see all the "TODO"s
 among all the files in org-roam in a single agenda-view. The code was borrowed from vulpea.
-#+begin_src elisp
+#+begin_src elisp :tangle no
     (defun vulpea-project-p ()
 
 
