@@ -197,6 +197,9 @@
 [submodule "mixed-pitch"]
 	path = lib/mixed-pitch
 	url = https://gitlab.com/jabranham/mixed-pitch.git
+[submodule "multi-vterm"]
+	path = lib/multi-vterm
+	url = https://github.com/suonlight/multi-vterm.git
 [submodule "oj"]
 	path = lib/oj
 	url = https://github.com/conao3/oj.el.git

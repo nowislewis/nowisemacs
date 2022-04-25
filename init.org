@@ -347,6 +347,15 @@ I used to be a vim(evil) user, but now I use meow to manage all my keys
    '("e a d" . aweshell-dedicated-toggle)
    '("e a b" . aweshell-switch-buffer)
    '("e a s" . aweshell-search-history)
+
+   ;; vterm
+   '("e v v" . multi-vterm)
+   '("e v d" . multi-vterm-dedicated-toggle)
+   '("e v n" . multi-vterm-next)
+   '("e v p" . multi-vterm-prev)
+   '("e v r" . multi-vterm-rename-buffer)
+   '("e v s" . multi-vterm-dedicated-select)
+   '("e v w" . multi-vterm-project)
    ;; insert-translated
    '("e i i" . insert-translated-name-insert)
    '("e i r" . insert-translated-name-replace)
@@ -892,10 +901,6 @@ should be check after reading the embark.el manual
     (yas-global-mode 1))
   ;;(setup yasnippet-snippets)
 #+end_src
-** deadgrep
-#+begin_src elisp :tangle no
-  (setup deadgrep)
-#+end_src
 ** rg.el
 #+begin_src elisp
   (setup rg)
@@ -1057,6 +1062,10 @@ This is adapted from the extra font lock rules provided by Drew Adams' dired+ pa
 ** vterm
 #+begin_src elisp
   (setup vterm)
+#+end_src
+** multi-vterm
+#+begin_src elisp
+  (setup multi-vterm)
 #+end_src
 * git
 ** magit
