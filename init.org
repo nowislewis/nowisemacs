@@ -440,7 +440,7 @@ I used to be a vim(evil) user, but now I use meow to manage all my keys
 #+end_src
 
 ** minibuffer-modifier-keys
-#+begin_src elisp
+#+begin_src elisp :tangle no
   (require 'minibuffer-modifier-keys)
   (minibuffer-modifier-keys-setup t)
 #+end_src
@@ -1067,6 +1067,13 @@ This is adapted from the extra font lock rules provided by Drew Adams' dired+ pa
 #+begin_src elisp
   (setup multi-vterm)
 #+end_src
+** dtache
+#+begin_src elisp
+  (setup dtache
+    (:with-function dtache-setup
+      (:hook-into after-init)))
+    ;; (:bind [remap async-shell-command] dtache-shell-command))
+#+end_src
 * git
 ** magit
 #+begin_src elisp
@@ -1222,6 +1229,7 @@ enable eglot in org-src mode
   (dolist (lang org-babel-lang-list)
     (eval `(lsp-org-babel-enable ,lang)))
 #+end_src
+**** consult-eglot
 *** citre
 Citre is an advanced Ctags (or actually, readtags) frontend for Emacs.
 #+begin_src elisp

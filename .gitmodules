@@ -66,6 +66,9 @@
 [submodule "consult"]
 	path = lib/consult
 	url = https://github.com/minad/consult.git
+[submodule "consult-eglot"]
+	path = lib/consult-eglot
+	url = https://github.com/mohkale/consult-eglot.git
 [submodule "corfu"]
 	path = lib/corfu
 	url = https://github.com/minad/corfu.git
@@ -99,6 +102,9 @@
 [submodule "doom-modeline"]
 	path = lib/doom-modeline
 	url = https://github.com/seagle0128/doom-modeline.git
+[submodule "dtache"]
+	path = lib/dtache
+	url = https://gitlab.com/niklaseklund/dtache.git
 [submodule "eglot"]
 	path = lib/eglot
 	url = https://github.com/joaotavora/eglot.git
@@ -191,9 +197,6 @@
 [submodule "meow"]
 	path = lib/meow
 	url = https://github.com/meow-edit/meow.git
-[submodule "minibuffer-modifier-keys"]
-	path = lib/minibuffer-modifier-keys
-	url = https://github.com/SpringHan/minibuffer-modifier-keys.git
 [submodule "mixed-pitch"]
 	path = lib/mixed-pitch
 	url = https://gitlab.com/jabranham/mixed-pitch.git
@@ -270,7 +273,7 @@
 	url = https://github.com/magnars/s.el.git
 [submodule "setup"]
 	path = lib/setup
-	url = https://github.com/emacsmirror/setup.git
+	url = https://github.com/phikal/setup.el
 [submodule "shrink-path"]
 	path = lib/shrink-path
 	url = https://gitlab.com/bennya/shrink-path.el.git
