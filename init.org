@@ -5,38 +5,38 @@
 * Startup config
 ** UI speed up
 #+begin_src elisp :tangle ~/.emacs.d/early-init.el
-    ;; -*- lexical-binding: t; -*-
-    (setq gc-cons-threshold most-positive-fixnum
-          gc-cons-percentage 0.5) ;;defer gc futher back
+;; -*- lexical-binding: t; -*-
+  (setq gc-cons-threshold most-positive-fixnum
+        gc-cons-percentage 0.5) ;;defer gc futher back
 
-    ;; Package initialize occurs automatically, before `user-init-file' is
-    ;; loaded, but after `early-init-file'. We handle package
-    ;; initialization, so we must prevent Emacs from doing it early!
-    (setq package-enable-at-startup nil)
+  ;; Package initialize occurs automatically, before `user-init-file' is
+  ;; loaded, but after `early-init-file'. We handle package
+  ;; initialization, so we must prevent Emacs from doing it early!
+  (setq package-enable-at-startup nil)
 
-    ;; Inhibit resizing frame
-    (setq frame-inhibit-implied-resize t)
+  ;; Inhibit resizing frame
+  (setq frame-inhibit-implied-resize t)
 
-    ;; (add-to-list 'default-frame-alist '(undecorated . t))
-    ;; Faster to disable these here (before they've been initialized)
-    (push '(menu-bar-lines . 0) default-frame-alist)
-    (push '(tool-bar-lines . 0) default-frame-alist)
-    (push '(vertical-scroll-bars) default-frame-alist)
+  ;; (add-to-list 'default-frame-alist '(undecorated . t))
+  ;; Faster to disable these here (before they've been initialized)
+  (push '(menu-bar-lines . 0) default-frame-alist)
+  (push '(tool-bar-lines . 0) default-frame-alist)
+  (push '(vertical-scroll-bars) default-frame-alist)
 
-    ;; (tool-bar-mode -1)                      ;禁用工具栏
-    ;; (scroll-bar-mode -1)                    ;禁用滚动条
-    (setq
-     ;; 默认用最简单的模式
-     initial-major-mode 'fundamental-mode
-     package--init-file-ensured t
-     inhibit-startup-message t             ; 关闭启动 Emacs 时的欢迎界面
-     )
-    ;; (pixel-scroll-precision-mode t) ;; 最近发现和 pdf-continuous-view-mode 工作不协调
+  ;; (tool-bar-mode -1)                      ;禁用工具栏
+  ;; (scroll-bar-mode -1)                    ;禁用滚动条
+  (setq
+   ;; 默认用最简单的模式
+   initial-major-mode 'fundamental-mode
+   package--init-file-ensured t
+   inhibit-startup-message t             ; 关闭启动 Emacs 时的欢迎界面
+   )
+  ;; (pixel-scroll-precision-mode t) ;; 最近发现和 pdf-continuous-view-mode 工作不协调
 
 #+end_src
 ** generic
 #+begin_src elisp
-  ;; -*- lexical-binding: t; -*-
+;; -*- lexical-binding: t; -*-
   (add-to-list 'load-path (expand-file-name "lib/borg" user-emacs-directory))
   (require 'borg)
   (setq borg-rewrite-urls-alist
@@ -66,6 +66,7 @@
   (setq completions-detailed t) ;;useful in emacs 28
   ;; (server-start)
 #+end_src
+
 The following content is not enabled yet, because I want to minimize unnecessary settings as much as possible
 #+begin_src elisp :tangle no
   ;; Restore emacs session.
@@ -347,7 +348,7 @@ I used to be a vim(evil) user, but now I use meow to manage all my keys
    '("e a d" . aweshell-dedicated-toggle)
    '("e a b" . aweshell-switch-buffer)
    '("e a s" . aweshell-search-history)
-
+   ;; '("e d" . dtache-action-map) //TODO use global in dtache
    ;; vterm
    '("e v v" . multi-vterm)
    '("e v d" . multi-vterm-dedicated-toggle)
@@ -363,7 +364,7 @@ I used to be a vim(evil) user, but now I use meow to manage all my keys
    ;; imenu-list
    '("e l" . imenu-list-smart-toggle)
    ;; org-download
-   '("e d" . org-download-screenshot)
+   '("e s" . org-download-screenshot)
    ;; english help
    '("e h c" . toggle-company-english-helper)
    '("e h f" . english-teacher-follow-mode))
@@ -593,6 +594,7 @@ only enable line number in some modes, borrowed from lazycat-emacs
                  'nxml-mode-hook
                  'nim-mode-hook
                  'org-mode-hook
+                 'verilog-mode-hook
                  ))
     (add-hook hook (lambda () (display-line-numbers-mode))))
 #+end_src
@@ -618,7 +620,7 @@ diff-hl-mode highlights uncommitted changes on the left side of the window (area
   (setup diff-hl
     (:hook-into text-mode prog-mode)
     (:when-loaded
-    (diff-hl-margin-mode)))
+      (diff-hl-margin-mode)))
     #+end_src
 ** emacs-dashboard
 #+begin_src elisp
@@ -649,32 +651,32 @@ diff-hl-mode highlights uncommitted changes on the left side of the window (area
   (setup awesome-tray
     (:option
      ;; awesome-tray-file-path-show-filename t
-             awesome-tray-update-interval 0.2
-             awesome-tray-buffer-name-buffer-changed t
-             awesome-tray-file-path-truncate-dirname-levels 3
-             awesome-tray-buffer-name-max-length 30)
+     awesome-tray-update-interval 0.2
+     awesome-tray-buffer-name-buffer-changed t
+     awesome-tray-file-path-truncate-dirname-levels 3
+     awesome-tray-buffer-name-max-length 30)
     ;; (require 'awesome-tray)
 
     (:when-loaded
-    (defvar lewis-awesome-tray-deli "  ")
+      (defvar lewis-awesome-tray-deli "  ")
 
-    (defun pyim-awesome-tray()
-      (concat current-input-method-title))
-    (defun persp-awesome-tray()
-      (concat "[" (persp-current-name) "]"))
+      (defun pyim-awesome-tray()
+        (concat current-input-method-title))
+      (defun persp-awesome-tray()
+        (concat "[" (persp-current-name) "]"))
 
-    (defun project-awesome-tray()
-      (car (nthcdr 2 (project-current))))
-    (defun meow-awesome-tray()
-      (concat "<" (meow-indicator) ">"))
+      (defun project-awesome-tray()
+        (car (nthcdr 2 (project-current))))
+      (defun meow-awesome-tray()
+        (concat "<" (meow-indicator) ">"))
 
-     (add-to-list 'awesome-tray-module-alist '("meow" . (meow-awesome-tray awesome-tray-module-last-command-face)))
-     (add-to-list 'awesome-tray-module-alist '("pyim" . (pyim-awesome-tray awesome-tray-module-input-method-face)))
-     (add-to-list 'awesome-tray-module-alist '("persp" . (persp-awesome-tray awesome-tray-module-location-face)))
+      (add-to-list 'awesome-tray-module-alist '("meow" . (meow-awesome-tray awesome-tray-module-last-command-face)))
+      (add-to-list 'awesome-tray-module-alist '("pyim" . (pyim-awesome-tray awesome-tray-module-input-method-face)))
+      (add-to-list 'awesome-tray-module-alist '("persp" . (persp-awesome-tray awesome-tray-module-location-face)))
 
-    (setq awesome-tray-active-modules (list "location" lewis-awesome-tray-deli "buffer-read-only" "file-path" "buffer-name" lewis-awesome-tray-deli "pyim"  "" "meow" lewis-awesome-tray-deli "persp" lewis-awesome-tray-deli "mode-name" "git"))
-    ;; (awesome-tray-mode 1)
-    ))
+      (setq awesome-tray-active-modules (list "location" lewis-awesome-tray-deli "buffer-read-only" "file-path" "buffer-name" lewis-awesome-tray-deli "pyim"  "" "meow" lewis-awesome-tray-deli "persp" lewis-awesome-tray-deli "mode-name" "git"))
+      ;; (awesome-tray-mode 1)
+      ))
 #+end_src
 ** hl-todo
 #+begin_src elisp
@@ -851,17 +853,15 @@ should be check after reading the embark.el manual
 ** corfu(instead of company)
 #+begin_src elisp
   (setup corfu
-    (:option
-     ;; Optional customizations
-     corfu-cycle t                ;; Enable cycling for `corfu-next/previous'
-     corfu-auto t                 ;; Enable auto completion
-     ;; (corfu-quit-at-boundary t)     ;; Automatically quit at word boundary
-     corfu-quit-no-match t        ;; Automatically quit if there is no match
-     corfu-preview-current nil    ;; Disable current candidate preview
-     ;; corfu-echo-documentation nil ;; Disable documentation in the echo area
-     corfu-auto-prefix 2
-     corfu-auto-delay 0.01
-     )
+    (:option corfu-cycle t                ;; Enable cycling for `corfu-next/previous'
+             corfu-auto t                 ;; Enable auto completion
+             ;; (corfu-quit-at-boundary t)     ;; Automatically quit at word boundary
+             corfu-quit-no-match t        ;; Automatically quit if there is no match
+             corfu-preview-current nil    ;; Disable current candidate preview
+             ;; corfu-echo-documentation nil ;; Disable documentation in the echo area
+             corfu-auto-prefix 2
+             corfu-auto-delay 0.01
+             )
     (:with-map corfu-map
       (:bind
        ;; [tab] corfu-next
@@ -1071,18 +1071,62 @@ This is adapted from the extra font lock rules provided by Drew Adams' dired+ pa
 #+begin_src elisp
   (setup dtache
     (:with-function dtache-setup
-      (:hook-into after-init)))
-    ;; (:bind [remap async-shell-command] dtache-shell-command))
+      (:hook-into after-init))
+    (:with-feature vterm
+      (:bind "<S-return>" #'dtache-vterm-send-input
+             "<C-return>" #'dtache-vterm-attach
+             "C-c C-d" #'dtache-vterm-detach))
+    (:when-loaded
+      (global-set-key (kbd "C-c e d") dtache-action-map)
+      ;; embark
+      ;; (defvar embark-dtache-map (make-composed-keymap dtache-action-map embark-general-map))
+      ;; (add-to-list 'embark-keymap-alist '(dtache . embark-dtache-map))
+      ;; vterm
+      (defun dtache-vterm-send-input (&optional detach)
+        "Create a `dtache' session."
+        (interactive)
+        (vterm-send-C-a)
+        (let* ((input (buffer-substring-no-properties (point) (vterm-end-of-line)))
+               (dtache-session-origin 'vterm)
+               (dtache-session-action
+                '(:attach dtache-shell-command-attach-session
+                          :view dtache-view-dwim
+                          :run dtache-shell-command))
+               (dtache-session-mode
+                (if detach 'create 'create-and-attach)))
+          (vterm-send-C-k)
+          (process-send-string vterm--process (dtache-dtach-command input t))
+          (vterm-send-C-e)
+          (vterm-send-return)))
+
+      (defun dtache-vterm-attach (session)
+        "Attach to an active `dtache' session."
+        (interactive
+         (list
+          (let* ((host-name (car (dtache--host)))
+                 (sessions
+                  (thread-last (dtache-get-sessions)
+                               (seq-filter (lambda (it)
+                                             (string= (car (dtache--session-host it)) host-name)))
+                               (seq-filter (lambda (it) (eq 'active (dtache--determine-session-state it)))))))
+            (dtache-completing-read sessions))))
+        (let ((dtache-session-mode 'attach))
+          (process-send-string vterm--process (dtache-dtach-command session t))
+          (vterm-send-return)))
+      (defun dtache-vterm-detach ()
+        "Detach from a `dtache' session."
+        (interactive)
+        (process-send-string vterm--process dtache--dtach-detach-character))))
 #+end_src
 * git
 ** magit
 #+begin_src elisp
   (setup magit
     ;; (:when-loaded
-      ;; (magit-add-section-hook 'magit-status-sections-hook
-      ;;                         'magit-insert-modules
-      ;;                         'magit-insert-stashes
-      ;;                         'append))
+    ;; (magit-add-section-hook 'magit-status-sections-hook
+    ;;                         'magit-insert-modules
+    ;;                         'magit-insert-stashes
+    ;;                         'append))
     )
 #+end_src
 ** blamer
@@ -1259,7 +1303,10 @@ eglot client leveraging LTEX Language Server.
 #+begin_src elisp
   (setup hideshow
     (:with-hook prog-mode-hook
-      (:hook hs-minor-mode)))
+      (:hook hs-minor-mode))
+    (add-to-list 'hs-special-modes-alist '(verilog-mode "\\(\\<begin\\>\\|\\<case\\>\\|\\<module\\>\\|\\<class\\>\\|\\<function\\>\\|\\<task\\>\\)"
+                                                        "\\(\\<end\\>\\|\\<endcase\\>\\|\\<endmodule\\>\\|\\<endclass\\>\\|\\<endfunction\\>\\|\\<endtask\\>\\)" nil verilog-forward-sexp-function))
+    )
 #+end_src
 * Org Mode
 ** org-mode
@@ -1813,6 +1860,27 @@ Simple distraction-free editing. I use darkroom instead of writeroom because it'
     (:autoload eaf-open-pdf-from-history))
   (setup eaf-rss-reader
     (:autoload eaf-open-rss-reader))
+#+end_src
+** gnus
+#+begin_src elisp :tangle ~/.gnus.el
+(setq user-full-name "yi liu"
+      user-mail-address "lewisliu.gm@gmail.com")
+
+;; Send email through SMTP
+(setq message-send-mail-function 'smtpmail-send-it
+      smtpmail-default-smtp-server "smtp.gmail.com"
+      smtpmail-smtp-service 587
+      smtpmail-local-domain "homepc")
+
+(setq gnus-select-method
+      '(nnimap "gmail"
+	       (nnimap-address "imap.gmail.com")  ; it could also be imap.googlemail.com if that's your server.
+	       (nnimap-server-port "imaps")
+	       (nnimap-stream ssl)))
+
+(setq smtpmail-smtp-server "smtp.gmail.com"
+      smtpmail-smtp-service 587
+      gnus-ignored-newsgroups "^to\\.\\|^[0-9. ]+\\( \\|$\\)\\|^[\"]\"[#'()]")
 #+end_src
 ** Simulate company with corfu
 Company is wide-used, but I use corfu for its simplity. So I add a simulation for some packages which use
