@@ -974,8 +974,8 @@ borrowed from citre, now you can always jump-back use "M-,"
   (setup pyim
     (:option pyim-dicts '((:name "lewis_pyim_dict" :file "~/Documents/emacs/other-files/lewis_pyim_dict.pyim")
                           (:name "lewis_big_dict" :file "~/Documents/emacs/other-files/pyim-bigdict.pyim.gz"))
-             ;; pyim-default-scheme 'xiaohe-shuangpin
-             pyim-default-scheme 'quanpin
+             pyim-default-scheme 'xiaohe-shuangpin
+             ;; pyim-default-scheme 'quanpin
              pyim-punctuation-translate-p '(no yes auto)
              pyim-page-tooltip 'posframe
              pyim-page-length 5
@@ -1712,11 +1712,11 @@ among all the files in org-roam in a single agenda-view. The code was borrowed f
 ** org-noter
 #+begin_src elisp
   (setup org-noter
-    (:option
-     org-noter-notes-search-path (list org-directory)
-     org-noter-auto-save-last-location t
-     org-noter-separate-notes-from-heading nil
-     org-noter-doc-split-percentage '(0.6 . 0.4)))
+    (:option org-noter-notes-search-path (list org-directory)
+             org-noter-auto-save-last-location t
+             org-noter-separate-notes-from-heading nil
+             org-noter-hide-other nil
+             org-noter-doc-split-percentage '(0.6 . 0.4)))
 #+end_src
 ** org-present
 #+begin_src elisp
@@ -1824,6 +1824,11 @@ among all the files in org-roam in a single agenda-view. The code was borrowed f
             "https://valdyas.org/fading/feed/"
             "https://manateelazycat.github.io/feed.xml"
   )))
+#+end_src
+** nov
+#+begin_src elisp
+  (setup nov
+    (:file-match "\\.epub\\'"))
 #+end_src
 ** darkroom
 Simple distraction-free editing. I use darkroom instead of writeroom because it's more simple

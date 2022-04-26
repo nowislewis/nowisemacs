@@ -145,6 +145,9 @@
 [submodule "epkg-marginalia"]
 	path = lib/epkg-marginalia
 	url = https://github.com/emacscollective/epkg-marginalia.git
+[submodule "esxml"]
+	path = lib/esxml
+	url = https://github.com/tali713/esxml.git
 [submodule "exec-path-from-shell"]
 	path = lib/exec-path-from-shell
 	url = https://github.com/purcell/exec-path-from-shell.git
@@ -203,6 +206,9 @@
 [submodule "multi-vterm"]
 	path = lib/multi-vterm
 	url = https://github.com/suonlight/multi-vterm.git
+[submodule "nov"]
+	path = lib/nov
+	url = https://depp.brause.cc/nov.el.git
 [submodule "oj"]
 	path = lib/oj
 	url = https://github.com/conao3/oj.el.git
