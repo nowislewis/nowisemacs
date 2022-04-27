@@ -5,7 +5,7 @@
 * Startup config
 ** UI speed up
 #+begin_src elisp :tangle ~/.emacs.d/early-init.el
-;; -*- lexical-binding: t; -*-
+  ;; -*- lexical-binding: t; -*-
   (setq gc-cons-threshold most-positive-fixnum
         gc-cons-percentage 0.5) ;;defer gc futher back
 
@@ -22,17 +22,13 @@
   (push '(menu-bar-lines . 0) default-frame-alist)
   (push '(tool-bar-lines . 0) default-frame-alist)
   (push '(vertical-scroll-bars) default-frame-alist)
-
   ;; (tool-bar-mode -1)                      ;禁用工具栏
   ;; (scroll-bar-mode -1)                    ;禁用滚动条
-  (setq
-   ;; 默认用最简单的模式
-   initial-major-mode 'fundamental-mode
-   package--init-file-ensured t
-   inhibit-startup-message t             ; 关闭启动 Emacs 时的欢迎界面
-   )
+  (setq initial-major-mode 'fundamental-mode ;; 默认用最简单的模式
+        package--init-file-ensured t
+        inhibit-startup-message t             ; 关闭启动 Emacs 时的欢迎界面
+        )
   ;; (pixel-scroll-precision-mode t) ;; 最近发现和 pdf-continuous-view-mode 工作不协调
-
 #+end_src
 ** generic
 #+begin_src elisp
@@ -305,7 +301,6 @@ I used to be a vim(evil) user, but now I use meow to manage all my keys
                               ;; '("%" . meow-query-replace-regexp)
                               '("/" . consult-line)))
     (meow-global-mode 1)
-                                          ; meow-setup 用于自定义按键绑定，可以直接使用下文中的示例
     (meow-setup))
 #+end_src
 
@@ -348,15 +343,7 @@ I used to be a vim(evil) user, but now I use meow to manage all my keys
    '("e a d" . aweshell-dedicated-toggle)
    '("e a b" . aweshell-switch-buffer)
    '("e a s" . aweshell-search-history)
-   ;; '("e d" . dtache-action-map) //TODO use global in dtache
-   ;; vterm
-   '("e v v" . multi-vterm)
-   '("e v d" . multi-vterm-dedicated-toggle)
-   '("e v n" . multi-vterm-next)
-   '("e v p" . multi-vterm-prev)
-   '("e v r" . multi-vterm-rename-buffer)
-   '("e v s" . multi-vterm-dedicated-select)
-   '("e v w" . multi-vterm-project)
+   ;; '("e d" . dtache-action-map) //TODO Now use global bind in dtache section
    ;; insert-translated
    '("e i i" . insert-translated-name-insert)
    '("e i r" . insert-translated-name-replace)
@@ -379,6 +366,11 @@ I used to be a vim(evil) user, but now I use meow to manage all my keys
    '("s h" . consult-history)
    '("s f" . consult-find)
    '("s F" . lewis/find-file-other-dir))
+   ;; vterm
+  (meow-leader-define-key
+   '("t t" . vterm-toggle)
+   '("t n" . vterm-toggle-forward)
+   '("t p" . vterm-toggle-backward))
 
   (defun find-config-file()
     (interactive)
@@ -655,16 +647,12 @@ diff-hl-mode highlights uncommitted changes on the left side of the window (area
      awesome-tray-buffer-name-buffer-changed t
      awesome-tray-file-path-truncate-dirname-levels 3
      awesome-tray-buffer-name-max-length 30)
-    ;; (require 'awesome-tray)
-
     (:when-loaded
       (defvar lewis-awesome-tray-deli "  ")
-
       (defun pyim-awesome-tray()
         (concat current-input-method-title))
       (defun persp-awesome-tray()
         (concat "[" (persp-current-name) "]"))
-
       (defun project-awesome-tray()
         (car (nthcdr 2 (project-current))))
       (defun meow-awesome-tray()
@@ -674,9 +662,8 @@ diff-hl-mode highlights uncommitted changes on the left side of the window (area
       (add-to-list 'awesome-tray-module-alist '("pyim" . (pyim-awesome-tray awesome-tray-module-input-method-face)))
       (add-to-list 'awesome-tray-module-alist '("persp" . (persp-awesome-tray awesome-tray-module-location-face)))
 
-      (setq awesome-tray-active-modules (list "location" lewis-awesome-tray-deli "buffer-read-only" "file-path" "buffer-name" lewis-awesome-tray-deli "pyim"  "" "meow" lewis-awesome-tray-deli "persp" lewis-awesome-tray-deli "mode-name" "git"))
-      ;; (awesome-tray-mode 1)
-      ))
+      (setq awesome-tray-active-modules (list "location" lewis-awesome-tray-deli "buffer-read-only" "file-path" "buffer-name" lewis-awesome-tray-deli "pyim"  "" "meow" lewis-awesome-tray-deli "persp" lewis-awesome-tray-deli "mode-name" "git")))
+    )
 #+end_src
 ** hl-todo
 #+begin_src elisp
@@ -708,8 +695,8 @@ diff-hl-mode highlights uncommitted changes on the left side of the window (area
     (electric-pair-mode t))
 
   (global-auto-revert-mode t)                  ; 当另一程序修改了文件时，让 Emacs 及时刷新 Buffer
-  (delete-selection-mode t)                    ; 选中文本后输入文本会替换文本（更符合我们习惯了的其它编辑器的逻辑）
-  (global-hl-line-mode)
+  ;; (delete-selection-mode t)                    ; 选中文本后输入文本会替换文本（更符合我们习惯了的其它编辑器的逻辑）
+  ;; (global-hl-line-mode)
   (recentf-mode t)
   (blink-cursor-mode -1)                  ;指针不闪动
 #+end_src
@@ -766,9 +753,9 @@ diff-hl-mode highlights uncommitted changes on the left side of the window (area
 #+begin_src elisp
   (setup vertico
     (:option vertico-cycle t)
-    (:with-mode vertico
+    (:with-map vertico-map
       (:bind [backspace] vertico-directory-delete-char))
-    (vertico-mode))
+    (:hook-into after-init))
   (vertico-posframe-mode 1)
 #+end_src
 ** Orderless
@@ -1061,15 +1048,19 @@ This is adapted from the extra font lock rules provided by Drew Adams' dired+ pa
 #+end_src
 ** vterm
 #+begin_src elisp
-  (setup vterm)
+    (setup vterm
+      (:bind [(control return)] vterm-toggle-insert-cd))
 #+end_src
-** multi-vterm
+** vterm-toggle
 #+begin_src elisp
-  (setup multi-vterm)
+  (setup vterm-toggle
+    (:option vterm-toggle-hide-method 'reset-window-configration)
+    (:global [(control tab)] vterm-toggle))
 #+end_src
 ** dtache
 #+begin_src elisp
   (setup dtache
+    (:if-system 'darwin)
     (:with-function dtache-setup
       (:hook-into after-init))
     (:with-feature vterm

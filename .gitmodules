@@ -203,9 +203,6 @@
 [submodule "mixed-pitch"]
 	path = lib/mixed-pitch
 	url = https://gitlab.com/jabranham/mixed-pitch.git
-[submodule "multi-vterm"]
-	path = lib/multi-vterm
-	url = https://github.com/suonlight/multi-vterm.git
 [submodule "nov"]
 	path = lib/nov
 	url = https://depp.brause.cc/nov.el.git
@@ -318,6 +315,9 @@
 [submodule "vterm"]
 	path = lib/vterm
 	url = https://github.com/akermu/emacs-libvterm.git
+[submodule "vterm-toggle"]
+	path = lib/vterm-toggle
+	url = https://github.com/jixiuf/vterm-toggle.git
 [submodule "vundo"]
 	path = lib/vundo
 	url = https://github.com/casouri/vundo
