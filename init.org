@@ -915,9 +915,9 @@ Popper is a minor-mode to tame the flood of ephemeral windows Emacs produces, wh
                                       (floor (frame-height) 2)))
 
              )
-    (:global "C-`" popper-toggle-latest
-             "M-`" popper-cycle
-             "C-M-`" popper-toggle-type)
+    (:global "C-~" popper-toggle-latest
+             "M-~" popper-cycle
+             "C-M-~" popper-toggle-type)
     (popper-mode +1)
     (popper-echo-mode +1))
 #+end_src
@@ -961,8 +961,8 @@ borrowed from citre, now you can always jump-back use "M-,"
   (setup pyim
     (:option pyim-dicts '((:name "lewis_pyim_dict" :file "~/Documents/emacs/other-files/lewis_pyim_dict.pyim")
                           (:name "lewis_big_dict" :file "~/Documents/emacs/other-files/pyim-bigdict.pyim.gz"))
-             pyim-default-scheme 'xiaohe-shuangpin
-             ;; pyim-default-scheme 'quanpin
+             ;; pyim-default-scheme 'xiaohe-shuangpin
+             pyim-default-scheme 'quanpin
              pyim-punctuation-translate-p '(no yes auto)
              pyim-page-tooltip 'posframe
              pyim-page-length 5
@@ -1055,7 +1055,7 @@ This is adapted from the extra font lock rules provided by Drew Adams' dired+ pa
 #+begin_src elisp
   (setup vterm-toggle
     (:option vterm-toggle-hide-method 'reset-window-configration)
-    (:global [(control tab)] vterm-toggle))
+    (:global "C-`" vterm-toggle))
 #+end_src
 ** dtache
 #+begin_src elisp
