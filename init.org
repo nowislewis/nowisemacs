@@ -376,9 +376,6 @@ I used to be a vim(evil) user, but now I use meow to manage all my keys
   (require 'minibuffer-modifier-keys)
   (minibuffer-modifier-keys-setup t)
 #+end_src
-#+begin_src elisp
-
-#+end_src
 * UI
 ** Font
 #+begin_src elisp

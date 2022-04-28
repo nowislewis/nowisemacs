@@ -39,7 +39,8 @@ It's designed by following principles:
   front-end *citre*, users can easily use and expand almost all programming languages under emacs.
 + Pinyin search everywhere powered by PYIM, orderless completion.
 ** How to use
-All configs can be seen [[file:init.org][here]] .
+All configs can be seen [[file:init.org][here]] . It should be noticed that some common configurations that have been moved to [[https://github.com/nowislewis/nowisemacs-base][nowisemacs-base]] for a better reusability, and it also reduces codes  in this main configuration.
+
 Nowisemacs uses a single org file to manage all configurations. To reduce the startup time of emacs, users need to
 generate =.el= configuration files before the first startup:
 1. =mv ~/.emacs.d ~/.emacs.d.back= ;; Backup your original configuration
