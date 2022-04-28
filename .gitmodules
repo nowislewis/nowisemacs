@@ -104,7 +104,7 @@
 	url = https://github.com/seagle0128/doom-modeline.git
 [submodule "dtache"]
 	path = lib/dtache
-	url = https://gitlab.com/niklaseklund/dtache.git
+	url = https://github.com/emacsmirror/dtache.git
 [submodule "eglot"]
 	path = lib/eglot
 	url = https://github.com/joaotavora/eglot.git
@@ -156,13 +156,13 @@
 	url = https://github.com/rejeep/f.el.git
 [submodule "gcmh"]
 	path = lib/gcmh
-	url = https://gitlab.com/koral/gcmh.git
+	url = https://github.com/emacsmirror/gcmh.git
 [submodule "geiser"]
 	path = lib/geiser
-	url = https://gitlab.com/emacs-geiser/geiser.git
+	url = https://github.com/emacsmirror/geiser.git
 [submodule "geiser-guile"]
 	path = lib/geiser-guile
-	url = https://gitlab.com/emacs-geiser/guile.git
+	url = https://github.com/emacsmirror/guile.git
 [submodule "go-translate"]
 	path = lib/go-translate
 	url = https://github.com/lorniu/go-translate.git
@@ -202,7 +202,7 @@
 	url = https://github.com/meow-edit/meow.git
 [submodule "mixed-pitch"]
 	path = lib/mixed-pitch
-	url = https://gitlab.com/jabranham/mixed-pitch.git
+	url = https://github.com/emacsmirror/mixed-pitch.git
 [submodule "nov"]
 	path = lib/nov
 	url = https://depp.brause.cc/nov.el.git
@@ -279,7 +279,7 @@
 	url = https://github.com/phikal/setup.el
 [submodule "shrink-path"]
 	path = lib/shrink-path
-	url = https://gitlab.com/bennya/shrink-path.el.git
+	url = https://github.com/emacsmirror/shrink-path.el.git
 [submodule "simple-httpd"]
 	path = lib/simple-httpd
 	url = https://github.com/skeeto/emacs-web-server.git
