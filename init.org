@@ -376,49 +376,8 @@ I used to be a vim(evil) user, but now I use meow to manage all my keys
   (require 'minibuffer-modifier-keys)
   (minibuffer-modifier-keys-setup t)
 #+end_src
-** insert-pair
 #+begin_src elisp
-  (defun insert-quotations (&optional arg)
-    "Enclose following ARG sexps in quotation marks.
-    Leave point after open-paren."
-    (interactive "*P")
-    (insert-pair arg ?\' ?\'))
 
-  (defun insert-quotes (&optional arg)
-    "Enclose following ARG sexps in quotes.
-    Leave point after open-quote."
-    (interactive "*P")
-    (insert-pair arg ?\" ?\"))
-
-  (defun insert-backquote (&optional arg)
-    "Enclose following ARG sexps in quotations with backquote.
-    Leave point after open-quotation."
-    (interactive "*P")
-    (insert-pair arg ?\` ?\'))
-
-  (defun insert-star (&optional arg)
-    "Enclose following ARG sexps in stars.
-  Leave point after open-quotation."
-    (interactive "*P")
-    (insert-pair arg ?\* ?\*))
-
-  (defun insert-bracket (&optional arg)
-    "Enclose following ARG sexps in brackets.
-  Leave point after open-quotation."
-    (interactive "*P")
-    (insert-pair arg ?\[ ?\]))
-
-  (defun insert-curly (&optional arg)
-    "Enclose following ARG sexps in curly braces.
-  Leave point after open-quotation."
-    (interactive "*P")
-    (insert-pair arg ?\{ ?\}))
-
-  (defun insert-equate (&optional arg)
-    "Enclose following ARG sexps in equations.
-  Leave point after open-quotation."
-    (interactive "*P")
-    (insert-pair arg ?\= ?\=))
 #+end_src
 * UI
 ** Font
@@ -430,10 +389,10 @@ I used to be a vim(evil) user, but now I use meow to manage all my keys
   (when (display-graphic-p)
     ;; Set default font
     (cl-loop for font in '(
-                           ;; "JetBrains Mono"
                            ;; "InconsolataGo QiHei NF"
                            "Sarasa Mono SC Nerd"
                            "yaheiInconsolata"
+                           "JetBrains Mono"
                            "Monaco"
                            "Consolas")
              when (font-installed-p font)
@@ -476,59 +435,6 @@ Modus-themes is great especailly for org mode
     (load-theme 'modus-operandi))
 #+end_src
 
-** line number
-only enable line number in some modes, borrowed from lazycat-emacs
-#+begin_src elisp
-  (setq display-line-numbers-width-start t)
-  (setq line-number-display-limit large-file-warning-threshold)
-  (setq line-number-display-limit-width 1000)
-
-  (dolist (hook (list
-                 'c-mode-common-hook
-                 'c-mode-hook
-                 'emacs-lisp-mode-hook
-                 'lisp-interaction-mode-hook
-                 'lisp-mode-hook
-                 'java-mode-hook
-                 'asm-mode-hook
-
-                 'haskell-mode-hook
-                 'rcirc-mode-hook
-                 'erc-mode-hook
-                 'sh-mode-hook
-                 'makefile-gmake-mode-hook
-                 'python-mode-hook
-                 'js-mode-hook
-                 'html-mode-hook
-                 'css-mode-hook
-                 'tuareg-mode-hook
-                 'go-mode-hook
-                 'coffee-mode-hook
-                 'qml-mode-hook
-                 'markdown-mode-hook
-                 'slime-repl-mode-hook
-                 'package-menu-mode-hook
-                 'cmake-mode-hook
-                 'php-mode-hook
-                 'web-mode-hook
-                 'coffee-mode-hook
-                 'sws-mode-hook
-                 'jade-mode-hook
-                 'vala-mode-hook
-                 'rust-mode-hook
-                 'ruby-mode-hook
-                 'qmake-mode-hook
-                 'lua-mode-hook
-                 'swift-mode-hook
-                 'llvm-mode-hook
-                 'conf-toml-mode-hook
-                 'nxml-mode-hook
-                 'nim-mode-hook
-                 'org-mode-hook
-                 'verilog-mode-hook
-                 ))
-    (add-hook hook (lambda () (display-line-numbers-mode))))
-#+end_src
 ** all-the-icons
 I'm thinking about removing this package, but it's pretty good so far
 *** all-the-icons
@@ -704,10 +610,6 @@ diff-hl-mode highlights uncommitted changes on the left side of the window (area
           completion-category-defaults nil
           completion-category-overrides '((file (styles . (partial-completion))))))
 #+end_src
-** savehist
-#+begin_src elisp
-    (savehist-mode)
-#+end_src
 ** Consult Commands
 *** consult
 #+begin_src elisp
@@ -879,7 +781,7 @@ borrowed from citre, now you can always jump-back use "M-,"
                   consult-find
                   find-file
                   goto-line
-                  citre-jump
+                  ;; citre-jump
                   isearch-forward
                   ))
     (advice-add func :before 'my--push-point-to-xref-marker-stack))
@@ -969,13 +871,6 @@ This is adapted from the extra font lock rules provided by Drew Adams' dired+ pa
     ;; Running `persp-mode' multiple times resets the perspective list...
     (unless (equal persp-mode t)
       (persp-mode)))
-#+end_src
-** auto-revert changed files
-#+begin_src elisp
-;; Revert Dired and other buffers
-(setq global-auto-revert-non-file-buffers t)
-;; Revert buffers when the underlying file has changed
-(global-auto-revert-mode 1)
 #+end_src
 * shell
 ** aweshell
