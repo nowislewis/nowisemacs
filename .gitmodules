@@ -206,6 +206,9 @@
 [submodule "nov"]
 	path = lib/nov
 	url = https://depp.brause.cc/nov.el.git
+[submodule "nowisemacs-base"]
+	path = lib/nowisemacs-base
+	url = https://github.com/nowislewis/nowisemacs-base
 [submodule "oj"]
 	path = lib/oj
 	url = https://github.com/conao3/oj.el.git
