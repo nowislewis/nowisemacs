@@ -32,15 +32,18 @@
 #+end_src
 ** generic
 #+begin_src elisp
-;; -*- lexical-binding: t; -*-
-  (add-to-list 'load-path (expand-file-name "lib/borg" user-emacs-directory))
-  (require 'borg)
-  (setq borg-rewrite-urls-alist
-        '(("git@github.com:" . "https://github.com/")
-          ("git@gitlab.com:" . "https://gitlab.com/")))
-  (borg-initialize)
+  ;; -*- lexical-binding: t; -*-
+    (add-to-list 'load-path (expand-file-name "lib/borg" user-emacs-directory))
+    (require 'borg)
+    (setq borg-rewrite-urls-alist
+          '(("git@github.com:" . "https://github.com/")
+            ("git@gitlab.com:" . "https://gitlab.com/")))
+    (borg-initialize)
 
-  ;; 定义一些启动目录，方便下次迁移修改
+  (require 'benchmark-init)
+  ;; To disable collection of benchmark data after init is done.
+  (add-hook 'after-init-hook 'benchmark-init/deactivate)
+    ;; 定义一些启动目录，方便下次迁移修改
 #+end_src
 
 The following content is not enabled yet, because I want to minimize unnecessary settings as much as possible
@@ -713,7 +716,7 @@ should be check after reading the embark.el manual
   (setup corfu-doc
     (:hook-into corfu-mode))
 
-  (setup svg-lib) ;; built-in has little icons
+  ;; (setup svg-lib) ;; built-in has little icons
   (setup kind-icon
     (:load-after corfu)
     (:option kind-icon-default-face 'corfu-default) ; to compute blended backgrounds correctly

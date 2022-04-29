@@ -53,9 +53,6 @@
 [submodule "closql"]
 	path = lib/closql
 	url = https://github.com/emacscollective/closql.git
-[submodule "cmake-mode"]
-	path = lib/cmake-mode
-	url = https://github.com/emacsmirror/cmake-mode.git
 [submodule "company-english-helper"]
 	path = lib/company-english-helper
 	url = https://github.com/manateelazycat/company-english-helper
@@ -298,9 +295,6 @@
 [submodule "super-save"]
 	path = lib/super-save
 	url = https://github.com/bbatsov/super-save.git
-[submodule "svg-lib"]
-	path = lib/svg-lib
-	url = https://github.com/rougier/svg-lib.git
 [submodule "symbol-overlay"]
 	path = lib/symbol-overlay
 	url = https://github.com/wolray/symbol-overlay.git
