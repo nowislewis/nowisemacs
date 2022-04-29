@@ -40,9 +40,6 @@
             ("git@gitlab.com:" . "https://gitlab.com/")))
     (borg-initialize)
 
-  (require 'benchmark-init)
-  ;; To disable collection of benchmark data after init is done.
-  (add-hook 'after-init-hook 'benchmark-init/deactivate)
     ;; 定义一些启动目录，方便下次迁移修改
 #+end_src
 
@@ -771,7 +768,7 @@ Jump anywhere in the world
 #+end_src
 *** jump-back
 borrowed from citre, now you can always jump-back use "M-,"
-#+begin_src elisp :tangle no
+#+begin_src elisp
   (defun my--push-point-to-xref-marker-stack (&rest r)
     (xref-push-marker-stack (point-marker))) ;; must autoload this command in xref
   (dolist (func '(find-function
@@ -781,7 +778,7 @@ borrowed from citre, now you can always jump-back use "M-,"
                   consult-find
                   find-file
                   goto-line
-                  ;; citre-jump
+                  citre-jump
                   isearch-forward
                   ))
     (advice-add func :before 'my--push-point-to-xref-marker-stack))
@@ -980,7 +977,8 @@ Show git blame info about current line
     (advice-add 'helpful-update :after #'elisp-demos-advice-helpful-update))
 #+end_src
 **** elispfl
-#+begin_src elisp
+#+begin_src elisp :tangle no
+  (require 'elispfl)
   (setup elispfl
     (:hook-into emacs-lisp-mode ielm))
 #+end_src
@@ -1035,13 +1033,12 @@ Emacs major-mode to work with Beancount ledger files
   (setup quickrun)
 #+end_src
 *** tree-sitter
-#+begin_src elisp :tangle no
-  (setup (:pkg tree-sitter)
-    ;; (:hook-into prog-mode)
-    (:when-loaded
-      ;; (require 'tree-sitter-langs)
-      (add-hook 'tree-sitter-after-on-hook #'tree-sitter-hl-mode)))
-    (setup (:pkg tree-sitter-langs))
+**** tree-sitter
+#+begin_src elisp
+    (setup tree-sitter
+      (:hook-into c-mode-common python-mode)
+      (:hook tree-sitter-hl-mode))
+;; (setup tree-sitter-langs)
 #+end_src
 *** lsp mode
 **** eglot
@@ -1104,10 +1101,10 @@ Citre is an advanced Ctags (or actually, readtags) frontend for Emacs.
 #+begin_src elisp
   (setup citre
     (require 'citre-config)
-    (:option
-     citre-use-project-root-when-creating-tags t
-     citre-prompt-language-for-ctags-command t
-     citre-auto-enable-citre-mode-modes '(prog-mode)))
+    (:option citre-use-project-root-when-creating-tags t
+             citre-prompt-language-for-ctags-command t
+             ;; citre-auto-enable-citre-mode-modes '(prog-mode)
+             ))
 #+end_src
 *** symbol-overlay
 Highlight symbols with keymap-enabled overlays

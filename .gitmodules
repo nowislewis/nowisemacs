@@ -123,9 +123,6 @@
 [submodule "elisp-refs"]
 	path = lib/elisp-refs
 	url = https://github.com/Wilfred/elisp-refs.git
-[submodule "elispfl"]
-	path = lib/elispfl
-	url = https://github.com/cireu/elispfl
 [submodule "emacsql"]
 	path = lib/emacsql
 	url = https://github.com/skeeto/emacsql.git
@@ -301,6 +298,12 @@
 [submodule "tablist"]
 	path = lib/tablist
 	url = https://github.com/politza/tablist.git
+[submodule "tree-sitter"]
+	path = lib/tree-sitter
+	url = https://github.com/emacs-tree-sitter/elisp-tree-sitter.git
+[submodule "tree-sitter-langs"]
+	path = lib/tree-sitter-langs
+	url = https://github.com/emacs-tree-sitter/tree-sitter-langs.git
 [submodule "vertico"]
 	path = lib/vertico
 	url = https://github.com/minad/vertico.git
