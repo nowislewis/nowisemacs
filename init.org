@@ -751,7 +751,6 @@ Popper is a minor-mode to tame the flood of ephemeral windows Emacs produces, wh
                                      (fit-window-to-buffer
                                       win
                                       (floor (frame-height) 2)))
-
              )
     (:global "C-~" popper-toggle-latest
              "M-~" popper-cycle
@@ -834,7 +833,8 @@ borrowed from citre, now you can always jump-back use "M-,"
 *** dirvish
 Dirvish is a minimalistic file manager based on Dired. It's fast
 #+begin_src elisp
-(setup dirvish)
+  (setup dirvish
+     (:option dirvish-attributes '(expanded-state all-the-icons file-size)))
 #+end_src
 *** diredfl
 This is adapted from the extra font lock rules provided by Drew Adams' dired+ package, but published via a modern means, and with support for older Emacsen removed.
@@ -847,7 +847,8 @@ This is adapted from the extra font lock rules provided by Drew Adams' dired+ pa
   ;; this is in dired-hacks
   (setup dired-subtree
     (:load-after dired)
-    (:option dired-subtree-line-prefix "     ")
+    (:option dired-subtree-line-prefix "   "
+             dired-subtree-cycle-depth 1)
     (:with-map dired-mode-map
       (:bind "TAB" dired-subtree-cycle)))
 #+end_src
@@ -1015,7 +1016,6 @@ Emacs major-mode to work with Beancount ledger files
         (setq python-shell-interpreter "python3"))
       (with-eval-after-load 'exec-path-from-shell
         (exec-path-from-shell-copy-env "PYTHONPATH"))
-      ;; (setup (:pkg live-py-mode))
       ))
 #+end_src
 *** cpp
@@ -1047,11 +1047,7 @@ Emacs major-mode to work with Beancount ledger files
   (setup project)
   (setup xref
     (:autoload xref-push-marker-stack)) ;; autoload this command for jump-back
-  ;; (setup (:pkg flymake :type built-in))
-  ;; (setup (:pkg jsonrpc :type built-in))
-  ;; (setup (:pkg eldoc :type built-in))
 
-  ;; (setup (:pkg markdown-mode))
   (setup eldoc-box
     (add-hook 'eglot--managed-mode-hook #'eldoc-box-hover-at-point-mode t))
 
@@ -1091,7 +1087,7 @@ enable eglot in org-src mode
                   (format "Prepare local buffer environment for org source block (%s)."
                           (upcase ,lang))))))))
   (defvar org-babel-lang-list
-    '("python" "C++" "C"))
+    '("python" "C++" "C" "scheme" "elisp"))
   (dolist (lang org-babel-lang-list)
     (eval `(lsp-org-babel-enable ,lang)))
 #+end_src
