@@ -193,6 +193,9 @@
 [submodule "marginalia"]
 	path = lib/marginalia
 	url = https://github.com/minad/marginalia.git
+[submodule "markdown-mode"]
+	path = lib/markdown-mode
+	url = https://github.com/jrblevin/markdown-mode.git
 [submodule "meow"]
 	path = lib/meow
 	url = https://github.com/meow-edit/meow.git
@@ -303,6 +306,8 @@
 [submodule "tree-sitter"]
 	path = lib/tree-sitter
 	url = https://github.com/emacs-tree-sitter/elisp-tree-sitter.git
+    load-path = core
+    load-path = lisp
 [submodule "tree-sitter-langs"]
 	path = lib/tree-sitter-langs
 	url = https://github.com/emacs-tree-sitter/tree-sitter-langs.git

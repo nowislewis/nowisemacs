@@ -403,9 +403,9 @@ I used to be a vim(evil) user, but now I use meow to manage all my keys
              return (set-face-attribute 'variable-pitch nil :family font :height 1.0)))
 
   ;; Specify font for all unicode characters
-  ;; (cl-loop for font in '("Apple Color Emoji" "Segoe UI Symbol" "Symbola" "Symbol")
+  ;; (cl-loop for font in '("Symbola" "Symbol")
   ;;          when (font-installed-p font)
-  ;;          return(set-fontset-font t 'unicode font nil 'prepend))
+  ;;          return(set-fontset-font t 'unicode font nil 'prepend)))
 
   ;; ;; Specify font for Chinese characters
   ;; (cl-loop for font in '("WenQuanYi Micro Hei" "Microsoft Yahei")
@@ -1043,21 +1043,24 @@ Emacs major-mode to work with Beancount ledger files
 *** lsp mode
 **** eglot
 #+begin_src elisp
-  ;; use built-in package dep
-  (setup project)
-  (setup xref
-    (:autoload xref-push-marker-stack)) ;; autoload this command for jump-back
+   ;; use built-in package dep
+   (setup project)
+   (setup xref
+     (:autoload xref-push-marker-stack)) ;; autoload this command for jump-back
+   (setup markdown-mode
+     (:file-match "\\.md\\'"))
 
-  (setup eldoc-box
-    (add-hook 'eglot--managed-mode-hook #'eldoc-box-hover-at-point-mode t))
+   (setup eldoc-box
+     (add-hook 'eglot--managed-mode-hook #'eldoc-box-hover-at-point-mode t))
 
-  ;; (setq xref-search-program 'ripgrep)
-  (setq read-process-output-max (* 1024 1024))
-  (setup eglot)
-  (setup eldoc
-    (:option eldoc-echo-area-use-multiline-p 3
-          eldoc-echo-area-display-truncation-message nil))
-  (setq c-basic-offset 4)
+   ;; (setq xref-search-program 'ripgrep)
+   (setq read-process-output-max (* 1024 1024))
+   (setup eglot)
+   (setup eldoc
+     (:option eldoc-echo-area-use-multiline-p t
+              eldoc-echo-area-display-truncation-message nil))
+  ;; # (setq eldoc-echo-area-prefer-doc-buffer nil)
+   (setq c-basic-offset 4)
 #+end_src
 **** lsp-org-special
 enable eglot in org-src mode
@@ -1445,7 +1448,7 @@ among all the files in org-roam in a single agenda-view. The code was borrowed f
 
   (defun vulpea-buffer-tags-remove (tag)
     "Remove a TAG from filetags in current buffer."
-    (let* ((tags (vulpea-buffer-tags-get))
+    (let* ((tags (vulpea-buffer-tags-get))l
            (tags (delete tag tags)))
       (apply #'vulpea-buffer-tags-set tags)))
 
