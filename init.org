@@ -33,14 +33,17 @@
 ** generic
 #+begin_src elisp
   ;; -*- lexical-binding: t; -*-
-    (add-to-list 'load-path (expand-file-name "lib/borg" user-emacs-directory))
-    (require 'borg)
-    (setq borg-rewrite-urls-alist
-          '(("git@github.com:" . "https://github.com/")
-            ("git@gitlab.com:" . "https://gitlab.com/")))
-    (borg-initialize)
+  (add-to-list 'load-path (expand-file-name "lib/borg" user-emacs-directory))
+  (require 'borg)
+  (setq borg-rewrite-urls-alist
+        '(("git@github.com:" . "https://github.com/")
+          ("git@gitlab.com:" . "https://gitlab.com/")))
+  (borg-initialize)
 
-    ;; 定义一些启动目录，方便下次迁移修改
+  (setq start-time (current-time))
+  (defun time-subtract-millis (b a)
+    (* 1000.0 (float-time (time-subtract b a))))
+  ;; 定义一些启动目录，方便下次迁移修改
 #+end_src
 
 The following content is not enabled yet, because I want to minimize unnecessary settings as much as possible
@@ -451,10 +454,11 @@ rainbow-delimiters is a "rainbow parentheses"-like mode which highlights delimit
 ** diff-hl
 diff-hl-mode highlights uncommitted changes on the left side of the window (area also known as the "gutter"), allows you to jump between and revert them selectively.
 #+begin_src elisp
-  (setup diff-hl
-    (:hook-into text-mode prog-mode)
-    (:when-loaded
-      (diff-hl-margin-mode)))
+    (setup diff-hl
+      (:hook-into text-mode prog-mode)
+      (:when-loaded
+        (diff-hl-margin-mode))
+      (:messure-time))
     #+end_src
 ** emacs-dashboard
 #+begin_src elisp
@@ -741,25 +745,26 @@ should be check after reading the embark.el manual
 ** popper
 Popper is a minor-mode to tame the flood of ephemeral windows Emacs produces, while still keeping them within arm’s reach.
 #+begin_src elisp
-  (setup popper
-    (:option popper-reference-buffers '("\\*Messages\\*"
-                                        "Output\\*$"
-                                        "\\*Async Shell Command\\*"
-                                        "Go-Translate"
-                                        help-mode
-                                        helpful-mode
-                                        compilation-mode
-                                        youdao-dictionary-mode)
-             popper-window-height  (lambda (win)
-                                     (fit-window-to-buffer
-                                      win
-                                      (floor (frame-height) 2)))
-             )
-    (:global "C-~" popper-toggle-latest
-             "M-~" popper-cycle
-             "C-M-~" popper-toggle-type)
-    (popper-mode +1)
-    (popper-echo-mode +1))
+    (setup popper
+      (:option popper-reference-buffers '("\\*Messages\\*"
+                                          "Output\\*$"
+                                          "\\*Async Shell Command\\*"
+                                          "Go-Translate"
+                                          help-mode
+                                          helpful-mode
+                                          compilation-mode
+                                          youdao-dictionary-mode)
+               popper-window-height  (lambda (win)
+                                       (fit-window-to-buffer
+                                        win
+                                        (floor (frame-height) 2)))
+               )
+      (:global "C-~" popper-toggle-latest
+               "M-~" popper-cycle
+               "C-M-~" popper-toggle-type)
+      (popper-mode +1)
+      (popper-echo-mode +1)
+      (:messure-time))
 #+end_src
 ** Move
 *** avy
@@ -1723,7 +1728,7 @@ Everytime you want to use a command that relys on =company-mode= such as =toggle
 
     (defun company-grab-symbol ()
       "If point is at the end of a symbol, return it.
-    Otherwise, if point is not inside a symbol, return an empty string."
+      Otherwise, if point is not inside a symbol, return an empty string."
       (if (looking-at "\\_>")
           (buffer-substring (point) (save-excursion (skip-syntax-backward "w_")
                                                     (point)))
