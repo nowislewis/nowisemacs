@@ -544,12 +544,12 @@ diff-hl-mode highlights uncommitted changes on the left side of the window (area
 #+end_src
 ** backup, super-save
 #+begin_src elisp
-  (setq make-backup-files nil)
-  (setq auto-save-default nil)
+    (setq make-backup-files nil)
+    (setq auto-save-default nil)
 
-  (setup super-save
-    (super-save-mode 1)
-    (setq super-save-auto-save-when-idle t))
+    (setup super-save
+      (super-save-mode 1)
+      (setq super-save-auto-save-when-idle t))
 #+end_src
 ** 自动换行
 #+begin_src elisp
@@ -597,8 +597,10 @@ diff-hl-mode highlights uncommitted changes on the left side of the window (area
     (:option vertico-cycle t)
     (:with-map vertico-map
       (:bind [backspace] vertico-directory-delete-char))
-    (:hook-into after-init))
-  (vertico-posframe-mode 1)
+    (:hook-into after-init)
+    (:hook vertico-posframe-mode)
+    )
+  ;; (vertico-posframe-mode 1)
 #+end_src
 ** Orderless
 #+begin_src elisp
@@ -652,7 +654,8 @@ diff-hl-mode highlights uncommitted changes on the left side of the window (area
     (:when-loaded
       (cl-pushnew 'epkg-marginalia-annotate-package
                   (alist-get 'package marginalia-annotator-registry)))
-    (marginalia-mode))
+    (:hook-into vertico-mode-hook))
+    ;; (marginalia-mode))
 
 #+end_src
 ** embark
@@ -944,13 +947,7 @@ This is adapted from the extra font lock rules provided by Drew Adams' dired+ pa
 * git
 ** magit
 #+begin_src elisp
-  (setup magit
-    ;; (:when-loaded
-    ;; (magit-add-section-hook 'magit-status-sections-hook
-    ;;                         'magit-insert-modules
-    ;;                         'magit-insert-stashes
-    ;;                         'append))
-    )
+  (setup magit)
 #+end_src
 ** blamer
 Show git blame info about current line
@@ -1361,8 +1358,6 @@ The main purpose for this section is to add every node that has a "TODO" into or
 among all the files in org-roam in a single agenda-view. The code was borrowed from vulpea.
 #+begin_src elisp :tangle no
     (defun vulpea-project-p ()
-
-
     "Return non-nil if current buffer has any todo entry.
   TODO entries marked as done are ignored, meaning the this
   function returns nil if current buffer contains only completed

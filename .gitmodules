@@ -66,6 +66,9 @@
 [submodule "consult-eglot"]
 	path = lib/consult-eglot
 	url = https://github.com/mohkale/consult-eglot.git
+[submodule "copilot"]
+	path = lib/copilot
+	url = https://github.com/zerolfx/copilot.el
 [submodule "corfu"]
 	path = lib/corfu
 	url = https://github.com/minad/corfu.git
@@ -104,6 +107,9 @@
 [submodule "dtache"]
 	path = lib/dtache
 	url = https://github.com/emacsmirror/dtache.git
+[submodule "editorconfig"]
+	path = lib/editorconfig
+	url = https://github.com/editorconfig/editorconfig-emacs.git
 [submodule "eglot"]
 	path = lib/eglot
 	url = https://github.com/joaotavora/eglot.git
@@ -308,6 +314,7 @@
 	url = https://github.com/emacs-tree-sitter/elisp-tree-sitter.git
     load-path = core
     load-path = lisp
+    no-byte-compile = core/tsc-dyn.dylib
 [submodule "tree-sitter-langs"]
 	path = lib/tree-sitter-langs
 	url = https://github.com/emacs-tree-sitter/tree-sitter-langs.git
