@@ -309,6 +309,9 @@
 [submodule "tablist"]
 	path = lib/tablist
 	url = https://github.com/politza/tablist.git
+[submodule "tomelr"]
+	path = lib/tomelr
+	url = https://github.com/kaushalmodi/tomelr
 [submodule "tree-sitter"]
 	path = lib/tree-sitter
 	url = https://github.com/emacs-tree-sitter/elisp-tree-sitter.git

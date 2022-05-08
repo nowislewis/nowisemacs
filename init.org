@@ -544,7 +544,7 @@ diff-hl-mode highlights uncommitted changes on the left side of the window (area
   ;; (delete-selection-mode t)                    ; 选中文本后输入文本会替换文本（更符合我们习惯了的其它编辑器的逻辑）
   ;; (global-hl-line-mode)
   (recentf-mode t)
-  (blink-cursor-mode -1)                  ;指针不闪动
+  ;; (blink-cursor-mode -1)                  ;指针不闪动
 #+end_src
 ** backup, super-save
 #+begin_src elisp
