@@ -336,6 +336,10 @@ I used to be a vim(evil) user, but now I use meow to manage all my keys
    '("n r n" . org-roam-capture)
    '("n r r" . org-roam-buffer-toggle)
    '("n r R" . org-roam-link-replace-all)
+   '("n r b" . consult-org-roam-backlinks)
+   '("n r s" . consult-org-roam-search)
+     ;; ("C-c n e" . consult-org-roam-file-find)
+
    ;; date
    '("n r d b" . org-roam-dailies-goto-previous-note)
    '("n r d d" . org-roam-dailies-goto-date)
@@ -1513,6 +1517,12 @@ among all the files in org-roam in a single agenda-view. The code was borrowed f
 #+begin_src elisp
 (setup delve)
 #+end_src
+*** consult-org-roam
+#+begin_src elisp
+  (setup consult-org-roam
+    (:option consult-org-roam-grep-func #'consult-ripgrep)
+    (:hook-into org-roam-mode))
+#+end_src
 ** ox-hugo
 #+begin_src elisp
   (setup ox-hugo
@@ -1627,6 +1637,11 @@ among all the files in org-roam in a single agenda-view. The code was borrowed f
 
   (add-hook 'TeX-after-compilation-finished-functions
             #'TeX-revert-document-buffer)
+#+end_src
+** image-roll.el
+#+begin_src elisp :tangle no
+  (setup image-roll
+    (:load-after pdf-tools))
 #+end_src
 ** elfeed
 #+begin_src elisp
