@@ -187,9 +187,6 @@
 [submodule "insert-translated-name"]
 	path = lib/insert-translated-name
 	url = https://github.com/manateelazycat/insert-translated-name
-[submodule "kind-icon"]
-	path = lib/kind-icon
-	url = https://github.com/jdtsmith/kind-icon
 [submodule "libgit"]
 	path = lib/libgit
 	url = https://github.com/magit/libegit2.git
@@ -217,6 +214,9 @@
 [submodule "nowisemacs-base"]
 	path = lib/nowisemacs-base
 	url = https://github.com/nowislewis/nowisemacs-base
+[submodule "nyan-mode"]
+	path = lib/nyan-mode
+	url = https://github.com/TeMPOraL/nyan-mode.git
 [submodule "oj"]
 	path = lib/oj
 	url = https://github.com/conao3/oj.el.git
