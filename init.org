@@ -511,8 +511,10 @@ diff-hl-mode highlights uncommitted changes on the left side of the window (area
 #+end_src
 ** nyan-mode
 #+begin_src elisp
-    (setup nyan-mode
-      (:hook-into after-init))
+  (setup nyan-mode
+    (:hook-into after-init)
+    (:when-loaded
+      (nyan-start-animation)))
 #+end_src
 ** hl-todo
 #+begin_src elisp
