@@ -912,6 +912,7 @@ borrowed from citre, now you can always jump-back use "M-,"
                           (:name "lewis_big_dict" :file "~/Documents/emacs/other-files/pyim-bigdict.pyim.gz"))
              ;; pyim-default-scheme 'xiaohe-shuangpin
              pyim-default-scheme 'quanpin
+             pyim-cloudim 'baidu
              pyim-punctuation-translate-p '(no yes auto)
              pyim-page-tooltip 'posframe
              pyim-page-length 5
