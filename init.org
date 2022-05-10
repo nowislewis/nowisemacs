@@ -549,7 +549,7 @@ diff-hl-mode highlights uncommitted changes on the left side of the window (area
   ;; (delete-selection-mode t)                    ; 选中文本后输入文本会替换文本（更符合我们习惯了的其它编辑器的逻辑）
   ;; (global-hl-line-mode)
   (recentf-mode t)
-  ;; (blink-cursor-mode -1)                  ;指针不闪动
+  (blink-cursor-mode -1)                  ;指针不闪动
 #+end_src
 ** backup, super-save
 #+begin_src elisp
@@ -940,6 +940,7 @@ borrowed from citre, now you can always jump-back use "M-,"
       (advice-add 'orderless-regexp :around #'my-orderless-regexp)
       )
     (setq default-input-method "pyim"))
+  ;;
 #+end_src
 * File and Browsing
 ** file browsing
@@ -972,7 +973,9 @@ This is adapted from the extra font lock rules provided by Drew Adams' dired+ pa
     (:autoload imenu-list-smart-toggle)
     (:option imenu-list-focus-after-activate t
              imenu-list-auto-resize t
-             imenu-list-position 'left))
+             imenu-list-position 'left
+             imenu-list-auto-update nil
+             ))
 #+end_src
 ** perspective
 #+begin_src elisp
