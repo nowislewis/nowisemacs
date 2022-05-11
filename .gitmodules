@@ -193,6 +193,12 @@
 [submodule "lister"]
 	path = lib/lister
 	url = https://github.com/publicimageltd/lister.git
+[submodule "load-relative"]
+	path = lib/load-relative
+	url = https://github.com/rocky/emacs-load-relative.git
+[submodule "loc-changes"]
+	path = lib/loc-changes
+	url = https://github.com/rocky/emacs-loc-changes.git
 [submodule "magit"]
 	path = lib/magit
 	url = https://github.com/magit/magit.git
@@ -279,6 +285,12 @@
 [submodule "rainbow-delimiters"]
 	path = lib/rainbow-delimiters
 	url = https://github.com/Fanael/rainbow-delimiters.git
+[submodule "realgud"]
+	path = lib/realgud
+	url = https://github.com/realgud/realgud.git
+[submodule "realgud-lldb"]
+	path = lib/realgud-lldb
+	url = https://github.com/realgud/realgud-lldb.git
 [submodule "rg"]
 	path = lib/rg
 	url = https://github.com/dajva/rg.el.git
@@ -324,14 +336,14 @@
 [submodule "tree-sitter-langs"]
 	path = lib/tree-sitter-langs
 	url = https://github.com/emacs-tree-sitter/tree-sitter-langs.git
+[submodule "valign"]
+	path = lib/valign
+	url = https://github.com/casouri/valign.git
 [submodule "vertico"]
 	path = lib/vertico
 	url = https://github.com/minad/vertico.git
 	load-path = .
 	load-path = extensions
-[submodule "vertico-posframe"]
-	path = lib/vertico-posframe
-	url = https://github.com/tumashu/vertico-posframe.git
 [submodule "vterm"]
 	path = lib/vterm
 	url = https://github.com/akermu/emacs-libvterm.git

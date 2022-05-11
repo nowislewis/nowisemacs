@@ -388,8 +388,8 @@ I used to be a vim(evil) user, but now I use meow to manage all my keys
     ;; Set default font
     (cl-loop for font in '(
                            ;; "InconsolataGo QiHei NF"
-                           "Sarasa Mono SC Nerd"
-                           "yaheiInconsolata"
+                           ;; "Sarasa Mono SC Nerd"
+                           ;; "yaheiInconsolata"
                            "JetBrains Mono"
                            "Monaco"
                            "Consolas")
@@ -401,7 +401,7 @@ I used to be a vim(evil) user, but now I use meow to manage all my keys
     ;; variable-pitch
     (cl-loop for font in '("Noto Sans CJK SC" "Arial" "Helvetica" "Times New Roman")
              when (font-installed-p font)
-             return (set-face-attribute 'variable-pitch nil :family font :height 1.0)))
+             return (set-face-attribute 'variable-pitch nil :family font :height 1.0))
 
   ;; Specify font for all unicode characters
   ;; (cl-loop for font in '("Symbola" "Symbol")
@@ -409,9 +409,9 @@ I used to be a vim(evil) user, but now I use meow to manage all my keys
   ;;          return(set-fontset-font t 'unicode font nil 'prepend)))
 
   ;; ;; Specify font for Chinese characters
-  ;; (cl-loop for font in '("WenQuanYi Micro Hei" "Microsoft Yahei")
-  ;;          when (font-installed-p font)
-  ;;          return (set-fontset-font t '(#x4e00 . #x9fff) font)))
+  (cl-loop for font in '("Noto Sans CJK SC" "Microsoft Yahei")
+           when (font-installed-p font)
+           return (set-fontset-font t '(#x4e00 . #x9fff) font)))
 
   ;; (set-face-attribute 'default nil :family "yaheiInconsolata" :height 140)
 
@@ -607,9 +607,8 @@ diff-hl-mode highlights uncommitted changes on the left side of the window (area
     (:with-map vertico-map
       (:bind [backspace] vertico-directory-delete-char))
     (:hook-into after-init)
-    (:hook vertico-posframe-mode)
+    ;; (:hook vertico-posframe-mode)
     )
-  ;; (vertico-posframe-mode 1)
 #+end_src
 ** Orderless
 #+begin_src elisp
@@ -910,8 +909,8 @@ borrowed from citre, now you can always jump-back use "M-,"
   (setup pyim
     (:option pyim-dicts '((:name "lewis_pyim_dict" :file "~/Documents/emacs/other-files/lewis_pyim_dict.pyim")
                           (:name "lewis_big_dict" :file "~/Documents/emacs/other-files/pyim-bigdict.pyim.gz"))
-             ;; pyim-default-scheme 'xiaohe-shuangpin
-             pyim-default-scheme 'quanpin
+             pyim-default-scheme 'xiaohe-shuangpin
+             ;; pyim-default-scheme 'quanpin
              pyim-cloudim 'baidu
              pyim-punctuation-translate-p '(no yes auto)
              pyim-page-tooltip 'posframe
@@ -1240,6 +1239,15 @@ eglot client leveraging LTEX Language Server.
                                                         "\\(\\<end\\>\\|\\<endcase\\>\\|\\<endmodule\\>\\|\\<endclass\\>\\|\\<endfunction\\>\\|\\<endtask\\>\\)" nil verilog-forward-sexp-function))
     )
 #+end_src
+*** realgud
+#+begin_src elisp
+  (setup load-relative)
+  (setup loc-changes)
+  (setup realgud)
+  (setup realgud-lldb
+    (:autoload realgud--lldb))
+
+#+end_src
 * Org Mode
 ** org-mode
 #+begin_src elisp
@@ -1350,6 +1358,13 @@ eglot client leveraging LTEX Language Server.
                                (?* . "•")))
     (:hook-into org-mode)
     (add-hook 'org-agenda-finalize-hook #'org-modern-agenda)
+    )
+#+end_src
+** valign
+#+begin_src elisp
+  (setup valign
+    (:hook-into org-mode)
+    (:option valign-max-table-size 10000)
     )
 #+end_src
 ** org-appear
@@ -1468,7 +1483,9 @@ eglot client leveraging LTEX Language Server.
 *** org-roam-agenda
 The main purpose for this section is to add every node that has a "TODO" into org-agenda, so I can see all the "TODO"s
 among all the files in org-roam in a single agenda-view. The code was borrowed from vulpea.
-#+begin_src elisp :tangle no
+#+begin_src elisp
+  (defun lewis/load-agenda()
+    (interactive)
     (defun vulpea-project-p ()
     "Return non-nil if current buffer has any todo entry.
   TODO entries marked as done are ignored, meaning the this
@@ -1615,6 +1632,7 @@ among all the files in org-roam in a single agenda-view. The code was borrowed f
       (when (re-search-forward (concat "\\(^#\\+" name ":.*\n?\\)")
                                (point-max) t)
         (replace-match ""))))
+  )
 #+end_src
 *** delve
 #+begin_src elisp
