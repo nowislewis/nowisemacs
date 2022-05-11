@@ -300,14 +300,16 @@ I used to be a vim(evil) user, but now I use meow to manage all my keys
 
   ;; search
   (meow-leader-define-key
-   '("s s" . consult-line)
    '("s b" . consult-buffer)
    '("s d" . consult-ripgrep)
    '("s D" . lewis/ripgrep-search-other-dir)
+   '("s f" . consult-find)
+   '("s F" . lewis/find-file-other-dir)
    '("s g" . rg)
    '("s h" . consult-history)
-   '("s f" . consult-find)
-   '("s F" . lewis/find-file-other-dir))
+   '("s i" . consult-imenu)
+   '("s s" . consult-line)
+   )
    ;; vterm
   (meow-leader-define-key
    '("t t" . vterm-toggle)
@@ -1243,7 +1245,10 @@ eglot client leveraging LTEX Language Server.
 #+begin_src elisp
   (setup load-relative)
   (setup loc-changes)
-  (setup realgud)
+  (setup realgud
+    (:with-map realgud:shortkey-mode-map
+      (:bind [mouse-3] realgud:tooltip-eval))
+    )
   (setup realgud-lldb
     (:autoload realgud--lldb))
 
