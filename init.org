@@ -28,7 +28,7 @@
         package--init-file-ensured t
         inhibit-startup-message t             ; 关闭启动 Emacs 时的欢迎界面
         )
-  ;; (pixel-scroll-precision-mode t) ;; 最近发现和 pdf-continuous-view-mode 工作不协调
+  ;; (pixel-scroll-precision-mode t) ;; 最近发现和 pdf-view-mode 工作不协调
 #+end_src
 ** generic
 #+begin_src elisp
@@ -339,6 +339,7 @@ I used to be a vim(evil) user, but now I use meow to manage all my keys
    '("n r r" . org-roam-buffer-toggle)
    '("n r R" . org-roam-link-replace-all)
    '("n r b" . consult-org-roam-backlinks)
+   '("n r B" . consult-org-roam-forward-links)
    '("n r s" . consult-org-roam-search)
      ;; ("C-c n e" . consult-org-roam-file-find)
 
@@ -1352,6 +1353,7 @@ eglot client leveraging LTEX Language Server.
          ;; (C++ . t)
          ;; (bash . t)
          ))
+      (add-hook 'org-babel-after-execute-hook 'org-redisplay-inline-images)
   ))
 #+end_src
 ** org-modern
