@@ -288,9 +288,11 @@
 [submodule "realgud"]
 	path = lib/realgud
 	url = https://github.com/realgud/realgud.git
+    no-byte-compile = cask-install.el
 [submodule "realgud-lldb"]
 	path = lib/realgud-lldb
 	url = https://github.com/realgud/realgud-lldb.git
+    no-byte-compile = cask-install.el
 [submodule "rg"]
 	path = lib/rg
 	url = https://github.com/dajva/rg.el.git
