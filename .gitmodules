@@ -7,6 +7,9 @@
 [submodule "all-the-icons-completion"]
 	path = lib/all-the-icons-completion
 	url = https://github.com/iyefrat/all-the-icons-completion.git
+[submodule "all-the-icons-ibuffer"]
+	path = lib/all-the-icons-ibuffer
+	url = https://github.com/seagle0128/all-the-icons-ibuffer.git
 [submodule "async"]
 	path = lib/async
 	url = https://github.com/jwiegley/emacs-async.git
