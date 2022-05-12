@@ -385,15 +385,16 @@ I used to be a vim(evil) user, but now I use meow to manage all my keys
 #+begin_src elisp
   (defun font-installed-p (font-name)
     "Check if font with FONT-NAME is available."
-    (find-font (font-spec :name font-name)))
+   (find-font (font-spec :name font-name)))
 
   (when (display-graphic-p)
     ;; Set default font
     (cl-loop for font in '(
                            ;; "InconsolataGo QiHei NF"
-                           ;; "Sarasa Mono SC Nerd"
                            ;; "yaheiInconsolata"
+                           "JetBrainsMono Nerd Font"
                            "JetBrains Mono"
+                           "Sarasa Mono SC Nerd"
                            "Monaco"
                            "Consolas")
              when (font-installed-p font)
@@ -406,15 +407,16 @@ I used to be a vim(evil) user, but now I use meow to manage all my keys
              when (font-installed-p font)
              return (set-face-attribute 'variable-pitch nil :family font :height 1.0))
 
-  ;; Specify font for all unicode characters
-  ;; (cl-loop for font in '("Symbola" "Symbol")
-  ;;          when (font-installed-p font)
-  ;;          return(set-fontset-font t 'unicode font nil 'prepend)))
+    ;; Specify font for all unicode characters
+    ;; (cl-loop for font in '("Symbola" "Symbol")
+    ;;          when (font-installed-p font)
+    ;;          return(set-fontset-font t 'unicode font nil 'prepend)))
 
-  ;; ;; Specify font for Chinese characters
-  (cl-loop for font in '("Noto Sans CJK SC" "Microsoft Yahei")
-           when (font-installed-p font)
-           return (set-fontset-font t '(#x4e00 . #x9fff) font)))
+    ;; ;; Specify font for Chinese characters
+    ;; (cl-loop for font in '("Noto Sans CJK SC" "Microsoft Yahei")
+    ;;          when (font-installed-p font)
+    ;;          return (set-fontset-font t '(#x4e00 . #x9fff) font))
+    )
 
   ;; (set-face-attribute 'default nil :family "yaheiInconsolata" :height 140)
 
@@ -990,7 +992,7 @@ This is adapted from the extra font lock rules provided by Drew Adams' dired+ pa
 #+end_src
 * shell
 ** aweshell
-#+begin_src elisp
+#+begin_src elisp :tangle no
   (setup aweshell
     (:option aweshell-auto-suggestion-p nil)
     (:autoload aweshell-toggle)
@@ -1641,6 +1643,7 @@ among all the files in org-roam in a single agenda-view. The code was borrowed f
         (replace-match ""))))
   )
 #+end_src
+
 *** delve
 #+begin_src elisp
 (setup delve)
@@ -1710,7 +1713,7 @@ among all the files in org-roam in a single agenda-view. The code was borrowed f
 #+end_src
 
 ** xeft
-#+begin_src elisp
+#+begin_src elisp :tangle no
   (setup xeft
     (:option xeft-directory "~/Documents/emacs/orgmode/roam"
              xeft-database "~/.emacs.d/.xeft/db"
