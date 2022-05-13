@@ -294,7 +294,7 @@ I used to be a vim(evil) user, but now I use meow to manage all my keys.
    ;; org-download
    '("e s" . org-download-screenshot)
    ;; english help
-   '("e h c" . toggle-company-english-helper)
+   '("e h c" . toggle-corfu-english-helper)
    '("e h f" . english-teacher-follow-mode))
 
   ;; search
@@ -843,6 +843,10 @@ should be check after reading the embark.el manual
     (:option yas-snippet-dirs '("~/.emacs.d/etc/snippets"))
     (yas-global-mode 1))
   ;;(setup yasnippet-snippets)
+#+end_src
+** consult-yasnippet
+#+begin_src elisp
+(setup consult-yasnippet)
 #+end_src
 ** rg.el
 #+begin_src elisp
@@ -1804,10 +1808,11 @@ among all the files in org-roam in a single agenda-view. The code was borrowed f
       (:autoload insert-translated-name-insert)
       (:autoload insert-translated-name-replace))
 #+end_src
-** company-english-helper
+** corfu-english-helper
+I use corfu english helper instead of company-english-helper.
 #+begin_src elisp
-  (setup company-english-helper
-    (:autoload toggle-company-english-helper))
+  (setup corfu-english-helper
+    (:autoload toggle-corfu-english-helper))
 #+end_src
 * 阅读
 ** pdf-tools
@@ -1912,7 +1917,7 @@ Company is wide-used, but I use corfu for its simplity. So I add a simulation fo
 company. Currently, These codes are test only with English-helper, which is a great package helping writing English.
 
 Everytime you want to use a command that relys on =company-mode= such as =toggle-company-english-helper=, you should first call =simulate-company-with-corfu= using =M-x= manually.
-#+begin_src elisp
+#+begin_src elisp :tangle no
   (defun simulate-company-with-corfu()
     (interactive)
     (defvaralias 'company-candidates 'corfu--candidates)

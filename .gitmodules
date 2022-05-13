@@ -53,10 +53,6 @@
 [submodule "closql"]
 	path = lib/closql
 	url = https://github.com/emacscollective/closql.git
-[submodule "company-english-helper"]
-	path = lib/company-english-helper
-	url = https://github.com/manateelazycat/company-english-helper
-    no-byte-compile = company-english-helper.el
 [submodule "compat"]
 	path = lib/compat
 	url = https://github.com/emacs-straight/compat
@@ -69,6 +65,9 @@
 [submodule "consult-org-roam"]
 	path = lib/consult-org-roam
 	url = https://github.com/jgru/consult-org-roam.git
+[submodule "consult-yasnippet"]
+	path = lib/consult-yasnippet
+	url = https://github.com/mohkale/consult-yasnippet.git
 [submodule "copilot"]
 	path = lib/copilot
 	url = https://github.com/zerolfx/copilot.el
@@ -80,6 +79,9 @@
 [submodule "corfu-doc"]
 	path = lib/corfu-doc
 	url = https://github.com/galeo/corfu-doc.git
+[submodule "corfu-english-helper"]
+	path = lib/corfu-english-helper
+	url = https://github.com/manateelazycat/corfu-english-helper
 [submodule "darkroom"]
 	path = lib/darkroom
 	url = https://github.com/joaotavora/darkroom.git
