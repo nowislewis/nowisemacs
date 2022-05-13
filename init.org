@@ -237,7 +237,6 @@ I used to be a vim(evil) user, but now I use meow to manage all my keys.
                               '("," . meow-reverse)
                               '("." . repeat)
 
-
                               ;; '("&" . meow-query-replace)
                               ;; '("%" . meow-query-replace-regexp)
                               '("/" . consult-line)))
@@ -1351,6 +1350,7 @@ eglot client leveraging LTEX Language Server.
              org-confirm-babel-evaluate nil
              org-src-window-setup 'split-window-below
              org-refile-targets '(("~/Documents/emacs/orgmode/roam/2022-04-25-org_refile_notes.org" . (:maxlevel . 9)))
+             org-ellipsis "⤵"
              )
     (:hook org-num-mode)
     (:when-loaded
@@ -1710,7 +1710,7 @@ among all the files in org-roam in a single agenda-view. The code was borrowed f
 #+end_src
 
 *** delve
-#+begin_src elisp
+#+begin_src elisp :tangle no
 (setup delve)
 #+end_src
 *** consult-org-roam
@@ -1725,7 +1725,7 @@ among all the files in org-roam in a single agenda-view. The code was borrowed f
     (:load-after ox))
 #+end_src
 ** org-elp for latex live preview
-#+begin_src elisp
+#+begin_src elisp :tangle no
   (setup org-elp
     (:option org-elp-idle-time 0.5
              org-elp-split-fraction 0.25))
