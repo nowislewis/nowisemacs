@@ -75,6 +75,8 @@
 [submodule "corfu"]
 	path = lib/corfu
 	url = https://github.com/minad/corfu.git
+    load-path = .
+    load-path = extensions
 [submodule "corfu-doc"]
 	path = lib/corfu-doc
 	url = https://github.com/galeo/corfu-doc.git
