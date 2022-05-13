@@ -909,6 +909,11 @@ borrowed from citre, now you can always jump-back use "M-,"
 #+begin_src elisp
   (setq bookmark-default-file "~/Documents/emacs/other-files/bookmarks")
 #+end_src
+** ace-window
+#+begin_src elisp
+  (setup ace-window
+    (:global [remap other-window] #'ace-window))
+#+end_src
 * ibuffer
 ** ibuffer
 #+begin_src elisp
