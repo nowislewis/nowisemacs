@@ -691,51 +691,50 @@ should be check after reading the embark.el manual
 #+end_src
 ** corfu(instead of company)
 #+begin_src elisp
-  (setup corfu
-    (:option corfu-cycle t                ;; Enable cycling for `corfu-next/previous'
-             corfu-auto t                 ;; Enable auto completion
-             ;; (corfu-quit-at-boundary t)     ;; Automatically quit at word boundary
-             corfu-quit-no-match t        ;; Automatically quit if there is no match
-             corfu-preview-current nil    ;; Disable current candidate preview
-             ;; corfu-echo-documentation nil ;; Disable documentation in the echo area
-             corfu-auto-prefix 2
-             corfu-auto-delay 0.01
-             )
-    (:with-map corfu-map
-      (:bind
-       ;; [tab] corfu-next
-       ;;       [backtab] corfu-previous
-       "<escape>" corfu-quit))
-    (global-corfu-mode)
+    (setup corfu
+      (:option corfu-cycle t                ;; Enable cycling for `corfu-next/previous'
+               corfu-auto t                 ;; Enable auto completion
+               ;; (corfu-quit-at-boundary t)     ;; Automatically quit at word boundary
+               corfu-quit-no-match t        ;; Automatically quit if there is no match
+               corfu-preview-current nil    ;; Disable current candidate preview
+               ;; corfu-echo-documentation nil ;; Disable documentation in the echo area
+               corfu-auto-prefix 2
+               corfu-auto-delay 0.01
+               )
+      (:with-map corfu-map
+        (:bind
+         ;; [tab] corfu-next
+         ;;       [backtab] corfu-previous
+         "<escape>" corfu-quit))
+      (global-corfu-mode)
 
-    (require 'corfu-history)
-    (corfu-history-mode)
-    )
+      (require 'corfu-history)
+      (corfu-history-mode)
+      )
 
-  (defun corfu-enable-always-in-minibuffer ()
-    "Enable Corfu in the minibuffer if Vertico/Mct are not active."
-    (unless (or (bound-and-true-p mct--active)
-                (bound-and-true-p vertico--input))
-      ;; (setq-local corfu-auto nil) Enable/disable auto completion
-      (corfu-mode 1)))
-  (add-hook 'minibuffer-setup-hook #'corfu-enable-always-in-minibuffer 1)
+    (defun corfu-enable-always-in-minibuffer ()
+      "Enable Corfu in the minibuffer if Vertico/Mct are not active."
+      (unless (or (bound-and-true-p mct--active)
+                  (bound-and-true-p vertico--input))
+        ;; (setq-local corfu-auto nil) Enable/disable auto completion
+        (corfu-mode 1)))
+    (add-hook 'minibuffer-setup-hook #'corfu-enable-always-in-minibuffer 1)
+    ;; corfu backend
+    (setup cape
+      (add-to-list 'completion-at-point-functions #'cape-file)
+      ;; (add-to-list 'completion-at-point-functions #'cape-tex)
+      (add-to-list 'completion-at-point-functions #'cape-dabbrev)
+      ;; (add-to-list 'completion-at-point-functions #'cape-keyword)
+      )
+    ;; Enable Corfu completion UI
+    (setup corfu-doc
+      (:hook-into corfu-mode))
 
-  ;; corfu backend
-  (setup cape
-    (add-to-list 'completion-at-point-functions #'cape-file)
-    ;; (add-to-list 'completion-at-point-functions #'cape-tex)
-    ;; (add-to-list 'completion-at-point-functions #'cape-dabbrev)
-    ;; (add-to-list 'completion-at-point-functions #'cape-keyword)
-    )
-  ;; Enable Corfu completion UI
-  (setup corfu-doc
-    (:hook-into corfu-mode))
-
-  ;; (setup svg-lib) ;; built-in has little icons
-  ;; (setup kind-icon
-  ;;   (:load-after corfu)
-  ;;   (:option kind-icon-default-face 'corfu-default) ; to compute blended backgrounds correctly
-  ;;   (add-to-list 'corfu-margin-formatters #'kind-icon-margin-formatter))
+    ;; (setup svg-lib) ;; built-in has little icons
+    ;; (setup kind-icon
+    ;;   (:load-after corfu)
+    ;;   (:option kind-icon-default-face 'corfu-default) ; to compute blended backgrounds correctly
+    ;;   (add-to-list 'corfu-margin-formatters #'kind-icon-margin-formatter))
 #+end_src
 ** corfu-all-the-icons
 #+begin_src elisp
@@ -1277,6 +1276,15 @@ eglot client leveraging LTEX Language Server.
   (setup inheritenv)
   (setup language-id)
   (setup format-all)
+#+end_src
+*** tabnine-capf
+#+begin_src elisp :tangle no
+    (setup names)
+  (setup unicode-escape)
+  (setup tabnine-capf
+    (:load-after cape)
+    (add-hook 'kill-emacs-hook #'tabnine-capf-kill-process)
+    (add-to-list 'completion-at-point-functions #'tabnine-completion-at-point))
 #+end_src
 * Org Mode
 ** org-mode

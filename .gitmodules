@@ -212,6 +212,9 @@
 [submodule "mixed-pitch"]
 	path = lib/mixed-pitch
 	url = https://github.com/emacsmirror/mixed-pitch.git
+[submodule "names"]
+	path = lib/names
+	url = https://github.com/Malabarba/names.git
 [submodule "nov"]
 	path = lib/nov
 	url = https://depp.brause.cc/nov.el.git
@@ -313,6 +316,9 @@
 [submodule "tablist"]
 	path = lib/tablist
 	url = https://github.com/politza/tablist.git
+[submodule "tabnine-capf"]
+	path = lib/tabnine-capf
+	url = https://github.com/50ways2sayhard/tabnine-capf
 [submodule "tomelr"]
 	path = lib/tomelr
 	url = https://github.com/kaushalmodi/tomelr
@@ -325,6 +331,9 @@
 [submodule "tree-sitter-langs"]
 	path = lib/tree-sitter-langs
 	url = https://github.com/emacs-tree-sitter/tree-sitter-langs.git
+[submodule "unicode-escape"]
+	path = lib/unicode-escape
+	url = https://github.com/kosh04/unicode-escape.el.git
 [submodule "valign"]
 	path = lib/valign
 	url = https://github.com/casouri/valign.git
