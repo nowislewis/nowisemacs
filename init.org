@@ -81,7 +81,7 @@ The following content is not enabled yet, because I want to minimize unnecessary
 * Package Management
 I use borg to manage packages, so setup.el is only used to config packages quickly, I write several macros in =noisemacs-base=. It should be noticed that if you use only a =init.el= file, all the funcs or macros defined in =init.el= can't pass native comp, so move these things that you defined yourself to a seperate repo(nowisemacs-base) will resolve this problem.
 #+begin_src elisp
-(require 'nowisemacs-base)
+  (require 'nowisemacs-base)
 #+end_src
 * gcmh
 Enforce a sneaky Garbage Collection strategy to minimize GC interference with user activity.
@@ -225,7 +225,7 @@ I used to be a vim(evil) user, but now I use meow to manage all my keys.
                               '("^" . meow-join)
                               '("*" . symbol-overlay-put)
                               '("-" . negative-argument)
-                              '("=" . indent-region)
+                              '("=" . format-all-region)
 
                               '("[" . meow-beginning-of-thing)
                               '("]" . meow-end-of-thing)
@@ -308,7 +308,7 @@ I used to be a vim(evil) user, but now I use meow to manage all my keys.
    '("s i" . consult-imenu)
    '("s s" . consult-line)
    )
-   ;; vterm
+  ;; vterm
   (meow-leader-define-key
    '("t t" . vterm-toggle)
    '("t n" . vterm-toggle-forward)
@@ -339,7 +339,7 @@ I used to be a vim(evil) user, but now I use meow to manage all my keys.
    '("n r b" . consult-org-roam-backlinks)
    '("n r B" . consult-org-roam-forward-links)
    '("n r s" . consult-org-roam-search)
-     ;; ("C-c n e" . consult-org-roam-file-find)
+   ;; ("C-c n e" . consult-org-roam-file-find)
 
    ;; date
    '("n r d b" . org-roam-dailies-goto-previous-note)
@@ -383,7 +383,7 @@ I used to be a vim(evil) user, but now I use meow to manage all my keys.
 #+begin_src elisp
   (defun font-installed-p (font-name)
     "Check if font with FONT-NAME is available."
-   (find-font (font-spec :name font-name)))
+    (find-font (font-spec :name font-name)))
 
   (when (display-graphic-p)
     ;; Set default font
@@ -455,12 +455,12 @@ rainbow-delimiters is a "rainbow parentheses"-like mode which highlights delimit
 ** diff-hl
 diff-hl-mode highlights uncommitted changes on the left side of the window (area also known as the "gutter"), allows you to jump between and revert them selectively.
 #+begin_src elisp
-    (setup diff-hl
-      (:hook-into text-mode prog-mode)
-      (:when-loaded
-        (diff-hl-margin-mode))
-      (:messure-time))
-    #+end_src
+  (setup diff-hl
+    (:hook-into text-mode prog-mode)
+    (:when-loaded
+      (diff-hl-margin-mode))
+    (:messure-time))
+#+end_src
 ** emacs-dashboard
 #+begin_src elisp
   (setup dashboard
@@ -556,12 +556,12 @@ diff-hl-mode highlights uncommitted changes on the left side of the window (area
 #+end_src
 ** backup, super-save
 #+begin_src elisp
-    (setq make-backup-files nil)
-    (setq auto-save-default nil)
+  (setq make-backup-files nil)
+  (setq auto-save-default nil)
 
-    (setup super-save
-      (super-save-mode 1)
-      (setq super-save-auto-save-when-idle t))
+  (setup super-save
+    (super-save-mode 1)
+    (setq super-save-auto-save-when-idle t))
 #+end_src
 ** 自动换行
 #+begin_src elisp
@@ -574,7 +574,7 @@ diff-hl-mode highlights uncommitted changes on the left side of the window (area
 ** so-long
 解决长行卡死问题
 #+begin_src elisp
-    (global-so-long-mode 1)
+  (global-so-long-mode 1)
 #+end_src
 ** TRAMP
 #+begin_src elisp
@@ -589,9 +589,9 @@ diff-hl-mode highlights uncommitted changes on the left side of the window (area
 #+begin_src elisp
   ;; 可以优化速度, 建议看一下官网的一篇文章
   (setup exec-path-from-shell
-      (exec-path-from-shell-initialize))
-      ;; (when (memq window-system '(mac ns x))
-    ;;   (exec-path-from-shell-initialize)))
+    (exec-path-from-shell-initialize))
+  ;; (when (memq window-system '(mac ns x))
+  ;;   (exec-path-from-shell-initialize)))
 #+end_src
 ** Undo
 *** vundo for undo history
@@ -617,8 +617,8 @@ diff-hl-mode highlights uncommitted changes on the left side of the window (area
 #+begin_src elisp
   (setup orderless
     (:option completion-styles '(orderless)
-          completion-category-defaults nil
-          completion-category-overrides '((file (styles . (partial-completion))))))
+             completion-category-defaults nil
+             completion-category-overrides '((file (styles . (partial-completion))))))
 #+end_src
 ** Consult Commands
 *** consult
@@ -666,8 +666,6 @@ diff-hl-mode highlights uncommitted changes on the left side of the window (area
       (cl-pushnew 'epkg-marginalia-annotate-package
                   (alist-get 'package marginalia-annotator-registry)))
     (:hook-into vertico-mode-hook))
-    ;; (marginalia-mode))
-
 #+end_src
 ** embark
 should be check after reading the embark.el manual
@@ -742,99 +740,99 @@ should be check after reading the embark.el manual
   (setup corfu-all-the-icons
     (:with-feature corfu
       (:when-loaded
-    (require 'all-the-icons)
+        (require 'all-the-icons)
 
-    (defvar kind-all-the-icons--cache nil
-      "The cache of styled and padded label (text or icon).
+        (defvar kind-all-the-icons--cache nil
+          "The cache of styled and padded label (text or icon).
   An alist.")
 
-    (defun kind-all-the-icons-reset-cache ()
-      "Remove all cached icons from `kind-all-the-icons-mapping'."
-      (interactive)
-      (setq kind-all-the-icons--cache nil))
+        (defun kind-all-the-icons-reset-cache ()
+          "Remove all cached icons from `kind-all-the-icons-mapping'."
+          (interactive)
+          (setq kind-all-the-icons--cache nil))
 
-    (defun kind-all-the-icons--set-default-clear-cache (&rest args)
-      (kind-all-the-icons-reset-cache)
-      (apply #'set-default args))
+        (defun kind-all-the-icons--set-default-clear-cache (&rest args)
+          (kind-all-the-icons-reset-cache)
+          (apply #'set-default args))
 
-    (defvar kind-all-the-icons--icons
-      `((unknown . ,(all-the-icons-material "find_in_page" :height 0.8 :v-adjust -0.15))
-        (text . ,(all-the-icons-faicon "text-width" :height 0.8 :v-adjust -0.02))
-        (method . ,(all-the-icons-faicon "cube" :height 0.8 :v-adjust -0.02 :face 'all-the-icons-purple))
-        (function . ,(all-the-icons-faicon "cube" :height 0.8 :v-adjust -0.02 :face 'all-the-icons-purple))
-        (fun . ,(all-the-icons-faicon "cube" :height 0.8 :v-adjust -0.02 :face 'all-the-icons-purple))
-        (constructor . ,(all-the-icons-faicon "cube" :height 0.8 :v-adjust -0.02 :face 'all-the-icons-purple))
-        (ctor . ,(all-the-icons-faicon "cube" :height 0.8 :v-adjust -0.02 :face 'all-the-icons-purple))
-        (field . ,(all-the-icons-octicon "tag" :height 0.85 :v-adjust 0 :face 'all-the-icons-lblue))
-        (variable . ,(all-the-icons-octicon "tag" :height 0.85 :v-adjust 0 :face 'all-the-icons-lblue))
-        (var . ,(all-the-icons-octicon "tag" :height 0.85 :v-adjust 0 :face 'all-the-icons-lblue))
-        (class . ,(all-the-icons-material "settings_input_component" :height 0.8 :v-adjust -0.15 :face 'all-the-icons-orange))
-        (interface . ,(all-the-icons-material "share" :height 0.8 :v-adjust -0.15 :face 'all-the-icons-lblue))
-        (i/f . ,(all-the-icons-material "share" :height 0.8 :v-adjust -0.15 :face 'all-the-icons-lblue))
-        (module . ,(all-the-icons-material "view_module" :height 0.8 :v-adjust -0.15 :face 'all-the-icons-lblue))
-        (mod . ,(all-the-icons-material "view_module" :height 0.8 :v-adjust -0.15 :face 'all-the-icons-lblue))
-        (property . ,(all-the-icons-faicon "wrench" :height 0.8 :v-adjust -0.02))
-        (prop . ,(all-the-icons-faicon "wrench" :height 0.8 :v-adjust -0.02))
-        (unit . ,(all-the-icons-material "settings_system_daydream" :height 0.8 :v-adjust -0.15))
-        (value . ,(all-the-icons-material "format_align_right" :height 0.8 :v-adjust -0.15 :face 'all-the-icons-lblue))
-        (enum . ,(all-the-icons-material "storage" :height 0.8 :v-adjust -0.15 :face 'all-the-icons-orange))
-        (keyword . ,(all-the-icons-material "filter_center_focus" :height 0.8 :v-adjust -0.15))
-        (k/w . ,(all-the-icons-material "filter_center_focus" :height 0.8 :v-adjust -0.15))
-        (snippet . ,(all-the-icons-material "format_align_center" :height 0.8 :v-adjust -0.15))
-        (sn . ,(all-the-icons-material "format_align_center" :height 0.8 :v-adjust -0.15))
-        (color . ,(all-the-icons-material "palette" :height 0.8 :v-adjust -0.15))
-        (file . ,(all-the-icons-faicon "file-o" :height 0.8 :v-adjust -0.02))
-        (reference . ,(all-the-icons-material "collections_bookmark" :height 0.8 :v-adjust -0.15))
-        (ref . ,(all-the-icons-material "collections_bookmark" :height 0.8 :v-adjust -0.15))
-        (folder . ,(all-the-icons-faicon "folder-open" :height 0.8 :v-adjust -0.02))
-        (dir . ,(all-the-icons-faicon "folder-open" :height 0.8 :v-adjust -0.02))
-        (enum-member . ,(all-the-icons-material "format_align_right" :height 0.8 :v-adjust -0.15))
-        (enummember . ,(all-the-icons-material "format_align_right" :height 0.8 :v-adjust -0.15))
-        (member . ,(all-the-icons-material "format_align_right" :height 0.8 :v-adjust -0.15))
-        (constant . ,(all-the-icons-faicon "square-o" :height 0.8 :v-adjust -0.1))
-        (const . ,(all-the-icons-faicon "square-o" :height 0.8 :v-adjust -0.1))
-        (struct . ,(all-the-icons-material "settings_input_component" :height 0.8 :v-adjust -0.15 :face 'all-the-icons-orange))
-        (event . ,(all-the-icons-octicon "zap" :height 0.8 :v-adjust 0 :face 'all-the-icons-orange))
-        (operator . ,(all-the-icons-material "control_point" :height 0.8 :v-adjust -0.15))
-        (op . ,(all-the-icons-material "control_point" :height 0.8 :v-adjust -0.15))
-        (type-parameter . ,(all-the-icons-faicon "arrows" :height 0.8 :v-adjust -0.02))
-        (param . ,(all-the-icons-faicon "arrows" :height 0.8 :v-adjust -0.02))
-        (template . ,(all-the-icons-material "format_align_left" :height 0.8 :v-adjust -0.15))
-        (t . ,(all-the-icons-material "find_in_page" :height 0.8 :v-adjust -0.15))))
+        (defvar kind-all-the-icons--icons
+          `((unknown . ,(all-the-icons-material "find_in_page" :height 0.8 :v-adjust -0.15))
+            (text . ,(all-the-icons-faicon "text-width" :height 0.8 :v-adjust -0.02))
+            (method . ,(all-the-icons-faicon "cube" :height 0.8 :v-adjust -0.02 :face 'all-the-icons-purple))
+            (function . ,(all-the-icons-faicon "cube" :height 0.8 :v-adjust -0.02 :face 'all-the-icons-purple))
+            (fun . ,(all-the-icons-faicon "cube" :height 0.8 :v-adjust -0.02 :face 'all-the-icons-purple))
+            (constructor . ,(all-the-icons-faicon "cube" :height 0.8 :v-adjust -0.02 :face 'all-the-icons-purple))
+            (ctor . ,(all-the-icons-faicon "cube" :height 0.8 :v-adjust -0.02 :face 'all-the-icons-purple))
+            (field . ,(all-the-icons-octicon "tag" :height 0.85 :v-adjust 0 :face 'all-the-icons-lblue))
+            (variable . ,(all-the-icons-octicon "tag" :height 0.85 :v-adjust 0 :face 'all-the-icons-lblue))
+            (var . ,(all-the-icons-octicon "tag" :height 0.85 :v-adjust 0 :face 'all-the-icons-lblue))
+            (class . ,(all-the-icons-material "settings_input_component" :height 0.8 :v-adjust -0.15 :face 'all-the-icons-orange))
+            (interface . ,(all-the-icons-material "share" :height 0.8 :v-adjust -0.15 :face 'all-the-icons-lblue))
+            (i/f . ,(all-the-icons-material "share" :height 0.8 :v-adjust -0.15 :face 'all-the-icons-lblue))
+            (module . ,(all-the-icons-material "view_module" :height 0.8 :v-adjust -0.15 :face 'all-the-icons-lblue))
+            (mod . ,(all-the-icons-material "view_module" :height 0.8 :v-adjust -0.15 :face 'all-the-icons-lblue))
+            (property . ,(all-the-icons-faicon "wrench" :height 0.8 :v-adjust -0.02))
+            (prop . ,(all-the-icons-faicon "wrench" :height 0.8 :v-adjust -0.02))
+            (unit . ,(all-the-icons-material "settings_system_daydream" :height 0.8 :v-adjust -0.15))
+            (value . ,(all-the-icons-material "format_align_right" :height 0.8 :v-adjust -0.15 :face 'all-the-icons-lblue))
+            (enum . ,(all-the-icons-material "storage" :height 0.8 :v-adjust -0.15 :face 'all-the-icons-orange))
+            (keyword . ,(all-the-icons-material "filter_center_focus" :height 0.8 :v-adjust -0.15))
+            (k/w . ,(all-the-icons-material "filter_center_focus" :height 0.8 :v-adjust -0.15))
+            (snippet . ,(all-the-icons-material "format_align_center" :height 0.8 :v-adjust -0.15))
+            (sn . ,(all-the-icons-material "format_align_center" :height 0.8 :v-adjust -0.15))
+            (color . ,(all-the-icons-material "palette" :height 0.8 :v-adjust -0.15))
+            (file . ,(all-the-icons-faicon "file-o" :height 0.8 :v-adjust -0.02))
+            (reference . ,(all-the-icons-material "collections_bookmark" :height 0.8 :v-adjust -0.15))
+            (ref . ,(all-the-icons-material "collections_bookmark" :height 0.8 :v-adjust -0.15))
+            (folder . ,(all-the-icons-faicon "folder-open" :height 0.8 :v-adjust -0.02))
+            (dir . ,(all-the-icons-faicon "folder-open" :height 0.8 :v-adjust -0.02))
+            (enum-member . ,(all-the-icons-material "format_align_right" :height 0.8 :v-adjust -0.15))
+            (enummember . ,(all-the-icons-material "format_align_right" :height 0.8 :v-adjust -0.15))
+            (member . ,(all-the-icons-material "format_align_right" :height 0.8 :v-adjust -0.15))
+            (constant . ,(all-the-icons-faicon "square-o" :height 0.8 :v-adjust -0.1))
+            (const . ,(all-the-icons-faicon "square-o" :height 0.8 :v-adjust -0.1))
+            (struct . ,(all-the-icons-material "settings_input_component" :height 0.8 :v-adjust -0.15 :face 'all-the-icons-orange))
+            (event . ,(all-the-icons-octicon "zap" :height 0.8 :v-adjust 0 :face 'all-the-icons-orange))
+            (operator . ,(all-the-icons-material "control_point" :height 0.8 :v-adjust -0.15))
+            (op . ,(all-the-icons-material "control_point" :height 0.8 :v-adjust -0.15))
+            (type-parameter . ,(all-the-icons-faicon "arrows" :height 0.8 :v-adjust -0.02))
+            (param . ,(all-the-icons-faicon "arrows" :height 0.8 :v-adjust -0.02))
+            (template . ,(all-the-icons-material "format_align_left" :height 0.8 :v-adjust -0.15))
+            (t . ,(all-the-icons-material "find_in_page" :height 0.8 :v-adjust -0.15))))
 
 
-    (defsubst kind-all-the-icons--metadata-get (metadata type-name)
-      (or
-       (plist-get completion-extra-properties (intern (format ":%s" type-name)))
-       (cdr (assq (intern type-name) metadata))))
+        (defsubst kind-all-the-icons--metadata-get (metadata type-name)
+          (or
+           (plist-get completion-extra-properties (intern (format ":%s" type-name)))
+           (cdr (assq (intern type-name) metadata))))
 
-    (defun kind-all-the-icons-formatted (kind)
-      "Format icon kind with all-the-icons"
-      (or (alist-get kind kind-all-the-icons--cache)
-          (let ((map (assq kind kind-all-the-icons--icons)))
-            (let*  ((icon (if map
-                              (cdr map)
-                            (cdr (assq t kind-all-the-icons--icons))))
-                    (half (/ (default-font-width) 2))
-                    (pad (propertize " " 'display `(space :width (,half))))
-                    (disp (concat pad icon pad)))
-              (setf (alist-get kind kind-all-the-icons--cache) disp)
-              disp))))
+        (defun kind-all-the-icons-formatted (kind)
+          "Format icon kind with all-the-icons"
+          (or (alist-get kind kind-all-the-icons--cache)
+              (let ((map (assq kind kind-all-the-icons--icons)))
+                (let*  ((icon (if map
+                                  (cdr map)
+                                (cdr (assq t kind-all-the-icons--icons))))
+                        (half (/ (default-font-width) 2))
+                        (pad (propertize " " 'display `(space :width (,half))))
+                        (disp (concat pad icon pad)))
+                  (setf (alist-get kind kind-all-the-icons--cache) disp)
+                  disp))))
 
-    (defun kind-all-the-icons-margin-formatter (metadata)
-      "Return a margin-formatter function which produces kind icons.
+        (defun kind-all-the-icons-margin-formatter (metadata)
+          "Return a margin-formatter function which produces kind icons.
   METADATA is the completion metadata supplied by the caller (see
   info node `(elisp)Programmed Completion').  To use, add this
   function to the relevant margin-formatters list."
-      (if-let ((kind-func (kind-all-the-icons--metadata-get metadata "company-kind")))
-          (lambda (cand)
-            (if-let ((kind (funcall kind-func cand)))
-                (kind-all-the-icons-formatted kind)
-              (kind-all-the-icons-formatted t))))) ;; as a backup
+          (if-let ((kind-func (kind-all-the-icons--metadata-get metadata "company-kind")))
+              (lambda (cand)
+                (if-let ((kind (funcall kind-func cand)))
+                    (kind-all-the-icons-formatted kind)
+                  (kind-all-the-icons-formatted t))))) ;; as a backup
 
-    (add-to-list 'corfu-margin-formatters
-                 #'kind-all-the-icons-margin-formatter)
-    )))
+        (add-to-list 'corfu-margin-formatters
+                     #'kind-all-the-icons-margin-formatter)
+        )))
 #+end_src
 ** yasnippet
 #+begin_src elisp
@@ -845,7 +843,7 @@ should be check after reading the embark.el manual
 #+end_src
 ** consult-yasnippet
 #+begin_src elisp
-(setup consult-yasnippet)
+  (setup consult-yasnippet)
 #+end_src
 ** rg.el
 #+begin_src elisp
@@ -859,26 +857,26 @@ should be check after reading the embark.el manual
 ** popper
 Popper is a minor-mode to tame the flood of ephemeral windows Emacs produces, while still keeping them within arm’s reach.
 #+begin_src elisp
-    (setup popper
-      (:option popper-reference-buffers '("\\*Messages\\*"
-                                          "Output\\*$"
-                                          "\\*Async Shell Command\\*"
-                                          "Go-Translate"
-                                          help-mode
-                                          helpful-mode
-                                          compilation-mode
-                                          youdao-dictionary-mode)
-               popper-window-height  (lambda (win)
-                                       (fit-window-to-buffer
-                                        win
-                                        (floor (frame-height) 2)))
-               )
-      (:global "C-~" popper-toggle-latest
-               "M-~" popper-cycle
-               "C-M-~" popper-toggle-type)
-      (popper-mode +1)
-      (popper-echo-mode +1)
-      (:messure-time))
+  (setup popper
+    (:option popper-reference-buffers '("\\*Messages\\*"
+                                        "Output\\*$"
+                                        "\\*Async Shell Command\\*"
+                                        "Go-Translate"
+                                        help-mode
+                                        helpful-mode
+                                        compilation-mode
+                                        youdao-dictionary-mode)
+             popper-window-height  (lambda (win)
+                                     (fit-window-to-buffer
+                                      win
+                                      (floor (frame-height) 2)))
+             )
+    (:global "C-~" popper-toggle-latest
+             "M-~" popper-cycle
+             "C-M-~" popper-toggle-type)
+    (popper-mode +1)
+    (popper-echo-mode +1)
+    (:messure-time))
 #+end_src
 ** Move
 *** avy
@@ -969,7 +967,7 @@ borrowed from citre, now you can always jump-back use "M-,"
 Dirvish is a minimalistic file manager based on Dired. It's fast
 #+begin_src elisp
   (setup dirvish
-     (:option dirvish-attributes '(expanded-state all-the-icons file-size)))
+    (:option dirvish-attributes '(expanded-state all-the-icons file-size)))
 #+end_src
 *** diredfl
 This is adapted from the extra font lock rules provided by Drew Adams' dired+ package, but published via a modern means, and with support for older Emacsen removed.
@@ -1017,8 +1015,8 @@ This is adapted from the extra font lock rules provided by Drew Adams' dired+ pa
 #+end_src
 ** vterm
 #+begin_src elisp
-    (setup vterm
-      (:bind [(control return)] vterm-toggle-insert-cd))
+  (setup vterm
+    (:bind [(control return)] vterm-toggle-insert-cd))
 #+end_src
 ** vterm-toggle
 #+begin_src elisp
@@ -1119,8 +1117,8 @@ Show git blame info about current line
   (setup graphviz-dot-mode
     (:file-match "\\.dot\\'")
     (:option graphviz-dot-indent-width 4))
-    ;; (:when-loaded
-    ;;   (require 'company-graphviz-dot))) ;;for now, just use highlight
+  ;; (:when-loaded
+  ;;   (require 'company-graphviz-dot))) ;;for now, just use highlight
 #+end_src
 *** beancount
 Emacs major-mode to work with Beancount ledger files
@@ -1151,12 +1149,12 @@ Emacs major-mode to work with Beancount ledger files
 #+end_src
 *** cpp
 #+begin_src elisp
-(setup cmake-mode)
+  (setup cmake-mode)
 #+end_src
 *** scheme
 #+begin_src elisp
-(setup geiser)
-(setup geiser-guile)
+  (setup geiser)
+  (setup geiser-guile)
 #+end_src
 ** Useful programing tools
 *** quickrun
@@ -1166,10 +1164,10 @@ Emacs major-mode to work with Beancount ledger files
 *** tree-sitter
 **** tree-sitter
 #+begin_src elisp
-    (setup tree-sitter
-      (:hook-into c-mode-common python-mode)
-      (:hook tree-sitter-hl-mode))
-;; (setup tree-sitter-langs)
+  (setup tree-sitter
+    (:hook-into c-mode-common python-mode)
+    (:hook tree-sitter-hl-mode))
+  ;; (setup tree-sitter-langs)
 #+end_src
 *** lsp mode
 **** eglot
@@ -1229,12 +1227,9 @@ enable eglot in org-src mode
 **** consult-eglot
 **** lsp-bridge
 #+begin_src elisp :tangle no
+  ;; (require 'lsp-bridge)             ;; load lsp-bridge
   (setup lsp-bridge
-    (require 'lsp-bridge)             ;; load lsp-bridge
-
-    (require 'lsp-bridge-orderless)   ;; make lsp-bridge support fuzzy match, optional
-    (require 'lsp-bridge-icon)        ;; show icon for completion items, optional
-
+    (:autoload lsp-bridge-mode)
     ;; Enable lsp-bridge.
     (dolist (hook (list
                    'c-mode-hook
@@ -1272,6 +1267,10 @@ enable eglot in org-src mode
                        (setq-local corfu-auto nil)  ;; let lsp-bridge control when popup completion frame
                        (lsp-bridge-mode 1)
                        )))
+    (:when-loaded
+      (require 'lsp-bridge-orderless)   ;; make lsp-bridge support fuzzy match, optional
+      (require 'lsp-bridge-icon))        ;; show icon for completion items, optional
+
     )
 #+end_src
 *** citre
@@ -1294,10 +1293,10 @@ Highlight symbols with keymap-enabled overlays
 eglot client leveraging LTEX Language Server.
 #+begin_src elisp
   (setup eglot-ltex
-      (:option eglot-languagetool-server-path "~/Downloads/ltex-ls/")
-      (:with-hook text-mode-hook
-        (:hook (lambda ()
-                       (require 'eglot-ltex)))))
+    (:option eglot-languagetool-server-path "~/Downloads/ltex-ls/")
+    (:with-hook text-mode-hook
+      (:hook (lambda ()
+               (require 'eglot-ltex)))))
 #+end_src
 *** Code toggle with hideshow
 #+begin_src elisp
@@ -1318,7 +1317,12 @@ eglot client leveraging LTEX Language Server.
     )
   (setup realgud-lldb
     (:autoload realgud--lldb))
-
+#+end_src
+*** format-all
+#+begin_src elisp
+  (setup inheritenv)
+  (setup language-id)
+  (setup format-all)
 #+end_src
 * Org Mode
 ** org-mode
@@ -1421,7 +1425,7 @@ eglot client leveraging LTEX Language Server.
          ;; (bash . t)
          ))
       (add-hook 'org-babel-after-execute-hook 'org-redisplay-inline-images)
-  ))
+      ))
 #+end_src
 ** org-modern
 #+begin_src elisp
@@ -1544,9 +1548,9 @@ eglot client leveraging LTEX Language Server.
 #+end_src
 *** Every Zettel is a Draft until Declared Otherwise
 #+begin_src elisp
-(defun lewis/tag-new-node-as-draft ()
-  (org-roam-tag-add '("draft")))
-(add-hook 'org-roam-capture-new-node-hook #'lewis/tag-new-node-as-draft)
+  (defun lewis/tag-new-node-as-draft ()
+    (org-roam-tag-add '("draft")))
+  (add-hook 'org-roam-capture-new-node-hook #'lewis/tag-new-node-as-draft)
 #+end_src
 *** org-roam-ui
 #+begin_src elisp
@@ -1561,20 +1565,20 @@ among all the files in org-roam in a single agenda-view. The code was borrowed f
   (defun lewis/load-agenda()
     (interactive)
     (defun vulpea-project-p ()
-    "Return non-nil if current buffer has any todo entry.
+      "Return non-nil if current buffer has any todo entry.
   TODO entries marked as done are ignored, meaning the this
   function returns nil if current buffer contains only completed
   tasks."
-    (seq-find                                 ; (3)
-     (lambda (type)
-       (eq type 'todo))
-     (org-element-map                         ; (2)
-         (org-element-parse-buffer 'headline) ; (1)
-         'headline
-       (lambda (h)
-         (org-element-property :todo-type h)))))
+      (seq-find                                 ; (3)
+       (lambda (type)
+         (eq type 'todo))
+       (org-element-map                         ; (2)
+           (org-element-parse-buffer 'headline) ; (1)
+           'headline
+         (lambda (h)
+           (org-element-property :todo-type h)))))
 
-  (defun vulpea-project-update-tag ()
+    (defun vulpea-project-update-tag ()
       "Update PROJECT tag in the current buffer."
       (when (and (not (active-minibuffer-window))
                  (vulpea-buffer-p))
@@ -1594,83 +1598,83 @@ among all the files in org-roam in a single agenda-view. The code was borrowed f
                       (seq-difference original-tags tags))
               (apply #'vulpea-buffer-tags-set tags))))))
 
-  (defun vulpea-buffer-p ()
-    "Return non-nil if the currently visited buffer is a note."
-    (and buffer-file-name
-         (string-prefix-p
-          (expand-file-name (file-name-as-directory org-roam-directory))
-          (file-name-directory buffer-file-name))))
+    (defun vulpea-buffer-p ()
+      "Return non-nil if the currently visited buffer is a note."
+      (and buffer-file-name
+           (string-prefix-p
+            (expand-file-name (file-name-as-directory org-roam-directory))
+            (file-name-directory buffer-file-name))))
 
-  (defun vulpea-project-files ()
+    (defun vulpea-project-files ()
       "Return a list of note files containing 'project' tag." ;
       (seq-uniq
        (seq-map
         #'car
         (org-roam-db-query
          [:select [nodes:file]
-          :from tags
-          :left-join nodes
-          :on (= tags:node-id nodes:id)
-          :where (like tag (quote "%\"project\"%"))]))))
+                  :from tags
+                  :left-join nodes
+                  :on (= tags:node-id nodes:id)
+                  :where (like tag (quote "%\"project\"%"))]))))
 
-  (defun vulpea-agenda-files-update (&rest _)
-    "Update the value of `org-agenda-files'."
-    (setq org-agenda-files (vulpea-project-files)))
+    (defun vulpea-agenda-files-update (&rest _)
+      "Update the value of `org-agenda-files'."
+      (setq org-agenda-files (vulpea-project-files)))
 
-  (add-hook 'find-file-hook #'vulpea-project-update-tag)
-  (add-hook 'before-save-hook #'vulpea-project-update-tag)
+    (add-hook 'find-file-hook #'vulpea-project-update-tag)
+    (add-hook 'before-save-hook #'vulpea-project-update-tag)
 
-  (advice-add 'org-agenda :before #'vulpea-agenda-files-update)
-  (advice-add 'org-todo-list :before #'vulpea-agenda-files-update)
+    (advice-add 'org-agenda :before #'vulpea-agenda-files-update)
+    (advice-add 'org-todo-list :before #'vulpea-agenda-files-update)
 
-  ;; functions borrowed from `vulpea' library
-  ;; https://github.com/d12frosted/vulpea/blob/6a735c34f1f64e1f70da77989e9ce8da7864e5ff/vulpea-buffer.el
+    ;; functions borrowed from `vulpea' library
+    ;; https://github.com/d12frosted/vulpea/blob/6a735c34f1f64e1f70da77989e9ce8da7864e5ff/vulpea-buffer.el
 
-  (defun vulpea-buffer-tags-get ()
-    "Return filetags value in current buffer."
-    (vulpea-buffer-prop-get-list "filetags" "[ :]"))
+    (defun vulpea-buffer-tags-get ()
+      "Return filetags value in current buffer."
+      (vulpea-buffer-prop-get-list "filetags" "[ :]"))
 
-  (defun vulpea-buffer-tags-set (&rest tags)
-    "Set TAGS in current buffer.
+    (defun vulpea-buffer-tags-set (&rest tags)
+      "Set TAGS in current buffer.
   If filetags value is already set, replace it."
-    (if tags
-        (vulpea-buffer-prop-set
-         "filetags" (concat ":" (string-join tags ":") ":"))
-      (vulpea-buffer-prop-remove "filetags")))
+      (if tags
+          (vulpea-buffer-prop-set
+           "filetags" (concat ":" (string-join tags ":") ":"))
+        (vulpea-buffer-prop-remove "filetags")))
 
-  (defun vulpea-buffer-tags-add (tag)
-    "Add a TAG to filetags in current buffer."
-    (let* ((tags (vulpea-buffer-tags-get))
-           (tags (append tags (list tag))))
-      (apply #'vulpea-buffer-tags-set tags)))
+    (defun vulpea-buffer-tags-add (tag)
+      "Add a TAG to filetags in current buffer."
+      (let* ((tags (vulpea-buffer-tags-get))
+             (tags (append tags (list tag))))
+        (apply #'vulpea-buffer-tags-set tags)))
 
-  (defun vulpea-buffer-tags-remove (tag)
-    "Remove a TAG from filetags in current buffer."
-    (let* ((tags (vulpea-buffer-tags-get))l
-           (tags (delete tag tags)))
-      (apply #'vulpea-buffer-tags-set tags)))
+    (defun vulpea-buffer-tags-remove (tag)
+      "Remove a TAG from filetags in current buffer."
+      (let* ((tags (vulpea-buffer-tags-get))l
+             (tags (delete tag tags)))
+        (apply #'vulpea-buffer-tags-set tags)))
 
-  (defun vulpea-buffer-prop-set (name value)
-    "Set a file property called NAME to VALUE in buffer file.
+    (defun vulpea-buffer-prop-set (name value)
+      "Set a file property called NAME to VALUE in buffer file.
   If the property is already set, replace its value."
-    (setq name (downcase name))
-    (org-with-point-at 1
-      (let ((case-fold-search t))
-        (if (re-search-forward (concat "^#\\+" name ":\\(.*\\)")
-                               (point-max) t)
-            (replace-match (concat "#+" name ": " value) 'fixedcase)
-          (while (and (not (eobp))
-                      (looking-at "^[#:]"))
-            (if (save-excursion (end-of-line) (eobp))
-                (progn
-                  (end-of-line)
-                  (insert "\n"))
-              (forward-line)
-              (beginning-of-line)))
-          (insert "#+" name ": " value "\n")))))
+      (setq name (downcase name))
+      (org-with-point-at 1
+        (let ((case-fold-search t))
+          (if (re-search-forward (concat "^#\\+" name ":\\(.*\\)")
+                                 (point-max) t)
+              (replace-match (concat "#+" name ": " value) 'fixedcase)
+            (while (and (not (eobp))
+                        (looking-at "^[#:]"))
+              (if (save-excursion (end-of-line) (eobp))
+                  (progn
+                    (end-of-line)
+                    (insert "\n"))
+                (forward-line)
+                (beginning-of-line)))
+            (insert "#+" name ": " value "\n")))))
 
-  (defun vulpea-buffer-prop-set-list (name values &optional separators)
-    "Set a file property called NAME to VALUES in current buffer.
+    (defun vulpea-buffer-prop-set-list (name values &optional separators)
+      "Set a file property called NAME to VALUES in current buffer.
   VALUES are quoted and combined into single string using
   `combine-and-quote-strings'.
   If SEPARATORS is non-nil, it should be a regular expression
@@ -1678,40 +1682,40 @@ among all the files in org-roam in a single agenda-view. The code was borrowed f
   If nil it defaults to `split-string-default-separators', normally
   \"[ \f\t\n\r\v]+\", and OMIT-NULLS is forced to t.
   If the property is already set, replace its value."
-    (vulpea-buffer-prop-set
-     name (combine-and-quote-strings values separators)))
+      (vulpea-buffer-prop-set
+       name (combine-and-quote-strings values separators)))
 
-  (defun vulpea-buffer-prop-get (name)
-    "Get a buffer property called NAME as a string."
-    (org-with-point-at 1
-      (when (re-search-forward (concat "^#\\+" name ": \\(.*\\)")
-                               (point-max) t)
-        (buffer-substring-no-properties
-         (match-beginning 1)
-         (match-end 1)))))
+    (defun vulpea-buffer-prop-get (name)
+      "Get a buffer property called NAME as a string."
+      (org-with-point-at 1
+        (when (re-search-forward (concat "^#\\+" name ": \\(.*\\)")
+                                 (point-max) t)
+          (buffer-substring-no-properties
+           (match-beginning 1)
+           (match-end 1)))))
 
-  (defun vulpea-buffer-prop-get-list (name &optional separators)
-    "Get a buffer property NAME as a list using SEPARATORS.
+    (defun vulpea-buffer-prop-get-list (name &optional separators)
+      "Get a buffer property NAME as a list using SEPARATORS.
   If SEPARATORS is non-nil, it should be a regular expression
   matching text that separates, but is not part of, the substrings.
   If nil it defaults to `split-string-default-separators', normally
   \"[ \f\t\n\r\v]+\", and OMIT-NULLS is forced to t."
-    (let ((value (vulpea-buffer-prop-get name)))
-      (when (and value (not (string-empty-p value)))
-        (split-string-and-unquote value separators))))
+      (let ((value (vulpea-buffer-prop-get name)))
+        (when (and value (not (string-empty-p value)))
+          (split-string-and-unquote value separators))))
 
-  (defun vulpea-buffer-prop-remove (name)
-    "Remove a buffer property called NAME."
-    (org-with-point-at 1
-      (when (re-search-forward (concat "\\(^#\\+" name ":.*\n?\\)")
-                               (point-max) t)
-        (replace-match ""))))
-  )
+    (defun vulpea-buffer-prop-remove (name)
+      "Remove a buffer property called NAME."
+      (org-with-point-at 1
+        (when (re-search-forward (concat "\\(^#\\+" name ":.*\n?\\)")
+                                 (point-max) t)
+          (replace-match ""))))
+    )
 #+end_src
 
 *** delve
 #+begin_src elisp :tangle no
-(setup delve)
+  (setup delve)
 #+end_src
 *** consult-org-roam
 #+begin_src elisp
@@ -1747,7 +1751,7 @@ among all the files in org-roam in a single agenda-view. The code was borrowed f
 #+end_src
 ** org-present
 #+begin_src elisp
-(setup org-present)
+  (setup org-present)
 #+end_src
 ** org-citar
 #+begin_src elisp
@@ -1791,10 +1795,10 @@ among all the files in org-roam in a single agenda-view. The code was borrowed f
   (setup go-translate
     (:option gts-translate-list '(("en" "zh")))
     (:when-loaded
-             (setq gts-default-translator (gts-translator
-                                     :picker (gts-prompt-picker)
-                                     :engines (list (gts-google-engine))
-                                     :render (gts-buffer-render))))
+      (setq gts-default-translator (gts-translator
+                                    :picker (gts-prompt-picker)
+                                    :engines (list (gts-google-engine))
+                                    :render (gts-buffer-render))))
     (defun my-gts-translate-posframe ()
       (interactive)
       (if (not (featurep 'go-translate))
@@ -1809,9 +1813,9 @@ among all the files in org-roam in a single agenda-view. The code was borrowed f
 #+end_src
 ** insert-translated-name
 #+begin_src elisp
-    (setup insert-translated-name
-      (:autoload insert-translated-name-insert)
-      (:autoload insert-translated-name-replace))
+  (setup insert-translated-name
+    (:autoload insert-translated-name-insert)
+    (:autoload insert-translated-name-replace))
 #+end_src
 ** corfu-english-helper
 I use corfu english helper instead of company-english-helper.
@@ -1853,7 +1857,7 @@ I use corfu english helper instead of company-english-helper.
             "https://guix.gnu.org/feeds/blog.atom"
             "https://valdyas.org/fading/feed/"
             "https://manateelazycat.github.io/feed.xml"
-  )))
+            )))
 #+end_src
 ** nov
 #+begin_src elisp
@@ -1869,17 +1873,17 @@ Simple distraction-free editing. I use darkroom instead of writeroom because it'
 ** xwidget
 #+begin_src elisp
   (defun lewis/url-browser-new-buffer(url &optional new-session)
-      (interactive (progn
-                 (require 'browse-url)
-                 (browse-url-interactive-arg "xwidget-webkit URL: ")))
-      (xwidget-webkit-browse-url url t))
+    (interactive (progn
+                   (require 'browse-url)
+                   (browse-url-interactive-arg "xwidget-webkit URL: ")))
+    (xwidget-webkit-browse-url url t))
 
   (setq browse-url-browser-function 'lewis/url-browser-new-buffer)
 #+end_src
 ** oj.el for online program contest
 #+begin_src elisp
-      (setup oj
-        (:option oj-default-online-judge 'codeforces))
+  (setup oj
+    (:option oj-default-online-judge 'codeforces))
 #+end_src
 ** eaf
 #+begin_src elisp :tangle no
@@ -1898,24 +1902,24 @@ Simple distraction-free editing. I use darkroom instead of writeroom because it'
 #+end_src
 ** gnus
 #+begin_src elisp :tangle ~/.gnus.el
-(setq user-full-name "yi liu"
-      user-mail-address "lewisliu.gm@gmail.com")
+  (setq user-full-name "yi liu"
+        user-mail-address "lewisliu.gm@gmail.com")
 
-;; Send email through SMTP
-(setq message-send-mail-function 'smtpmail-send-it
-      smtpmail-default-smtp-server "smtp.gmail.com"
-      smtpmail-smtp-service 587
-      smtpmail-local-domain "homepc")
+  ;; Send email through SMTP
+  (setq message-send-mail-function 'smtpmail-send-it
+        smtpmail-default-smtp-server "smtp.gmail.com"
+        smtpmail-smtp-service 587
+        smtpmail-local-domain "homepc")
 
-(setq gnus-select-method
-      '(nnimap "gmail"
-	       (nnimap-address "imap.gmail.com")  ; it could also be imap.googlemail.com if that's your server.
-	       (nnimap-server-port "imaps")
-	       (nnimap-stream ssl)))
+  (setq gnus-select-method
+        '(nnimap "gmail"
+                 (nnimap-address "imap.gmail.com")  ; it could also be imap.googlemail.com if that's your server.
+                 (nnimap-server-port "imaps")
+                 (nnimap-stream ssl)))
 
-(setq smtpmail-smtp-server "smtp.gmail.com"
-      smtpmail-smtp-service 587
-      gnus-ignored-newsgroups "^to\\.\\|^[0-9. ]+\\( \\|$\\)\\|^[\"]\"[#'()]")
+  (setq smtpmail-smtp-server "smtp.gmail.com"
+        smtpmail-smtp-service 587
+        gnus-ignored-newsgroups "^to\\.\\|^[0-9. ]+\\( \\|$\\)\\|^[\"]\"[#'()]")
 #+end_src
 ** Simulate company with corfu
 Company is wide-used, but I use corfu for its simplity. So I add a simulation for some packages which use
