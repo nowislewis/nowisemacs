@@ -310,6 +310,7 @@ I used to be a vim(evil) user, but now I use meow to manage all my keys.
    )
   ;; vterm
   (meow-leader-define-key
+   '("t i" . vterm-toggle-insert-cd)
    '("t t" . vterm-toggle)
    '("t n" . vterm-toggle-forward)
    '("t p" . vterm-toggle-backward))
