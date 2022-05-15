@@ -1286,7 +1286,7 @@ eglot client leveraging LTEX Language Server.
   ;;                                        ("#+begin_src" . "ℱ")
   ;;                                        ("#+end_src" . "Ⅎ")))
   (setup org
-    (setq org-directory "~/Documents/emacs/orgmode/")
+    (setq org-directory nowisemacs-doc-org-mode-dir)
     (:option org-adapt-indentation t
              org-startup-indented t
              org-hide-emphasis-markers t
@@ -1379,7 +1379,20 @@ eglot client leveraging LTEX Language Server.
          ;; (bash . t)
          ))
       (add-hook 'org-babel-after-execute-hook 'org-redisplay-inline-images)
-      ))
+      ;; open word
+      (add-to-list 'org-file-apps '("\\.docx\\'" . default))
+      (defun lewis/org-export-docx ()
+        (interactive)
+        (let ((docx-file (concat (file-name-sans-extension (buffer-file-name)) ".docx"))
+              (template-file (concat (file-name-as-directory nowisemacs-doc-other-file-dir)
+                                     "template.docx")))
+          (shell-command (format "pandoc %s -o %s --reference-doc=%s"
+                                 (buffer-file-name)
+                                 docx-file
+                                 template-file
+                                 ))
+          (message "Convert finish: %s" docx-file)))
+    ))
 #+end_src
 ** org-modern
 #+begin_src elisp
@@ -1428,8 +1441,8 @@ eglot client leveraging LTEX Language Server.
                                            #'org-roam-reflinks-section
                                            ;; #'org-roam-unlinked-references-section
                                            )
-     org-roam-directory "~/Documents/emacs/orgmode/roam/"
-     org-roam-dailies-directory "~/Documents/emacs/orgmode/roam"
+     org-roam-directory (concat nowisemacs-doc-root-dir "/orgmode/roam/")
+     org-roam-dailies-directory (concat nowisemacs-doc-root-dir "/orgmode/roam/")
 
      org-roam-db-gc-threshold most-positive-fixnum
      ;; org-roam-node-display-template "${doom-hierarchy:*} ${tags:37}"
