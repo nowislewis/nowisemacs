@@ -225,7 +225,8 @@ I used to be a vim(evil) user, but now I use meow to manage all my keys.
                               '("^" . meow-join)
                               '("*" . symbol-overlay-put)
                               '("-" . negative-argument)
-                              '("=" . format-all-region)
+                              ;; '("=" . format-all-region)
+                              '("=" . indent-region)
 
                               '("[" . meow-beginning-of-thing)
                               '("]" . meow-end-of-thing)
@@ -1226,54 +1227,6 @@ enable eglot in org-src mode
     (eval `(lsp-org-babel-enable ,lang)))
 #+end_src
 **** consult-eglot
-**** lsp-bridge
-#+begin_src elisp :tangle no
-  ;; (require 'lsp-bridge)             ;; load lsp-bridge
-  (setup lsp-bridge
-    (:autoload lsp-bridge-mode)
-    ;; Enable lsp-bridge.
-    (dolist (hook (list
-                   'c-mode-hook
-                   'c++-mode-hook
-                   'java-mode-hook
-                   'python-mode-hook
-                   'ruby-mode-hook
-                   'rust-mode-hook
-                   'elixir-mode-hook
-                   'go-mode-hook
-                   'haskell-mode-hook
-                   'haskell-literate-mode-hook
-                   'dart-mode-hook
-                   'scala-mode-hook
-                   'typescript-mode-hook
-                   'typescript-tsx-mode-hook
-                   'js2-mode-hook
-                   'js-mode-hook
-                   'rjsx-mode-hook
-                   'tuareg-mode-hook
-                   'latex-mode-hook
-                   'Tex-latex-mode-hook
-                   'texmode-hook
-                   'context-mode-hook
-                   'texinfo-mode-hook
-                   'bibtex-mode-hook
-                   'clojure-mode-hook
-                   'clojurec-mode-hook
-                   'clojurescript-mode-hook
-                   'clojurex-mode-hook
-                   'sh-mode-hook
-                   'web-mode-hook
-                   ))
-      (add-hook hook (lambda ()
-                       (setq-local corfu-auto nil)  ;; let lsp-bridge control when popup completion frame
-                       (lsp-bridge-mode 1)
-                       )))
-    (:when-loaded
-      (require 'lsp-bridge-orderless)   ;; make lsp-bridge support fuzzy match, optional
-      (require 'lsp-bridge-icon))        ;; show icon for completion items, optional
-
-    )
-#+end_src
 *** citre
 Citre is an advanced Ctags (or actually, readtags) frontend for Emacs.
 #+begin_src elisp
@@ -1309,7 +1262,7 @@ eglot client leveraging LTEX Language Server.
     )
 #+end_src
 *** realgud
-#+begin_src elisp
+#+begin_src elisp :tangle no
   (setup load-relative)
   (setup loc-changes)
   (setup realgud
@@ -1320,7 +1273,7 @@ eglot client leveraging LTEX Language Server.
     (:autoload realgud--lldb))
 #+end_src
 *** format-all
-#+begin_src elisp
+#+begin_src elisp :tangle no
   (setup inheritenv)
   (setup language-id)
   (setup format-all)
@@ -1712,11 +1665,6 @@ among all the files in org-roam in a single agenda-view. The code was borrowed f
                                  (point-max) t)
           (replace-match ""))))
     )
-#+end_src
-
-*** delve
-#+begin_src elisp :tangle no
-  (setup delve)
 #+end_src
 *** consult-org-roam
 #+begin_src elisp
