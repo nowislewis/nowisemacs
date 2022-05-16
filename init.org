@@ -460,8 +460,7 @@ diff-hl-mode highlights uncommitted changes on the left side of the window (area
   (setup diff-hl
     (:hook-into text-mode prog-mode)
     (:when-loaded
-      (diff-hl-margin-mode))
-    (:messure-time))
+      (diff-hl-margin-mode)))
 #+end_src
 ** emacs-dashboard
 #+begin_src elisp
@@ -546,9 +545,9 @@ diff-hl-mode highlights uncommitted changes on the left side of the window (area
 #+begin_src elisp
   (setup save-place
     (:hook-into after-init-hook))
-  (setup elec-pair
-    (:option electric-pair-inhibit-predicate 'electric-pair-conservative-inhibit)
-    (electric-pair-mode t))
+  ;; (setup elec-pair
+  ;;   (:option electric-pair-inhibit-predicate 'electric-pair-conservative-inhibit)
+  ;;   (electric-pair-mode t))
 
   (global-auto-revert-mode t)                  ; 当另一程序修改了文件时，让 Emacs 及时刷新 Buffer
   ;; (delete-selection-mode t)                    ; 选中文本后输入文本会替换文本（更符合我们习惯了的其它编辑器的逻辑）
@@ -858,26 +857,26 @@ should be check after reading the embark.el manual
 ** popper
 Popper is a minor-mode to tame the flood of ephemeral windows Emacs produces, while still keeping them within arm’s reach.
 #+begin_src elisp
-  (setup popper
-    (:option popper-reference-buffers '("\\*Messages\\*"
-                                        "Output\\*$"
-                                        "\\*Async Shell Command\\*"
-                                        "Go-Translate"
-                                        help-mode
-                                        helpful-mode
-                                        compilation-mode
-                                        youdao-dictionary-mode)
-             popper-window-height  (lambda (win)
-                                     (fit-window-to-buffer
-                                      win
-                                      (floor (frame-height) 2)))
-             )
-    (:global "C-~" popper-toggle-latest
-             "M-~" popper-cycle
-             "C-M-~" popper-toggle-type)
-    (popper-mode +1)
-    (popper-echo-mode +1)
-    (:messure-time))
+    (setup popper
+      (:option popper-reference-buffers '("\\*Messages\\*"
+                                          "Output\\*$"
+                                          "\\*Async Shell Command\\*"
+                                          "Go-Translate"
+                                          help-mode
+                                          helpful-mode
+                                          compilation-mode
+                                          youdao-dictionary-mode)
+               popper-window-height  (lambda (win)
+                                       (fit-window-to-buffer
+                                        win
+                                        (floor (frame-height) 2)))
+               )
+      (:global "C-~" popper-toggle-latest
+               "M-~" popper-cycle
+               "C-M-~" popper-toggle-type)
+      (popper-mode +1)
+      (popper-echo-mode +1)
+      )
 #+end_src
 ** Move
 *** avy
@@ -1241,6 +1240,71 @@ Highlight symbols with keymap-enabled overlays
 #+begin_src elisp
   (setup symbol-overlay
     (:autoload symbol-overlay-put))
+#+end_src
+*** grammatical-edit
+#+begin_src elisp
+  (setup grammatical-edit
+    (:bind "(" grammatical-edit-open-round
+           "[" grammatical-edit-open-bracket
+           "{" grammatical-edit-open-curly
+           ")" grammatical-edit-close-round
+           "]" grammatical-edit-close-bracket
+           "}" grammatical-edit-close-curly
+           ;; "=" grammatical-edit-equal
+           "%" grammatical-edit-match-paren
+           "\"" grammatical-edit-double-quote
+           "'" grammatical-edit-single-quote))
+
+  (dolist (hook (list
+                 'c-mode-common-hook
+                 'c-mode-hook
+                 'c++-mode-hook
+                 'java-mode-hook
+                 'haskell-mode-hook
+                 'emacs-lisp-mode-hook
+                 'lisp-interaction-mode-hook
+                 'lisp-mode-hook
+                 'maxima-mode-hook
+                 'ielm-mode-hook
+                 'sh-mode-hook
+                 'makefile-gmake-mode-hook
+                 'php-mode-hook
+                 'python-mode-hook
+                 'js-mode-hook
+                 'go-mode-hook
+                 'qml-mode-hook
+                 'jade-mode-hook
+                 'css-mode-hook
+                 'ruby-mode-hook
+                 'coffee-mode-hook
+                 'rust-mode-hook
+                 'qmake-mode-hook
+                 'lua-mode-hook
+                 'swift-mode-hook
+                 'minibuffer-inactive-mode-hook
+                 'typescript-mode-hook
+                 ))
+    (add-hook hook '(lambda () (grammatical-edit-mode 1))))
+
+  ;; (define-key grammatical-edit-mode-map (kbd "SPC") 'grammatical-edit-space)
+  ;; (define-key grammatical-edit-mode-map (kbd "RET") 'grammatical-edit-newline)
+
+  ;; (define-key grammatical-edit-mode-map (kbd "M-o") 'grammatical-edit-backward-delete)
+  ;; (define-key grammatical-edit-mode-map (kbd "C-d") 'grammatical-edit-forward-delete)
+  ;; (define-key grammatical-edit-mode-map (kbd "C-k") 'grammatical-edit-kill)
+
+  ;; (define-key grammatical-edit-mode-map (kbd "M-\"") 'grammatical-edit-wrap-double-quote)
+  ;; (define-key grammatical-edit-mode-map (kbd "M-'") 'grammatical-edit-wrap-single-quote)
+  ;; (define-key grammatical-edit-mode-map (kbd "M-[") 'grammatical-edit-wrap-bracket)
+  ;; (define-key grammatical-edit-mode-map (kbd "M-{") 'grammatical-edit-wrap-curly)
+  ;; (define-key grammatical-edit-mode-map (kbd "M-(") 'grammatical-edit-wrap-round)
+  ;; (define-key grammatical-edit-mode-map (kbd "M-)") 'grammatical-edit-unwrap)
+
+  ;; (define-key grammatical-edit-mode-map (kbd "M-p") 'grammatical-edit-jump-right)
+  ;; (define-key grammatical-edit-mode-map (kbd "M-n") 'grammatical-edit-jump-left)
+  ;; (define-key grammatical-edit-mode-map (kbd "M-:") 'grammatical-edit-jump-out-pair-and-newline)
+
+  ;; (define-key grammatical-edit-mode-map (kbd "C-j") 'grammatical-edit-jump-up)
 #+end_src
 *** eglot-ltex
 eglot client leveraging LTEX Language Server.

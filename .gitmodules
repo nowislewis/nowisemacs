@@ -175,6 +175,9 @@
 [submodule "go-translate"]
 	path = lib/go-translate
 	url = https://github.com/lorniu/go-translate.git
+[submodule "grammatical-edit"]
+	path = lib/grammatical-edit
+	url = https://github.com/manateelazycat/grammatical-edit
 [submodule "graphviz-dot-mode"]
 	path = lib/graphviz-dot-mode
 	url = https://github.com/ppareit/graphviz-dot-mode.git
