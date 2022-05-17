@@ -12,6 +12,21 @@
  |______|/|_____|/  \ |    |___|/   \|_____|\|___|/|_____|/ |___________|/  \|___||____|/
                      \|____|
 #+end_src
+* Contents                                                              :toc:
+- [[#introduction-to-nowisemacs][Introduction to nowisemacs]]
+  - [[#features][Features]]
+  - [[#how-to-use][How to use]]
+  - [[#how-to-customize][How to customize]]
+  - [[#ideas-behind-nowisemacs][Ideas behind nowisemacs]]
+- [[#things-you-must-know-before-going-deeper][Things you must know before going deeper]]
+  - [[#radical][Radical]]
+  - [[#sacrifice-for-simplicity][Sacrifice for simplicity]]
+  - [[#beginners-are-encouraged-to-access-package-website][Beginners are encouraged to access package website]]
+- [[#optinal-reading][Optinal reading]]
+  - [[#why-setup-instead-of-simpler-manual-configuration-or-full-blown-use-package][Why setup instead of simpler manual configuration or full-blown use-package?]]
+  - [[#how-to-become-a-proficient-user-in-emacs][How to become a proficient user in emacs]]
+- [[#related-great-solutions][Related great solutions]]
+
 * Introduction to nowisemacs
 Nowisemacs is a configuration framework for GNU Emacs that tends to be used in everyday scenarios with a wealth of
 features but on an easy-to-maintain

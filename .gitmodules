@@ -322,6 +322,9 @@
 [submodule "tabnine-capf"]
 	path = lib/tabnine-capf
 	url = https://github.com/50ways2sayhard/tabnine-capf
+[submodule "toc-org"]
+	path = lib/toc-org
+	url = https://github.com/snosov1/toc-org.git
 [submodule "tomelr"]
 	path = lib/tomelr
 	url = https://github.com/kaushalmodi/tomelr
