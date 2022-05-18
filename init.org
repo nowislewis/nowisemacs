@@ -489,53 +489,52 @@ I used to be a vim(evil) user, but now I use meow to manage all my keys.
 * UI
 ** Font
 #+begin_src elisp
-  (defun font-installed-p (font-name)
-    "Check if font with FONT-NAME is available."
-    (find-font (font-spec :name font-name)))
+    (defun font-installed-p (font-name)
+      "Check if font with FONT-NAME is available."
+      (find-font (font-spec :name font-name)))
 
-  (when (display-graphic-p)
-    ;; Set default font
-    (cl-loop for font in '(
-                           ;; "InconsolataGo QiHei NF"
-                           ;; "yaheiInconsolata"
-                           "JetBrainsMono Nerd Font"
-                           "JetBrains Mono"
-                           "Sarasa Mono SC Nerd"
-                           "Monaco"
-                           "Consolas")
-             when (font-installed-p font)
-             return (progn
-                      (set-face-attribute 'default nil :family font :height 140)
-                      (set-face-attribute 'fixed-pitch nil :family font :height 1.0)))
+    (when (display-graphic-p)
+      ;; Set default font
+      (cl-loop for font in '(
+                             ;; "InconsolataGo QiHei NF"
+                             ;; "yaheiInconsolata"
+                             "JetBrainsMono Nerd Font"
+                             "JetBrains Mono"
+                             "Sarasa Mono SC Nerd"
+                             "Monaco"
+                             "Consolas")
+               when (font-installed-p font)
+               return (progn
+                        (set-face-attribute 'default nil :family font :height 140)
+                        (set-face-attribute 'fixed-pitch nil :family font :height 1.0)))
 
-    ;; variable-pitch
-    (cl-loop for font in '("Noto Sans CJK SC" "Arial" "Helvetica" "Times New Roman")
-             when (font-installed-p font)
-             return (set-face-attribute 'variable-pitch nil :family font :height 1.0))
+      ;; variable-pitch
+      (cl-loop for font in '("Noto Sans CJK SC" "Arial" "Helvetica" "Times New Roman")
+               when (font-installed-p font)
+               return (set-face-attribute 'variable-pitch nil :family font :height 1.0))
 
-;; Specify font for all unicode characters
-    ;; (cl-loop for font in '("Symbola" "Symbol")
-    ;;          when (font-installed-p font)
-    ;;          return(set-fontset-font t 'unicode font nil 'prepend)))
+  ;; Specify font for all unicode characters
+      ;; (cl-loop for font in '("Symbola" "Symbol")
+      ;;          when (font-installed-p font)
+      ;;          return(set-fontset-font t 'unicode font nil 'prepend))
 
-    ;; ;; Specify font for Chinese characters
-    ;; (cl-loop for font in '("Noto Sans CJK SC" "Microsoft Yahei")
-    ;;          when (font-installed-p font)
-    ;;          return (set-fontset-font t '(#x4e00 . #x9fff) font))
-    )
+      ;; ;; Specify font for Chinese characters
+      ;; (cl-loop for font in '("Noto Sans CJK SC" "Microsoft Yahei")
+      ;;          when (font-installed-p font)
+      ;;          return (set-fontset-font t '(#x4e00 . #x9fff) font))
+      )
     #+end_src
 ** variable-pitch  and cn-en-fixed-pitch faces
 #+begin_src elisp
   (setup mixed-pitch
     (:hook-into text-mode)
     (:when-loaded
-      (delete 'org-table mixed-pitch-fixed-pitch-faces)))
-
-  ;; 英文等宽字体(无需中英文对齐)
-  ;; (dolist (fixed-en-face '(org-level-1
-  ;;                          ))
-  ;;   (add-to-list fixed-en-face mixed-pitch-fixed-pitch-faces))
-  ;;   (add-to-list line-number mixed-pitch-fixed-pitch-faces)
+      (delete 'org-table mixed-pitch-fixed-pitch-faces)
+      ;; 英文等宽字体(无需中英文对齐)
+      ;; (let ((fixed-en-face-list '(org-level-1)))
+      ;;   (setq mixed-pitch-fixed-pitch-faces (append mixed-pitch-fixed-pitch-faces fixed-en-face-list)))
+      )
+    )
 
   ;; 中英文严格等宽字体设置
   (with-eval-after-load 'org
@@ -544,7 +543,7 @@ I used to be a vim(evil) user, but now I use meow to manage all my keys.
 
 #+end_src
 ** variable-pitch faces
-Not enabled
+Not enabled, now use mixed-pitch
 #+begin_src elisp :tangle no
   ;; 非等宽字体设置
   (dolist (variable-face '(org-default))
