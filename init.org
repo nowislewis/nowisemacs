@@ -656,7 +656,7 @@ diff-hl-mode highlights uncommitted changes on the left side of the window (area
 
   (global-auto-revert-mode t)                  ; 当另一程序修改了文件时，让 Emacs 及时刷新 Buffer
   ;; (delete-selection-mode t)                    ; 选中文本后输入文本会替换文本（更符合我们习惯了的其它编辑器的逻辑）
-  ;; (global-hl-line-mode)
+  (global-hl-line-mode)
   (recentf-mode t)
   (blink-cursor-mode -1)                  ;指针不闪动
 #+end_src
@@ -1571,7 +1571,8 @@ eglot client leveraging LTEX Language Server.
   (setup org-modern
     (:option org-modern-list '((?+ . "➤")
                                (?- . "–")
-                               (?* . "•")))
+                               (?* . "•"))
+             org-modern-table nil)
     (:hook-into org-mode)
     (add-hook 'org-agenda-finalize-hook #'org-modern-agenda)
     )
