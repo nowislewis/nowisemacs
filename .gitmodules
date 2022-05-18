@@ -340,9 +340,6 @@
 [submodule "unicode-escape"]
 	path = lib/unicode-escape
 	url = https://github.com/kosh04/unicode-escape.el.git
-[submodule "valign"]
-	path = lib/valign
-	url = https://github.com/casouri/valign.git
 [submodule "vertico"]
 	path = lib/vertico
 	url = https://github.com/minad/vertico.git

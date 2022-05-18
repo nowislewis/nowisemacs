@@ -15,6 +15,8 @@
   - [[#which-key][which-key]]
 - [[#ui][UI]]
   - [[#font][Font]]
+  - [[#variable-pitch--and-cn-en-fixed-pitch-faces][variable-pitch  and cn-en-fixed-pitch faces]]
+  - [[#variable-pitch-faces][variable-pitch faces]]
   - [[#theme][Theme]]
   - [[#all-the-icons][all-the-icons]]
   - [[#rainbow-delimiters][rainbow-delimiters]]
@@ -73,7 +75,6 @@
 - [[#org-mode][Org Mode]]
   - [[#org-mode-1][org-mode]]
   - [[#org-modern][org-modern]]
-  - [[#valign][valign]]
   - [[#org-appear][org-appear]]
   - [[#org-download][org-download]]
   - [[#org-roam][org-roam]]
@@ -512,7 +513,7 @@ I used to be a vim(evil) user, but now I use meow to manage all my keys.
              when (font-installed-p font)
              return (set-face-attribute 'variable-pitch nil :family font :height 1.0))
 
-    ;; Specify font for all unicode characters
+;; Specify font for all unicode characters
     ;; (cl-loop for font in '("Symbola" "Symbol")
     ;;          when (font-installed-p font)
     ;;          return(set-fontset-font t 'unicode font nil 'prepend)))
@@ -522,14 +523,39 @@ I used to be a vim(evil) user, but now I use meow to manage all my keys.
     ;;          when (font-installed-p font)
     ;;          return (set-fontset-font t '(#x4e00 . #x9fff) font))
     )
-
-  ;; (set-face-attribute 'default nil :family "yaheiInconsolata" :height 140)
-
+    #+end_src
+** variable-pitch  and cn-en-fixed-pitch faces
+#+begin_src elisp
   (setup mixed-pitch
-    (:hook-into text-mode))
-  ;; 需要等宽的把face 添加到 mixed-pitch-fixed-pitch-faces
-#+end_src
+    (:hook-into text-mode)
+    (:when-loaded
+      (delete 'org-table mixed-pitch-fixed-pitch-faces)))
 
+  ;; 英文等宽字体(无需中英文对齐)
+  ;; (dolist (fixed-en-face '(org-level-1
+  ;;                          ))
+  ;;   (add-to-list fixed-en-face mixed-pitch-fixed-pitch-faces))
+  ;;   (add-to-list line-number mixed-pitch-fixed-pitch-faces)
+
+  ;; 中英文严格等宽字体设置
+  (with-eval-after-load 'org
+    (dolist (fixed-chinese-english-face '(org-table))
+      (set-face-attribute fixed-chinese-english-face nil :family "Sarasa Mono SC Nerd" :height 1.0)))
+
+#+end_src
+** variable-pitch faces
+Not enabled
+#+begin_src elisp :tangle no
+  ;; 非等宽字体设置
+  (dolist (variable-face '(org-default))
+    (set-face-attribute variable-face nil :inherit 'variable-pitch))
+  ;; 英文等宽字体(无需中英文对齐)
+  (dolist (variable-face '(org-level-1))
+    (set-face-attribute variable-face nil :inherit 'fixed-pitch))
+  ;; 中英文等宽字体设置
+  (dolist (fixed-chinese-english-face '(org-table))
+    (set-face-attribute fixed-chinese-english-face nil :family "Sarasa Mono SC Nerd" :height 1.0))
+#+end_src
 ** Theme
 Modus-themes is great especailly for org mode
 #+begin_src elisp
@@ -1575,13 +1601,6 @@ eglot client leveraging LTEX Language Server.
              org-modern-table nil)
     (:hook-into org-mode)
     (add-hook 'org-agenda-finalize-hook #'org-modern-agenda)
-    )
-#+end_src
-** valign
-#+begin_src elisp
-  (setup valign
-    (:hook-into org-mode)
-    (:option valign-max-table-size 10000)
     )
 #+end_src
 ** org-appear
