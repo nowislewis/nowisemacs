@@ -1352,6 +1352,7 @@ enable eglot in org-src mode
 **** consult-eglot
 #+begin_src elisp
   (setup consult-eglot
+    (:load-after eglot)
     (:with-map eglot-mode-map
       (:bind [remap xref-find-apropos] #'consult-eglot-symbols)))
 #+end_src
