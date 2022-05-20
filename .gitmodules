@@ -194,6 +194,9 @@
 [submodule "insert-translated-name"]
 	path = lib/insert-translated-name
 	url = https://github.com/manateelazycat/insert-translated-name
+[submodule "lib/eaf"]
+	path = lib/eaf
+	url = https://github.com/emacs-eaf/emacs-application-framework.git
 [submodule "libgit"]
 	path = lib/libgit
 	url = https://github.com/magit/libegit2.git
@@ -310,6 +313,9 @@
 [submodule "string-inflection"]
 	path = lib/string-inflection
 	url = https://github.com/akicho8/string-inflection.git
+[submodule "sudo-edit"]
+	path = lib/sudo-edit
+	url = https://github.com/nflath/sudo-edit.git
 [submodule "super-save"]
 	path = lib/super-save
 	url = https://github.com/bbatsov/super-save.git

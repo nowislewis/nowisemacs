@@ -100,6 +100,7 @@
   - [[#ojel-for-online-program-contest][oj.el for online program contest]]
   - [[#eaf][eaf]]
   - [[#gnus][gnus]]
+  - [[#proxy][proxy]]
   - [[#simulate-company-with-corfu][Simulate company with corfu]]
 
 * Startup config
@@ -119,6 +120,7 @@
 
   ;; (add-to-list 'default-frame-alist '(undecorated . t))
   ;; Faster to disable these here (before they've been initialized)
+  (push '(alpha-background . 85) default-frame-alist)
   (push '(menu-bar-lines . 0) default-frame-alist)
   (push '(tool-bar-lines . 0) default-frame-alist)
   (push '(vertical-scroll-bars) default-frame-alist)
@@ -565,8 +567,8 @@ Modus-themes is great especailly for org mode
              modus-themes-hl-line '(intense accented)
              modus-themes-paren-match '(intense bold underline)
              modus-themes-subtle-line-numbers t)
-    ;; (load-theme 'modus-vivendi))
-    (load-theme 'modus-operandi))
+    (load-theme 'modus-vivendi))
+    ;; (load-theme 'modus-operandi))
 #+end_src
 
 ** all-the-icons
@@ -2021,6 +2023,7 @@ I use corfu english helper instead of company-english-helper.
             "https://valdyas.org/fading/feed/"
             "https://manateelazycat.github.io/feed.xml")))
 #+end_src
+
 ** nov
 #+begin_src elisp
   (setup nov
@@ -2049,13 +2052,14 @@ Simple distraction-free editing. I use darkroom instead of writeroom because it'
 #+end_src
 ** eaf
 #+begin_src elisp :tangle no
-  (setup (:pkg eaf :host github :repo "emacs-eaf/emacs-application-framework" :files ("*.el"))
-    (:option eaf--mac-enable-rosetta t)
-    (add-to-list 'load-path "~/.emacs.d/straight/repos/emacs-application-framework")
+  (setup eaf
+    ;; (:option eaf--mac-enable-rosetta t)
+    (add-to-list 'load-path "~/.emacs.d/lib/eaf")
     (require 'eaf)
     )
 
   (setup eaf-browser
+    (require 'eaf-browser)
     (:autoload eaf-open-browser))
   (setup eaf-pdf-viewer
     (:autoload eaf-open-pdf-from-history))
@@ -2082,6 +2086,37 @@ Simple distraction-free editing. I use darkroom instead of writeroom because it'
   (setq smtpmail-smtp-server "smtp.gmail.com"
         smtpmail-smtp-service 587
         gnus-ignored-newsgroups "^to\\.\\|^[0-9. ]+\\( \\|$\\)\\|^[\"]\"[#'()]")
+#+end_src
+** proxy
+#+begin_src elisp
+  ;; Configure network proxy
+(setq my-proxy "socks://127.0.0.1:20170")
+  (defun show-proxy ()
+    "Show http/https proxy."
+    (interactive)
+    (if url-proxy-services
+        (message "Current proxy is \"%s\"" my-proxy)
+      (message "No proxy")))
+
+  (defun set-proxy ()
+    "Set http/https proxy."
+    (interactive)
+    (setq url-proxy-services `(("http" . ,my-proxy)
+                               ("https" . ,my-proxy)))
+    (show-proxy))
+
+  (defun unset-proxy ()
+    "Unset http/https proxy."
+    (interactive)
+    (setq url-proxy-services nil)
+    (show-proxy))
+
+  (defun toggle-proxy ()
+    "Toggle http/https proxy."
+    (interactive)
+    (if url-proxy-services
+        (unset-proxy)
+      (set-proxy)))
 #+end_src
 ** Simulate company with corfu
 Company is wide-used, but I use corfu for its simplity. So I add a simulation for some packages which use
