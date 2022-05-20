@@ -2051,15 +2051,12 @@ Simple distraction-free editing. I use darkroom instead of writeroom because it'
     (:option oj-default-online-judge 'codeforces))
 #+end_src
 ** eaf
-#+begin_src elisp :tangle no
+#+begin_src elisp
   (setup eaf
     ;; (:option eaf--mac-enable-rosetta t)
     (add-to-list 'load-path "~/.emacs.d/lib/eaf")
-    (require 'eaf)
-    )
-
+    (require 'eaf))
   (setup eaf-browser
-    (require 'eaf-browser)
     (:autoload eaf-open-browser))
   (setup eaf-pdf-viewer
     (:autoload eaf-open-pdf-from-history))
