@@ -760,23 +760,16 @@ diff-hl-mode highlights uncommitted changes on the left side of the window (area
   (setup consult
     (:with-map minibuffer-local-map
       (:bind "C-r" consult-history))
-    ;; Optionally configure the register formatting. This improves the register
-    ;; preview for `consult-register', `consult-register-load',
-    ;; `consult-register-store' and the Emacs built-ins.
     (setq register-preview-delay 0
           register-preview-function #'consult-register-format)
-    ;; Optionally replace `completing-read-multiple' with an enhanced version.
     (advice-add #'completing-read-multiple :override #'consult-completing-read-multiple)
-    ;; Use Consult to select xref locations with preview
     (setq xref-show-xrefs-function #'consult-xref
           xref-show-definitions-function #'consult-xref)
-    ;; Optionally configure a function which returns the project root directory.
-    ;; There are multiple reasonable alternatives to chose from.
-    ;;;; 1. project.el (project-root)
     (setq consult-project-root-function
           (lambda ()
             (when-let (project (project-current))
-              (car (project-roots project))))))
+              (car (project-roots project)))))
+    )
 #+end_src
 *** search other cwd
 #+begin_src elisp
@@ -2053,9 +2046,29 @@ Simple distraction-free editing. I use darkroom instead of writeroom because it'
 ** eaf
 #+begin_src elisp
   (setup eaf
-    ;; (:option eaf--mac-enable-rosetta t)
     (add-to-list 'load-path "~/.emacs.d/lib/eaf")
-    (require 'eaf))
+    (require 'eaf)
+    (:option eaf-browser-enable-autofill t)
+    ;; for consult preview
+    (:when-loaded
+    (add-to-list 'consult-buffer-sources 'consult--source-eaf-buffer)
+    (defvar consult--source-eaf-buffer
+      `(:name     "EAF Buffer"
+                  :narrow   ?e
+                  :category buffer
+                  :face     consult-buffer
+                  :history  buffer-name-history
+                  :state    ,#'consult--buffer-state
+                  :default  t
+                  :items
+                  ,(lambda ()
+                     (mapcar #'buffer-name
+                             (seq-filter
+                              (lambda (x)
+                                (eq (buffer-local-value 'major-mode x) 'eaf-mode))
+                              (buffer-list)))))
+      "EAF candidate source for `consult-buffer'."))
+    )
   (setup eaf-browser
     (:autoload eaf-open-browser))
   (setup eaf-pdf-viewer
