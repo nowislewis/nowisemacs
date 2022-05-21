@@ -615,7 +615,7 @@ diff-hl-mode highlights uncommitted changes on the left side of the window (area
     (:option doom-modeline-window-width-limit fill-column
              doom-modeline-height 20
              doom-modeline-hud t
-             doom-modeline-icon nil
+             ;; doom-modeline-icon nil
              doom-modeline-unicode-fallback t)
     (:hook-into after-init))
 #+end_src
@@ -2050,24 +2050,25 @@ Simple distraction-free editing. I use darkroom instead of writeroom because it'
     (require 'eaf)
     (:option eaf-browser-enable-autofill t)
     ;; for consult preview
-    (:when-loaded
-    (add-to-list 'consult-buffer-sources 'consult--source-eaf-buffer)
-    (defvar consult--source-eaf-buffer
-      `(:name     "EAF Buffer"
-                  :narrow   ?e
-                  :category buffer
-                  :face     consult-buffer
-                  :history  buffer-name-history
-                  :state    ,#'consult--buffer-state
-                  :default  t
-                  :items
-                  ,(lambda ()
-                     (mapcar #'buffer-name
-                             (seq-filter
-                              (lambda (x)
-                                (eq (buffer-local-value 'major-mode x) 'eaf-mode))
-                              (buffer-list)))))
-      "EAF candidate source for `consult-buffer'."))
+    (:with-feature consult
+      (:when-loaded
+        (add-to-list 'consult-buffer-sources 'consult--source-eaf-buffer)
+        (defvar consult--source-eaf-buffer
+          `(:name     "EAF Buffer"
+                      :narrow   ?e
+                      :category buffer
+                      :face     consult-buffer
+                      :history  buffer-name-history
+                      :state    ,#'consult--buffer-state
+                      :default  t
+                      :items
+                      ,(lambda ()
+                         (mapcar #'buffer-name
+                                 (seq-filter
+                                  (lambda (x)
+                                    (eq (buffer-local-value 'major-mode x) 'eaf-mode))
+                                  (buffer-list)))))
+          "EAF candidate source for `consult-buffer'.")))
     )
   (setup eaf-browser
     (:autoload eaf-open-browser))
@@ -2076,6 +2077,7 @@ Simple distraction-free editing. I use darkroom instead of writeroom because it'
   (setup eaf-rss-reader
     (:autoload eaf-open-rss-reader))
 #+end_src
+**
 ** gnus
 #+begin_src elisp :tangle ~/.gnus.el
   (setq user-full-name "yi liu"
