@@ -71,9 +71,6 @@
 [submodule "consult-yasnippet"]
 	path = lib/consult-yasnippet
 	url = https://github.com/mohkale/consult-yasnippet.git
-[submodule "copilot"]
-	path = lib/copilot
-	url = https://github.com/zerolfx/copilot.el
 [submodule "corfu"]
 	path = lib/corfu
 	url = https://github.com/minad/corfu.git
@@ -111,9 +108,6 @@
 [submodule "doom-modeline"]
 	path = lib/doom-modeline
 	url = https://github.com/seagle0128/doom-modeline.git
-[submodule "dtache"]
-	path = lib/dtache
-	url = https://github.com/emacsmirror/dtache.git
 [submodule "editorconfig"]
 	path = lib/editorconfig
 	url = https://github.com/editorconfig/editorconfig-emacs.git
@@ -218,9 +212,6 @@
 [submodule "mixed-pitch"]
 	path = lib/mixed-pitch
 	url = https://github.com/emacsmirror/mixed-pitch.git
-[submodule "names"]
-	path = lib/names
-	url = https://github.com/Malabarba/names.git
 [submodule "nov"]
 	path = lib/nov
 	url = https://depp.brause.cc/nov.el.git
@@ -325,9 +316,6 @@
 [submodule "tablist"]
 	path = lib/tablist
 	url = https://github.com/politza/tablist.git
-[submodule "tabnine-capf"]
-	path = lib/tabnine-capf
-	url = https://github.com/50ways2sayhard/tabnine-capf
 [submodule "toc-org"]
 	path = lib/toc-org
 	url = https://github.com/snosov1/toc-org.git
@@ -343,9 +331,6 @@
 [submodule "tree-sitter-langs"]
 	path = lib/tree-sitter-langs
 	url = https://github.com/emacs-tree-sitter/tree-sitter-langs.git
-[submodule "unicode-escape"]
-	path = lib/unicode-escape
-	url = https://github.com/kosh04/unicode-escape.el.git
 [submodule "vertico"]
 	path = lib/vertico
 	url = https://github.com/minad/vertico.git

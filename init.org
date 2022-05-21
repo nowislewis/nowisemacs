@@ -65,7 +65,6 @@
   - [[#aweshell][aweshell]]
   - [[#vterm][vterm]]
   - [[#vterm-toggle][vterm-toggle]]
-  - [[#dtache][dtache]]
 - [[#git][git]]
   - [[#magit][magit]]
   - [[#blamer][blamer]]
@@ -84,7 +83,6 @@
   - [[#org-noter][org-noter]]
   - [[#org-present][org-present]]
   - [[#org-citar][org-citar]]
-  - [[#xeft][xeft]]
   - [[#toc-org][toc-org]]
 - [[#翻译][翻译]]
   - [[#go-translate][go-translate]]
@@ -98,6 +96,7 @@
 - [[#tools][tools]]
   - [[#xwidget][xwidget]]
   - [[#ojel-for-online-program-contest][oj.el for online program contest]]
+  - [[#sudo-edit][sudo-edit]]
   - [[#eaf][eaf]]
   - [[#gnus][gnus]]
   - [[#proxy][proxy]]
@@ -724,8 +723,6 @@ diff-hl-mode highlights uncommitted changes on the left side of the window (area
   ;; 可以优化速度, 建议看一下官网的一篇文章
   (setup exec-path-from-shell
     (exec-path-from-shell-initialize))
-  ;; (when (memq window-system '(mac ns x))
-  ;;   (exec-path-from-shell-initialize)))
 #+end_src
 ** Undo
 *** vundo for undo history
@@ -819,11 +816,10 @@ should be check after reading the embark.el manual
     (setup corfu
       (:option corfu-cycle t                ;; Enable cycling for `corfu-next/previous'
                corfu-auto t                 ;; Enable auto completion
-               ;; (corfu-quit-at-boundary t)     ;; Automatically quit at word boundary
                corfu-quit-no-match t        ;; Automatically quit if there is no match
                corfu-preview-current nil    ;; Disable current candidate preview
                ;; corfu-echo-documentation nil ;; Disable documentation in the echo area
-               corfu-auto-prefix 2
+               corfu-auto-prefix 1
                corfu-auto-delay 0.01
                )
       (:with-map corfu-map
@@ -1149,58 +1145,6 @@ This is adapted from the extra font lock rules provided by Drew Adams' dired+ pa
     (:option vterm-toggle-hide-method 'reset-window-configration)
     (:global "C-`" vterm-toggle))
 #+end_src
-** dtache
-#+begin_src elisp
-  (setup dtache
-    (:if-system 'darwin)
-    (:with-function dtache-setup
-      (:hook-into after-init))
-    (:with-feature vterm
-      (:bind "<S-return>" #'dtache-vterm-send-input
-             "<C-return>" #'dtache-vterm-attach
-             "C-c C-d" #'dtache-vterm-detach))
-    (:when-loaded
-      (global-set-key (kbd "C-c e d") dtache-action-map)
-      ;; embark
-      ;; (defvar embark-dtache-map (make-composed-keymap dtache-action-map embark-general-map))
-      ;; (add-to-list 'embark-keymap-alist '(dtache . embark-dtache-map))
-      ;; vterm
-      (defun dtache-vterm-send-input (&optional detach)
-        "Create a `dtache' session."
-        (interactive)
-        (vterm-send-C-a)
-        (let* ((input (buffer-substring-no-properties (point) (vterm-end-of-line)))
-               (dtache-session-origin 'vterm)
-               (dtache-session-action
-                '(:attach dtache-shell-command-attach-session
-                          :view dtache-view-dwim
-                          :run dtache-shell-command))
-               (dtache-session-mode
-                (if detach 'create 'create-and-attach)))
-          (vterm-send-C-k)
-          (process-send-string vterm--process (dtache-dtach-command input t))
-          (vterm-send-C-e)
-          (vterm-send-return)))
-
-      (defun dtache-vterm-attach (session)
-        "Attach to an active `dtache' session."
-        (interactive
-         (list
-          (let* ((host-name (car (dtache--host)))
-                 (sessions
-                  (thread-last (dtache-get-sessions)
-                               (seq-filter (lambda (it)
-                                             (string= (car (dtache--session-host it)) host-name)))
-                               (seq-filter (lambda (it) (eq 'active (dtache--determine-session-state it)))))))
-            (dtache-completing-read sessions))))
-        (let ((dtache-session-mode 'attach))
-          (process-send-string vterm--process (dtache-dtach-command session t))
-          (vterm-send-return)))
-      (defun dtache-vterm-detach ()
-        "Detach from a `dtache' session."
-        (interactive)
-        (process-send-string vterm--process dtache--dtach-detach-character))))
-#+end_src
 * git
 ** magit
 #+begin_src elisp
@@ -1459,21 +1403,6 @@ eglot client leveraging LTEX Language Server.
     )
   (setup realgud-lldb
     (:autoload realgud--lldb))
-#+end_src
-*** format-all
-#+begin_src elisp :tangle no
-  (setup inheritenv)
-  (setup language-id)
-  (setup format-all)
-#+end_src
-*** tabnine-capf
-#+begin_src elisp :tangle no
-  (setup names)
-  (setup unicode-escape)
-  (setup tabnine-capf
-    (:load-after cape)
-    (add-hook 'kill-emacs-hook #'tabnine-capf-kill-process)
-    (add-to-list 'completion-at-point-functions #'tabnine-completion-at-point))
 #+end_src
 * Org Mode
 ** org-mode
@@ -1934,14 +1863,6 @@ among all the files in org-roam in a single agenda-view. The code was borrowed f
 
 #+end_src
 
-** xeft
-#+begin_src elisp :tangle no
-  (setup xeft
-    (:option xeft-directory "~/Documents/emacs/orgmode/roam"
-             xeft-database "~/.emacs.d/.xeft/db"
-             xeft-recursive t
-             xeft-default-extension "org"))
-#+end_src
 ** toc-org
 #+begin_src elisp
   (setup toc-org
@@ -2042,39 +1963,45 @@ Simple distraction-free editing. I use darkroom instead of writeroom because it'
   (setup oj
     (:option oj-default-online-judge 'codeforces))
 #+end_src
+** sudo-edit
+#+begin_src elisp
+(setup sudo-edit)
+#+end_src
 ** eaf
 #+begin_src elisp
-  (setup eaf
-    (add-to-list 'load-path "~/.emacs.d/lib/eaf")
-    (require 'eaf)
-    (:option eaf-browser-enable-autofill t)
-    ;; for consult preview
-    (:with-feature consult
-      (:when-loaded
-        (add-to-list 'consult-buffer-sources 'consult--source-eaf-buffer)
-        (defvar consult--source-eaf-buffer
-          `(:name     "EAF Buffer"
-                      :narrow   ?e
-                      :category buffer
-                      :face     consult-buffer
-                      :history  buffer-name-history
-                      :state    ,#'consult--buffer-state
-                      :default  t
-                      :items
-                      ,(lambda ()
-                         (mapcar #'buffer-name
-                                 (seq-filter
-                                  (lambda (x)
-                                    (eq (buffer-local-value 'major-mode x) 'eaf-mode))
-                                  (buffer-list)))))
-          "EAF candidate source for `consult-buffer'.")))
-    )
-  (setup eaf-browser
-    (:autoload eaf-open-browser))
-  (setup eaf-pdf-viewer
-    (:autoload eaf-open-pdf-from-history))
-  (setup eaf-rss-reader
-    (:autoload eaf-open-rss-reader))
+    (setup eaf
+      (add-to-list 'load-path "~/.emacs.d/lib/eaf")
+      (require 'eaf)
+      (:option eaf-browser-enable-autofill t
+               eaf-webengine-font-family "Noto Sans CJK SC"
+               eaf-webengine-fixed-font-family "JetBrainsMono Nerd Font")
+      ;; for consult preview
+      (:with-feature consult
+        (:when-loaded
+          (add-to-list 'consult-buffer-sources 'consult--source-eaf-buffer)
+          (defvar consult--source-eaf-buffer
+            `(:name     "EAF Buffer"
+                        :narrow   ?e
+                        :category buffer
+                        :face     consult-buffer
+                        :history  buffer-name-history
+                        :state    ,#'consult--buffer-state
+                        :default  t
+                        :items
+                        ,(lambda ()
+                           (mapcar #'buffer-name
+                                   (seq-filter
+                                    (lambda (x)
+                                      (eq (buffer-local-value 'major-mode x) 'eaf-mode))
+                                    (buffer-list)))))
+            "EAF candidate source for `consult-buffer'.")))
+      )
+    (setup eaf-browser
+      (:autoload eaf-open-browser))
+    (setup eaf-pdf-viewer
+      (:autoload eaf-open-pdf-from-history))
+    (setup eaf-rss-reader
+      (:autoload eaf-open-rss-reader))
 #+end_src
 ** gnus
 #+begin_src elisp :tangle ~/.gnus.el
