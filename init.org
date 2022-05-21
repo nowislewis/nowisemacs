@@ -1055,8 +1055,8 @@ borrowed from citre, now you can always jump-back use "M-,"
   (setup pyim
     (:option pyim-dicts '((:name "lewis_pyim_dict" :file "~/Documents/emacs/other-files/lewis_pyim_dict.pyim")
                           (:name "lewis_big_dict" :file "~/Documents/emacs/other-files/pyim-bigdict.pyim.gz"))
-             pyim-default-scheme 'xiaohe-shuangpin
-             ;; pyim-default-scheme 'quanpin
+             ;; pyim-default-scheme 'xiaohe-shuangpin
+             pyim-default-scheme 'quanpin
              pyim-cloudim 'baidu
              pyim-punctuation-translate-p '(no yes auto)
              pyim-page-tooltip 'posframe
@@ -1085,7 +1085,6 @@ borrowed from citre, now you can always jump-back use "M-,"
       (advice-add 'orderless-regexp :around #'my-orderless-regexp)
       )
     (setq default-input-method "pyim"))
-  ;;
 #+end_src
 * File and Browsing
 ** file browsing
@@ -2077,7 +2076,6 @@ Simple distraction-free editing. I use darkroom instead of writeroom because it'
   (setup eaf-rss-reader
     (:autoload eaf-open-rss-reader))
 #+end_src
-**
 ** gnus
 #+begin_src elisp :tangle ~/.gnus.el
   (setq user-full-name "yi liu"
