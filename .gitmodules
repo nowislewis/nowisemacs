@@ -1,9 +1,6 @@
 [submodule "ace-window"]
 	path = lib/ace-window
 	url = https://github.com/abo-abo/ace-window.git
-[submodule "ag"]
-	path = lib/ag
-	url = https://github.com/Wilfred/ag.el.git
 [submodule "all-the-icons"]
 	path = lib/all-the-icons
 	url = https://github.com/domtronn/all-the-icons.el.git
