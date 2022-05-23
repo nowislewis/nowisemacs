@@ -78,7 +78,6 @@
   - [[#org-download][org-download]]
   - [[#org-roam][org-roam]]
   - [[#ox-hugo][ox-hugo]]
-  - [[#org-elp-for-latex-live-preview][org-elp for latex live preview]]
   - [[#org-clock][org-clock]]
   - [[#org-noter][org-noter]]
   - [[#org-present][org-present]]
@@ -183,6 +182,7 @@ The following content is not enabled yet, because I want to minimize unnecessary
 I use borg to manage packages, so setup.el is only used to config packages quickly, I write several macros in =noisemacs-base=. It should be noticed that if you use only a =init.el= file, all the funcs or macros defined in =init.el= can't pass native comp, so move these things that you defined yourself to a seperate repo(nowisemacs-base) will resolve this problem.
 #+begin_src elisp
   (require 'nowisemacs-base)
+  (setup epkg)
 #+end_src
 * gcmh
 Enforce a sneaky Garbage Collection strategy to minimize GC interference with user activity.
@@ -532,9 +532,6 @@ I used to be a vim(evil) user, but now I use meow to manage all my keys.
     (:hook-into text-mode)
     (:when-loaded
       (delete 'org-table mixed-pitch-fixed-pitch-faces)
-      ;; 英文等宽字体(无需中英文对齐)
-      ;; (let ((fixed-en-face-list '(org-level-1)))
-      ;;   (setq mixed-pitch-fixed-pitch-faces (append mixed-pitch-fixed-pitch-faces fixed-en-face-list)))
       )
     )
 
@@ -813,49 +810,46 @@ should be check after reading the embark.el manual
 #+end_src
 ** corfu(instead of company)
 #+begin_src elisp
-    (setup corfu
-      (:option corfu-cycle t                ;; Enable cycling for `corfu-next/previous'
-               corfu-auto t                 ;; Enable auto completion
-               corfu-quit-no-match t        ;; Automatically quit if there is no match
-               corfu-preview-current nil    ;; Disable current candidate preview
-               ;; corfu-echo-documentation nil ;; Disable documentation in the echo area
-               corfu-auto-prefix 1
-               corfu-auto-delay 0.01
-               )
-      (:with-map corfu-map
-        (:bind
-         ;; [tab] corfu-next
-         ;;       [backtab] corfu-previous
-         "<escape>" corfu-quit))
-      (global-corfu-mode)
+  (setup corfu
+    (:option corfu-cycle t                ;; Enable cycling for `corfu-next/previous'
+             corfu-auto t                 ;; Enable auto completion
+             corfu-quit-no-match t        ;; Automatically quit if there is no match
+             corfu-preview-current nil    ;; Disable current candidate preview
+             ;; corfu-echo-documentation nil ;; Disable documentation in the echo area
+             corfu-auto-prefix 1
+             corfu-auto-delay 0.01
+             )
+    (:with-map corfu-map
+      (:bind
+       ;; [tab] corfu-next
+       ;;       [backtab] corfu-previous
+       "<escape>" corfu-quit))
+    (global-corfu-mode)
+    )
 
-      (require 'corfu-history)
-      (corfu-history-mode)
-      )
+  (defun corfu-enable-always-in-minibuffer ()
+    "Enable Corfu in the minibuffer if Vertico/Mct are not active."
+    (unless (or (bound-and-true-p mct--active)
+                (bound-and-true-p vertico--input))
+      ;; (setq-local corfu-auto nil) Enable/disable auto completion
+      (corfu-mode 1)))
+  (add-hook 'minibuffer-setup-hook #'corfu-enable-always-in-minibuffer 1)
+  ;; corfu backend
+  (setup cape
+    (add-to-list 'completion-at-point-functions #'cape-file)
+    ;; (add-to-list 'completion-at-point-functions #'cape-tex)
+    (add-to-list 'completion-at-point-functions #'cape-dabbrev)
+    ;; (add-to-list 'completion-at-point-functions #'cape-keyword)
+    )
+  ;; Enable Corfu completion UI
+  (setup corfu-doc
+    (:hook-into corfu-mode))
 
-    (defun corfu-enable-always-in-minibuffer ()
-      "Enable Corfu in the minibuffer if Vertico/Mct are not active."
-      (unless (or (bound-and-true-p mct--active)
-                  (bound-and-true-p vertico--input))
-        ;; (setq-local corfu-auto nil) Enable/disable auto completion
-        (corfu-mode 1)))
-    (add-hook 'minibuffer-setup-hook #'corfu-enable-always-in-minibuffer 1)
-    ;; corfu backend
-    (setup cape
-      (add-to-list 'completion-at-point-functions #'cape-file)
-      ;; (add-to-list 'completion-at-point-functions #'cape-tex)
-      (add-to-list 'completion-at-point-functions #'cape-dabbrev)
-      ;; (add-to-list 'completion-at-point-functions #'cape-keyword)
-      )
-    ;; Enable Corfu completion UI
-    (setup corfu-doc
-      (:hook-into corfu-mode))
-
-    ;; (setup svg-lib) ;; built-in has little icons
-    ;; (setup kind-icon
-    ;;   (:load-after corfu)
-    ;;   (:option kind-icon-default-face 'corfu-default) ; to compute blended backgrounds correctly
-    ;;   (add-to-list 'corfu-margin-formatters #'kind-icon-margin-formatter))
+  ;; (setup svg-lib) ;; built-in has little icons
+  ;; (setup kind-icon
+  ;;   (:load-after corfu)
+  ;;   (:option kind-icon-default-face 'corfu-default) ; to compute blended backgrounds correctly
+  ;;   (add-to-list 'corfu-margin-formatters #'kind-icon-margin-formatter))
 #+end_src
 ** corfu-all-the-icons
 #+begin_src elisp
@@ -1088,23 +1082,14 @@ borrowed from citre, now you can always jump-back use "M-,"
 Dirvish is a minimalistic file manager based on Dired. It's fast
 #+begin_src elisp
   (setup dirvish
-    (:option dirvish-attributes '(expanded-state all-the-icons file-size)))
+    (:option dirvish-attributes '(expanded-state all-the-icons file-size))
+    (:bind "TAB" dirvish-toggle-subtree))
 #+end_src
 *** diredfl
 This is adapted from the extra font lock rules provided by Drew Adams' dired+ package, but published via a modern means, and with support for older Emacsen removed.
 #+begin_src elisp
   (setup diredfl
     (:hook-into dired-mode))
-#+end_src
-*** dired-subtree
-#+begin_src elisp
-  ;; this is in dired-hacks
-  (setup dired-subtree
-    (:load-after dired)
-    (:option dired-subtree-line-prefix "   "
-             dired-subtree-cycle-depth 1)
-    (:with-map dired-mode-map
-      (:bind "TAB" dired-subtree-cycle)))
 #+end_src
 ** structure browsing
 *** imenu-list
@@ -1210,10 +1195,6 @@ Emacs major-mode to work with Beancount ledger files
         (exec-path-from-shell-copy-env "PYTHONPATH"))
       ))
 #+end_src
-*** cpp
-#+begin_src elisp
-  (setup cmake-mode)
-#+end_src
 *** scheme
 #+begin_src elisp
   (setup geiser)
@@ -1230,7 +1211,7 @@ Emacs major-mode to work with Beancount ledger files
   (setup tree-sitter
     (:hook-into c-mode-common python-mode)
     (:hook tree-sitter-hl-mode))
-  ;; (setup tree-sitter-langs)
+  (setup tree-sitter-langs)
 #+end_src
 *** lsp mode
 **** eglot
@@ -1248,7 +1229,8 @@ Emacs major-mode to work with Beancount ledger files
   ;; (setq xref-search-program 'ripgrep)
   (setq read-process-output-max (* 1024 1024))
   (setup eglot
-    (:option eglot-workspace-configuration '((:python.analysis :useLibraryCodeForTypes t))))
+    (:option eglot-events-buffer-size 0
+             eglot-workspace-configuration '((:python.analysis :useLibraryCodeForTypes t))))
   (setup eldoc
     (:option eldoc-echo-area-use-multiline-p t
              eldoc-echo-area-display-truncation-message nil))
@@ -1283,7 +1265,7 @@ enable eglot in org-src mode
                   (format "Prepare local buffer environment for org source block (%s)."
                           (upcase ,lang))))))))
   (defvar org-babel-lang-list
-    '("python" "C++" "C" "scheme" "elisp"))
+    '("python" "C++" "C"))
   (dolist (lang org-babel-lang-list)
     (eval `(lsp-org-babel-enable ,lang)))
 #+end_src
@@ -1522,7 +1504,6 @@ eglot client leveraging LTEX Language Server.
 #+end_src
 ** org-modern
 #+begin_src elisp
-  ;; Enable org-modern-mode
   (setup org-modern
     (:option org-modern-list '((?+ . "➤")
                                (?- . "–")
@@ -1807,14 +1788,9 @@ among all the files in org-roam in a single agenda-view. The code was borrowed f
 #+end_src
 ** ox-hugo
 #+begin_src elisp
+  (setup tomelr)
   (setup ox-hugo
     (:load-after ox))
-#+end_src
-** org-elp for latex live preview
-#+begin_src elisp :tangle no
-  (setup org-elp
-    (:option org-elp-idle-time 0.5
-             org-elp-split-fraction 0.25))
 #+end_src
 ** org-clock
 *** org-pomodoro
@@ -1936,9 +1912,9 @@ I use corfu english helper instead of company-english-helper.
             "https://valdyas.org/fading/feed/"
             "https://manateelazycat.github.io/feed.xml")))
 #+end_src
-
 ** nov
 #+begin_src elisp
+  (setup esxml)
   (setup nov
     (:file-match "\\.epub\\'"))
 #+end_src

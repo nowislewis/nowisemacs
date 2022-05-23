@@ -74,8 +74,6 @@
 [submodule "corfu"]
 	path = lib/corfu
 	url = https://github.com/minad/corfu.git
-    load-path = .
-    load-path = extensions
 [submodule "corfu-doc"]
 	path = lib/corfu-doc
 	url = https://github.com/galeo/corfu-doc.git
@@ -94,9 +92,6 @@
 [submodule "diff-hl"]
 	path = lib/diff-hl
 	url = https://github.com/dgutov/diff-hl.git
-[submodule "dired-hacks"]
-	path = lib/dired-hacks
-	url = https://github.com/Fuco1/dired-hacks.git
 [submodule "diredfl"]
 	path = lib/diredfl
 	url = https://github.com/purcell/diredfl.git
@@ -117,9 +112,6 @@
 [submodule "eglot-ltex"]
 	path = lib/eglot-ltex
 	url = https://github.com/emacs-languagetool/eglot-ltex
-[submodule "eimp"]
-	path = lib/eimp
-	url = https://github.com/nicferrier/eimp.git
 [submodule "eldoc-box"]
 	path = lib/eldoc-box
 	url = https://github.com/casouri/eldoc-box.git
@@ -295,9 +287,6 @@
 [submodule "simple-httpd"]
 	path = lib/simple-httpd
 	url = https://github.com/skeeto/emacs-web-server.git
-[submodule "spinner"]
-	path = lib/spinner
-	url = https://github.com/Malabarba/spinner.el.git
 [submodule "sqlite3"]
 	path = lib/sqlite3
 	url = https://github.com/pekingduck/emacs-sqlite3-api.git
@@ -321,7 +310,7 @@
 	url = https://github.com/snosov1/toc-org.git
 [submodule "tomelr"]
 	path = lib/tomelr
-	url = https://github.com/kaushalmodi/tomelr
+	url = https://github.com/kaushalmodi/tomelr.git
 [submodule "tree-sitter"]
 	path = lib/tree-sitter
 	url = https://github.com/emacs-tree-sitter/elisp-tree-sitter.git
