@@ -68,6 +68,7 @@
 - [[#git][git]]
   - [[#magit][magit]]
   - [[#blamer][blamer]]
+  - [[#ediff][ediff]]
 - [[#program][Program]]
   - [[#language][Language]]
   - [[#useful-programing-tools][Useful programing tools]]
@@ -128,7 +129,7 @@
         package--init-file-ensured t
         inhibit-startup-message t             ; 关闭启动 Emacs 时的欢迎界面
         )
-  ;; (pixel-scroll-precision-mode t) ;; 最近发现和 pdf-view-mode 工作不协调
+  (pixel-scroll-precision-mode t) ;; 最近发现和 pdf-view-mode 工作不协调
 #+end_src
 ** generic
 #+begin_src elisp
@@ -559,7 +560,8 @@ Modus-themes is great especailly for org mode
 #+begin_src elisp
   (setup modus-themes
     (:option modus-themes-org-blocks 'tinted-background
-             modus-themes-mode-line '(3d)
+             ;; modus-themes-mode-line '(3d)
+             modus-themes-mode-line '(3d accented)
              modus-themes-hl-line '(intense accented)
              modus-themes-paren-match '(intense bold underline)
              modus-themes-subtle-line-numbers t)
@@ -599,7 +601,8 @@ diff-hl-mode highlights uncommitted changes on the left side of the window (area
                                (bookmarks . 5)
                                ;; (projects . 5)
                                )
-             ;; dashboard-set-heading-icons t
+             dashboard-set-heading-icons t
+             dashboard-set-file-icons t
              dashboard-center-content t
              dashboard-startup-banner "~/.emacs.d/etc/banner.txt"
              dashboard-set-init-info t)
@@ -1142,6 +1145,27 @@ Show git blame info about current line
     (:option blamer-idle-time 0.3
              blamer-min-offset 70))
 #+end_src
+** ediff
+#+begin_src elisp
+  (setup ediff
+    (:option ediff-split-window-function 'split-window-horizontally
+             ediff-window-setup-function 'ediff-setup-windows-plain)
+    ;; restore windows Configuration after ediff
+    (add-hook 'ediff-before-setup-hook #'ediff-save-window-conf)
+    (add-hook 'ediff-quit-hook #'ediff-restore-window-conf)
+    (:when-loaded
+      (defvar local-ediff-saved-window-conf nil)
+
+      (defun ediff-save-window-conf ()
+        (setq local-ediff-saved-window-conf (current-window-configuration)))
+
+      (defun ediff-restore-window-conf ()
+        (when (window-configuration-p local-ediff-saved-window-conf)
+          (set-window-configuration local-ediff-saved-window-conf)))
+      )
+    )
+
+#+end_src
 * Program
 ** Language
 *** elisp
@@ -1199,6 +1223,15 @@ Emacs major-mode to work with Beancount ledger files
 #+begin_src elisp
   (setup geiser)
   (setup geiser-guile)
+#+end_src
+*** cc-mode
+#+begin_src emacs-lisp
+  (setup cc-mode)
+  (setup hideif
+    (:option hide-ifdef-shadow t
+             hide-ifdef-initially t)
+    (:with-feature hide-ifdef-mode
+      (:hook-into c-mode c++-mode)))
 #+end_src
 ** Useful programing tools
 *** quickrun
