@@ -149,12 +149,6 @@
 [submodule "gcmh"]
 	path = lib/gcmh
 	url = https://github.com/emacsmirror/gcmh.git
-[submodule "geiser"]
-	path = lib/geiser
-	url = https://github.com/emacsmirror/geiser.git
-[submodule "geiser-guile"]
-	path = lib/geiser-guile
-	url = https://github.com/emacsmirror/guile.git
 [submodule "go-translate"]
 	path = lib/go-translate
 	url = https://github.com/lorniu/go-translate.git
@@ -280,7 +274,7 @@
 	url = https://github.com/phikal/setup.el
 [submodule "shrink-path"]
 	path = lib/shrink-path
-	url = https://github.com/emacsmirror/shrink-path.el.git
+	url = https://gitlab.com/bennya/shrink-path.el.git
 [submodule "simple-httpd"]
 	path = lib/simple-httpd
 	url = https://github.com/skeeto/emacs-web-server.git

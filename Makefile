@@ -13,8 +13,8 @@ update:
 	./etc/update_submodule.sh
 # 初始化下载，更新到 .gitmodules 中指定的 commit
 init:
-	git submodule update --init --depth=1
-
+	@git submodule update --init
+	@git submodule foreach git reset --hard
 # 修改 .gitmodules 后
 sync:
 	git submodule sync
