@@ -10,7 +10,7 @@ bootstrap-borg:
 clean-init: tangle-init
 # 更新到 remote 最新 commit
 update:
-	./etc/update_submodule.sh
+	./useful-tools/update_submodule.sh
 # 初始化下载，更新到 .gitmodules 中指定的 commit
 init:
 	@git submodule update --init

@@ -30,6 +30,8 @@
   - [[#simple][simple]]
   - [[#general-modes][general modes]]
   - [[#backup-super-save][backup, super-save]]
+  - [[#no-littering][no-littering]]
+  - [[#recentf][recentf]]
   - [[#自动换行][自动换行]]
   - [[#so-long][so-long]]
   - [[#tramp][TRAMP]]
@@ -605,7 +607,7 @@ diff-hl-mode highlights uncommitted changes on the left side of the window (area
              dashboard-set-heading-icons t
              dashboard-set-file-icons t
              dashboard-center-content t
-             dashboard-startup-banner "~/.emacs.d/etc/banner.txt"
+             dashboard-startup-banner (concat nowisemacs-config-useful-tools "banner.txt")
              dashboard-set-init-info t)
     (dashboard-setup-startup-hook))
 #+end_src
@@ -685,7 +687,6 @@ diff-hl-mode highlights uncommitted changes on the left side of the window (area
   (global-auto-revert-mode t)                  ; 当另一程序修改了文件时，让 Emacs 及时刷新 Buffer
   ;; (delete-selection-mode t)                    ; 选中文本后输入文本会替换文本（更符合我们习惯了的其它编辑器的逻辑）
   (global-hl-line-mode)
-  (recentf-mode t)
   (blink-cursor-mode -1)                  ;指针不闪动
 #+end_src
 ** backup, super-save
@@ -696,6 +697,20 @@ diff-hl-mode highlights uncommitted changes on the left side of the window (area
   (setup super-save
     (super-save-mode 1)
     (setq super-save-auto-save-when-idle t))
+#+end_src
+** no-littering
+#+begin_src lisp
+    (setup no-littering)
+#+end_src
+** recentf
+#+begin_src elisp
+  (setup recentf
+    (:also-load no-littering)
+    (:option recentf-max-saved-items 1000
+             recentf-exclude `("/tmp/" "/ssh:" ,(concat user-emacs-directory "lib/.*-autoloads\\.el\\'")))
+    (add-to-list 'recentf-exclude no-littering-var-directory)
+    (add-to-list 'recentf-exclude no-littering-etc-directory)
+    (recentf-mode))
 #+end_src
 ** 自动换行
 #+begin_src elisp
@@ -957,7 +972,7 @@ should be check after reading the embark.el manual
 ** yasnippet
 #+begin_src elisp
   (setup yasnippet
-    (:option yas-snippet-dirs '("~/.emacs.d/etc/snippets"))
+    (:option yas-snippet-dirs (list (concat nowisemacs-config-useful-tools "snippets")))
     (yas-global-mode 1))
   ;;(setup yasnippet-snippets)
 #+end_src
