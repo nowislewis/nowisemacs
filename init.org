@@ -1114,7 +1114,7 @@ borrowed from citre, now you can always jump-back use "M-,"
 Dirvish is a minimalistic file manager based on Dired. It's fast
 #+begin_src elisp
   (setup dirvish
-    (:option dirvish-attributes '(expanded-state all-the-icons file-size))
+    (:option dirvish-attributes '(subtree-state all-the-icons file-size))
     (:bind "TAB" dirvish-toggle-subtree))
 #+end_src
 *** diredfl
