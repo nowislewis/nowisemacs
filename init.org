@@ -1612,14 +1612,14 @@ eglot client leveraging LTEX Language Server.
       ;; Codes blow are used to general a hierachy for title nodes that under a file
       (cl-defmethod org-roam-node-doom-filetitle ((node org-roam-node))
         "Return the value of \"#+title:\" (if any) from file that NODE resides in.
-      If there's no file-level title in the file, return empty string."
+       If there's no file-level title in the file, return empty string."
         (or (if (= (org-roam-node-level node) 0)
                 (org-roam-node-title node)
               (org-roam-get-keyword "TITLE" (org-roam-node-file node)))
             ""))
       (cl-defmethod org-roam-node-doom-hierarchy ((node org-roam-node))
         "Return hierarchy for NODE, constructed of its file title, OLP and direct title.
-        If some elements are missing, they will be stripped out."
+         If some elements are missing, they will be stripped out."
         (let ((title     (org-roam-node-title node))
               (olp       (org-roam-node-olp   node))
               (level     (org-roam-node-level node))
@@ -1654,14 +1654,13 @@ eglot client leveraging LTEX Language Server.
                      (window-parameters . ((no-other-window . t)
                                            (no-delete-other-windows . t)))))
       (org-roam-buffer-toggle)
+
+      ;; Every Zettel is a Draft until Declared Otherwise
+      (add-hook 'org-roam-capture-new-node-hook (lambda()
+                                                  (org-roam-tag-add '("draft"))))
       ))
 #+end_src
-*** Every Zettel is a Draft until Declared Otherwise
-#+begin_src elisp
-  (defun lewis/tag-new-node-as-draft ()
-    (org-roam-tag-add '("draft")))
-  (add-hook 'org-roam-capture-new-node-hook #'lewis/tag-new-node-as-draft)
-#+end_src
+
 *** org-roam-ui
 #+begin_src elisp
   ;; (setup (:pkg websocket))
@@ -1671,7 +1670,7 @@ eglot client leveraging LTEX Language Server.
 *** org-roam-agenda
 The main purpose for this section is to add every node that has a "TODO" into org-agenda, so I can see all the "TODO"s
 among all the files in org-roam in a single agenda-view. The code was borrowed from vulpea.
-#+begin_src elisp :tangle no
+#+begin_src elisp
   (defun vulpea-project-p ()
   "Return non-nil if current buffer has any todo entry.
 
@@ -1821,6 +1820,7 @@ If nil it defaults to `split-string-default-separators', normally
                              (point-max) t)
       (replace-match ""))))
 #+end_src
+
 *** consult-org-roam
 #+begin_src elisp
   (setup consult-org-roam
@@ -1864,6 +1864,8 @@ If nil it defaults to `split-string-default-separators', normally
   ;; borrowed from https://jethrokuan.github.io/org-roam-guide/ as a method for insert notes for reference
   (defun lewis/org-roam-node-from-cite (keys-entries)
     (interactive (list (citar-select-ref :multiple nil :rebuild-cache t)))
+    (if (not (featurep 'citar))
+        (require 'citar))
     (let ((title (citar--format-entry-no-widths (cdr keys-entries)
                                                 "${author editor}::${title}")))
       (org-roam-capture- :templates
@@ -1909,8 +1911,8 @@ If nil it defaults to `split-string-default-separators', normally
 ** insert-translated-name
 #+begin_src elisp
   (setup insert-translated-name
-    (:autoload insert-translated-name-insert)
-    (:autoload insert-translated-name-replace))
+    (:autoload insert-translated-name-insert
+               insert-translated-name-replace))
 #+end_src
 ** corfu-english-helper
 I use corfu english helper instead of company-english-helper.
