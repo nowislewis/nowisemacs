@@ -257,9 +257,9 @@
 [submodule "pyim"]
 	path = lib/pyim
 	url = https://github.com/tumashu/pyim.git
-[submodule "pyim-basedict"]
-	path = lib/pyim-basedict
-	url = https://github.com/tumashu/pyim-basedict.git
+[submodule "pyim-tsinghua-dict"]
+	path = lib/pyim-tsinghua-dict
+	url = https://github.com/tumashu/pyim-tsinghua-dict.git
 [submodule "queue"]
 	path = lib/queue
 	url = https://github.com/emacsmirror/queue.git

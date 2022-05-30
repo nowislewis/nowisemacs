@@ -1069,10 +1069,10 @@ borrowed from citre, now you can always jump-back use "M-,"
 ** pyim
 #+begin_src elisp
   (setup posframe)
-  (setup pyim-basedict
+  (setup pyim-tsinghua-dict
     (:load-after pyim-dict)
     (:when-loaded
-      (pyim-basedict-enable)))
+      (pyim-tsinghua-dict-enable)))
   (setup pyim
     (:option
      ;; pyim-dicts '((:name "lewis_pyim_dict" :file "~/Documents/emacs/other-files/lewis_pyim_dict.pyim")
