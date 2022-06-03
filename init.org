@@ -680,12 +680,8 @@ diff-hl-mode highlights uncommitted changes on the left side of the window (area
 #+begin_src elisp
   (setup save-place
     (:hook-into after-init-hook))
-  ;; (setup elec-pair
-  ;;   (:option electric-pair-inhibit-predicate 'electric-pair-conservative-inhibit)
-  ;;   (electric-pair-mode t))
 
   (global-auto-revert-mode t)                  ; 当另一程序修改了文件时，让 Emacs 及时刷新 Buffer
-  ;; (delete-selection-mode t)                    ; 选中文本后输入文本会替换文本（更符合我们习惯了的其它编辑器的逻辑）
   (global-hl-line-mode)
   (blink-cursor-mode -1)                  ;指针不闪动
 #+end_src
@@ -815,15 +811,8 @@ should be check after reading the embark.el manual
 
   (setup embark
     (:also-load embark-consult)
-    (:option prefix-help-command 'embark-prefix-help-command)
-    (:global "C-S-a" embark-act)
-
-    ;; Show Embark actions via which-key
-    (setq embark-action-indicator
-          (lambda (map)
-            (which-key--show-keymap "Embark" map nil nil 'no-paging)
-            #'which-key--hide-popup-ignore-command)
-          embark-become-indicator embark-action-indicator))
+    (setq prefix-help-command 'embark-prefix-help-command)
+    (:global "C-S-a" embark-act))
 
   (setup wgrep)
 #+end_src
@@ -1255,7 +1244,9 @@ Emacs major-mode to work with Beancount ledger files
 #+end_src
 *** cc-mode
 #+begin_src emacs-lisp
-  (setup cc-mode)
+  (setup cc-mode
+      (:option c-basic-offset 4))
+
   (setup hideif
     (:option hide-ifdef-shadow t
              hide-ifdef-initially t)
@@ -1281,14 +1272,15 @@ Emacs major-mode to work with Beancount ledger files
   ;; use built-in package dep
   (setup project)
   (setup xref
+    (:option xref-search-program #'ripgrep)
     (:autoload xref-push-marker-stack)) ;; autoload this command for jump-back
+
   (setup markdown-mode
     (:file-match "\\.md\\'"))
 
   (setup eldoc-box
     (add-hook 'eglot--managed-mode-hook #'eldoc-box-hover-at-point-mode t))
 
-  ;; (setq xref-search-program 'ripgrep)
   (setq read-process-output-max (* 1024 1024))
   (setup eglot
     (:option eglot-events-buffer-size 0
@@ -1297,7 +1289,6 @@ Emacs major-mode to work with Beancount ledger files
     (:option eldoc-echo-area-use-multiline-p t
              eldoc-echo-area-display-truncation-message nil))
   ;; # (setq eldoc-echo-area-prefer-doc-buffer nil)
-  (setq c-basic-offset 4)
 #+end_src
 **** lsp-org-special
 enable eglot in org-src mode
@@ -1369,33 +1360,11 @@ Highlight symbols with keymap-enabled overlays
            "'" grammatical-edit-single-quote))
 
   (dolist (hook (list
-                 'c-mode-common-hook
-                 'c-mode-hook
-                 'c++-mode-hook
-                 'java-mode-hook
-                 'haskell-mode-hook
-                 'emacs-lisp-mode-hook
-                 'lisp-interaction-mode-hook
-                 'lisp-mode-hook
+                 'prog-mode-hook
                  'maxima-mode-hook
                  'ielm-mode-hook
-                 'sh-mode-hook
-                 'makefile-gmake-mode-hook
-                 'php-mode-hook
-                 'python-mode-hook
-                 'js-mode-hook
-                 'go-mode-hook
                  'qml-mode-hook
-                 'jade-mode-hook
-                 'css-mode-hook
-                 'ruby-mode-hook
-                 'coffee-mode-hook
-                 'rust-mode-hook
-                 'qmake-mode-hook
-                 'lua-mode-hook
-                 'swift-mode-hook
                  'minibuffer-inactive-mode-hook
-                 'typescript-mode-hook
                  ))
     (add-hook hook '(lambda () (grammatical-edit-mode 1))))
 
@@ -1419,6 +1388,7 @@ Highlight symbols with keymap-enabled overlays
 
   ;; (define-key grammatical-edit-mode-map (kbd "C-j") 'grammatical-edit-jump-up)
 #+end_src
+
 *** eglot-ltex
 eglot client leveraging LTEX Language Server.
 #+begin_src elisp
@@ -1610,6 +1580,7 @@ eglot client leveraging LTEX Language Server.
      org-roam-db-gc-threshold most-positive-fixnum
      ;; org-roam-node-display-template "${doom-hierarchy:*} ${tags:37}"
      org-roam-node-display-template (concat "${type:15} ${doom-hierarchy:80} " (propertize "${tags:*}" 'face 'org-tag))
+
      org-roam-capture-templates '(("m" "main" plain "%?"
                                    :target
                                    (file+head "main/%<%Y-%m-%d>-${slug}.org"
@@ -1691,7 +1662,7 @@ eglot client leveraging LTEX Language Server.
 *** org-roam-agenda
 The main purpose for this section is to add every node that has a "TODO" into org-agenda, so I can see all the "TODO"s
 among all the files in org-roam in a single agenda-view. The code was borrowed from vulpea.
-#+begin_src elisp :tangle no
+#+begin_src elisp
   (defun vulpea-buffer-p ()
     "Return non-nil if the currently visited buffer is a note."
     (and buffer-file-name
@@ -1841,15 +1812,6 @@ among all the files in org-roam in a single agenda-view. The code was borrowed f
             (apply #'vulpea-buffer-tags-set tags))))))
 #+end_src
 
-#+RESULTS:
-: vulpea-project-update-tag
-
-*** consult-org-roam
-#+begin_src elisp
-  (setup consult-org-roam
-    (:option consult-org-roam-grep-func #'consult-ripgrep)
-    (:hook-into org-roam-mode))
-#+end_src
 ** ox-hugo
 #+begin_src elisp
   (setup tomelr)
@@ -2012,7 +1974,6 @@ Simple distraction-free editing. I use darkroom instead of writeroom because it'
 ** eaf
 #+begin_src elisp
   (setup eaf
-    (:if-system 'gnu/linux)
     (add-to-list 'load-path "~/.emacs.d/lib/eaf")
     (require 'eaf)
     (:option eaf-browser-enable-autofill t
@@ -2037,8 +1998,7 @@ Simple distraction-free editing. I use darkroom instead of writeroom because it'
                                   (lambda (x)
                                     (eq (buffer-local-value 'major-mode x) 'eaf-mode))
                                   (buffer-list)))))
-          "EAF candidate source for `consult-buffer'.")))
-    )
+          "EAF candidate source for `consult-buffer'."))))
   (setup eaf-browser
     (:autoload eaf-open-browser))
   (setup eaf-pdf-viewer

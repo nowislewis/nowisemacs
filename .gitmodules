@@ -62,9 +62,6 @@
 [submodule "consult-eglot"]
 	path = lib/consult-eglot
 	url = https://github.com/mohkale/consult-eglot.git
-[submodule "consult-org-roam"]
-	path = lib/consult-org-roam
-	url = https://github.com/jgru/consult-org-roam.git
 [submodule "consult-yasnippet"]
 	path = lib/consult-yasnippet
 	url = https://github.com/mohkale/consult-yasnippet.git
