@@ -651,9 +651,9 @@ diff-hl-mode highlights uncommitted changes on the left side of the window (area
 ** nyan-mode
 #+begin_src elisp
   (setup nyan-mode
-    (:hook-into after-init)
-    (:when-loaded
-      (nyan-start-animation)))
+    (:option nyan-animate-nyancat t
+             nyan-wavy-trail t)
+    (:hook-into after-init))
 #+end_src
 ** hl-todo
 #+begin_src elisp
@@ -1655,14 +1655,14 @@ eglot client leveraging LTEX Language Server.
 
 *** org-roam-ui
 #+begin_src elisp
-  ;; (setup (:pkg websocket))
-  ;; (setup (:pkg simple-httpd))
-  ;; (setup (:pkg org-roam-ui :host github :repo "org-roam/org-roam-ui" :files ("*.el" "out")))
+  (setup websocket)
+  (setup simple-httpd)
+  (setup org-roam-ui)
 #+end_src
 *** org-roam-agenda
 The main purpose for this section is to add every node that has a "TODO" into org-agenda, so I can see all the "TODO"s
 among all the files in org-roam in a single agenda-view. The code was borrowed from vulpea.
-#+begin_src elisp
+#+begin_src elisp :tangle no
   (defun vulpea-buffer-p ()
     "Return non-nil if the currently visited buffer is a note."
     (and buffer-file-name
