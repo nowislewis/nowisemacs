@@ -57,7 +57,6 @@
 - [[#ibuffer][ibuffer]]
   - [[#ibuffer-1][ibuffer]]
   - [[#all-the-icons-ibuffer][all-the-icons-ibuffer]]
-  - [[#ibuffer-sidebar][ibuffer-sidebar]]
 - [[#input][Input]]
   - [[#pyim][pyim]]
 - [[#file-and-browsing][File and Browsing]]
@@ -126,12 +125,11 @@
   (push '(menu-bar-lines . 0) default-frame-alist)
   (push '(tool-bar-lines . 0) default-frame-alist)
   (push '(vertical-scroll-bars) default-frame-alist)
-  (push '(undecorated . t) default-frame-alist)
+  ;; (push '(undecorated . t) default-frame-alist)
   (setq initial-major-mode 'fundamental-mode ;; 默认用最简单的模式
         package--init-file-ensured t
         inhibit-startup-message t             ; 关闭启动 Emacs 时的欢迎界面
         )
-  (pixel-scroll-precision-mode t) ;; 最近发现和 pdf-view-mode 工作不协调
 #+end_src
 ** generic
 #+begin_src elisp
@@ -332,13 +330,13 @@ I used to be a vim(evil) user, but now I use meow to manage all my keys.
 ** meow commands like vim
 #+begin_src elisp
   (defun lewis/meow-append()
-       (interactive)
-       (progn (meow-line 1)
-              (meow-append)))
+    (interactive)
+    (progn (meow-line 1)
+           (meow-append)))
   (defun lewis/meow-insert()
-       (interactive)
-       (progn (meow-join 1)
-              (meow-append)))
+    (interactive)
+    (progn (meow-join 1)
+           (meow-append)))
 #+end_src
 ** meow leader keys
 #+begin_src elisp
@@ -493,46 +491,47 @@ I used to be a vim(evil) user, but now I use meow to manage all my keys.
 #+begin_src elisp
   (setup which-key
     (:option whick-key-idle-delay 0.1)
-    (which-key-mode))
+    (:defer
+     (which-key-mode)))
 #+end_src
 * UI
 ** Font
 #+begin_src elisp
-    (defun font-installed-p (font-name)
-      "Check if font with FONT-NAME is available."
-      (find-font (font-spec :name font-name)))
+  (defun font-installed-p (font-name)
+    "Check if font with FONT-NAME is available."
+    (find-font (font-spec :name font-name)))
 
-    (when (display-graphic-p)
-      ;; Set default font
-      (cl-loop for font in '(
-                             ;; "InconsolataGo QiHei NF"
-                             ;; "yaheiInconsolata"
-                             "JetBrainsMono Nerd Font"
-                             "JetBrains Mono"
-                             "Sarasa Mono SC Nerd"
-                             "Monaco"
-                             "Consolas")
-               when (font-installed-p font)
-               return (progn
-                        (set-face-attribute 'default nil :family font :height 140)
-                        (set-face-attribute 'fixed-pitch nil :family font :height 1.0)))
+  (when (display-graphic-p)
+    ;; Set default font
+    (cl-loop for font in '(
+                           ;; "InconsolataGo QiHei NF"
+                           ;; "yaheiInconsolata"
+                           "JetBrainsMono Nerd Font"
+                           "JetBrains Mono"
+                           "Sarasa Mono SC Nerd"
+                           "Monaco"
+                           "Consolas")
+             when (font-installed-p font)
+             return (progn
+                      (set-face-attribute 'default nil :family font :height 140)
+                      (set-face-attribute 'fixed-pitch nil :family font :height 1.0)))
 
-      ;; variable-pitch
-      (cl-loop for font in '("Noto Sans CJK SC" "Arial" "Helvetica" "Times New Roman")
-               when (font-installed-p font)
-               return (set-face-attribute 'variable-pitch nil :family font :height 1.0))
+    ;; variable-pitch
+    (cl-loop for font in '("Noto Sans CJK SC" "Arial" "Helvetica" "Times New Roman")
+             when (font-installed-p font)
+             return (set-face-attribute 'variable-pitch nil :family font :height 1.0))
 
-  ;; Specify font for all unicode characters
-      ;; (cl-loop for font in '("Symbola" "Symbol")
-      ;;          when (font-installed-p font)
-      ;;          return(set-fontset-font t 'unicode font nil 'prepend))
+    ;; Specify font for all unicode characters
+    ;; (cl-loop for font in '("Symbola" "Symbol")
+    ;;          when (font-installed-p font)
+    ;;          return(set-fontset-font t 'unicode font nil 'prepend))
 
-      ;; ;; Specify font for Chinese characters
-      ;; (cl-loop for font in '("Noto Sans CJK SC" "Microsoft Yahei")
-      ;;          when (font-installed-p font)
-      ;;          return (set-fontset-font t '(#x4e00 . #x9fff) font))
-      )
-    #+end_src
+    ;; ;; Specify font for Chinese characters
+    ;; (cl-loop for font in '("Noto Sans CJK SC" "Microsoft Yahei")
+    ;;          when (font-installed-p font)
+    ;;          return (set-fontset-font t '(#x4e00 . #x9fff) font))
+    )
+#+end_src
 ** variable-pitch  and cn-en-fixed-pitch faces
 #+begin_src elisp
   (setup mixed-pitch
@@ -664,7 +663,10 @@ diff-hl-mode highlights uncommitted changes on the left side of the window (area
 ** hl-todo
 #+begin_src elisp
   ;; 0.48
-  (global-hl-todo-mode)
+  (setup hl-todo
+    (:defer
+     (global-hl-todo-mode))
+    )
 #+end_src
 * General Configuration
 ** simple
@@ -686,11 +688,20 @@ diff-hl-mode highlights uncommitted changes on the left side of the window (area
 ** general modes
 #+begin_src elisp
   (setup save-place
-    (:hook-into after-init-hook))
+    (:defer save-place-mode))
+  ;; (:hook-into after-init))
 
-  (global-auto-revert-mode t)                  ; 当另一程序修改了文件时，让 Emacs 及时刷新 Buffer
-  (global-hl-line-mode)
+  (setup autorevert
+    (:defer (global-auto-revert-mode t)))                  ; 当另一程序修改了文件时，让 Emacs 及时刷新 Buffer
+  (setup hl-line
+    (:defer
+     (global-hl-line-mode)))
   (blink-cursor-mode -1)                  ;指针不闪动
+
+  (setup pixel-scroll
+    (:defer
+     (pixel-scroll-precision-mode t)))
+  ;; 最近发现和 pdf-view-mode 工作不协调
 #+end_src
 ** backup, super-save
 #+begin_src elisp
@@ -698,12 +709,14 @@ diff-hl-mode highlights uncommitted changes on the left side of the window (area
   (setq auto-save-default nil)
 
   (setup super-save
-    (super-save-mode 1)
-    (setq super-save-auto-save-when-idle t))
+    (:option super-save-auto-save-when-idle t)
+    (:defer
+     (super-save-mode 1))
+    )
 #+end_src
 ** no-littering
 #+begin_src lisp
-    (setup no-littering)
+  (setup no-littering)
 #+end_src
 ** recentf
 #+begin_src elisp
@@ -713,7 +726,8 @@ diff-hl-mode highlights uncommitted changes on the left side of the window (area
              recentf-exclude `("/tmp/" "/ssh:" ,(concat user-emacs-directory "lib/.*-autoloads\\.el\\'")))
     (add-to-list 'recentf-exclude no-littering-var-directory)
     (add-to-list 'recentf-exclude no-littering-etc-directory)
-    (recentf-mode))
+    (:defer
+     (recentf-mode)))
 #+end_src
 ** 自动换行
 #+begin_src elisp
@@ -726,7 +740,9 @@ diff-hl-mode highlights uncommitted changes on the left side of the window (area
 ** so-long
 解决长行卡死问题
 #+begin_src elisp
-  (global-so-long-mode 1)
+  (setup so-long
+    (:defer
+     (global-so-long-mode 1)))
 #+end_src
 ** TRAMP
 #+begin_src elisp
@@ -741,7 +757,8 @@ diff-hl-mode highlights uncommitted changes on the left side of the window (area
 #+begin_src elisp
   ;; 可以优化速度, 建议看一下官网的一篇文章
   (setup exec-path-from-shell
-    (exec-path-from-shell-initialize))
+    (:defer
+     (exec-path-from-shell-initialize)))
 #+end_src
 ** Undo
 *** vundo for undo history
@@ -760,7 +777,6 @@ diff-hl-mode highlights uncommitted changes on the left side of the window (area
     (:with-map vertico-map
       (:bind [backspace] vertico-directory-delete-char))
     (:hook-into after-init)
-    ;; (:hook vertico-posframe-mode)
     )
 #+end_src
 ** Orderless
@@ -828,7 +844,7 @@ should be check after reading the embark.el manual
 #+end_src
 ** corfu(instead of company)
 #+begin_src elisp
-    ;;0.585
+  ;;0.585
   (setup corfu
     (:option corfu-cycle t                ;; Enable cycling for `corfu-next/previous'
              corfu-auto t                 ;; Enable auto completion
@@ -843,7 +859,8 @@ should be check after reading the embark.el manual
        ;; [tab] corfu-next
        ;;       [backtab] corfu-previous
        "<escape>" corfu-quit))
-    (global-corfu-mode)
+    (:defer
+     (global-corfu-mode))
     )
 
   (defun corfu-enable-always-in-minibuffer ()
@@ -853,22 +870,17 @@ should be check after reading the embark.el manual
       ;; (setq-local corfu-auto nil) Enable/disable auto completion
       (corfu-mode 1)))
   (add-hook 'minibuffer-setup-hook #'corfu-enable-always-in-minibuffer 1)
-  ;; corfu backend
+
   (setup cape
     (add-to-list 'completion-at-point-functions #'cape-file)
     ;; (add-to-list 'completion-at-point-functions #'cape-tex)
     (add-to-list 'completion-at-point-functions #'cape-dabbrev)
     ;; (add-to-list 'completion-at-point-functions #'cape-keyword)
     )
+
   ;; Enable Corfu completion UI
   (setup corfu-doc
     (:hook-into corfu-mode))
-
-  ;; (setup svg-lib) ;; built-in has little icons
-  ;; (setup kind-icon
-  ;;   (:load-after corfu)
-  ;;   (:option kind-icon-default-face 'corfu-default) ; to compute blended backgrounds correctly
-  ;;   (add-to-list 'corfu-margin-formatters #'kind-icon-margin-formatter))
 #+end_src
 ** corfu-all-the-icons
 #+begin_src elisp
@@ -974,8 +986,7 @@ should be check after reading the embark.el manual
   ;; 0.63
   (setup yasnippet
     (:option yas-snippet-dirs (list (concat nowisemacs-config-useful-tools "snippets")))
-    (yas-global-mode 1))
-  ;;(setup yasnippet-snippets)
+    (:defer (yas-global-mode)))
 #+end_src
 ** consult-yasnippet
 #+begin_src elisp
@@ -988,7 +999,9 @@ should be check after reading the embark.el manual
 * Window Management
 ** winner-mode
 #+begin_src elisp
-  (winner-mode t)
+  (setup winner
+    (:defer
+     (winner-mode t)))
 #+end_src
 ** popper
 Popper is a minor-mode to tame the flood of ephemeral windows Emacs produces, while still keeping them within arm’s reach.
@@ -1011,8 +1024,9 @@ Popper is a minor-mode to tame the flood of ephemeral windows Emacs produces, wh
     (:global "C-~" popper-toggle-latest
              "M-~" popper-cycle
              "C-M-~" popper-toggle-type)
-    (popper-mode +1)
-    (popper-echo-mode +1)
+    (:defer
+     (popper-mode +1)
+     (popper-echo-mode +1))
     )
 #+end_src
 ** Move
@@ -1058,14 +1072,6 @@ borrowed from citre, now you can always jump-back use "M-,"
 #+begin_src elisp
   (setup all-the-icons-ibuffer
     (:hook-into ibuffer-mode))
-#+end_src
-** ibuffer-sidebar
-#+begin_src elisp
-  (setup ibuffer-sidebar)
-    ;; (require 'ibuffer-sidebar)
-    ;; (:autoload ibuffer-sidebar-toggle-sidebar))
-    ;; (setq ibuffer-sidebar-use-custom-font t)
-    ;; (setq ibuffer-sidebar-face `(:family "Helvetica" :height 140)))
 #+end_src
 * Input
 ** pyim
@@ -1223,8 +1229,6 @@ Show git blame info about current line
   (setup graphviz-dot-mode
     (:file-match "\\.dot\\'")
     (:option graphviz-dot-indent-width 4))
-  ;; (:when-loaded
-  ;;   (require 'company-graphviz-dot))) ;;for now, just use highlight
 #+end_src
 *** beancount
 Emacs major-mode to work with Beancount ledger files
@@ -1261,7 +1265,7 @@ Emacs major-mode to work with Beancount ledger files
 *** cc-mode
 #+begin_src emacs-lisp
   (setup cc-mode
-      (:option c-basic-offset 4))
+    (:option c-basic-offset 4))
 
   (setup hideif
     (:option hide-ifdef-shadow t
@@ -1302,7 +1306,7 @@ Emacs major-mode to work with Beancount ledger files
 #+end_src
 **** lsp-org-special
 enable eglot in org-src mode
-#+begin_src elisp
+#+begin_src elisp :tangle no
   (cl-defmacro lsp-org-babel-enable (lang)
     "Support LANG in org source code block."
     (cl-check-type lang stringp)
@@ -1343,7 +1347,8 @@ enable eglot in org-src mode
 Citre is an advanced Ctags (or actually, readtags) frontend for Emacs.
 #+begin_src elisp
   (setup citre
-    (require 'citre-config)
+    (:defer
+     (require 'citre-config))
     (:option citre-use-project-root-when-creating-tags t
              citre-prompt-language-for-ctags-command t
              ;; citre-auto-enable-citre-mode-modes '(prog-mode)
@@ -1367,16 +1372,14 @@ Highlight symbols with keymap-enabled overlays
            ;; "=" grammatical-edit-equal
            "%" grammatical-edit-match-paren
            "\"" grammatical-edit-double-quote
-           "'" grammatical-edit-single-quote))
-
-  (dolist (hook (list
-                 'prog-mode-hook
-                 'maxima-mode-hook
-                 'ielm-mode-hook
-                 'qml-mode-hook
-                 'minibuffer-inactive-mode-hook
-                 ))
-    (add-hook hook '(lambda () (grammatical-edit-mode 1))))
+           "'" grammatical-edit-single-quote)
+    (:hook-into text-mode
+                prog-mode
+                maxima-mode
+                ielm-mode
+                qml-mode
+                minibuffer-inactive-mode
+                ))
 
   ;; (define-key grammatical-edit-mode-map (kbd "SPC") 'grammatical-edit-space)
   ;; (define-key grammatical-edit-mode-map (kbd "RET") 'grammatical-edit-newline)
@@ -1542,7 +1545,7 @@ eglot client leveraging LTEX Language Server.
                                  template-file
                                  ))
           (message "Convert finish: %s" docx-file)))
-    ))
+      ))
 #+end_src
 ** org-modern
 #+begin_src elisp
@@ -1983,13 +1986,14 @@ Simple distraction-free editing. I use darkroom instead of writeroom because it'
 #+end_src
 ** sudo-edit
 #+begin_src elisp
-(setup sudo-edit)
+  (setup sudo-edit)
 #+end_src
 ** eaf
 #+begin_src elisp
   (setup eaf
     (add-to-list 'load-path "~/.emacs.d/lib/eaf")
-    (require 'eaf)
+    (:defer
+     (require 'eaf))
     (:option eaf-browser-enable-autofill t
              eaf-webengine-font-family "Noto Sans CJK SC"
              eaf-webengine-fixed-font-family "JetBrainsMono Nerd Font"
@@ -2045,7 +2049,7 @@ Simple distraction-free editing. I use darkroom instead of writeroom because it'
 ** proxy
 #+begin_src elisp
   ;; Configure network proxy
-(setq my-proxy "socks://127.0.0.1:20170")
+  (setq my-proxy "socks://127.0.0.1:20170")
   (defun show-proxy ()
     "Show http/https proxy."
     (interactive)
