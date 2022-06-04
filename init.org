@@ -359,13 +359,13 @@ I used to be a vim(evil) user, but now I use meow to manage all my keys.
 
   ;; buffer
   (meow-leader-define-key
-   '("b b" . persp-switch-to-buffer)
-   '("b B" . switch-to-buffer)
+   ;; '("b b" . persp-switch-to-buffer)
+   '("b b" . consult-buffer) ;; work with C-x b
    '("b k" . kill-current-buffer)
    '("b l" . meow-last-buffer)
    '("b m" . bookmark-set)
-   '("b n" . next-buffer)
    '("b M" . bookmark-delete)
+   '("b n" . next-buffer)
    '("b j" . bookmark-jump)
    '("b p" . previous-buffer)
    '("b r" . revert-buffer))
@@ -396,7 +396,7 @@ I used to be a vim(evil) user, but now I use meow to manage all my keys.
    ;; imenu-list
    '("e l" . imenu-list-smart-toggle)
    ;; org-download
-   '("e s" . org-download-screenshot)
+   '("e d" . org-download-screenshot)
    ;; english help
    '("e h c" . toggle-corfu-english-helper)
    '("e h f" . english-teacher-follow-mode))
@@ -433,19 +433,17 @@ I used to be a vim(evil) user, but now I use meow to manage all my keys.
   (meow-leader-define-key
    '("n r D" . org-roam-demote-entire-buffer)
    '("n r f" . org-roam-node-find)
-   '("n r F" . org-roam-ref-find)
+   '("n r F" . consult-org-roam-forward-links)
    '("n r g" . org-roam-graph)
    '("n r i" . org-roam-node-insert)
    '("n r I" . org-id-get-create)
-   ;; '("n r m" . org-roam-buffer-toggle)
    '("n r M" . org-roam-buffer-display-dedicated)
-   '("n r n" . org-roam-capture)
-   '("n r r" . org-roam-buffer-toggle)
+   '("n r c" . org-roam-capture)
+   '("n r t" . org-roam-buffer-toggle)
+   '("n r r" . org-roam-ref-find)
    '("n r R" . org-roam-link-replace-all)
    '("n r b" . consult-org-roam-backlinks)
-   '("n r B" . consult-org-roam-forward-links)
    '("n r s" . consult-org-roam-search)
-   ;; ("C-c n e" . consult-org-roam-file-find)
 
    ;; date
    '("n r d b" . org-roam-dailies-goto-previous-note)
@@ -1579,12 +1577,13 @@ eglot client leveraging LTEX Language Server.
 #+begin_src elisp
   (setup emacsql-sqlite-builtin)
   (setup org-roam
+    (:also-load org)
     (:option
      org-roam-database-connector 'sqlite-builtin
-     org-roam-mode-section-functions (list #'org-roam-backlinks-section
-                                           #'org-roam-reflinks-section
-                                           ;; #'org-roam-unlinked-references-section
-                                           )
+     org-roam-mode-sections (list #'org-roam-backlinks-section
+                                  #'org-roam-reflinks-section
+                                  ;; #'org-roam-unlinked-references-section
+                                  )
      org-roam-directory (concat nowisemacs-doc-root-dir "/orgmode/roam/")
      org-roam-dailies-directory (concat nowisemacs-doc-root-dir "/orgmode/roam/")
 
@@ -1657,6 +1656,7 @@ eglot client leveraging LTEX Language Server.
                      (window-parameters . ((no-other-window . t)
                                            (no-delete-other-windows . t)))))
       (org-roam-buffer-toggle)
+      ;; (magit-section-show-level-2-all)
 
       ;; Every Zettel is a Draft until Declared Otherwise
       (add-hook 'org-roam-capture-new-node-hook (lambda()
@@ -1669,6 +1669,11 @@ eglot client leveraging LTEX Language Server.
   (setup websocket)
   (setup simple-httpd)
   (setup org-roam-ui)
+#+end_src
+*** consult-org-roam
+#+begin_src elisp
+  (setup consult-org-roam
+    (:hook-into org-roam-mode))
 #+end_src
 *** org-roam-agenda
 The main purpose for this section is to add every node that has a "TODO" into org-agenda, so I can see all the "TODO"s
