@@ -126,8 +126,7 @@
   (push '(menu-bar-lines . 0) default-frame-alist)
   (push '(tool-bar-lines . 0) default-frame-alist)
   (push '(vertical-scroll-bars) default-frame-alist)
-  ;; (tool-bar-mode -1)                      ;禁用工具栏
-  ;; (scroll-bar-mode -1)                    ;禁用滚动条
+  (push '(undecorated . t) default-frame-alist)
   (setq initial-major-mode 'fundamental-mode ;; 默认用最简单的模式
         package--init-file-ensured t
         inhibit-startup-message t             ; 关闭启动 Emacs 时的欢迎界面
@@ -185,8 +184,12 @@ The following content is not enabled yet, because I want to minimize unnecessary
 * Package Management
 I use borg to manage packages, so setup.el is only used to config packages quickly, I write several macros in =noisemacs-base=. It should be noticed that if you use only a =init.el= file, all the funcs or macros defined in =init.el= can't pass native comp, so move these things that you defined yourself to a seperate repo(nowisemacs-base) will resolve this problem.
 #+begin_src elisp
-  (require 'nowisemacs-base)
+  (setup compat)
+  (setup closql)
+  (setup emacsql)
   (setup epkg)
+  ;;setup
+  (require 'nowisemacs-base)
 #+end_src
 * gcmh
 Enforce a sneaky Garbage Collection strategy to minimize GC interference with user activity.
@@ -568,8 +571,8 @@ Modus-themes is great especailly for org mode
              modus-themes-hl-line '(intense accented)
              modus-themes-paren-match '(intense bold underline)
              modus-themes-subtle-line-numbers t)
-    (load-theme 'modus-vivendi))
-    ;; (load-theme 'modus-operandi))
+    ;; (load-theme 'modus-vivendi))
+    (load-theme 'modus-operandi))
 #+end_src
 
 ** all-the-icons
@@ -613,6 +616,9 @@ diff-hl-mode highlights uncommitted changes on the left side of the window (area
 #+end_src
 ** doom-modeline
 #+begin_src elisp
+  (setup dash)
+  (setup shrink-path) ;; <-(setup s)(setup f)
+
   (setup doom-modeline
     (:option doom-modeline-window-width-limit fill-column
              doom-modeline-height 20
@@ -657,6 +663,7 @@ diff-hl-mode highlights uncommitted changes on the left side of the window (area
 #+end_src
 ** hl-todo
 #+begin_src elisp
+  ;; 0.48
   (global-hl-todo-mode)
 #+end_src
 * General Configuration
@@ -794,6 +801,7 @@ diff-hl-mode highlights uncommitted changes on the left side of the window (area
 #+end_src
 ** Marginalia
 #+begin_src elisp
+  (setup epkg-marginalia)
   (setup marginalia
     (:option marginalia-annotators '(marginalia-annotators-heavy
                                      marginalia-annotators-light
@@ -809,15 +817,18 @@ should be check after reading the embark.el manual
   (setup embark-consult
     (add-hook 'embark-collect-mode-hook #'consult-preview-at-point-mode))
 
+  (setup avy)
   (setup embark
     (:also-load embark-consult)
     (setq prefix-help-command 'embark-prefix-help-command)
     (:global "C-S-a" embark-act))
 
+  (setup ag)
   (setup wgrep)
 #+end_src
 ** corfu(instead of company)
 #+begin_src elisp
+    ;;0.585
   (setup corfu
     (:option corfu-cycle t                ;; Enable cycling for `corfu-next/previous'
              corfu-auto t                 ;; Enable auto completion
@@ -960,6 +971,7 @@ should be check after reading the embark.el manual
 #+end_src
 ** yasnippet
 #+begin_src elisp
+  ;; 0.63
   (setup yasnippet
     (:option yas-snippet-dirs (list (concat nowisemacs-config-useful-tools "snippets")))
     (yas-global-mode 1))
@@ -981,26 +993,27 @@ should be check after reading the embark.el manual
 ** popper
 Popper is a minor-mode to tame the flood of ephemeral windows Emacs produces, while still keeping them within arm’s reach.
 #+begin_src elisp
-    (setup popper
-      (:option popper-reference-buffers '("\\*Messages\\*"
-                                          "Output\\*$"
-                                          "\\*Async Shell Command\\*"
-                                          "Go-Translate"
-                                          help-mode
-                                          helpful-mode
-                                          compilation-mode
-                                          youdao-dictionary-mode)
-               popper-window-height  (lambda (win)
-                                       (fit-window-to-buffer
-                                        win
-                                        (floor (frame-height) 2)))
-               )
-      (:global "C-~" popper-toggle-latest
-               "M-~" popper-cycle
-               "C-M-~" popper-toggle-type)
-      (popper-mode +1)
-      (popper-echo-mode +1)
-      )
+  ;;0.67
+  (setup popper
+    (:option popper-reference-buffers '("\\*Messages\\*"
+                                        "Output\\*$"
+                                        "\\*Async Shell Command\\*"
+                                        "Go-Translate"
+                                        help-mode
+                                        helpful-mode
+                                        compilation-mode
+                                        youdao-dictionary-mode)
+             popper-window-height  (lambda (win)
+                                     (fit-window-to-buffer
+                                      win
+                                      (floor (frame-height) 2)))
+             )
+    (:global "C-~" popper-toggle-latest
+             "M-~" popper-cycle
+             "C-M-~" popper-toggle-type)
+    (popper-mode +1)
+    (popper-echo-mode +1)
+    )
 #+end_src
 ** Move
 *** avy
@@ -1062,6 +1075,7 @@ borrowed from citre, now you can always jump-back use "M-,"
     (:load-after pyim-dict)
     (:when-loaded
       (pyim-tsinghua-dict-enable)))
+  (setup xr)
   (setup pyim
     (:option
      ;; pyim-dicts '((:name "lewis_pyim_dict" :file "~/Documents/emacs/other-files/lewis_pyim_dict.pyim")
@@ -1154,6 +1168,7 @@ This is adapted from the extra font lock rules provided by Drew Adams' dired+ pa
 * git
 ** magit
 #+begin_src elisp
+  (setup with-editor)
   (setup magit)
 #+end_src
 ** blamer
@@ -1189,6 +1204,7 @@ Show git blame info about current line
 *** elisp
 **** helpful
 #+begin_src elisp
+  (setup elisp-refs)
   (setup helpful
     (:global "C-h f" #'helpful-callable
              "C-h v" #'helpful-variable
@@ -1217,7 +1233,7 @@ Emacs major-mode to work with Beancount ledger files
     (:file-match "\\.beancount\\'"))
 #+end_src
 *** latex
-#+begin_src elisp
+#+begin_src elisp :tangle no
   (setup auctex)
   (setup cdlatex)
 #+end_src
@@ -1264,13 +1280,7 @@ Emacs major-mode to work with Beancount ledger files
   (setup tree-sitter
     (:hook-into c-mode-common python-mode)
     (:hook tree-sitter-hl-mode))
-  (setup tree-sitter-langs)
-#+end_src
-*** lsp mode
-**** eglot
-#+begin_src elisp
-  ;; use built-in package dep
-  (setup project)
+  (setup tree-sitter-lang)
   (setup xref
     (:option xref-search-program #'ripgrep)
     (:autoload xref-push-marker-stack)) ;; autoload this command for jump-back
@@ -1552,6 +1562,7 @@ eglot client leveraging LTEX Language Server.
 #+end_src
 ** org-download
 #+begin_src elisp
+  (setup async)
   (setup org-download
     (:option org-download-method 'directory
              org-download-screenshot-basename "screenshot.jpg"
@@ -1566,7 +1577,7 @@ eglot client leveraging LTEX Language Server.
 ** org-roam
 *** org-roam
 #+begin_src elisp
-  ;; (setup emacs-sqlite-builtin)
+  (setup emacsql-sqlite-builtin)
   (setup org-roam
     (:option
      org-roam-database-connector 'sqlite-builtin
@@ -1839,6 +1850,8 @@ among all the files in org-roam in a single agenda-view. The code was borrowed f
 #+end_src
 ** org-citar
 #+begin_src elisp
+  (setup parsebib)
+  (setup citeproc) ;;<- (setup queue) (setup string-inflection)
   (setup citar
     (:option org-cite-global-bibliography '("~/Documents/emacs/orgmode/bibliography/better_zotero_bib.bib")
              org-cite-insert-processor 'citar
@@ -1908,6 +1921,7 @@ I use corfu english helper instead of company-english-helper.
 * 阅读
 ** pdf-tools
 #+begin_src elisp
+  (setup tablist)
   (setup pdf-tools
     (:option pdf-view-use-scaling t)
     (:with-map pdf-view-mode-map
@@ -1942,7 +1956,7 @@ I use corfu english helper instead of company-english-helper.
 #+end_src
 ** nov
 #+begin_src elisp
-  (setup esxml)
+  (setup esxml) ;; <- (setup kv)
   (setup nov
     (:file-match "\\.epub\\'"))
 #+end_src
@@ -1978,7 +1992,8 @@ Simple distraction-free editing. I use darkroom instead of writeroom because it'
     (require 'eaf)
     (:option eaf-browser-enable-autofill t
              eaf-webengine-font-family "Noto Sans CJK SC"
-             eaf-webengine-fixed-font-family "JetBrainsMono Nerd Font")
+             eaf-webengine-fixed-font-family "JetBrainsMono Nerd Font"
+             )
     ;; for consult preview
     (:with-feature consult
       (:when-loaded

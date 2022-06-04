@@ -1,6 +1,9 @@
 [submodule "ace-window"]
 	path = lib/ace-window
 	url = https://github.com/abo-abo/ace-window.git
+[submodule "ag"]
+	path = lib/ag
+	url = https://github.com/Wilfred/ag.el.git
 [submodule "all-the-icons"]
 	path = lib/all-the-icons
 	url = https://github.com/domtronn/all-the-icons.el.git
@@ -13,22 +16,15 @@
 [submodule "async"]
 	path = lib/async
 	url = https://github.com/jwiegley/emacs-async.git
-[submodule "auctex"]
-	path = lib/auctex
-	url = https://github.com/emacsmirror/auctex
-    build-step = ./autogen.sh
-	build-step = ./configure
-	build-step = make
-	build-step = make install
 [submodule "avy"]
 	path = lib/avy
 	url = https://github.com/abo-abo/avy.git
 [submodule "awesome-tray"]
 	path = lib/awesome-tray
-	url = https://github.com/manateelazycat/awesome-tray
-[submodule "beancount-mode"]
-	path = lib/beancount-mode
-	url = https://github.com/beancount/beancount-mode
+	url = https://github.com/manateelazycat/awesome-tray.git
+[submodule "beancount"]
+	path = lib/beancount
+	url = https://github.com/beancount/beancount-mode.git
 [submodule "blamer"]
 	path = lib/blamer
 	url = https://github.com/Artawower/blamer.el.git
@@ -38,12 +34,9 @@
 [submodule "cape"]
 	path = lib/cape
 	url = https://github.com/minad/cape.git
-[submodule "cdlatex"]
-	path = lib/cdlatex
-	url = https://github.com/cdominik/cdlatex.git
 [submodule "citar"]
 	path = lib/citar
-	url = https://github.com/bdarcus/citar.git
+	url = https://github.com/emacs-citar/citar.git
 [submodule "citeproc"]
 	path = lib/citeproc
 	url = https://github.com/andras-simonyi/citeproc-el.git
@@ -73,7 +66,7 @@
 	url = https://github.com/galeo/corfu-doc.git
 [submodule "corfu-english-helper"]
 	path = lib/corfu-english-helper
-	url = https://github.com/manateelazycat/corfu-english-helper
+	url = https://github.com/manateelazycat/corfu-english-helper.git
 [submodule "darkroom"]
 	path = lib/darkroom
 	url = https://github.com/joaotavora/darkroom.git
@@ -97,15 +90,17 @@
 [submodule "doom-modeline"]
 	path = lib/doom-modeline
 	url = https://github.com/seagle0128/doom-modeline.git
-[submodule "editorconfig"]
-	path = lib/editorconfig
-	url = https://github.com/editorconfig/editorconfig-emacs.git
+[submodule "eaf"]
+	path = lib/eaf
+	url = https://github.com/emacs-eaf/emacs-application-framework.git
+    load-path = .
+    load-path = core
 [submodule "eglot"]
 	path = lib/eglot
 	url = https://github.com/joaotavora/eglot.git
 [submodule "eglot-ltex"]
 	path = lib/eglot-ltex
-	url = https://github.com/emacs-languagetool/eglot-ltex
+	url = https://github.com/emacs-languagetool/eglot-ltex.git
 [submodule "eldoc-box"]
 	path = lib/eldoc-box
 	url = https://github.com/casouri/eldoc-box.git
@@ -125,6 +120,7 @@
 [submodule "emacsql-sqlite-builtin"]
 	path = lib/emacsql-sqlite-builtin
 	url = https://github.com/emacscollective/emacsql-sqlite-builtin.git
+    no-byte-compile = emacsql-sqlite-module.el
 [submodule "embark"]
 	path = lib/embark
 	url = https://github.com/oantolin/embark.git
@@ -151,7 +147,7 @@
 	url = https://github.com/lorniu/go-translate.git
 [submodule "grammatical-edit"]
 	path = lib/grammatical-edit
-	url = https://github.com/manateelazycat/grammatical-edit
+	url = https://github.com/manateelazycat/grammatical-edit.git
 [submodule "graphviz-dot-mode"]
 	path = lib/graphviz-dot-mode
 	url = https://github.com/ppareit/graphviz-dot-mode.git
@@ -162,21 +158,18 @@
 [submodule "hl-todo"]
 	path = lib/hl-todo
 	url = https://github.com/tarsius/hl-todo.git
+[submodule "ibuffer-sidebar"]
+	path = lib/ibuffer-sidebar
+	url = https://github.com/jojojames/ibuffer-sidebar.git
 [submodule "imenu-list"]
 	path = lib/imenu-list
 	url = https://github.com/bmag/imenu-list.git
 [submodule "insert-translated-name"]
 	path = lib/insert-translated-name
-	url = https://github.com/manateelazycat/insert-translated-name
-[submodule "lib/eaf"]
-	path = lib/eaf
-	url = https://github.com/emacs-eaf/emacs-application-framework.git
-[submodule "libgit"]
-	path = lib/libgit
-	url = https://github.com/magit/libegit2.git
-[submodule "lister"]
-	path = lib/lister
-	url = https://github.com/publicimageltd/lister.git
+	url = https://github.com/manateelazycat/insert-translated-name.git
+[submodule "kv"]
+	path = lib/kv
+	url = https://github.com/nicferrier/emacs-kv.git
 [submodule "magit"]
 	path = lib/magit
 	url = https://github.com/magit/magit.git
@@ -200,7 +193,7 @@
 	url = https://depp.brause.cc/nov.el.git
 [submodule "nowisemacs-base"]
 	path = lib/nowisemacs-base
-	url = https://github.com/nowislewis/nowisemacs-base
+	url = https://github.com/nowislewis/nowisemacs-base.git
 [submodule "nyan-mode"]
 	path = lib/nyan-mode
 	url = https://github.com/TeMPOraL/nyan-mode.git
@@ -229,7 +222,7 @@
 	path = lib/org-roam
 	url = https://github.com/org-roam/org-roam.git
     load-path = .
- 	load-path = extensions
+    load-path = extensions
 [submodule "org-roam-ui"]
 	path = lib/org-roam-ui
 	url = https://github.com/org-roam/org-roam-ui.git
@@ -256,7 +249,7 @@
 	url = https://github.com/tumashu/pyim.git
 [submodule "pyim-tsinghua-dict"]
 	path = lib/pyim-tsinghua-dict
-	url = https://github.com/tumashu/pyim-tsinghua-dict.git
+	url = https://github.com/redguardtoo/pyim-tsinghua-dict.git
 [submodule "queue"]
 	path = lib/queue
 	url = https://github.com/emacsmirror/queue.git
@@ -281,9 +274,6 @@
 [submodule "simple-httpd"]
 	path = lib/simple-httpd
 	url = https://github.com/skeeto/emacs-web-server.git
-[submodule "sqlite3"]
-	path = lib/sqlite3
-	url = https://github.com/pekingduck/emacs-sqlite3-api.git
 [submodule "string-inflection"]
 	path = lib/string-inflection
 	url = https://github.com/akicho8/string-inflection.git
@@ -317,8 +307,8 @@
 [submodule "vertico"]
 	path = lib/vertico
 	url = https://github.com/minad/vertico.git
-	load-path = .
-	load-path = extensions
+    load-path = .
+    load-path = extensions
 [submodule "vterm"]
 	path = lib/vterm
 	url = https://github.com/akermu/emacs-libvterm.git
@@ -327,7 +317,7 @@
 	url = https://github.com/jixiuf/vterm-toggle.git
 [submodule "vundo"]
 	path = lib/vundo
-	url = https://github.com/casouri/vundo
+	url = https://github.com/casouri/vundo.git
 [submodule "websocket"]
 	path = lib/websocket
 	url = https://github.com/ahyatt/emacs-websocket.git
