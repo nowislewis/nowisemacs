@@ -229,7 +229,7 @@ I used to be a vim(evil) user, but now I use meow to manage all my keys.
                             '("2" . meow-expand-2)
                             '("1" . meow-expand-1)
                             '("a" . meow-append)
-                            '("A" . lewis/meow-append)
+                            '("A" . meow-append-vim)
                             '("b" . meow-back-word)
                             '("B" . meow-back-symbol)
                             '("c" . meow-change)
@@ -252,7 +252,7 @@ I used to be a vim(evil) user, but now I use meow to manage all my keys.
                             '("h" . meow-left)
                             '("H" . meow-left-expand)
                             '("i" . meow-insert)
-                            '("I" . lewis/meow-insert)
+                            '("I" . meow-insert-vim)
                             '("j" . meow-next)
                             '("J" . meow-next-expand)
                             '("k" . meow-prev)
@@ -326,11 +326,11 @@ I used to be a vim(evil) user, but now I use meow to manage all my keys.
 #+end_src
 ** meow commands like vim
 #+begin_src elisp
-  (defun lewis/meow-append()
+  (defun meow-append-vim()
     (interactive)
     (progn (meow-line 1)
            (meow-append)))
-  (defun lewis/meow-insert()
+  (defun meow-insert-vim()
     (interactive)
     (progn (meow-join 1)
            (meow-append)))
@@ -1989,8 +1989,6 @@ Simple distraction-free editing. I use darkroom instead of writeroom because it'
 #+begin_src elisp
   (setup eaf
     (add-to-list 'load-path "~/.emacs.d/lib/eaf")
-    (:defer
-     (require 'eaf))
     (:option eaf-browser-enable-autofill t
              eaf-webengine-font-family "Noto Sans CJK SC"
              eaf-webengine-fixed-font-family "JetBrainsMono Nerd Font"
