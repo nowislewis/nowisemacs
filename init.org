@@ -69,6 +69,7 @@
   - [[#vterm-toggle][vterm-toggle]]
 - [[#git][git]]
   - [[#magit][magit]]
+  - [[#magit-delta][magit-delta]]
   - [[#blamer][blamer]]
   - [[#ediff][ediff]]
 - [[#program][Program]]
@@ -1044,8 +1045,7 @@ borrowed from citre, now you can always jump-back use "M-,"
                   find-file
                   goto-line
                   citre-jump
-                  isearch-forward
-                  ))
+                  isearch-forward))
     (advice-add func :before 'my--push-point-to-xref-marker-stack))
 #+end_src
 *** bookmark
@@ -1078,28 +1078,26 @@ borrowed from citre, now you can always jump-back use "M-,"
       (pyim-tsinghua-dict-enable)))
   (setup xr)
   (setup pyim
-    (:option
-     ;; pyim-dicts '((:name "lewis_pyim_dict" :file "~/Documents/emacs/other-files/lewis_pyim_dict.pyim")
-     ;;                      (:name "lewis_big_dict" :file "~/Documents/emacs/other-files/pyim-bigdict.pyim.gz"))
-     ;; pyim-default-scheme 'xiaohe-shuangpin
-     pyim-default-scheme 'quanpin
-     pyim-cloudim 'baidu
-     pyim-punctuation-translate-p '(no yes auto)
-     pyim-page-tooltip 'posframe
-     pyim-page-length 5
-     )
+    (:option pyim-cloudim 'baidu
+             pyim-punctuation-translate-p '(no yes auto)
+             pyim-page-tooltip 'posframe
+             pyim-page-length 5)
     (:when-loaded
       (require 'pyim-cregexp-utils)
       (require 'pyim-cstring-utils)
       (set-default 'pyim-punctuation-half-width-functions
                    '(pyim-probe-punctuation-line-beginning pyim-probe-punctuation-after-punctuation))
+      ;; pyim-default-scheme 'xiaohe-shuangpin
+      (pyim-default-scheme 'quanpin)
       (pyim-isearch-mode 1)
-      (defalias 'pyim-probe-meow-normal-mode
-        #'(lambda nil
-            (meow-normal-mode-p)))
-      (set-default 'pyim-english-input-switch-functions
-                   '(pyim-probe-auto-english pyim-probe-isearch-mode pyim-probe-program-mode pyim-probe-org-structure-template pyim-probe-org-latex-mode pyim-probe-meow-normal-mode))
 
+      (defalias 'pyim-probe-meow-normal-mode #'(lambda nil
+                                                 (meow-normal-mode-p)))
+      (set-default 'pyim-english-input-switch-functions '(pyim-probe-auto-english
+                                                          pyim-probe-isearch-mode
+                                                          pyim-probe-program-mode
+                                                          pyim-probe-org-structure-template pyim-probe-org-latex-mode
+                                                          pyim-probe-meow-normal-mode))
       (defalias 'my-orderless-regexp
         #'(lambda
             (orig_func component)
@@ -1108,9 +1106,9 @@ borrowed from citre, now you can always jump-back use "M-,"
                   (funcall orig_func component)))
               (pyim-cregexp-build result))))
       (advice-add 'orderless-regexp :around #'my-orderless-regexp)
-
       )
     (setq default-input-method "pyim"))
+
 #+end_src
 * File and Browsing
 ** file browsing
@@ -1172,6 +1170,12 @@ This is adapted from the extra font lock rules provided by Drew Adams' dired+ pa
   (setup with-editor)
   (setup magit)
 #+end_src
+** magit-delta
+#+begin_src elisp
+  (setup xterm-color)
+  (setup magit-delta
+    (:hook-into magit-mode))
+#+end_src
 ** blamer
 Show git blame info about current line
 #+begin_src elisp
@@ -1196,8 +1200,7 @@ Show git blame info about current line
       (defun ediff-restore-window-conf ()
         (when (window-configuration-p local-ediff-saved-window-conf)
           (set-window-configuration local-ediff-saved-window-conf)))
-      )
-    )
+      ))
 
 #+end_src
 * Program
@@ -1578,36 +1581,36 @@ eglot client leveraging LTEX Language Server.
   (setup emacsql-sqlite-builtin)
   (setup org-roam
     (:also-load org)
-    (:option
-     org-roam-database-connector 'sqlite-builtin
-     org-roam-mode-sections (list #'org-roam-backlinks-section
-                                  #'org-roam-reflinks-section
-                                  ;; #'org-roam-unlinked-references-section
-                                  )
-     org-roam-directory (concat nowisemacs-doc-root-dir "/orgmode/roam/")
-     org-roam-dailies-directory (concat nowisemacs-doc-root-dir "/orgmode/roam/")
+    (:option org-roam-database-connector 'sqlite-builtin
+             org-roam-mode-sections (list #'org-roam-backlinks-section
+                                          #'org-roam-reflinks-section
+                                          ;; #'org-roam-unlinked-references-section
+                                          )
+             org-roam-directory (concat nowisemacs-doc-root-dir "/orgmode/roam/")
+             org-roam-dailies-directory (concat nowisemacs-doc-root-dir "/orgmode/roam/")
 
-     org-roam-db-gc-threshold most-positive-fixnum
-     ;; org-roam-node-display-template "${doom-hierarchy:*} ${tags:37}"
-     org-roam-node-display-template (concat "${type:15} ${doom-hierarchy:80} " (propertize "${tags:*}" 'face 'org-tag))
+             org-roam-db-gc-threshold most-positive-fixnum
+             ;; org-roam-node-display-template "${doom-hierarchy:*} ${tags:37}"
+             org-roam-node-display-template (concat "${type:15} ${doom-hierarchy:80} "
+                                                    (propertize "${tags:*}" 'face 'org-tag))
 
-     org-roam-capture-templates '(("m" "main" plain "%?"
-                                   :target
-                                   (file+head "main/%<%Y-%m-%d>-${slug}.org"
-                                              "#+title: ${title}\n* Action notes\n* Idea notes\n* Sealed notes")
-                                   :unnarrowed t)
-                                  ("r" "reference" plain "%?"
-                                   :target
-                                   (file+head "reference/%<%Y-%m-%d>-${slug}.org"
-                                              "#+title: ${title}\n* Action notes\n* Idea notes\n* Sealed notes")
-                                   :unnarrowed t)
-                                  ("a" "article" plain "%?"
-                                   ;; :target
-                                   :if-new
-                                   (file+head "articles/%<%Y-%m-%d>-${slug}.org"
-                                              "#+title: ${title}\n* Action notes\n* Idea notes\n* Sealed notes")
-                                   :unnarrowed t))
-     )
+             org-roam-capture-templates '(("m" "main" plain "%?"
+                                           :target
+                                           (file+head "main/%<%Y-%m-%d>-${slug}.org"
+                                                      "#+title: ${title}\n* Action notes\n* Idea notes\n* Sealed notes")
+                                           :unnarrowed t)
+                                          ("r" "reference" plain "%?"
+                                           :target
+                                           (file+head "reference/%<%Y-%m-%d>-${slug}.org"
+                                                      "#+title: ${title}\n* Action notes\n* Idea notes\n* Sealed notes")
+                                           :unnarrowed t)
+                                          ("a" "article" plain "%?"
+                                           ;; :target
+                                           :if-new
+                                           (file+head "articles/%<%Y-%m-%d>-${slug}.org"
+                                                      "#+title: ${title}\n* Action notes\n* Idea notes\n* Sealed notes")
+                                           :unnarrowed t))
+             )
     (:when-loaded
       (org-roam-db-autosync-mode)
 

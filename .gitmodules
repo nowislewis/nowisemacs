@@ -173,6 +173,9 @@
 [submodule "magit"]
 	path = lib/magit
 	url = https://github.com/magit/magit.git
+[submodule "magit-delta"]
+	path = lib/magit-delta
+	url = https://github.com/dandavison/magit-delta.git
 [submodule "marginalia"]
 	path = lib/marginalia
 	url = https://github.com/minad/marginalia.git
@@ -336,6 +339,9 @@
 [submodule "xr"]
 	path = lib/xr
 	url = https://github.com/mattiase/xr.git
+[submodule "xterm-color"]
+	path = lib/xterm-color
+	url = https://github.com/atomontage/xterm-color.git
 [submodule "yasnippet"]
 	path = lib/yasnippet
 	url = https://github.com/joaotavora/yasnippet.git
