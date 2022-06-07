@@ -148,7 +148,6 @@ The following content is not enabled yet, because I want to minimize unnecessary
   ;; Restore emacs session.
   (setq initial-buffer-choice t)
   (run-with-timer 1 nil #'(lambda () (bury-buffer)))
-
   ;; 增加IO性能
   (setq process-adaptive-read-buffering nil)
   (setq read-process-output-max (* 1024 1024))
@@ -1282,7 +1281,12 @@ Emacs major-mode to work with Beancount ledger files
   (setup tree-sitter
     (:hook-into c-mode-common python-mode)
     (:hook tree-sitter-hl-mode))
-  (setup tree-sitter-lang)
+  (setup tree-sitter-langs)
+#+end_src
+*** lsp mode
+**** eglot
+#+begin_src elisp
+  (setup project)
   (setup xref
     (:option xref-search-program #'ripgrep)
     (:autoload xref-push-marker-stack)) ;; autoload this command for jump-back
@@ -1428,6 +1432,27 @@ eglot client leveraging LTEX Language Server.
     )
   (setup realgud-lldb
     (:autoload realgud--lldb))
+#+end_src
+*** separedit
+#+begin_src elisp
+  (setup edit-indirect)
+  (setup separedit
+    (:option separedit-default-mode 'org-mode
+             separedit-continue-fill-column t
+             separedit-remove-trailing-spaces-in-comment t)
+    (:autoload separedit))
+
+  ;; Key binding for modes you want edit
+  ;; or simply bind ‘global-map’ for all.
+  (define-key prog-mode-map        (kbd "C-c '") #'separedit)
+  ;; (define-key minibuffer-local-map (kbd "C-c '") #'separedit)
+  ;; (define-key help-mode-map        (kbd "C-c '") #'separedit)
+  ;; (define-key helpful-mode-map     (kbd "C-c '") #'separedit)
+
+
+  ;; feature options
+  ;; (setq separedit-preserve-string-indentation t)
+  ;; (setq separedit-write-file-when-execute-save t)
 #+end_src
 * Org Mode
 ** org-mode
@@ -1842,6 +1867,13 @@ among all the files in org-roam in a single agenda-view. The code was borrowed f
 #+begin_src elisp :tangle no
   (setup org-pomodoro
     (:option org-pomodoro-finished-sound "~/Documents/emacs/other-files/applaud.wav"))
+#+end_src
+*** wakatime
+#+begin_src elisp
+  (setup wakatime
+    (:if-system 'darwin)
+    (:defer
+     (global-wakatime-mode)))
 #+end_src
 ** org-noter
 #+begin_src elisp
