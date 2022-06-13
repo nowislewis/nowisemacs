@@ -684,14 +684,15 @@ diff-hl-mode highlights uncommitted changes on the left side of the window (area
 #+begin_src elisp
   (setup save-place
     (:defer save-place-mode))
-  ;; (:hook-into after-init))
 
   (setup autorevert
     (:defer (global-auto-revert-mode t)))                  ; 当另一程序修改了文件时，让 Emacs 及时刷新 Buffer
   (setup hl-line
     (:defer
      (global-hl-line-mode)))
-  (blink-cursor-mode -1)                  ;指针不闪动
+  (setup frame
+    (:defer (blink-cursor-mode -1)                  ;指针不闪动
+            ))
 
   (setup pixel-scroll
     (:defer
@@ -771,7 +772,8 @@ diff-hl-mode highlights uncommitted changes on the left side of the window (area
     (:option vertico-cycle t)
     (:with-map vertico-map
       (:bind [backspace] vertico-directory-delete-char))
-    (:hook-into after-init)
+    (:defer
+     (vertico-mode))
     )
 #+end_src
 ** Orderless
@@ -785,18 +787,16 @@ diff-hl-mode highlights uncommitted changes on the left side of the window (area
 *** consult
 #+begin_src elisp
   (setup consult
-    (:with-map minibuffer-local-map
-      (:bind "C-r" consult-history))
-    (setq register-preview-delay 0
-          register-preview-function #'consult-register-format)
-    (advice-add #'completing-read-multiple :override #'consult-completing-read-multiple)
-    (setq xref-show-xrefs-function #'consult-xref
-          xref-show-definitions-function #'consult-xref)
-    (setq consult-project-root-function
-          (lambda ()
-            (when-let (project (project-current))
-              (car (project-roots project)))))
-    )
+    (:option register-preview-delay 0
+             register-preview-function #'consult-register-format
+             xref-show-xrefs-function #'consult-xref
+             xref-show-definitions-function #'consult-xref
+             consult-project-root-function (lambda ()
+                                             (when-let (project (project-current))
+                                               (car (project-roots project)))))
+  (:with-map minibuffer-local-map
+    (:bind "C-r" consult-history))
+  (advice-add #'completing-read-multiple :override #'consult-completing-read-multiple))
 #+end_src
 *** search other cwd
 #+begin_src elisp
@@ -855,7 +855,9 @@ should be check after reading the embark.el manual
        ;;       [backtab] corfu-previous
        "<escape>" corfu-quit))
     (:defer
-     (global-corfu-mode))
+     (global-corfu-mode)
+     (add-hook 'minibuffer-setup-hook #'corfu-enable-always-in-minibuffer 1)
+     )
     )
 
   (defun corfu-enable-always-in-minibuffer ()
@@ -864,7 +866,6 @@ should be check after reading the embark.el manual
                 (bound-and-true-p vertico--input))
       ;; (setq-local corfu-auto nil) Enable/disable auto completion
       (corfu-mode 1)))
-  (add-hook 'minibuffer-setup-hook #'corfu-enable-always-in-minibuffer 1)
 
   (setup cape
     (add-to-list 'completion-at-point-functions #'cape-file)
@@ -1457,10 +1458,6 @@ eglot client leveraging LTEX Language Server.
 * Org Mode
 ** org-mode
 #+begin_src elisp
-  ;; (setq-default prettify-symbols-alist '(("#+BEGIN_SRC" . "ℱ")
-  ;;                                        ("#+END_SRC" . "Ⅎ")
-  ;;                                        ("#+begin_src" . "ℱ")
-  ;;                                        ("#+end_src" . "Ⅎ")))
   (setup org
     (setq org-directory nowisemacs-doc-org-mode-dir)
     (:option org-adapt-indentation t
@@ -1872,8 +1869,7 @@ among all the files in org-roam in a single agenda-view. The code was borrowed f
 #+begin_src elisp
   (setup wakatime
     (:if-system 'darwin)
-    (:defer
-     (global-wakatime-mode)))
+    (:defer (global-wakatime-mode)))
 #+end_src
 ** org-noter
 #+begin_src elisp
@@ -1904,6 +1900,8 @@ among all the files in org-roam in a single agenda-view. The code was borrowed f
     (interactive (list (citar-select-ref :multiple nil :rebuild-cache t)))
     (if (not (featurep 'citar))
         (require 'citar))
+    (if (not (featurep 'org-roam))
+        (require 'org-roam))
     (let ((title (citar--format-entry-no-widths (cdr keys-entries)
                                                 "${author editor}::${title}")))
       (org-roam-capture- :templates
@@ -1975,7 +1973,6 @@ I use corfu english helper instead of company-english-helper.
 
   (add-hook 'TeX-after-compilation-finished-functions
             #'TeX-revert-document-buffer)
-#+end_src
 #+end_src
 ** elfeed
 #+begin_src elisp
