@@ -556,17 +556,28 @@ Not enabled, now use mixed-pitch
     (set-face-attribute fixed-chinese-english-face nil :family "Sarasa Mono SC Nerd" :height 1.0))
 #+end_src
 ** Theme
+*** modus
 Modus-themes is great especailly for org mode
 #+begin_src elisp
-  (setup modus-themes
-    (:option modus-themes-org-blocks 'tinted-background
-             ;; modus-themes-mode-line '(3d)
-             modus-themes-mode-line '(3d accented)
-             modus-themes-hl-line '(intense accented)
-             modus-themes-paren-match '(intense bold underline)
-             modus-themes-subtle-line-numbers t)
-    ;; (load-theme 'modus-vivendi))
-    (load-theme 'modus-operandi))
+  ;; (setup modus-themes
+  ;;   (:option modus-themes-org-blocks 'tinted-background
+  ;;            ;; modus-themes-mode-line '(3d)
+  ;;            modus-themes-mode-line '(3d accented)
+  ;;            modus-themes-hl-line '(intense accented)
+  ;;            modus-themes-paren-match '(intense bold underline)
+  ;;            modus-themes-subtle-line-numbers t)
+  ;;   ;; (load-theme 'modus-vivendi))
+  ;;   (load-theme 'modus-operandi))
+#+end_src
+*** doom-themes
+#+begin_src elisp
+  (setup doom-themes
+    (load-theme 'doom-monokai-classic t)
+    (:when-loaded
+      ;; ;; Enable flashing mode-line on errors
+      (doom-themes-visual-bell-config)
+      ;; Corrects (and improves) org-mode's native fontification.
+      (doom-themes-org-config)))
 #+end_src
 
 ** all-the-icons
@@ -819,7 +830,7 @@ diff-hl-mode highlights uncommitted changes on the left side of the window (area
     (:when-loaded
       (cl-pushnew 'epkg-marginalia-annotate-package
                   (alist-get 'package marginalia-annotator-registry)))
-    (:hook-into vertico-mode-hook))
+    (:hook-into after-init))
 #+end_src
 ** embark
 should be check after reading the embark.el manual
@@ -1710,11 +1721,10 @@ eglot client leveraging LTEX Language Server.
 #+end_src
 *** org-roam-agenda
 The main purpose for this section is to add every node that has a "TODO" into org-agenda, so I can see all the "TODO"s
-among all the files in org-roam in a single agenda-view. The code was borrowed from vulpea.
-#+begin_src elisp :tangle no
-
+among all the files in org-roam in a single agenda-view. The code was borrowed from vulpea and now in a repo "org-roam-agenda".
+#+begin_src elisp
+(require 'org-roam-agenda)
 #+end_src
-
 ** ox-hugo
 #+begin_src elisp
   (setup tomelr)
