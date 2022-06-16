@@ -7,7 +7,7 @@ bootstrap-borg:
  --url https://github.com/emacscollective/borg.git
 	@cd $(DRONES_DIR)/borg; git symbolic-ref HEAD refs/heads/master
 	@cd $(DRONES_DIR)/borg; git reset --hard HEAD
-clean-init: tangle-init
+init-clean: init-tangle
 # 更新到 remote 最新 commit
 update:
 	./useful-tools/update_submodule.sh

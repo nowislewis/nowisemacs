@@ -229,6 +229,9 @@
 	url = https://github.com/org-roam/org-roam.git
     load-path = .
     load-path = extensions
+[submodule "org-roam-agenda"]
+	path = lib/org-roam-agenda
+	url = https://github.com/nowislewis/org-roam-agenda.git
 [submodule "org-roam-ui"]
 	path = lib/org-roam-ui
 	url = https://github.com/org-roam/org-roam-ui.git
