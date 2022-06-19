@@ -396,6 +396,7 @@ I used to be a vim(evil) user, but now I use meow to manage all my keys.
 
    ;; imenu-list
    '("e l" . imenu-list-smart-toggle)
+   '("e L" . boxy-imenu)
    ;; org-download
    '("e d" . org-download-screenshot)
    ;; english help
@@ -493,6 +494,8 @@ I used to be a vim(evil) user, but now I use meow to manage all my keys.
 * UI
 ** Font
 #+begin_src elisp
+  (defvar lewis-font-size 140)
+  (defvar lewis-fixed-ch-en-font "Sarasa Mono SC Nerd")
   (defun font-installed-p (font-name)
     "Check if font with FONT-NAME is available."
     (find-font (font-spec :name font-name)))
@@ -509,7 +512,7 @@ I used to be a vim(evil) user, but now I use meow to manage all my keys.
                            "Consolas")
              when (font-installed-p font)
              return (progn
-                      (set-face-attribute 'default nil :family font :height 140)
+                      (set-face-attribute 'default nil :family font :height lewis-font-size)
                       (set-face-attribute 'fixed-pitch nil :family font :height 1.0)))
 
     ;; variable-pitch
@@ -554,7 +557,7 @@ Not enabled, now use mixed-pitch
     (set-face-attribute variable-face nil :inherit 'fixed-pitch))
   ;; 中英文等宽字体设置
   (dolist (fixed-chinese-english-face '(org-table))
-    (set-face-attribute fixed-chinese-english-face nil :family "Sarasa Mono SC Nerd" :height 1.0))
+    (set-face-attribute fixed-chinese-english-face nil :family lewis-fixed-ch-en-font :height 1.0))
 #+end_src
 ** Theme
 *** modus
@@ -798,7 +801,7 @@ diff-hl-mode highlights uncommitted changes on the left side of the window (area
 *** consult
 #+begin_src elisp
   (setup consult
-    (:option register-preview-delay 0
+    (:option register-preview-delay 0.1
              register-preview-function #'consult-register-format
              xref-show-xrefs-function #'consult-xref
              xref-show-definitions-function #'consult-xref
@@ -806,8 +809,8 @@ diff-hl-mode highlights uncommitted changes on the left side of the window (area
                                              (when-let (project (project-current))
                                                (car (project-roots project)))))
   (:with-map minibuffer-local-map
-    (:bind "C-r" consult-history))
-  (advice-add #'completing-read-multiple :override #'consult-completing-read-multiple))
+    (:bind "C-r" consult-history)))
+  ;; (advice-add #'completing-read-multiple :override #'consult-completing-read-multiple))
 #+end_src
 *** search other cwd
 #+begin_src elisp
@@ -1124,7 +1127,6 @@ borrowed from citre, now you can always jump-back use "M-,"
       (:defer
        (require 'pyim))
       (setq default-input-method "pyim"))
-
 #+end_src
 * File and Browsing
 ** file browsing
@@ -1151,6 +1153,19 @@ This is adapted from the extra font lock rules provided by Drew Adams' dired+ pa
              imenu-list-position 'left
              imenu-list-auto-update nil
              ))
+#+end_src
+*** boxy
+#+begin_src elisp
+  (setup boxy
+    (:hook (defun boxy-font-set ()
+             (make-local-variable 'default)
+             (set-face-attribute 'default nil :family lewis-fixed-ch-en-font :height lewis-font-size)
+             (make-local-variable 'fixed-pitch )
+             (set-face-attribute 'fixed-pitch nil :family lewis-fixed-ch-en-font :height 1.0))))
+
+  (setup boxy-heading)
+  (setup boxy-imenu)
+  (setup boxy-info)
 #+end_src
 ** perspective
 #+begin_src elisp

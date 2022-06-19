@@ -28,6 +28,15 @@
 [submodule "borg"]
 	path = lib/borg
 	url = https://github.com/emacscollective/borg.git
+[submodule "boxy"]
+	path = lib/boxy
+	url = https://gitlab.com/tygrdev/boxy.git
+[submodule "boxy-headings"]
+	path = lib/boxy-headings
+	url = https://gitlab.com/tygrdev/boxy-headings.git
+[submodule "boxy-imenu"]
+	path = lib/boxy-imenu
+	url = https://gitlab.com/tygrdev/boxy-imenu.git
 [submodule "cape"]
 	path = lib/cape
 	url = https://github.com/minad/cape.git
