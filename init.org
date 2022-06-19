@@ -87,6 +87,7 @@
   - [[#org-present][org-present]]
   - [[#org-citar][org-citar]]
   - [[#toc-org][toc-org]]
+  - [[#org-ql][org-ql]]
 - [[#翻译][翻译]]
   - [[#go-translate][go-translate]]
   - [[#insert-translated-name][insert-translated-name]]
@@ -1081,52 +1082,48 @@ borrowed from citre, now you can always jump-back use "M-,"
 * Input
 ** pyim
 #+begin_src elisp
+    (setup posframe)
+    (setup pyim-tsinghua-dict
+      (:load-after pyim-dict)
+      (:when-loaded
+        (pyim-tsinghua-dict-enable)))
+    (setup xr)
+    (setup pyim
+      (:option pyim-cloudim 'google
+               pyim-punctuation-translate-p '(no yes auto)
+               pyim-page-tooltip 'posframe
+               pyim-page-length 5
+               pyim-dcache-backend 'pyim-dregcache)
+      (:when-loaded
+        (require 'popup nil t)
+        (require 'pyim-dregcache)
+        (require 'pyim-cregexp-utils)
+        (require 'pyim-cstring-utils)
+        (set-default 'pyim-punctuation-half-width-functions
+                     '(pyim-probe-punctuation-line-beginning pyim-probe-punctuation-after-punctuation))
+        ;; pyim-default-scheme 'xiaohe-shuangpin
+        (pyim-default-scheme 'quanpin)
+        (pyim-isearch-mode 1)
 
-
-  ;; 如果使用 pyim-dregcache dcache 后端，就需要加载 pyim-dregcache 包。
-  ;; (setq pyim-dcache-backend 'pyim-dregcache)
-
-
-  (setup posframe)
-  (setup pyim-tsinghua-dict
-    (:load-after pyim-dict)
-    (:when-loaded
-      (pyim-tsinghua-dict-enable)))
-  (setup xr)
-  (setup pyim
-    (:option pyim-cloudim 'baidu
-             pyim-punctuation-translate-p '(no yes auto)
-             pyim-page-tooltip 'posframe
-             pyim-page-length 5
-             pyim-dcache-backend 'pyim-dregcache)
-    (:when-loaded
-      (require 'popup nil t)
-      (require 'pyim-dregcache)
-      (require 'pyim-cregexp-utils)
-      (require 'pyim-cstring-utils)
-      (set-default 'pyim-punctuation-half-width-functions
-                   '(pyim-probe-punctuation-line-beginning pyim-probe-punctuation-after-punctuation))
-      ;; pyim-default-scheme 'xiaohe-shuangpin
-      (pyim-default-scheme 'quanpin)
-      (pyim-isearch-mode 1)
-
-      (defalias 'pyim-probe-meow-normal-mode #'(lambda nil
-                                                 (meow-normal-mode-p)))
-      (set-default 'pyim-english-input-switch-functions '(pyim-probe-auto-english
-                                                          pyim-probe-isearch-mode
-                                                          pyim-probe-program-mode
-                                                          pyim-probe-org-structure-template pyim-probe-org-latex-mode
-                                                          pyim-probe-meow-normal-mode))
-      (defalias 'my-orderless-regexp
-        #'(lambda
-            (orig_func component)
-            (let
-                ((result
-                  (funcall orig_func component)))
-              (pyim-cregexp-build result))))
-      (advice-add 'orderless-regexp :around #'my-orderless-regexp)
-      )
-    (setq default-input-method "pyim"))
+        (defalias 'pyim-probe-meow-normal-mode #'(lambda nil
+                                                   (meow-normal-mode-p)))
+        (set-default 'pyim-english-input-switch-functions '(pyim-probe-auto-english
+                                                            pyim-probe-isearch-mode
+                                                            pyim-probe-program-mode
+                                                            pyim-probe-org-structure-template pyim-probe-org-latex-mode
+                                                            pyim-probe-meow-normal-mode))
+        (defalias 'my-orderless-regexp
+          #'(lambda
+              (orig_func component)
+              (let
+                  ((result
+                    (funcall orig_func component)))
+                (pyim-cregexp-build result))))
+        (advice-add 'orderless-regexp :around #'my-orderless-regexp)
+        )
+      (:defer
+       (require 'pyim))
+      (setq default-input-method "pyim"))
 
 #+end_src
 * File and Browsing
@@ -1795,6 +1792,16 @@ among all the files in org-roam in a single agenda-view. The code was borrowed f
   (setup toc-org
     (:hook-into org-mode))
 #+end_src
+** org-ql
+#+begin_src elisp :tangle no
+  (setup ht)
+  (setup ts)
+  (setup org-super-agenda)
+
+  (setup peg)
+  (setup ov)
+  (setup org-ql)
+#+end_src
 * 翻译
 ** go-translate
 #+begin_src elisp
@@ -1901,6 +1908,7 @@ Simple distraction-free editing. I use darkroom instead of writeroom because it'
     (:option eaf-browser-enable-autofill t
              eaf-webengine-font-family "Noto Sans CJK SC"
              eaf-webengine-fixed-font-family "JetBrainsMono Nerd Font"
+             ;; eaf-find-alternate-file-in-dired t
              )
     ;; for consult preview
     (:with-feature consult
@@ -1928,6 +1936,22 @@ Simple distraction-free editing. I use darkroom instead of writeroom because it'
     (:autoload eaf-open-pdf-from-history))
   (setup eaf-rss-reader
     (:autoload eaf-open-rss-reader))
+
+  (setup eaf-interleave-mode
+    (:option eaf-interleave-org-notes-dir-list '("~/org/interleave/")
+             eaf-interleave-split-direction 'vertical
+             eaf-interleave-disable-narrowing t
+             eaf-interleave-split-lines 20)
+    (:bind "M-." eaf-interleave-sync-current-note
+           "M-p" eaf-interleave-sync-previous-note
+           "M-n" eaf-interleave-sync-next-note)
+    (:with-feature eaf-interleave-app
+      (:bind "C-c M-i" eaf-interleave-add-note
+             "C-c M-o" eaf-interleave-open-notes-file
+             "C-c M-q" eaf-interleave-quit)
+      (:hook-into eaf-pdf-viewer
+                  eaf-browser)))
+
 #+end_src
 ** gnus
 #+begin_src elisp :tangle ~/.gnus.el

@@ -1,9 +1,6 @@
 [submodule "ace-window"]
 	path = lib/ace-window
 	url = https://github.com/abo-abo/ace-window.git
-[submodule "ag"]
-	path = lib/ag
-	url = https://github.com/Wilfred/ag.el.git
 [submodule "all-the-icons"]
 	path = lib/all-the-icons
 	url = https://github.com/domtronn/all-the-icons.el.git
@@ -103,6 +100,7 @@
 	url = https://github.com/emacs-eaf/emacs-application-framework.git
     load-path = .
     load-path = core
+    load-path = extension
 [submodule "edit-indirect"]
 	path = lib/edit-indirect
 	url = https://github.com/Fanael/edit-indirect.git
@@ -344,6 +342,8 @@
 [submodule "wgrep"]
 	path = lib/wgrep
 	url = https://github.com/mhayashi1120/Emacs-wgrep.git
+    no-byte-compile = wgrep-subtest.el
+    no-byte-compile = wgrep-ag.el
 [submodule "which-key"]
 	path = lib/which-key
 	url = https://github.com/justbur/emacs-which-key.git
