@@ -745,7 +745,8 @@ diff-hl-mode highlights uncommitted changes on the left side of the window (area
   (setq fill-column 120)          ;默认显示 100列就换行
   (setq word-wrap t)
   (setq word-wrap-by-category t)
-  (add-hook 'text-mode-hook 'visual-line-mode)
+  (global-visual-line-mode)
+  ;; (add-hook 'text-mode-hook 'visual-line-mode)
   ;; (add-hook 'org-mode-hook 'turn-on-auto-fill)
 #+end_src
 ** so-long
@@ -1154,6 +1155,7 @@ This is adapted from the extra font lock rules provided by Drew Adams' dired+ pa
              imenu-list-auto-update nil
              ))
 #+end_src
+
 *** boxy
 #+begin_src elisp
   (setup boxy
