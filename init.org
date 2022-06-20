@@ -1640,7 +1640,7 @@ eglot client leveraging LTEX Language Server.
                                           ;; #'org-roam-unlinked-references-section
                                           )
              org-roam-directory (concat nowisemacs-doc-root-dir "/orgmode/roam/")
-             org-roam-dailies-directory (concat nowisemacs-doc-root-dir "/orgmode/roam/")
+             org-roam-dailies-directory (concat nowisemacs-doc-root-dir "/orgmode/roam/dailies")
 
              org-roam-db-gc-threshold most-positive-fixnum
              ;; org-roam-node-display-template "${doom-hierarchy:*} ${tags:37}"
