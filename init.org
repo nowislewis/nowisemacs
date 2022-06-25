@@ -441,7 +441,8 @@ I used to be a vim(evil) user, but now I use meow to manage all my keys.
    '("n r i" . org-roam-node-insert)
    '("n r I" . org-id-get-create)
    '("n r M" . org-roam-buffer-display-dedicated)
-   '("n r c" . org-roam-capture)
+   ;; '("n r c" . org-roam-capture)
+   '("n r c" . lewis/org-roam-node-from-cite)
    '("n r t" . org-roam-buffer-toggle)
    '("n r r" . org-roam-ref-find)
    '("n r R" . org-roam-link-replace-all)
@@ -1096,48 +1097,48 @@ borrowed from citre, now you can always jump-back use "M-,"
 * Input
 ** pyim
 #+begin_src elisp
-    (setup posframe)
-    (setup pyim-tsinghua-dict
-      (:load-after pyim-dict)
-      (:when-loaded
-        (pyim-tsinghua-dict-enable)))
-    (setup xr)
-    (setup pyim
-      (:option pyim-cloudim 'google
-               pyim-punctuation-translate-p '(no yes auto)
-               pyim-page-tooltip 'posframe
-               pyim-page-length 5
-               pyim-dcache-backend 'pyim-dregcache)
-      (:when-loaded
-        (require 'popup nil t)
-        (require 'pyim-dregcache)
-        (require 'pyim-cregexp-utils)
-        (require 'pyim-cstring-utils)
-        (set-default 'pyim-punctuation-half-width-functions
-                     '(pyim-probe-punctuation-line-beginning pyim-probe-punctuation-after-punctuation))
-        ;; pyim-default-scheme 'xiaohe-shuangpin
-        (pyim-default-scheme 'quanpin)
-        (pyim-isearch-mode 1)
+  (setup posframe)
+  (setup pyim-tsinghua-dict
+    (:load-after pyim-dict)
+    (:when-loaded
+      (pyim-tsinghua-dict-enable)))
+  (setup xr)
+  (setup pyim
+    (:option pyim-cloudim 'google
+             pyim-punctuation-translate-p '(no yes auto)
+             pyim-page-tooltip 'posframe
+             pyim-page-length 5
+             pyim-dcache-backend 'pyim-dregcache)
+    (:when-loaded
+      (require 'popup nil t)
+      (require 'pyim-dregcache)
+      (require 'pyim-cregexp-utils)
+      (require 'pyim-cstring-utils)
+      (set-default 'pyim-punctuation-half-width-functions
+                   '(pyim-probe-punctuation-line-beginning pyim-probe-punctuation-after-punctuation))
+      ;; pyim-default-scheme 'xiaohe-shuangpin
+      (pyim-default-scheme 'quanpin)
+      (pyim-isearch-mode 1)
 
-        (defalias 'pyim-probe-meow-normal-mode #'(lambda nil
-                                                   (meow-normal-mode-p)))
-        (set-default 'pyim-english-input-switch-functions '(pyim-probe-auto-english
-                                                            pyim-probe-isearch-mode
-                                                            pyim-probe-program-mode
-                                                            pyim-probe-org-structure-template pyim-probe-org-latex-mode
-                                                            pyim-probe-meow-normal-mode))
-        (defalias 'my-orderless-regexp
-          #'(lambda
-              (orig_func component)
-              (let
-                  ((result
-                    (funcall orig_func component)))
-                (pyim-cregexp-build result))))
-        (advice-add 'orderless-regexp :around #'my-orderless-regexp)
-        )
-      (:defer
-       (require 'pyim))
-      (setq default-input-method "pyim"))
+      (defalias 'pyim-probe-meow-normal-mode #'(lambda nil
+                                                 (meow-normal-mode-p)))
+      (set-default 'pyim-english-input-switch-functions '(pyim-probe-auto-english
+                                                          pyim-probe-isearch-mode
+                                                          pyim-probe-program-mode
+                                                          pyim-probe-org-structure-template pyim-probe-org-latex-mode
+                                                          pyim-probe-meow-normal-mode))
+      (defalias 'my-orderless-regexp
+        #'(lambda
+            (orig_func component)
+            (let
+                ((result
+                  (funcall orig_func component)))
+              (pyim-cregexp-build result))))
+      (advice-add 'orderless-regexp :around #'my-orderless-regexp)
+      )
+    (:defer
+     (require 'pyim))
+    (setq default-input-method "pyim"))
 #+end_src
 * File and Browsing
 ** file browsing
@@ -1723,6 +1724,12 @@ eglot client leveraging LTEX Language Server.
                      (window-width . 0.25)
                      (window-parameters . ((no-other-window . t)
                                            (no-delete-other-windows . t)))))
+      ;; (add-to-list 'display-buffer-alist
+      ;;        '("\\*org-roam\\*"
+      ;;          (display-buffer-in-direction)
+      ;;          (direction . right)
+      ;;          (window-width . 0.33)
+      ;;          (window-height . fit-window-to-buffer)))
       (org-roam-buffer-toggle)
       ;; (magit-section-show-level-2-all)
 
@@ -1799,10 +1806,11 @@ among all the files in org-roam in a single agenda-view. The code was borrowed f
     (if (not (featurep 'org-roam))
         (require 'org-roam))
     (let ((title (citar--format-entry-no-widths (cdr keys-entries)
-                                                "${author editor}::${title}")))
+                                                "${title}")))
+                                                ;; "${author editor}::${title}")))
       (org-roam-capture- :templates
                          '(("r" "reference" plain "%?" :if-new
-                            (file+head "reference/${citekey}.org"
+                            (file+head "reference/%<%Y-%m-%d>-${title}.org"
                                        ":PROPERTIES:
   :ROAM_REFS: [cite:@${citekey}]
   :END:
@@ -1812,7 +1820,16 @@ among all the files in org-roam in a single agenda-view. The code was borrowed f
                          :node (org-roam-node-create :title title)
                          :props '(:finalize find-file))))
 
+  ;; org-roam-capture-templates '(("m" "main" plain "%?"
+  ;;                             :target
+  ;;                             (file+head "main/%<%Y-%m-%d>-${slug}.org"
+  ;;                                        "#+title: ${title}\n* Action notes\n* Idea notes\n* Sealed notes")
+
+
 #+end_src
+
+#+RESULTS:
+: lewis/org-roam-node-from-cite
 
 ** toc-org
 #+begin_src elisp
@@ -1822,30 +1839,17 @@ among all the files in org-roam in a single agenda-view. The code was borrowed f
 ** denote
 #+begin_src elisp
   (setup denote
-    (:option denote-directory (expand-file-name "~/Documents/emacs/orgmode/denote/"))
-             ;; denote-use-org-id t)
+    (:option denote-directory (expand-file-name "~/Documents/emacs/orgmode/denote/")
+             denote-front-matter-date-format 'org-timestamp)
     (:defer()
-  ;;          (defun my-denote-journal-with-tmr ()
-  ;;            "Like `my-denote-journal', but also set a 10-minute timer.
-  ;; The `tmr' command is part of the `tmr' package."
-  ;;            (interactive)
-  ;;            (denote
-  ;;             (format-time-string "%A %e %B %Y")
-  ;;             "journal")
-  ;;            (tmr 10 "Practice writing in my journal")) ; set 10 minute timer with a description
            (require 'denote-dired)
            ;; We use different ways to specify a path for demo purposes.
-           (setq denote-dired-directories
-                 (list denote-directory
-                       (thread-last denote-directory (expand-file-name "attachments"))
-                       (thread-last denote-directory (expand-file-name "vlog"))))
-
            (add-hook 'dired-mode-hook #'denote-dired-mode-in-directories)
            )
     )
 #+end_src
 ** xeft
-#+begin_src elisp
+#+begin_src elisp :tangle no
   (setup xeft
       (:option xeft-directory "~/Downloads/test_denote/"
                xeft-database (concat no-littering-var-directory "xeft/db")))
