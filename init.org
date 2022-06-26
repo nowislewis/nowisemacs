@@ -178,7 +178,7 @@ The following content is not enabled yet, because I want to minimize unnecessary
 #+end_src
 
 * Package Management
-I use borg to manage packages, so setup.el is only used to config packages quickly, I write several macros in =noisemacs-base=. It should be noticed that if you use only a =init.el= file, all the funcs or macros defined in =init.el= can't pass native comp, so move these things that you defined yourself to a seperate repo(nowisemacs-base) will resolve this problem.
+I use borg to manage packages, so setup.el is only used to config packages quickly, I write several macros in [[https://github.com/nowislewis/nowisemacs-base.git][nowisemacs-base]]. It should be noticed that if you use only a =init.el= file, all the funcs or macros defined in =init.el= can't pass native comp, so move these things that you defined yourself to a seperate repo(nowisemacs-base) will resolve this problem.
 #+begin_src elisp
   (setup compat)
   (setup closql)
@@ -1752,7 +1752,7 @@ eglot client leveraging LTEX Language Server.
 #+end_src
 *** org-roam-agenda
 The main purpose for this section is to add every node that has a "TODO" into org-agenda, so I can see all the "TODO"s
-among all the files in org-roam in a single agenda-view. The code was borrowed from vulpea and now in a repo "org-roam-agenda".
+among all the files in org-roam in a single agenda-view. The code was borrowed from vulpea and now in a repo "org-roam-agenda". You can see in [[https://github.com/nowislewis/org-roam-agenda.git][org-roam-agenda]]
 #+begin_src elisp
 (require 'org-roam-agenda)
 #+end_src
