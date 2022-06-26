@@ -1810,7 +1810,7 @@ among all the files in org-roam in a single agenda-view. The code was borrowed f
                                                 ;; "${author editor}::${title}")))
       (org-roam-capture- :templates
                          '(("r" "reference" plain "%?" :if-new
-                            (file+head "reference/%<%Y-%m-%d>-${title}.org"
+                            (file+head "reference/${title}.org"
                                        ":PROPERTIES:
   :ROAM_REFS: [cite:@${citekey}]
   :END:
