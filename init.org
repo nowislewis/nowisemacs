@@ -1894,7 +1894,9 @@ I use corfu english helper instead of company-english-helper.
   (setup pdf-tools
     (:option pdf-view-use-scaling t)
     (:with-map pdf-view-mode-map
-      (:bind "h" pdf-annot-add-highlight-markup-annotation))
+      (:bind "h" pdf-annot-add-highlight-markup-annotation
+             "[" pdf-view-scroll-down-or-previous-page
+             "]" pdf-view-scroll-up-or-next-page))
     (pdf-loader-install)
     (add-hook 'pdf-view-mode-hook (lambda() (linum-mode -1))))
 
