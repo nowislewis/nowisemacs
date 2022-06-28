@@ -69,7 +69,6 @@
   - [[#vterm-toggle][vterm-toggle]]
 - [[#git][git]]
   - [[#magit][magit]]
-  - [[#magit-delta][magit-delta]]
   - [[#blamer][blamer]]
   - [[#ediff][ediff]]
 - [[#program][Program]]
@@ -1212,12 +1211,6 @@ This is adapted from the extra font lock rules provided by Drew Adams' dired+ pa
   (setup with-editor)
   (setup magit)
 #+end_src
-** magit-delta
-#+begin_src elisp
-  (setup xterm-color)
-  (setup magit-delta
-    (:hook-into magit-mode))
-#+end_src
 ** blamer
 Show git blame info about current line
 #+begin_src elisp
@@ -1906,6 +1899,7 @@ I use corfu english helper instead of company-english-helper.
             "https://valdyas.org/fading/feed/"
             "https://manateelazycat.github.io/feed.xml")))
 #+end_src
+
 ** nov
 #+begin_src elisp
   (setup esxml) ;; <- (setup kv)
