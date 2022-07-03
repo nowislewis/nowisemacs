@@ -368,3 +368,10 @@
 [submodule "yasnippet"]
 	path = lib/yasnippet
 	url = https://github.com/joaotavora/yasnippet.git
+[submodule "zetteldesk"]
+	path = lib/zetteldesk
+	url = https://github.com/Vidianos-Giannitsis/zetteldesk.el.git
+    no-byte-compile = zetteldesk-kb-complete.el
+    no-byte-compile = zetteldesk-kb.el
+    no-byte-compile = zetteldesk-ref.el
+    no-byte-compile = zetteldesk-remark.el

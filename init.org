@@ -11,6 +11,7 @@
 - [[#keyboard-bindings][Keyboard Bindings]]
   - [[#meow][meow]]
   - [[#meow-commands-like-vim][meow commands like vim]]
+  - [[#transient-for-keybindings][transient for keybindings]]
   - [[#meow-leader-keys][meow leader keys]]
   - [[#which-key][which-key]]
 - [[#ui][UI]]
@@ -335,6 +336,108 @@ I used to be a vim(evil) user, but now I use meow to manage all my keys.
     (progn (meow-join 1)
            (meow-append)))
 #+end_src
+** transient for keybindings
+*** Transient
+#+begin_src elisp
+  (setup transient
+    (require 'transient)
+    (:autoload transient-define-prefix))
+#+end_src
+*** lewis-keybindings
+#+begin_src elisp
+  (transient-define-prefix leader-map-for-lewis()
+    "Define leader-key map for special functions"
+    [["Citre"
+      ("ca" "ace-peek" citre-ace-peek)
+      ("cj" "jump" citre-jump)
+      ("cp" "peek" citre-peek)
+      ("cJ" "jump-back" citre-jump-back)
+      ("cu" "update-this-tags-file" citre-update-this-tags-file)
+      ("cr" "peek-restore" citre-peek-restore)
+      ("cs" "peek-save-session" citre-peek-save-session)
+      ("cl" "peek-load-session" citre-peek-load-session)]
+     ["Youdao"
+      ("yp" "Translate posframe" my-gts-translate-posframe)
+      ("yi" "Translate input" gts-do-translate)]
+     ["Insert trsnlated"
+      ("ii" "name insert" insert-translated-name-insert)
+      ("ir" "name replace" insert-translated-name-replace)]
+     ["Imenu"
+      ("l" "Imenu list smart toggle" imenu-list-smart-toggle)
+      ("L" "Boxy imenu" boxy-imenu)]
+     ;; org-download
+     ["Org download"
+      ("d" "Screenshot" org-download-screenshot)]
+     ;; english help
+     ["English helper"
+      ("ht" "Toggle corfu english helper" toggle-corfu-english-helper)]])
+#+end_src
+*** org-roam-keybindings
+#+begin_src elisp
+  (transient-define-prefix leader-map-for-notes()
+    "Define notes leader-key maps"
+    [["Org Roam Basic"
+      ("f" "find" org-roam-node-find)
+      ("g" "graph" org-roam-graph)
+      ("i" "insert" org-roam-node-insert)
+      ("I" "Id get create" org-id-get-create)
+      ("M" "buffer display dedicated" org-roam-buffer-display-dedicated)
+      ("c" "node from cite" lewis/org-roam-node-from-cite)
+      ("t" "buffer toggle" org-roam-buffer-toggle)
+      ("r" "ref-find" org-roam-ref-find)
+      ("R" "link-replace-all" org-roam-link-replace-all)
+      ("b" "consult-backlinks" consult-org-roam-backlinks)
+      ("B" "consult-forward-links" consult-org-roam-forward-links)
+      ("s" "consult-search" consult-org-roam-search)]
+     ["Org Roam daily"
+      ("dd" "goto-date" org-roam-dailies-goto-date)
+      ("dD" "capture-date" org-roam-dailies-capture-date)
+      ("dm" "goto-tomorrow" org-roam-dailies-goto-tomorrow)
+      ("dM" "capture-tomorrow" org-roam-dailies-capture-tomorrow)
+      ("dn" "capture-today" org-roam-dailies-capture-today)
+      ("dt" "goto-today" org-roam-dailies-goto-today)
+      ("dT" "capture-today" org-roam-dailies-capture-today)
+      ("dy" "goto-yesterday" org-roam-dailies-goto-yesterday)
+      ("dY" "capture-yesterday" org-roam-dailies-capture-yesterday)
+      ("d-" "find-directory" org-roam-dailies-find-directory)]
+      ["Org roam option"
+      ("oa" "alias-add" org-roam-alias-add)
+      ("oA" "alias-remove" org-roam-alias-remove)
+      ("ot" "tag-add" org-roam-tag-add)
+      ("oT" "tag-remove" org-roam-tag-remove)
+      ("or" "ref-add" org-roam-ref-add)
+      ("oR" "ref-remove" org-roam-ref-remove)]
+      ["Zettel-desk"
+       ("m" "Zetteldesk mode" zetteldesk-mode)
+       ("z" "zetteldesk" zetteldesk-keybindings)]])
+#+end_src
+*** zetteldesk-keybindings
+#+begin_src elisp
+  (transient-define-prefix zetteldesk-keybindings
+    "Transient keymap for zetteldesk"
+    [["Add to Zetteldesk"
+      ("an" "Add Node" zetteldesk-add-node-to-desktop)
+      ("ab" "Add Node + All its backlinks" zetteldesk-add-backlinks-to-desktop)
+      ("ap" "Add one of its backlinks" zetteldesk-add-poi-or-moc-backlink-to-desktop)
+      ("aa" "Add Buffer" zetteldesk-add-to-desktop)]
+     ["Remove from Zetteldesk"
+      ("rn" "Remove Node" zetteldesk-remove-node-from-desktop)
+      ("rb" "Remove Node + All its backlinks" zetteldesk-remove-backlinks-from-desktop)
+      ("rr" "Remove from desktop" zetteldesk-remove-from-desktop)]
+     ["Insert from zetteldesk"
+      ("in" "Node and Contents" zetteldesk-insert-node-contents)
+      ("iN" "Node Contents without link" zetteldesk-insert-node-contents-without-link)
+      ("ii" "Link to Node" zetteldesk-node-insert)
+      ("ib" "Insert sort backlinks" zetteldesk-node-insert-sort-backlinks)
+      ("im" "Links to all POIs and MOCs" zetteldesk-node-insert-if-poi-or-moc)
+      ("ip" "Link to PDF" zetteldesk-insert-link-to-pdf)
+      ("io" "Org File Contents" zetteldesk-insert-org-file-contents)]
+     ["Main funtion"
+      ("b"  "Switch to Zetteldesk Buffer" zetteldesk-switch-to-buffer)
+      ("n"  "Find Zetteldesk Node" zetteldesk-node-find)
+      ("s"  "Switch to scratch buffer" zetteldesk-switch-to-scratch-buffer)]
+     ])
+#+end_src
 ** meow leader keys
 #+begin_src elisp
   ;; default
@@ -372,35 +475,7 @@ I used to be a vim(evil) user, but now I use meow to manage all my keys.
 
   ;; lewisliu
   (meow-leader-define-key
-   '("e y p" . my-gts-translate-posframe)
-   '("e y i" . gts-do-translate)
-   ;; citre
-   '("e c a" . citre-ace-peek)
-   '("e c j" . citre-jump)
-   '("e c p" . citre-peek)
-   '("e c J" . citre-jump-back)
-   '("e c u" . citre-update-this-tags-file)
-   '("e c r" . citre-peek-restore)
-   '("e c s" . citre-peek-save-session)
-   '("e c l" . citre-peek-load-session)
-   ;; aweshell
-   '("e a a" . aweshell-toggle)
-   '("e a d" . aweshell-dedicated-toggle)
-   '("e a b" . aweshell-switch-buffer)
-   '("e a s" . aweshell-search-history)
-   ;; '("e d" . dtache-action-map) //TODO Now use global bind in dtache section
-   ;; insert-translated
-   '("e i i" . insert-translated-name-insert)
-   '("e i r" . insert-translated-name-replace)
-
-   ;; imenu-list
-   '("e l" . imenu-list-smart-toggle)
-   '("e L" . boxy-imenu)
-   ;; org-download
-   '("e d" . org-download-screenshot)
-   ;; english help
-   '("e h c" . toggle-corfu-english-helper)
-   '("e h f" . english-teacher-follow-mode))
+   '("e" . leader-map-for-lewis))
 
   ;; search
   (meow-leader-define-key
@@ -432,52 +507,15 @@ I used to be a vim(evil) user, but now I use meow to manage all my keys.
 
   ;; notes
   (meow-leader-define-key
-   '("n r D" . org-roam-demote-entire-buffer)
-   '("n r f" . org-roam-node-find)
-   '("n r g" . org-roam-graph)
-   '("n r i" . org-roam-node-insert)
-   '("n r I" . org-id-get-create)
-   '("n r M" . org-roam-buffer-display-dedicated)
-   ;; '("n r c" . org-roam-capture)
-   '("n r c" . lewis/org-roam-node-from-cite)
-   '("n r t" . org-roam-buffer-toggle)
-   '("n r r" . org-roam-ref-find)
-   '("n r R" . org-roam-link-replace-all)
-   '("n r b" . consult-org-roam-backlinks)
-   '("n r B" . consult-org-roam-forward-links)
-   '("n r s" . consult-org-roam-search)
-
-   ;; date
-   '("n r d b" . org-roam-dailies-goto-previous-note)
-   '("n r d d" . org-roam-dailies-goto-date)
-   '("n r d D" . org-roam-dailies-capture-date)
-   '("n r d f" . org-roam-dailies-goto-next-note)
-   '("n r d m" . org-roam-dailies-goto-tomorrow)
-   '("n r d M" . org-roam-dailies-capture-tomorrow)
-   '("n r d n" . org-roam-dailies-capture-today)
-   '("n r d t" . org-roam-dailies-goto-today)
-   '("n r d T" . org-roam-dailies-capture-today)
-   '("n r d y" . org-roam-dailies-goto-yesterday)
-   '("n r d Y" . org-roam-dailies-capture-yesterday)
-   '("n r d -" . org-roam-dailies-find-directory)
-   ;; "node properties"
-   '("n r o a" . org-roam-alias-add)
-   '("n r o A" . org-roam-alias-remove)
-   '("n r o t" . org-roam-tag-add)
-   '("n r o T" . org-roam-tag-remove)
-   '("n r o r" . org-roam-ref-add)
-   '("n r o R" . org-roam-ref-remove)
-
+   '("n r" . leader-map-for-notes)
    '("n e" . org-noter)
    )
+
   (meow-leader-define-key
-   ;; time
-   ;; '("t t" . org-pomodoro)
    ;;a agenda
    '("a a" . org-agenda)
    ;;w workspace
    '("TAB". perspective-map))
-
   ;;oj
   (meow-leader-define-key
    '("o p" . oj-prepare)
@@ -1706,15 +1744,6 @@ eglot client leveraging LTEX Language Server.
               (file-name-directory
                (file-relative-name (org-roam-node-file node) org-roam-directory))))
           (error "")))
-
-      ;; (add-to-list 'display-buffer-alist
-      ;;              '("\\*org-roam\\*"
-      ;;                (display-buffer-in-side-window)
-      ;;                (side . right)
-      ;;                (slot . 0)
-      ;;                (window-width . 0.25)
-      ;;                (window-parameters . ((no-other-window . t)
-      ;;                                      (no-delete-other-windows . t)))))
       (add-to-list 'display-buffer-alist
              '("\\*org-roam\\*"
                (display-buffer-in-direction)
