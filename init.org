@@ -1375,6 +1375,10 @@ enable eglot in org-src mode
     (:with-map eglot-mode-map
       (:bind [remap xref-find-apropos] #'consult-eglot-symbols)))
 #+end_src
+**** lsp-bridge
+#+begin_src elisp
+(setup lsp-bridge)
+#+end_src
 *** citre
 Citre is an advanced Ctags (or actually, readtags) frontend for Emacs.
 #+begin_src elisp

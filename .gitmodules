@@ -173,6 +173,12 @@
 [submodule "insert-translated-name"]
 	path = lib/insert-translated-name
 	url = https://github.com/manateelazycat/insert-translated-name.git
+[submodule "lsp-bridge"]
+	path = lib/lsp-bridge
+	url = https://github.com/manateelazycat/lsp-bridge.git
+    load-path = .
+    load-path = acm
+    no-byte-compile = acm/acm-backend-tempel.el
 [submodule "magit"]
 	path = lib/magit
 	url = https://github.com/magit/magit.git
