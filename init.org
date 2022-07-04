@@ -57,7 +57,6 @@
   - [[#ace-window][ace-window]]
 - [[#ibuffer][ibuffer]]
   - [[#ibuffer-1][ibuffer]]
-  - [[#all-the-icons-ibuffer][all-the-icons-ibuffer]]
 - [[#input][Input]]
   - [[#pyim][pyim]]
 - [[#file-and-browsing][File and Browsing]]
@@ -70,7 +69,6 @@
   - [[#vterm-toggle][vterm-toggle]]
 - [[#git][git]]
   - [[#magit][magit]]
-  - [[#blamer][blamer]]
   - [[#ediff][ediff]]
 - [[#program][Program]]
   - [[#language][Language]]
@@ -406,37 +404,7 @@ I used to be a vim(evil) user, but now I use meow to manage all my keys.
       ("ot" "tag-add" org-roam-tag-add)
       ("oT" "tag-remove" org-roam-tag-remove)
       ("or" "ref-add" org-roam-ref-add)
-      ("oR" "ref-remove" org-roam-ref-remove)]
-      ["Zettel-desk"
-       ("m" "Zetteldesk mode" zetteldesk-mode)
-       ("z" "zetteldesk" zetteldesk-keybindings)]])
-#+end_src
-*** zetteldesk-keybindings
-#+begin_src elisp
-  (transient-define-prefix zetteldesk-keybindings
-    "Transient keymap for zetteldesk"
-    [["Add to Zetteldesk"
-      ("an" "Add Node" zetteldesk-add-node-to-desktop)
-      ("ab" "Add Node + All its backlinks" zetteldesk-add-backlinks-to-desktop)
-      ("ap" "Add one of its backlinks" zetteldesk-add-poi-or-moc-backlink-to-desktop)
-      ("aa" "Add Buffer" zetteldesk-add-to-desktop)]
-     ["Remove from Zetteldesk"
-      ("rn" "Remove Node" zetteldesk-remove-node-from-desktop)
-      ("rb" "Remove Node + All its backlinks" zetteldesk-remove-backlinks-from-desktop)
-      ("rr" "Remove from desktop" zetteldesk-remove-from-desktop)]
-     ["Insert from zetteldesk"
-      ("in" "Node and Contents" zetteldesk-insert-node-contents)
-      ("iN" "Node Contents without link" zetteldesk-insert-node-contents-without-link)
-      ("ii" "Link to Node" zetteldesk-node-insert)
-      ("ib" "Insert sort backlinks" zetteldesk-node-insert-sort-backlinks)
-      ("im" "Links to all POIs and MOCs" zetteldesk-node-insert-if-poi-or-moc)
-      ("ip" "Link to PDF" zetteldesk-insert-link-to-pdf)
-      ("io" "Org File Contents" zetteldesk-insert-org-file-contents)]
-     ["Main funtion"
-      ("b"  "Switch to Zetteldesk Buffer" zetteldesk-switch-to-buffer)
-      ("n"  "Find Zetteldesk Node" zetteldesk-node-find)
-      ("s"  "Switch to scratch buffer" zetteldesk-switch-to-scratch-buffer)]
-     ])
+      ("oR" "ref-remove" org-roam-ref-remove)]])
 #+end_src
 ** meow leader keys
 #+begin_src elisp
@@ -508,8 +476,7 @@ I used to be a vim(evil) user, but now I use meow to manage all my keys.
   ;; notes
   (meow-leader-define-key
    '("n r" . leader-map-for-notes)
-   '("n e" . org-noter)
-   )
+   '("n e" . org-noter))
 
   (meow-leader-define-key
    ;;a agenda
@@ -664,6 +631,8 @@ diff-hl-mode highlights uncommitted changes on the left side of the window (area
 ** doom-modeline
 #+begin_src elisp
   (setup dash)
+  (setup s)
+  (setup f)
   (setup shrink-path) ;; <-(setup s)(setup f)
 
   (setup doom-modeline
@@ -895,7 +864,6 @@ should be check after reading the embark.el manual
     (setq prefix-help-command 'embark-prefix-help-command)
     (:global "C-S-a" embark-act))
 
-  (setup ag)
   (setup wgrep)
 #+end_src
 ** corfu(instead of company)
@@ -1124,11 +1092,6 @@ borrowed from citre, now you can always jump-back use "M-,"
   (setup ibuffer
     (:global [remap list-buffers] #'ibuffer))
 #+end_src
-** all-the-icons-ibuffer
-#+begin_src elisp
-  (setup all-the-icons-ibuffer
-    (:hook-into ibuffer-mode))
-#+end_src
 * Input
 ** pyim
 #+begin_src elisp
@@ -1187,8 +1150,8 @@ Dirvish is a minimalistic file manager based on Dired. It's fast
 *** diredfl
 This is adapted from the extra font lock rules provided by Drew Adams' dired+ package, but published via a modern means, and with support for older Emacsen removed.
 #+begin_src elisp
-  ;; (setup diredfl
-  ;;   (:hook-into dired-mode))
+  (setup diredfl
+    (:hook-into dired-mode))
 #+end_src
 ** structure browsing
 *** imenu-list
@@ -1248,13 +1211,6 @@ This is adapted from the extra font lock rules provided by Drew Adams' dired+ pa
 #+begin_src elisp
   (setup with-editor)
   (setup magit)
-#+end_src
-** blamer
-Show git blame info about current line
-#+begin_src elisp
-  (setup blamer
-    (:option blamer-idle-time 0.3
-             blamer-min-offset 70))
 #+end_src
 ** ediff
 #+begin_src elisp
@@ -1675,7 +1631,7 @@ eglot client leveraging LTEX Language Server.
 #+begin_src elisp
   (setup emacsql-sqlite-builtin)
   (setup org-roam
-    (:also-load org)
+    
     (:option org-roam-database-connector 'sqlite-builtin
              org-roam-mode-sections       '(org-roam-backlinks-section
                                             org-roam-reflinks-section
@@ -1848,7 +1804,7 @@ among all the files in org-roam in a single agenda-view. The code was borrowed f
     (:hook-into org-mode))
 #+end_src
 ** denote
-#+begin_src elisp
+#+begin_src elisp :tangle no
   (setup denote
     (:option denote-directory (expand-file-name "~/Documents/emacs/orgmode/denote/")
              denote-front-matter-date-format 'org-timestamp)
@@ -1930,7 +1886,7 @@ I use corfu english helper instead of company-english-helper.
 #+end_src
 
 ** nov
-#+begin_src elisp
+#+begin_src elisp :tangle no
   (setup esxml) ;; <- (setup kv)
   (setup nov
     (:file-match "\\.epub\\'"))
@@ -2012,7 +1968,7 @@ Simple distraction-free editing. I use darkroom instead of writeroom because it'
                   eaf-browser)))
 #+end_src
 ** gnus
-#+begin_src elisp :tangle ~/.gnus.el
+#+begin_src elisp :tangle no
   (setq user-full-name "yi liu"
         user-mail-address "lewisliu.gm@gmail.com")
 
