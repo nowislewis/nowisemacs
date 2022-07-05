@@ -142,6 +142,9 @@
 [submodule "epkg-marginalia"]
 	path = lib/epkg-marginalia
 	url = https://github.com/emacscollective/epkg-marginalia.git
+[submodule "esxml"]
+	path = lib/esxml
+	url = https://github.com/tali713/esxml.git
 [submodule "exec-path-from-shell"]
 	path = lib/exec-path-from-shell
 	url = https://github.com/purcell/exec-path-from-shell.git
@@ -173,6 +176,9 @@
 [submodule "insert-translated-name"]
 	path = lib/insert-translated-name
 	url = https://github.com/manateelazycat/insert-translated-name.git
+[submodule "kv"]
+	path = lib/kv
+	url = https://github.com/nicferrier/emacs-kv.git
 [submodule "lsp-bridge"]
 	path = lib/lsp-bridge
 	url = https://github.com/manateelazycat/lsp-bridge.git
@@ -197,12 +203,12 @@
 [submodule "no-littering"]
 	path = lib/no-littering
 	url = https://github.com/emacscollective/no-littering.git
+[submodule "nov"]
+	path = lib/nov
+	url = https://depp.brause.cc/nov.el.git
 [submodule "nowisemacs-base"]
 	path = lib/nowisemacs-base
 	url = https://github.com/nowislewis/nowisemacs-base.git
-[submodule "nyan-mode"]
-	path = lib/nyan-mode
-	url = https://github.com/TeMPOraL/nyan-mode.git
 [submodule "oj"]
 	path = lib/oj
 	url = https://github.com/conao3/oj.el.git
