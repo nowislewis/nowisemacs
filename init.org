@@ -649,6 +649,8 @@ diff-hl-mode highlights uncommitted changes on the left side of the window (area
     (:option awesome-tray-ellipsis "⬇️"
              awesome-tray-separator "  " ;;"∲"
              awesome-tray-file-path-show-filename t
+             awesome-tray-update-interval 0.2
+
              awesome-tray-buffer-name-buffer-changed t
              awesome-tray-git-format "🌿%b"
              )
@@ -665,11 +667,10 @@ diff-hl-mode highlights uncommitted changes on the left side of the window (area
       (add-to-list 'awesome-tray-module-alist '("pyim" . (pyim-awesome-tray awesome-tray-module-input-method-face)))
       (add-to-list 'awesome-tray-module-alist '("persp" . (persp-awesome-tray awesome-tray-module-location-face)))
 
-      (setq awesome-tray-active-modules (list "meow" "location" "belong" "buffer-read-only" "file-path"  "pyim" "persp"  "mode-name" "git"))
+      (setq awesome-tray-active-modules (list "meow" "flymake" "location" "belong" "buffer-read-only" "file-path"  "pyim" "persp"  "mode-name" "git"))
       ))
   ;; (setup awesome-tray
   ;;   (:option
-  ;;    awesome-tray-update-interval 0.2
   ;;    awesome-tray-file-path-truncate-dirname-levels 3
   ;;    awesome-tray-buffer-name-max-length 30)
   ;;   (:when-loaded
