@@ -79,6 +79,9 @@
 [submodule "dashboard"]
 	path = lib/dashboard
 	url = https://github.com/emacs-dashboard/emacs-dashboard.git
+[submodule "deferred"]
+	path = lib/deferred
+	url = https://github.com/kiwanami/emacs-deferred.git
 [submodule "diff-hl"]
 	path = lib/diff-hl
 	url = https://github.com/dgutov/diff-hl.git
@@ -215,6 +218,9 @@
 [submodule "orderless"]
 	path = lib/orderless
 	url = https://github.com/oantolin/orderless.git
+[submodule "org-anki"]
+	path = lib/org-anki
+	url = https://github.com/eyeinsky/org-anki.git
 [submodule "org-appear"]
 	path = lib/org-appear
 	url = https://github.com/awth13/org-appear.git
@@ -259,6 +265,9 @@
 [submodule "posframe"]
 	path = lib/posframe
 	url = https://github.com/tumashu/posframe.git
+[submodule "promise"]
+	path = lib/promise
+	url = https://github.com/chuntaro/emacs-promise.git
 [submodule "pyim"]
 	path = lib/pyim
 	url = https://github.com/tumashu/pyim.git
@@ -274,6 +283,9 @@
 [submodule "rainbow-delimiters"]
 	path = lib/rainbow-delimiters
 	url = https://github.com/Fanael/rainbow-delimiters.git
+[submodule "request"]
+	path = lib/request
+	url = https://github.com/tkf/emacs-request.git
 [submodule "rg"]
 	path = lib/rg
 	url = https://github.com/dajva/rg.el.git
