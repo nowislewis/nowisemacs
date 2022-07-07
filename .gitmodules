@@ -58,9 +58,6 @@
 [submodule "consult-org-roam"]
 	path = lib/consult-org-roam
 	url = https://github.com/jgru/consult-org-roam.git
-[submodule "consult-yasnippet"]
-	path = lib/consult-yasnippet
-	url = https://github.com/mohkale/consult-yasnippet.git
 [submodule "corfu"]
 	path = lib/corfu
 	url = https://github.com/minad/corfu.git

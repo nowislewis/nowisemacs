@@ -48,7 +48,6 @@
   - [[#corfuinstead-of-company][corfu(instead of company)]]
   - [[#corfu-all-the-icons][corfu-all-the-icons]]
   - [[#yasnippet][yasnippet]]
-  - [[#consult-yasnippet][consult-yasnippet]]
   - [[#rgel][rg.el]]
 - [[#window-management][Window Management]]
   - [[#winner-mode][winner-mode]]
@@ -189,8 +188,6 @@ I use borg to manage packages, so setup.el is only used to config packages quick
 Enforce a sneaky Garbage Collection strategy to minimize GC interference with user activity.
 #+begin_src elisp
   (setup gcmh
-    (:option gcmh-idle-delay 5
-             gcmh-high-cons-threshold #x1000000) ; 16MB
     (:defer
      (gcmh-mode 1)))
 #+end_src
@@ -1024,10 +1021,6 @@ should be check after reading the embark.el manual
     (:option yas-snippet-dirs (list (concat nowisemacs-config-useful-tools "snippets")))
     (:defer (yas-global-mode)))
 #+end_src
-** consult-yasnippet
-#+begin_src elisp
-  (setup consult-yasnippet)
-#+end_src
 ** rg.el
 #+begin_src elisp
   (setup rg)
@@ -1093,7 +1086,7 @@ borrowed from citre, now you can always jump-back use "M-,"
   (setq bookmark-default-file "~/Documents/emacs/other-files/bookmarks")
 #+end_src
 ** ace-window
-#+begin_src elisp
+#+begin_src elisp :tangle no
   (setup ace-window
     (:global [remap other-window] #'ace-window))
 #+end_src
@@ -1761,10 +1754,6 @@ among all the files in org-roam in a single agenda-view. The code was borrowed f
   ;; borrowed from https://jethrokuan.github.io/org-roam-guide/ as a method for insert notes for reference
   (defun lewis/org-roam-node-from-cite (keys-entries)
     (interactive (list (citar-select-ref :multiple nil :rebuild-cache t)))
-    (if (not (featurep 'citar))
-        (require 'citar))
-    (if (not (featurep 'org-roam))
-        (require 'org-roam))
     (let ((title (citar--format-entry-no-widths (cdr keys-entries)
                                                 "${title}")))
                                                 ;; "${author editor}::${title}")))
