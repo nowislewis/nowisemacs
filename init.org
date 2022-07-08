@@ -1,6 +1,5 @@
  #+TITLE: Emacs Configuration
 #+PROPERTY: header-args:elisp :tangle ~/.emacs.d/init.el
-"Simulate company with corfu" is at the end of this file.
 
 * Content                                                               :toc:
 - [[#startup-config][Startup config]]
@@ -84,7 +83,6 @@
   - [[#org-present][org-present]]
   - [[#org-citar][org-citar]]
   - [[#toc-org][toc-org]]
-  - [[#denote][denote]]
   - [[#org-anki][org-anki]]
 - [[#翻译][翻译]]
   - [[#go-translate][go-translate]]
@@ -98,11 +96,8 @@
 - [[#tools][tools]]
   - [[#xwidget][xwidget]]
   - [[#ojel-for-online-program-contest][oj.el for online program contest]]
-  - [[#sudo-edit][sudo-edit]]
   - [[#eaf][eaf]]
-  - [[#gnus][gnus]]
   - [[#proxy][proxy]]
-  - [[#simulate-company-with-corfu][Simulate company with corfu]]
 
 * Startup config
 ** UI speed up
@@ -539,9 +534,7 @@ I used to be a vim(evil) user, but now I use meow to manage all my keys.
   (setup mixed-pitch
     (:hook-into text-mode)
     (:when-loaded
-      (delete 'org-table mixed-pitch-fixed-pitch-faces)
-      )
-    )
+      (delete 'org-table mixed-pitch-fixed-pitch-faces)))
 
   ;; 中英文严格等宽字体设置
   (with-eval-after-load 'org
@@ -627,7 +620,7 @@ diff-hl-mode highlights uncommitted changes on the left side of the window (area
     (dashboard-setup-startup-hook))
 #+end_src
 ** doom-modeline
-#+begin_src elisp :tangle no
+#+begin_src elisp
   (setup dash)
   (setup s)
   (setup f)
@@ -642,7 +635,7 @@ diff-hl-mode highlights uncommitted changes on the left side of the window (area
     (:hook-into after-init))
 #+end_src
 ** awesome-tray
-#+begin_src elisp
+#+begin_src elisp :tangle no
   (setup awesome-tray
     (:option awesome-tray-ellipsis "⬇️"
              awesome-tray-separator "  " ;;"∲"
@@ -728,6 +721,8 @@ diff-hl-mode highlights uncommitted changes on the left side of the window (area
     (:defer
      (pixel-scroll-precision-mode t)))
   ;; 最近发现和 pdf-view-mode 工作不协调
+  (setup repeat
+    (:defer (repeat-mode)))
 #+end_src
 ** backup,
 *** super-save
@@ -866,7 +861,6 @@ should be check after reading the embark.el manual
   (setup embark-consult
     (add-hook 'embark-collect-mode-hook #'consult-preview-at-point-mode))
 
-  (setup avy)
   (setup embark
     (:also-load embark-consult)
     (setq prefix-help-command 'embark-prefix-help-command)
@@ -1177,8 +1171,6 @@ This is adapted from the extra font lock rules provided by Drew Adams' dired+ pa
              (set-face-attribute 'default nil :family lewis-fixed-ch-en-font :height lewis-font-size)
              (make-local-variable 'fixed-pitch )
              (set-face-attribute 'fixed-pitch nil :family lewis-fixed-ch-en-font :height 1.0))))
-
-  (setup boxy-heading)
   (setup boxy-imenu)
   (setup boxy-info)
 #+end_src
@@ -1328,8 +1320,8 @@ Emacs major-mode to work with Beancount ledger files
   (setup markdown-mode
     (:file-match "\\.md\\'"))
 
-  (setup eldoc-box
-    (add-hook 'eglot--managed-mode-hook #'eldoc-box-hover-at-point-mode t))
+  ;; (setup eldoc-box
+  ;;   (add-hook 'eglot--managed-mode-hook #'eldoc-box-hover-at-point-mode t))
 
   (setq read-process-output-max (* 1024 1024))
   (setup eglot
@@ -1338,7 +1330,7 @@ Emacs major-mode to work with Beancount ledger files
   (setup eldoc
     (:option eldoc-echo-area-use-multiline-p t
              eldoc-echo-area-display-truncation-message nil))
-  ;; # (setq eldoc-echo-area-prefer-doc-buffer nil)
+  ;; (setq eldoc-echo-area-prefer-doc-buffer nil)
 #+end_src
 **** consult-eglot
 #+begin_src elisp
@@ -1775,19 +1767,8 @@ among all the files in org-roam in a single agenda-view. The code was borrowed f
   (setup toc-org
     (:hook-into org-mode))
 #+end_src
-** denote
-#+begin_src elisp :tangle no
-  (setup denote
-    (:option denote-directory (expand-file-name "~/Documents/emacs/orgmode/denote/")
-             denote-front-matter-date-format 'org-timestamp)
-    (:defer()
-           (require 'denote-dired)
-           ;; (add-hook 'dired-mode-hook #'denote-dired-mode-in-directories)
-           )
-    )
-#+end_src
 ** org-anki
-#+begin_src elisp
+#+begin_src elisp :tangle no
   (setup promise)
   (setup deferred)
   (setup request)
@@ -1891,10 +1872,6 @@ Simple distraction-free editing. I use darkroom instead of writeroom because it'
   (setup oj
     (:option oj-default-online-judge 'codeforces))
 #+end_src
-** sudo-edit
-#+begin_src elisp
-  (setup sudo-edit)
-#+end_src
 ** eaf
 #+begin_src elisp
   (setup eaf
@@ -1946,27 +1923,6 @@ Simple distraction-free editing. I use darkroom instead of writeroom because it'
       (:hook-into eaf-pdf-viewer
                   eaf-browser)))
 #+end_src
-** gnus
-#+begin_src elisp :tangle no
-  (setq user-full-name "yi liu"
-        user-mail-address "lewisliu.gm@gmail.com")
-
-  ;; Send email through SMTP
-  (setq message-send-mail-function 'smtpmail-send-it
-        smtpmail-default-smtp-server "smtp.gmail.com"
-        smtpmail-smtp-service 587
-        smtpmail-local-domain "homepc")
-
-  (setq gnus-select-method
-        '(nnimap "gmail"
-                 (nnimap-address "imap.gmail.com")  ; it could also be imap.googlemail.com if that's your server.
-                 (nnimap-server-port "imaps")
-                 (nnimap-stream ssl)))
-
-  (setq smtpmail-smtp-server "smtp.gmail.com"
-        smtpmail-smtp-service 587
-        gnus-ignored-newsgroups "^to\\.\\|^[0-9. ]+\\( \\|$\\)\\|^[\"]\"[#'()]")
-#+end_src
 ** proxy
 #+begin_src elisp
   ;; Configure network proxy
@@ -1997,33 +1953,4 @@ Simple distraction-free editing. I use darkroom instead of writeroom because it'
     (if url-proxy-services
         (unset-proxy)
       (set-proxy)))
-#+end_src
-** Simulate company with corfu
-Company is wide-used, but I use corfu for its simplity. So I add a simulation for some packages which use
-company. Currently, These codes are test only with English-helper, which is a great package helping writing English.
-
-Everytime you want to use a command that relys on =company-mode= such as =toggle-company-english-helper=, you should first call =simulate-company-with-corfu= using =M-x= manually.
-#+begin_src elisp :tangle no
-  (defun simulate-company-with-corfu()
-    (interactive)
-    (defvaralias 'company-candidates 'corfu--candidates)
-    (defalias 'company-mode 'corfu-mode) ;; should be deleted
-    (defvaralias 'company-mode 'corfu-mode) ;; should be deleted
-    (setq company-backends '())
-    (setq completion-at-point-functions-backup completion-at-point-functions)
-    (provide 'company)
-
-    (defun set-completion-functions ()
-      (setq completion-at-point-functions (cl-concatenate 'list (mapcar #'cape-company-to-capf company-backends) completion-at-point-functions-backup)))
-
-    (defun company-grab-symbol ()
-      "If point is at the end of a symbol, return it.
-      Otherwise, if point is not inside a symbol, return an empty string."
-      (if (looking-at "\\_>")
-          (buffer-substring (point) (save-excursion (skip-syntax-backward "w_")
-                                                    (point)))
-        (unless (and (char-after) (memq (char-syntax (char-after)) '(?w ?_)))
-          "")))
-    (advice-add 'toggle-company-english-helper :after #'set-completion-functions)
-    )
 #+end_src
