@@ -142,6 +142,9 @@
 [submodule "f"]
 	path = lib/f
 	url = https://github.com/rejeep/f.el.git
+[submodule "format-all"]
+	path = lib/format-all
+	url = https://github.com/lassik/emacs-format-all-the-code.git
 [submodule "gcmh"]
 	path = lib/gcmh
 	url = https://github.com/emacsmirror/gcmh.git
@@ -164,12 +167,18 @@
 [submodule "imenu-list"]
 	path = lib/imenu-list
 	url = https://github.com/bmag/imenu-list.git
+[submodule "inheritenv"]
+	path = lib/inheritenv
+	url = https://github.com/purcell/inheritenv.git
 [submodule "insert-translated-name"]
 	path = lib/insert-translated-name
 	url = https://github.com/manateelazycat/insert-translated-name.git
 [submodule "kv"]
 	path = lib/kv
 	url = https://github.com/nicferrier/emacs-kv.git
+[submodule "language-id"]
+	path = lib/language-id
+	url = https://github.com/lassik/emacs-language-id.git
 [submodule "lsp-bridge"]
 	path = lib/lsp-bridge
 	url = https://github.com/manateelazycat/lsp-bridge.git
