@@ -208,8 +208,8 @@ I used to be a vim(evil) user, but now I use meow to manage all my keys.
              ;; motion keys
              (meow-motion-overwrite-define-key '("j" . meow-next)
                                                '("k" . meow-prev)
-                                               '("h" . meow-left)
-                                               '("l" . meow-right)
+                                               ;; '("h" . meow-left)
+                                               ;; '("l" . meow-right)
                                                '("<escape>" . ignore)
                                                '("." . repeat))
              ;; normal keys
@@ -411,8 +411,8 @@ I used to be a vim(evil) user, but now I use meow to manage all my keys.
    ;; SPC j/k will run the original command in MOTION state.
    '("j" . "H-j")
    '("k" . "H-k")
-   '("h" . "H-h")
-   '("l" . "H-l")
+   ;; '("h" . "H-h")
+   ;; '("l" . "H-l")
    '("." . "H-.")
    ;; Use SPC (0-9) for digit arguments.
    '("1" . meow-digit-argument)
@@ -1329,7 +1329,57 @@ Emacs major-mode to work with Beancount ledger files
 #+end_src
 **** lsp-bridge
 #+begin_src elisp
-(setup lsp-bridge)
+  (setup lsp-bridge)
+
+  ;; lsp-bridge-toggle-english-helper
+  ;; lsp-bridge-mode
+  ;; lsp-bridge-list-diagnostics
+  ;; lsp-bridge-jump-to-next-diagnostic
+  ;; global-lsp-bridge-mode
+  ;; lsp-bridge-code-format
+  ;; lsp-bridge-rename
+  ;; lsp-bridge-find-def
+  ;; lsp-bridge-ref-mode
+  ;; lsp-bridge-ref-quit
+  ;; lsp-bridge-find-impl
+  ;; lsp-bridge-ref-popup
+  ;; lsp-bridge-code-action
+  ;; lsp-bridge-find-define
+  ;; lsp-bridge-kill-process
+  ;; lsp-bridge-ref-unfilter
+  ;; lsp-bridge-ref-open-file
+  ;; lsp-bridge-find-references
+  ;; lsp-bridge-ref-delete-line
+  ;; lsp-bridge-restart-process
+  ;; lsp-bridge-return-from-def
+  ;; lsp-bridge-ref-recover-line
+  ;; lsp-bridge-ref-apply-changed
+  ;; lsp-bridge-ref-jump-next-file
+  ;; lsp-bridge-ref-jump-prev-file
+  ;; lsp-bridge-ref-recover-buffer
+  ;; lsp-bridge-insert-common-prefix
+  ;; lsp-bridge-lookup-documentation
+  ;; lsp-bridge-ref-delete-all-lines
+  ;; lsp-bridge-signature-help-fetch
+  ;; lsp-bridge-find-def-other-window
+  ;; lsp-bridge-ref-beginning-of-line
+  ;; lsp-bridge-ref-jump-next-keyword
+  ;; lsp-bridge-ref-jump-prev-keyword
+  ;; lsp-bridge-find-impl-other-window
+  ;; lsp-bridge-ref-filter-match-files
+  ;; lsp-bridge-ref-open-file-and-stay
+  ;; lsp-bridge-jump-to-prev-diagnostic
+  ;; lsp-bridge-ref-insert-current-line
+  ;; lsp-bridge-ref-replace-all-matches
+  ;; lsp-bridge-ref-switch-to-edit-mode
+  ;; lsp-bridge-ref-switch-to-view-mode
+  ;; lsp-bridge-ref-filter-match-results
+  ;; lsp-bridge-ignore-current-diagnostic
+  ;; lsp-bridge-ref-filter-mismatch-files
+  ;; lsp-bridge-ref-filter-mismatch-results
+  ;; lsp-bridge-ref-remove-line-from-results
+  ;; lsp-bridge-popup-documentation-scroll-up
+  ;; lsp-bridge-popup-documentation-scroll-down
 #+end_src
 *** citre
 Citre is an advanced Ctags (or actually, readtags) frontend for Emacs.

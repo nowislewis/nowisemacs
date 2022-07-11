@@ -10,9 +10,6 @@
 [submodule "avy"]
 	path = lib/avy
 	url = https://github.com/abo-abo/avy.git
-[submodule "awesome-tray"]
-	path = lib/awesome-tray
-	url = https://github.com/manateelazycat/awesome-tray.git
 [submodule "beancount"]
 	path = lib/beancount
 	url = https://github.com/beancount/beancount-mode.git
