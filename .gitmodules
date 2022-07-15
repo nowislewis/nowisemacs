@@ -105,6 +105,9 @@
     load-path = .
     load-path = core
     load-path = extension
+[submodule "ebib"]
+	path = lib/ebib
+	url = https://github.com/joostkremers/ebib.git
 [submodule "edit-indirect"]
 	path = lib/edit-indirect
 	url = https://github.com/Fanael/edit-indirect.git
@@ -155,6 +158,9 @@
 [submodule "gcmh"]
 	path = lib/gcmh
 	url = https://github.com/emacsmirror/gcmh.git
+[submodule "gif-screencast"]
+	path = lib/gif-screencast
+	url = https://gitlab.com/Ambrevar/emacs-gif-screencast.git
 [submodule "go-translate"]
 	path = lib/go-translate
 	url = https://github.com/lorniu/go-translate.git

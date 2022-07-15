@@ -82,6 +82,7 @@
   - [[#citar-org-roam][citar-org-roam]]
   - [[#toc-org][toc-org]]
   - [[#org-anki][org-anki]]
+  - [[#ebib][ebib]]
 - [[#翻译][翻译]]
   - [[#go-translate][go-translate]]
   - [[#insert-translated-name][insert-translated-name]]
@@ -98,6 +99,7 @@
   - [[#eaf][eaf]]
   - [[#proxy][proxy]]
   - [[#app-launcher][app-launcher]]
+  - [[#gif-screencast][gif-screencast]]
 
 * Startup config
 ** UI speed up
@@ -406,6 +408,23 @@ I used to be a vim(evil) user, but now I use meow to manage all my keys.
       ("or" "ref-add" org-roam-ref-add)
       ("oR" "ref-remove" org-roam-ref-remove)]])
 #+end_src
+*** tools-keybindings
+#+begin_src elisp
+  (transient-define-prefix leader-map-for-tools()
+    "Define leader-key map for special functions"
+    [["Gif-screencast"
+      ("gs" "gif-screen-start-or-stop" gif-screencast-start-or-stop)
+      ("gp" "gif-screen-pause" gif-screencast-toggle-pause)
+      ]
+     ["App-launcher"
+      ("a" "app-run" app-launcher-run-app)]
+     ["Vterm-toggle"
+      ("vt" "vterm-toggle" vterm-toggle)
+      ("vf" "vterm-toggle" vterm-toggle-forward)
+      ("vb" "vterm-toggle" vterm-toggle-backward)]
+     ])
+
+#+end_src
 ** meow leader keys
 #+begin_src elisp
   ;; default
@@ -459,12 +478,9 @@ I used to be a vim(evil) user, but now I use meow to manage all my keys.
    '("s i" . consult-imenu)
    '("s s" . consult-line)
    )
-  ;; vterm
+  ;; tools
   (meow-leader-define-key
-   '("t i" . vterm-toggle-insert-cd)
-   '("t t" . vterm-toggle)
-   '("t n" . vterm-toggle-forward)
-   '("t p" . vterm-toggle-backward))
+   '("t" . leader-map-for-tools))
 
   (defun find-config-file()
     (interactive)
@@ -1849,6 +1865,11 @@ among all the files in org-roam in a single agenda-view. The code was borrowed f
   (setup request)
   (setup org-anki)
 #+end_src
+** ebib
+#+begin_src elisp
+  (setup ebib
+    (:option ebib-preload-bib-files '("~/Documents/emacs/orgmode/bibliography/better_zotero_bib.bib")))
+#+end_src
 * 翻译
 ** go-translate
 #+begin_src elisp
@@ -2040,4 +2061,14 @@ Simple distraction-free editing. I use darkroom instead of writeroom because it'
 ** app-launcher
 #+begin_src elisp
 (setup app-launcher)
+#+end_src
+** gif-screencast
+#+begin_src elisp
+  (setup gif-screencast
+    (:if-system 'darwin)
+    (:when-loaded
+      (:option gif-screencast-args '("-x") ;; To shut up the shutter sound of `screencapture' (see `gif-screencast-command').
+               gif-screencast-cropping-program "mogrify" ;; Optional: Used to crop the capture to the Emacs frame.
+               gif-screencast-capture-format "ppm" ;; Optional: Required to crop captured images.
+               gif-screencast-scale-factor 2.0)))
 #+end_src
