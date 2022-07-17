@@ -10,7 +10,7 @@
 - [[#keyboard-bindings][Keyboard Bindings]]
   - [[#meow][meow]]
   - [[#meow-commands-like-vim][meow commands like vim]]
-  - [[#transient-for-keybindings][transient for keybindings]]
+  - [[#transient-for-leader-keybindings][transient for leader-keybindings]]
   - [[#meow-leader-keys][meow leader keys]]
   - [[#which-key][which-key]]
 - [[#ui][UI]]
@@ -336,7 +336,7 @@ I used to be a vim(evil) user, but now I use meow to manage all my keys.
     (progn (meow-join 1)
            (meow-append)))
 #+end_src
-** transient for keybindings
+** transient for leader-keybindings
 *** Transient
 #+begin_src elisp
   (setup transient
@@ -356,22 +356,41 @@ I used to be a vim(evil) user, but now I use meow to manage all my keys.
       ("cr" "peek-restore" citre-peek-restore)
       ("cs" "peek-save-session" citre-peek-save-session)
       ("cl" "peek-load-session" citre-peek-load-session)]
-     ["Youdao"
-      ("yp" "Translate posframe" my-gts-translate-posframe)
-      ("yi" "Translate input" gts-do-translate)]
-     ["Insert trsnlated"
-      ("ii" "name insert" insert-translated-name-insert)
-      ("ir" "name replace" insert-translated-name-replace)]
      ["Imenu"
       ("l" "Imenu list smart toggle" imenu-list-smart-toggle)
       ("L" "Boxy imenu" boxy-imenu)]
+     ["Insert trsnlated"
+      ("ii" "name insert" insert-translated-name-insert)
+      ("ir" "name replace" insert-translated-name-replace)]
+     ;; english help
+     ["English helper"
+      ("ht" "Toggle corfu english helper" toggle-corfu-english-helper)]
      ;; org-download
      ["Org download"
       ("d" "Screenshot" org-download-screenshot)]
-     ;; english help
-     ["English helper"
-      ("ht" "Toggle corfu english helper" toggle-corfu-english-helper)]])
+     ["Youdao"
+      ("yp" "Translate posframe" my-gts-translate-posframe)
+      ("yi" "Translate input" gts-do-translate)]])
+
 #+end_src
+*** search-keybindings
+#+begin_src elisp
+  (transient-define-prefix leader-map-for-search()
+    "Define leader-key map for special functions"
+    [["Search"
+      ("b" "consult-buffer" consult-buffer)
+      ("d" "consult-ripgrep" consult-ripgrep)
+      ("D" "ripgrep-search-other-dir" lewis/ripgrep-search-other-dir)
+      ("f" "consult-find" consult-find)
+      ("F" "find-file-other-dir" lewis/find-file-other-dir)
+      ("g" "rg" rg)
+      ("h" "consult-history" consult-history)
+      ("i" "consult-imenu" consult-imenu)
+      ("j" "consult-dir" consult-dir)
+      ("s" "consult-line" consult-line)
+      ]])
+#+end_src
+
 *** org-roam-keybindings
 #+begin_src elisp
   (transient-define-prefix leader-map-for-notes()
@@ -408,22 +427,27 @@ I used to be a vim(evil) user, but now I use meow to manage all my keys.
       ("or" "ref-add" org-roam-ref-add)
       ("oR" "ref-remove" org-roam-ref-remove)]])
 #+end_src
-*** tools-keybindings
+*** Apps-keybindings
 #+begin_src elisp
-  (transient-define-prefix leader-map-for-tools()
+  (transient-define-prefix leader-map-for-apps()
     "Define leader-key map for special functions"
-    [["Gif-screencast"
+    [["Agenda"
+      ("a" "org-agenda" org-agenda)]
+     ["Gif-screencast"
       ("gs" "gif-screen-start-or-stop" gif-screencast-start-or-stop)
       ("gp" "gif-screen-pause" gif-screencast-toggle-pause)
       ]
      ["App-launcher"
-      ("a" "app-run" app-launcher-run-app)]
+      ("l" "launcher" app-launcher-run-app)]
      ["Vterm-toggle"
       ("vt" "vterm-toggle" vterm-toggle)
-      ("vf" "vterm-toggle" vterm-toggle-forward)
-      ("vb" "vterm-toggle" vterm-toggle-backward)]
+      ("vf" "vterm-toggle-forward" vterm-toggle-forward)
+      ("vb" "vterm-toggle-backward" vterm-toggle-backward)]
+     ["OJ"
+      ("op" "oj-prepare" oj-prepare)
+      ("ot" "oj-test" oj-test)
+      ("oh" "oj-open-home-dir" oj-open-home-dir)]
      ])
-
 #+end_src
 ** meow leader keys
 #+begin_src elisp
@@ -468,19 +492,11 @@ I used to be a vim(evil) user, but now I use meow to manage all my keys.
 
   ;; search
   (meow-leader-define-key
-   '("s b" . consult-buffer)
-   '("s d" . consult-ripgrep)
-   '("s D" . lewis/ripgrep-search-other-dir)
-   '("s f" . consult-find)
-   '("s F" . lewis/find-file-other-dir)
-   '("s g" . rg)
-   '("s h" . consult-history)
-   '("s i" . consult-imenu)
-   '("s s" . consult-line)
+   '("s" . leader-map-for-search)
    )
-  ;; tools
+  ;; appss
   (meow-leader-define-key
-   '("t" . leader-map-for-tools))
+   '("a" . leader-map-for-apps))
 
   (defun find-config-file()
     (interactive)
@@ -497,15 +513,8 @@ I used to be a vim(evil) user, but now I use meow to manage all my keys.
    '("n e" . org-noter))
 
   (meow-leader-define-key
-   ;;a agenda
-   '("a a" . org-agenda)
    ;;w workspace
    '("TAB". perspective-map))
-  ;;oj
-  (meow-leader-define-key
-   '("o p" . oj-prepare)
-   '("o t" . oj-test)
-   '("o h" . oj-open-home-dir))
 #+end_src
 ** which-key
 #+begin_src elisp
@@ -868,6 +877,16 @@ diff-hl-mode highlights uncommitted changes on the left side of the window (area
     )
   (setup consult-dash)
     #+end_src
+*** consult-dir
+#+begin_src elisp
+  (setup consult-dir)
+#+end_src
+*** consult-notes
+#+begin_src elisp
+  (setup consult-notes
+    (:option consult-notes-sources '(("Name" ?n "~/Documents/emacs/orgmode/roam/"))))
+#+end_src
+
 ** Marginalia
 #+begin_src elisp
   (setup epkg-marginalia)
@@ -926,7 +945,7 @@ should be check after reading the embark.el manual
   (setup cape
     (add-to-list 'completion-at-point-functions #'cape-file)
     ;; (add-to-list 'completion-at-point-functions #'cape-tex)
-    (add-to-list 'completion-at-point-functions #'cape-dabbrev)
+    ;; (add-to-list 'completion-at-point-functions #'cape-dabbrev)
     ;; (add-to-list 'completion-at-point-functions #'cape-keyword)
     )
 
@@ -1272,6 +1291,9 @@ Emacs major-mode to work with Beancount ledger files
 #+begin_src elisp
   (setup beancount
     (:file-match "\\.beancount\\'"))
+    (add-to-list 'auto-mode-alist
+               (cons "\\.[pP][dD][fF]\\'" 'eaf-mode))
+
 #+end_src
 *** latex
 #+begin_src elisp :tangle no
@@ -1783,10 +1805,10 @@ among all the files in org-roam in a single agenda-view. The code was borrowed f
     (:option org-pomodoro-finished-sound "~/Documents/emacs/other-files/applaud.wav"))
 #+end_src
 *** wakatime
-#+begin_src elisp
-  (setup wakatime
-    (:if-system 'darwin)
-    (:defer (global-wakatime-mode)))
+#+begin_src elisp :tangle no
+  ;; (setup wakatime
+  ;;   (:if-system 'darwin)
+  ;;   (:defer (global-wakatime-mode)))
 #+end_src
 ** org-noter
 #+begin_src elisp
@@ -2066,6 +2088,9 @@ Simple distraction-free editing. I use darkroom instead of writeroom because it'
 #+begin_src elisp
   (setup gif-screencast
     (:if-system 'darwin)
+    (:autoload gif-screencast-start-or-stop
+               gif-screencast-toggle-pause)
+
     (:when-loaded
       (:option gif-screencast-args '("-x") ;; To shut up the shutter sound of `screencapture' (see `gif-screencast-command').
                gif-screencast-cropping-program "mogrify" ;; Optional: Used to crop the capture to the Emacs frame.
