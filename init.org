@@ -81,7 +81,6 @@
   - [[#org-citar][org-citar]]
   - [[#citar-org-roam][citar-org-roam]]
   - [[#toc-org][toc-org]]
-  - [[#org-anki][org-anki]]
   - [[#ebib][ebib]]
 - [[#翻译][翻译]]
   - [[#go-translate][go-translate]]
@@ -1375,60 +1374,6 @@ Emacs major-mode to work with Beancount ledger files
     (:with-map eglot-mode-map
       (:bind [remap xref-find-apropos] #'consult-eglot-symbols)))
 #+end_src
-**** lsp-bridge
-#+begin_src elisp
-  (setup lsp-bridge)
-
-  ;; lsp-bridge-toggle-english-helper
-  ;; lsp-bridge-mode
-  ;; lsp-bridge-list-diagnostics
-  ;; lsp-bridge-jump-to-next-diagnostic
-  ;; global-lsp-bridge-mode
-  ;; lsp-bridge-code-format
-  ;; lsp-bridge-rename
-  ;; lsp-bridge-find-def
-  ;; lsp-bridge-ref-mode
-  ;; lsp-bridge-ref-quit
-  ;; lsp-bridge-find-impl
-  ;; lsp-bridge-ref-popup
-  ;; lsp-bridge-code-action
-  ;; lsp-bridge-find-define
-  ;; lsp-bridge-kill-process
-  ;; lsp-bridge-ref-unfilter
-  ;; lsp-bridge-ref-open-file
-  ;; lsp-bridge-find-references
-  ;; lsp-bridge-ref-delete-line
-  ;; lsp-bridge-restart-process
-  ;; lsp-bridge-return-from-def
-  ;; lsp-bridge-ref-recover-line
-  ;; lsp-bridge-ref-apply-changed
-  ;; lsp-bridge-ref-jump-next-file
-  ;; lsp-bridge-ref-jump-prev-file
-  ;; lsp-bridge-ref-recover-buffer
-  ;; lsp-bridge-insert-common-prefix
-  ;; lsp-bridge-lookup-documentation
-  ;; lsp-bridge-ref-delete-all-lines
-  ;; lsp-bridge-signature-help-fetch
-  ;; lsp-bridge-find-def-other-window
-  ;; lsp-bridge-ref-beginning-of-line
-  ;; lsp-bridge-ref-jump-next-keyword
-  ;; lsp-bridge-ref-jump-prev-keyword
-  ;; lsp-bridge-find-impl-other-window
-  ;; lsp-bridge-ref-filter-match-files
-  ;; lsp-bridge-ref-open-file-and-stay
-  ;; lsp-bridge-jump-to-prev-diagnostic
-  ;; lsp-bridge-ref-insert-current-line
-  ;; lsp-bridge-ref-replace-all-matches
-  ;; lsp-bridge-ref-switch-to-edit-mode
-  ;; lsp-bridge-ref-switch-to-view-mode
-  ;; lsp-bridge-ref-filter-match-results
-  ;; lsp-bridge-ignore-current-diagnostic
-  ;; lsp-bridge-ref-filter-mismatch-files
-  ;; lsp-bridge-ref-filter-mismatch-results
-  ;; lsp-bridge-ref-remove-line-from-results
-  ;; lsp-bridge-popup-documentation-scroll-up
-  ;; lsp-bridge-popup-documentation-scroll-down
-#+end_src
 *** citre
 Citre is an advanced Ctags (or actually, readtags) frontend for Emacs.
 #+begin_src elisp
@@ -1879,13 +1824,6 @@ among all the files in org-roam in a single agenda-view. The code was borrowed f
 #+begin_src elisp
   (setup toc-org
     (:hook-into org-mode))
-#+end_src
-** org-anki
-#+begin_src elisp :tangle no
-  (setup promise)
-  (setup deferred)
-  (setup request)
-  (setup org-anki)
 #+end_src
 ** ebib
 #+begin_src elisp
