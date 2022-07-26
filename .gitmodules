@@ -269,6 +269,9 @@
 [submodule "posframe"]
 	path = lib/posframe
 	url = https://github.com/tumashu/posframe.git
+[submodule "pulsar"]
+	path = lib/pulsar
+	url = https://gitlab.com/protesilaos/pulsar.git
 [submodule "pyim"]
 	path = lib/pyim
 	url = https://github.com/tumashu/pyim.git

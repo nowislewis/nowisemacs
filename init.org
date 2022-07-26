@@ -25,6 +25,7 @@
   - [[#doom-modeline][doom-modeline]]
   - [[#awesome-tray][awesome-tray]]
   - [[#hl-todo][hl-todo]]
+  - [[#pulsar][pulsar]]
 - [[#general-configuration][General Configuration]]
   - [[#simple][simple]]
   - [[#general-modes][general modes]]
@@ -712,6 +713,13 @@ diff-hl-mode highlights uncommitted changes on the left side of the window (area
      (global-hl-todo-mode))
     )
 #+end_src
+** pulsar
+#+begin_src elisp
+  (setup pulsar
+    (:defer
+     (pulsar-global-mode 1)
+     ))
+#+end_src
 * General Configuration
 ** simple
 #+begin_src elisp
@@ -1187,8 +1195,8 @@ Dirvish is a minimalistic file manager based on Dired. It's fast
 *** diredfl
 This is adapted from the extra font lock rules provided by Drew Adams' dired+ package, but published via a modern means, and with support for older Emacsen removed.
 #+begin_src elisp
-  (setup diredfl
-    (:hook-into dired-mode))
+  ;; (setup diredfl
+  ;;   (:hook-into dired-mode))
 #+end_src
 ** structure browsing
 *** imenu-list
@@ -1635,7 +1643,6 @@ eglot client leveraging LTEX Language Server.
 #+begin_src elisp
   (setup emacsql-sqlite-builtin)
   (setup org-roam
-    
     (:option org-roam-database-connector 'sqlite-builtin
              org-roam-mode-sections       '(org-roam-backlinks-section
                                             org-roam-reflinks-section
@@ -1646,7 +1653,7 @@ eglot client leveraging LTEX Language Server.
 
              org-roam-db-gc-threshold most-positive-fixnum
              ;; org-roam-node-display-template "${doom-hierarchy:*} ${tags:37}"
-             org-roam-node-display-template (concat "${type:15} ${doom-hierarchy:80} "
+             org-roam-node-display-template (concat "${namespace:15} ${doom-hierarchy:80} "
                                                     (propertize "${tags:*}" 'face 'org-tag))
 
              org-roam-capture-templates '(("m" "main" plain "%?"
@@ -1696,7 +1703,8 @@ eglot client leveraging LTEX Language Server.
                        separator (propertize (string-join olp " > ") 'face '(shadow italic))
                        separator title)))))
 
-      (cl-defmethod org-roam-node-type ((node org-roam-node))
+
+      (cl-defmethod org-roam-node-namespace ((node org-roam-node))
         "Return the TYPE of NODE."
         (condition-case nil
             (file-name-nondirectory
@@ -1778,23 +1786,6 @@ among all the files in org-roam in a single agenda-view. The code was borrowed f
              org-cite-follow-processor 'citar
              org-cite-activate-processor 'citar
              citar-bibliography org-cite-global-bibliography))
-
-  ;; borrowed from https://jethrokuan.github.io/org-roam-guide/ as a method for insert notes for reference
-  ;; (defun lewis/org-roam-node-from-cite (keys-entries)
-  ;;   (interactive (list (citar-select-ref)))
-  ;;   (let ((title (citar-format--entry "${title}" (cdr keys-entries)
-  ;;                                     )))
-  ;;     (org-roam-capture- :templates
-  ;;                        '(("r" "reference" plain "%?" :if-new
-  ;;                           (file+head "reference/${title}.org"
-  ;;                                      ":PROPERTIES:
-  ;;                                       :ROAM_REFS: [cite:@${citekey}]
-  ;;                                       :END:
-  ;;                                       #+title: ${title}\n* Action notes\n* Idea notes\n* Sealed notes")
-  ;;                           :unnarrowed t))
-  ;;                        :info (list :citekey (car keys-entries))
-  ;;                        :node (org-roam-node-create :title title)
-  ;;                        :props '(:finalize find-file))))
 #+end_src
 ** citar-org-roam
 #+begin_src elisp
