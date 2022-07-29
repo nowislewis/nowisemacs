@@ -393,41 +393,63 @@ I used to be a vim(evil) user, but now I use meow to manage all my keys.
       ]])
 #+end_src
 
-*** org-roam-keybindings
+*** notes-keybindings
 #+begin_src elisp
+  ;; (transient-define-prefix leader-map-for-notes()
+  ;;   "Define notes leader-key maps"
+  ;;   [["Org Roam Basic"
+  ;;     ("f" "find" org-roam-node-find)
+  ;;     ("g" "graph" org-roam-graph)
+  ;;     ("i" "insert" org-roam-node-insert)
+  ;;     ("I" "Id get create" org-id-get-create)
+  ;;     ("M" "buffer display dedicated" org-roam-buffer-display-dedicated)
+  ;;     ;; ("c" "node from cite" lewis/org-roam-node-from-cite)
+  ;;     ("t" "buffer toggle" org-roam-buffer-toggle)
+  ;;     ("r" "ref-find" org-roam-ref-find)
+  ;;     ("R" "link-replace-all" org-roam-link-replace-all)
+  ;;     ("b" "consult-backlinks" consult-org-roam-backlinks)
+  ;;     ("B" "consult-forward-links" consult-org-roam-forward-links)
+  ;;     ("s" "consult-search" consult-org-roam-search)]
+  ;;    ["Org Roam daily"
+  ;;     ("dd" "goto-date" org-roam-dailies-goto-date)
+  ;;     ("dD" "capture-date" org-roam-dailies-capture-date)
+  ;;     ("dm" "goto-tomorrow" org-roam-dailies-goto-tomorrow)
+  ;;     ("dM" "capture-tomorrow" org-roam-dailies-capture-tomorrow)
+  ;;     ("dn" "capture-today" org-roam-dailies-capture-today)
+  ;;     ("dt" "goto-today" org-roam-dailies-goto-today)
+  ;;     ("dT" "capture-today" org-roam-dailies-capture-today)
+  ;;     ("dy" "goto-yesterday" org-roam-dailies-goto-yesterday)
+  ;;     ("dY" "capture-yesterday" org-roam-dailies-capture-yesterday)
+  ;;     ("d-" "find-directory" org-roam-dailies-find-directory)]
+  ;;     ["Org roam option"
+  ;;     ("oa" "alias-add" org-roam-alias-add)
+  ;;     ("oA" "alias-remove" org-roam-alias-remove)
+  ;;     ("ot" "tag-add" org-roam-tag-add)
+  ;;     ("oT" "tag-remove" org-roam-tag-remove)
+  ;;     ("or" "ref-add" org-roam-ref-add)
+  ;;     ("oR" "ref-remove" org-roam-ref-remove)]])
+
   (transient-define-prefix leader-map-for-notes()
     "Define notes leader-key maps"
-    [["Org Roam Basic"
-      ("f" "find" org-roam-node-find)
-      ("g" "graph" org-roam-graph)
-      ("i" "insert" org-roam-node-insert)
-      ("I" "Id get create" org-id-get-create)
-      ("M" "buffer display dedicated" org-roam-buffer-display-dedicated)
-      ;; ("c" "node from cite" lewis/org-roam-node-from-cite)
-      ("t" "buffer toggle" org-roam-buffer-toggle)
-      ("r" "ref-find" org-roam-ref-find)
-      ("R" "link-replace-all" org-roam-link-replace-all)
-      ("b" "consult-backlinks" consult-org-roam-backlinks)
-      ("B" "consult-forward-links" consult-org-roam-forward-links)
-      ("s" "consult-search" consult-org-roam-search)]
-     ["Org Roam daily"
-      ("dd" "goto-date" org-roam-dailies-goto-date)
-      ("dD" "capture-date" org-roam-dailies-capture-date)
-      ("dm" "goto-tomorrow" org-roam-dailies-goto-tomorrow)
-      ("dM" "capture-tomorrow" org-roam-dailies-capture-tomorrow)
-      ("dn" "capture-today" org-roam-dailies-capture-today)
-      ("dt" "goto-today" org-roam-dailies-goto-today)
-      ("dT" "capture-today" org-roam-dailies-capture-today)
-      ("dy" "goto-yesterday" org-roam-dailies-goto-yesterday)
-      ("dY" "capture-yesterday" org-roam-dailies-capture-yesterday)
-      ("d-" "find-directory" org-roam-dailies-find-directory)]
-      ["Org roam option"
-      ("oa" "alias-add" org-roam-alias-add)
-      ("oA" "alias-remove" org-roam-alias-remove)
-      ("ot" "tag-add" org-roam-tag-add)
-      ("oT" "tag-remove" org-roam-tag-remove)
-      ("or" "ref-add" org-roam-ref-add)
-      ("oR" "ref-remove" org-roam-ref-remove)]])
+    [["New notes"
+      ("f" "find notes" find-denote-file-dir)
+      ("n" "denote" denote)
+      ("d" "date" denote-date)
+      ("t" "type" denote-type)
+      ("s" "subdirectory" denote-subdirectory)]
+     ["Link"
+      ("l" "link(add)" denote-link)
+      ("L" "add links(add)" denote-link-add-links)
+      ("b" "backlinks" denote-link-backlinks)]
+     ])
+
+
+  ;; denote-link-find-file
+  ;; denote-dired-rename-file
+  ;; denote-link-dired-marked-notes
+  ;; denote-dired-rename-marked-files
+  ;; denote-dired-rename-file-and-add-front-matter
+  ;; denote-dired-rename-marked-files-and-add-front-matters
 #+end_src
 *** Apps-keybindings
 #+begin_src elisp
@@ -512,6 +534,7 @@ I used to be a vim(evil) user, but now I use meow to manage all my keys.
   ;; notes
   (meow-leader-define-key
    '("n r" . leader-map-for-notes)
+   '("n d" . find-denote-file-dir)
    '("n e" . org-noter))
 
   (meow-leader-define-key
@@ -1197,9 +1220,9 @@ Dirvish is a minimalistic file manager based on Dired. It's fast
 #+end_src
 *** diredfl
 This is adapted from the extra font lock rules provided by Drew Adams' dired+ package, but published via a modern means, and with support for older Emacsen removed.
-#+begin_src elisp
-  ;; (setup diredfl
-  ;;   (:hook-into dired-mode))
+#+begin_src elisp :tangle no
+  (setup diredfl
+    (:hook-into dired-mode))
 #+end_src
 ** structure browsing
 *** imenu-list
@@ -1643,7 +1666,7 @@ eglot client leveraging LTEX Language Server.
 #+end_src
 ** org-roam
 *** org-roam
-#+begin_src elisp
+#+begin_src elisp :tangle no
   (setup emacsql-sqlite-builtin)
   (setup org-roam
     (:option org-roam-database-connector 'sqlite-builtin
@@ -1731,21 +1754,21 @@ eglot client leveraging LTEX Language Server.
 #+end_src
 
 *** org-roam-ui
-#+begin_src elisp
+#+begin_src elisp :tangle no
     (setup websocket)
     (setup simple-httpd)
     (setup org-roam-ui
       (:option org-roam-ui-browser-function #'eaf-open-browser-other-window))
 #+end_src
 *** consult-org-roam
-#+begin_src elisp
+#+begin_src elisp :tangle no
   (setup consult-org-roam
     (:hook-into org-roam-mode))
 #+end_src
 *** org-roam-agenda
 The main purpose for this section is to add every node that has a "TODO" into org-agenda, so I can see all the "TODO"s
 among all the files in org-roam in a single agenda-view. The code was borrowed from vulpea and now in a repo "org-roam-agenda". You can see in [[https://github.com/nowislewis/org-roam-agenda.git][org-roam-agenda]]
-#+begin_src elisp
+#+begin_src elisp :tangle no
 (require 'org-roam-agenda)
 #+end_src
 ** ox-hugo
@@ -1791,7 +1814,7 @@ among all the files in org-roam in a single agenda-view. The code was borrowed f
              citar-bibliography org-cite-global-bibliography))
 #+end_src
 ** citar-org-roam
-#+begin_src elisp
+#+begin_src elisp :tangle no
   (setup citar-org-roam
     (:option citar-org-roam-subdir "reference"
              citar-org-roam-note-title-template "${title}")
@@ -1826,34 +1849,37 @@ among all the files in org-roam in a single agenda-view. The code was borrowed f
 #+end_src
 ** denote
 #+begin_src elisp
-      (setup denote)
-      (require 'denote)
+  (setup denote
+    (:option denote-directory (expand-file-name "~/Documents/emacs/orgmode/denote/"))
+    (add-hook 'dired-mode-hook #'denote-dired-mode-in-directories)
+    )
+  ;; (require 'denote)
   ;; (find-dir "~/Documents/emacs/orgmode/denote/" "-ls")
   (defun find-denote-file-dir()
     (interactive)
-    (find-file "~/Documents/emacs/orgmode/denote/")
+    ;; (find-name-dired "~/Documents/emacs/orgmode/denote/" "*.org")
+    (dirvish-dwim "~/Documents/emacs/orgmode/denote/")
+    ;; (find-file "~/Documents/emacs/orgmode/denote/")
     )
-    ;; Remember to check the doc strings of those variables.
-    (setq denote-directory (expand-file-name "~/Documents/emacs/orgmode/denote/"))
+  ;; Remember to check the doc strings of those variables.
 
-    ;; You will not need to `require' all those individually once the
-    ;; package is available.
-    ;; (require 'denote-retrieve)
-    ;; (require 'denote-link)
-
+  ;; You will not need to `require' all those individually once the
+  ;; package is available.
+  ;; (require 'denote-retrieve)
+  ;; (require 'denote-link)
 
 
-    ;; We use different ways to specify a path for demo purposes.
-    ;; (setq denote-dired-directories
-    ;;       (list denote-directory
-    ;;             (thread-last denote-directory (expand-file-name "attachments"))
-    ;;             (expand-file-name "~/Documents/books")))
 
-    ;; Generic (great if you rename files Denote-style in lots of places):
-    ;; (add-hook 'dired-mode-hook #'denote-dired-mode)
-    ;;
-    ;; OR if only want it in `denote-dired-directories':
-    (add-hook 'dired-mode-hook #'denote-dired-mode-in-directories)
+  ;; We use different ways to specify a path for demo purposes.
+  ;; (setq denote-dired-directories
+  ;;       (list denote-directory
+  ;;             (thread-last denote-directory (expand-file-name "attachments"))
+  ;;             (expand-file-name "~/Documents/books")))
+
+  ;; Generic (great if you rename files Denote-style in lots of places):
+  ;; (add-hook 'dired-mode-hook #'denote-dired-mode)
+  ;;
+  ;; OR if only want it in `denote-dired-directories':
 
 #+end_src
 ** denote-convert-from-org-roam
