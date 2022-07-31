@@ -31,9 +31,7 @@
 [submodule "citar"]
 	path = lib/citar
 	url = https://github.com/emacs-citar/citar.git
-[submodule "citeproc"]
-	path = lib/citeproc
-	url = https://github.com/andras-simonyi/citeproc-el.git
+    no-byte-compile = citar-citeproc.el
 [submodule "citre"]
 	path = lib/citre
 	url = https://github.com/universal-ctags/citre.git
@@ -83,9 +81,6 @@
 [submodule "diff-hl"]
 	path = lib/diff-hl
 	url = https://github.com/dgutov/diff-hl.git
-[submodule "diredfl"]
-	path = lib/diredfl
-	url = https://github.com/purcell/diredfl.git
 [submodule "dirvish"]
 	path = lib/dirvish
 	url = https://github.com/alexluigit/dirvish.git
@@ -188,6 +183,12 @@
 [submodule "language-id"]
 	path = lib/language-id
 	url = https://github.com/lassik/emacs-language-id.git
+[submodule "lsp-bridge"]
+	path = lib/lsp-bridge
+	url = https://github.com/manateelazycat/lsp-bridge.git
+    load-path = .
+    load-path = acm
+    no-byte-compile = acm/acm-backend-tempel.el
 [submodule "magit"]
 	path = lib/magit
 	url = https://github.com/magit/magit.git
@@ -260,9 +261,6 @@
 [submodule "pyim-tsinghua-dict"]
 	path = lib/pyim-tsinghua-dict
 	url = https://github.com/redguardtoo/pyim-tsinghua-dict.git
-[submodule "queue"]
-	path = lib/queue
-	url = https://github.com/emacsmirror/queue.git
 [submodule "quickrun"]
 	path = lib/quickrun
 	url = https://github.com/emacsorphanage/quickrun.git
@@ -284,9 +282,6 @@
 [submodule "shrink-path"]
 	path = lib/shrink-path
 	url = https://gitlab.com/bennya/shrink-path.el.git
-[submodule "string-inflection"]
-	path = lib/string-inflection
-	url = https://github.com/akicho8/string-inflection.git
 [submodule "super-save"]
 	path = lib/super-save
 	url = https://github.com/bbatsov/super-save.git

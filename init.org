@@ -1,6 +1,6 @@
  #+TITLE: Emacs Configuration
 #+PROPERTY: header-args:elisp :tangle ~/.emacs.d/init.el
-
+some old configs are refiled in [[file:useful-tools/old-elisp/]]
 * Content                                                               :toc:
 - [[#startup-config][Startup config]]
   - [[#ui-speed-up][UI speed up]]
@@ -74,17 +74,14 @@
   - [[#org-modern][org-modern]]
   - [[#org-appear][org-appear]]
   - [[#org-download][org-download]]
-  - [[#org-roam][org-roam]]
   - [[#ox-hugo][ox-hugo]]
   - [[#org-clock][org-clock]]
   - [[#org-noter][org-noter]]
   - [[#org-present][org-present]]
-  - [[#org-citar][org-citar]]
-  - [[#citar-org-roam][citar-org-roam]]
+  - [[#citar][citar]]
   - [[#toc-org][toc-org]]
   - [[#ebib][ebib]]
   - [[#denote][denote]]
-  - [[#denote-convert-from-org-roam][denote-convert-from-org-roam]]
 - [[#翻译][翻译]]
   - [[#go-translate][go-translate]]
   - [[#insert-translated-name][insert-translated-name]]
@@ -395,39 +392,6 @@ I used to be a vim(evil) user, but now I use meow to manage all my keys.
 
 *** notes-keybindings
 #+begin_src elisp
-  ;; (transient-define-prefix leader-map-for-notes()
-  ;;   "Define notes leader-key maps"
-  ;;   [["Org Roam Basic"
-  ;;     ("f" "find" org-roam-node-find)
-  ;;     ("g" "graph" org-roam-graph)
-  ;;     ("i" "insert" org-roam-node-insert)
-  ;;     ("I" "Id get create" org-id-get-create)
-  ;;     ("M" "buffer display dedicated" org-roam-buffer-display-dedicated)
-  ;;     ;; ("c" "node from cite" lewis/org-roam-node-from-cite)
-  ;;     ("t" "buffer toggle" org-roam-buffer-toggle)
-  ;;     ("r" "ref-find" org-roam-ref-find)
-  ;;     ("R" "link-replace-all" org-roam-link-replace-all)
-  ;;     ("b" "consult-backlinks" consult-org-roam-backlinks)
-  ;;     ("B" "consult-forward-links" consult-org-roam-forward-links)
-  ;;     ("s" "consult-search" consult-org-roam-search)]
-  ;;    ["Org Roam daily"
-  ;;     ("dd" "goto-date" org-roam-dailies-goto-date)
-  ;;     ("dD" "capture-date" org-roam-dailies-capture-date)
-  ;;     ("dm" "goto-tomorrow" org-roam-dailies-goto-tomorrow)
-  ;;     ("dM" "capture-tomorrow" org-roam-dailies-capture-tomorrow)
-  ;;     ("dn" "capture-today" org-roam-dailies-capture-today)
-  ;;     ("dt" "goto-today" org-roam-dailies-goto-today)
-  ;;     ("dT" "capture-today" org-roam-dailies-capture-today)
-  ;;     ("dy" "goto-yesterday" org-roam-dailies-goto-yesterday)
-  ;;     ("dY" "capture-yesterday" org-roam-dailies-capture-yesterday)
-  ;;     ("d-" "find-directory" org-roam-dailies-find-directory)]
-  ;;     ["Org roam option"
-  ;;     ("oa" "alias-add" org-roam-alias-add)
-  ;;     ("oA" "alias-remove" org-roam-alias-remove)
-  ;;     ("ot" "tag-add" org-roam-tag-add)
-  ;;     ("oT" "tag-remove" org-roam-tag-remove)
-  ;;     ("or" "ref-add" org-roam-ref-add)
-  ;;     ("oR" "ref-remove" org-roam-ref-remove)]])
 
   (transient-define-prefix leader-map-for-notes()
     "Define notes leader-key maps"
@@ -442,14 +406,6 @@ I used to be a vim(evil) user, but now I use meow to manage all my keys.
       ("L" "add links(add)" denote-link-add-links)
       ("b" "backlinks" denote-link-backlinks)]
      ])
-
-
-  ;; denote-link-find-file
-  ;; denote-dired-rename-file
-  ;; denote-link-dired-marked-notes
-  ;; denote-dired-rename-marked-files
-  ;; denote-dired-rename-file-and-add-front-matter
-  ;; denote-dired-rename-marked-files-and-add-front-matters
 #+end_src
 *** Apps-keybindings
 #+begin_src elisp
@@ -719,16 +675,6 @@ diff-hl-mode highlights uncommitted changes on the left side of the window (area
 
       (setq awesome-tray-active-modules (list "meow" "flymake" "location" "belong" "buffer-read-only" "file-path"  "pyim" "persp"  "mode-name" "git"))
       ))
-  ;; (setup awesome-tray
-  ;;   (:option
-  ;;    awesome-tray-file-path-truncate-dirname-levels 3
-  ;;    awesome-tray-buffer-name-max-length 30)
-  ;;   (:when-loaded
-  ;;     (defvar lewis-awesome-tray-deli "  ")
-  ;;     (defun project-awesome-tray()
-  ;;       (car (nthcdr 2 (project-current))))
-
-  ;;   )
 #+end_src
 ** hl-todo
 #+begin_src elisp
@@ -1218,12 +1164,6 @@ Dirvish is a minimalistic file manager based on Dired. It's fast
     (:option dirvish-attributes '(subtree-state all-the-icons file-size))
     (:bind "TAB" dirvish-toggle-subtree))
 #+end_src
-*** diredfl
-This is adapted from the extra font lock rules provided by Drew Adams' dired+ package, but published via a modern means, and with support for older Emacsen removed.
-#+begin_src elisp :tangle no
-  (setup diredfl
-    (:hook-into dired-mode))
-#+end_src
 ** structure browsing
 *** imenu-list
 #+begin_src elisp
@@ -1326,7 +1266,6 @@ Emacs major-mode to work with Beancount ledger files
     (:file-match "\\.beancount\\'"))
     (add-to-list 'auto-mode-alist
                (cons "\\.[pP][dD][fF]\\'" 'eaf-mode))
-
 #+end_src
 *** latex
 #+begin_src elisp :tangle no
@@ -1408,6 +1347,13 @@ Emacs major-mode to work with Beancount ledger files
     (:with-map eglot-mode-map
       (:bind [remap xref-find-apropos] #'consult-eglot-symbols)))
 #+end_src
+**** lsp-bridge
+#+begin_src elisp
+  (setup lsp-bridge
+    (:option lsp-bridge-enable-signature-help t
+             lsp-bridge-org-babel-lang-list '("python" "C++" "elisp")
+             ))
+#+end_src
 *** citre
 Citre is an advanced Ctags (or actually, readtags) frontend for Emacs.
 #+begin_src elisp
@@ -1445,26 +1391,6 @@ Highlight symbols with keymap-enabled overlays
                 qml-mode
                 minibuffer-inactive-mode
                 ))
-
-  ;; (define-key grammatical-edit-mode-map (kbd "SPC") 'grammatical-edit-space)
-  ;; (define-key grammatical-edit-mode-map (kbd "RET") 'grammatical-edit-newline)
-
-  ;; (define-key grammatical-edit-mode-map (kbd "M-o") 'grammatical-edit-backward-delete)
-  ;; (define-key grammatical-edit-mode-map (kbd "C-d") 'grammatical-edit-forward-delete)
-  ;; (define-key grammatical-edit-mode-map (kbd "C-k") 'grammatical-edit-kill)
-
-  ;; (define-key grammatical-edit-mode-map (kbd "M-\"") 'grammatical-edit-wrap-double-quote)
-  ;; (define-key grammatical-edit-mode-map (kbd "M-'") 'grammatical-edit-wrap-single-quote)
-  ;; (define-key grammatical-edit-mode-map (kbd "M-[") 'grammatical-edit-wrap-bracket)
-  ;; (define-key grammatical-edit-mode-map (kbd "M-{") 'grammatical-edit-wrap-curly)
-  ;; (define-key grammatical-edit-mode-map (kbd "M-(") 'grammatical-edit-wrap-round)
-  ;; (define-key grammatical-edit-mode-map (kbd "M-)") 'grammatical-edit-unwrap)
-
-  ;; (define-key grammatical-edit-mode-map (kbd "M-p") 'grammatical-edit-jump-right)
-  ;; (define-key grammatical-edit-mode-map (kbd "M-n") 'grammatical-edit-jump-left)
-  ;; (define-key grammatical-edit-mode-map (kbd "M-:") 'grammatical-edit-jump-out-pair-and-newline)
-
-  ;; (define-key grammatical-edit-mode-map (kbd "C-j") 'grammatical-edit-jump-up)
 #+end_src
 
 *** eglot-ltex
@@ -1505,8 +1431,6 @@ eglot client leveraging LTEX Language Server.
              separedit-remove-trailing-spaces-in-comment t)
     (:autoload separedit))
 
-  ;; Key binding for modes you want edit
-  ;; or simply bind ‘global-map’ for all.
   (define-key prog-mode-map        (kbd "C-c '") #'separedit)
   ;; (define-key minibuffer-local-map (kbd "C-c '") #'separedit)
   ;; (define-key help-mode-map        (kbd "C-c '") #'separedit)
@@ -1664,113 +1588,6 @@ eglot client leveraging LTEX Language Server.
         (setq org-download-screenshot-method "screencapture -i %s")))
     (:autoload org-download-screenshot))
 #+end_src
-** org-roam
-*** org-roam
-#+begin_src elisp :tangle no
-  (setup emacsql-sqlite-builtin)
-  (setup org-roam
-    (:option org-roam-database-connector 'sqlite-builtin
-             org-roam-mode-sections       '(org-roam-backlinks-section
-                                            org-roam-reflinks-section
-                                            ;; org-roam-unlinked-references-section
-                                            )
-             org-roam-directory (concat nowisemacs-doc-root-dir "/orgmode/roam/")
-             org-roam-dailies-directory (concat nowisemacs-doc-root-dir "/orgmode/roam/dailies")
-
-             org-roam-db-gc-threshold most-positive-fixnum
-             ;; org-roam-node-display-template "${doom-hierarchy:*} ${tags:37}"
-             org-roam-node-display-template (concat "${namespace:15} ${doom-hierarchy:80} "
-                                                    (propertize "${tags:*}" 'face 'org-tag))
-
-             org-roam-capture-templates '(("m" "main" plain "%?"
-                                           :target
-                                           (file+head "main/%<%Y-%m-%d>-${slug}.org"
-                                                      "#+title: ${title}\n* Action notes\n* Idea notes\n* Sealed notes")
-                                           :unnarrowed t)
-                                          ("r" "reference" plain "%?"
-                                           :target
-                                           (file+head "reference/%<%Y-%m-%d>-${slug}.org"
-                                                      "#+title: ${title}\n* Action notes\n* Idea notes\n* Sealed notes")
-                                           :unnarrowed t)
-                                          ("a" "article" plain "%?"
-                                           ;; :target
-                                           :if-new
-                                           (file+head "articles/%<%Y-%m-%d>-${slug}.org"
-                                                      "#+title: ${title}\n* Action notes\n* Idea notes\n* Sealed notes")
-                                           :unnarrowed t))
-             )
-    (:when-loaded
-      (org-roam-db-autosync-mode)
-
-      ;; Codes blow are used to general a hierachy for title nodes that under a file
-      (cl-defmethod org-roam-node-doom-filetitle ((node org-roam-node))
-        "Return the value of \"#+title:\" (if any) from file that NODE resides in.
-       If there's no file-level title in the file, return empty string."
-        (or (if (= (org-roam-node-level node) 0)
-                (org-roam-node-title node)
-              (org-roam-get-keyword "TITLE" (org-roam-node-file node)))
-            ""))
-      (cl-defmethod org-roam-node-doom-hierarchy ((node org-roam-node))
-        "Return hierarchy for NODE, constructed of its file title, OLP and direct title.
-         If some elements are missing, they will be stripped out."
-        (let ((title     (org-roam-node-title node))
-              (olp       (org-roam-node-olp   node))
-              (level     (org-roam-node-level node))
-              (filetitle (org-roam-node-doom-filetitle node))
-              (separator (propertize " > " 'face 'shadow)))
-          (cl-case level
-            ;; node is a top-level file
-            (0 filetitle)
-            ;; node is a level 1 heading
-            (1 (concat (propertize filetitle 'face '(shadow italic))
-                       separator title))
-            ;; node is a heading with an arbitrary outline path
-            (t (concat (propertize filetitle 'face '(shadow italic))
-                       separator (propertize (string-join olp " > ") 'face '(shadow italic))
-                       separator title)))))
-
-
-      (cl-defmethod org-roam-node-namespace ((node org-roam-node))
-        "Return the TYPE of NODE."
-        (condition-case nil
-            (file-name-nondirectory
-             (directory-file-name
-              (file-name-directory
-               (file-relative-name (org-roam-node-file node) org-roam-directory))))
-          (error "")))
-      (add-to-list 'display-buffer-alist
-             '("\\*org-roam\\*"
-               (display-buffer-in-direction)
-               (direction . right)
-               (window-width . 0.33)
-               (window-height . fit-window-to-buffer)))
-      (org-roam-buffer-toggle)
-      ;; (magit-section-show-level-2-all)
-
-      ;; Every Zettel is a Draft until Declared Otherwise
-      (add-hook 'org-roam-capture-new-node-hook (lambda()
-                                                  (org-roam-tag-add '("draft"))))
-      ))
-#+end_src
-
-*** org-roam-ui
-#+begin_src elisp :tangle no
-    (setup websocket)
-    (setup simple-httpd)
-    (setup org-roam-ui
-      (:option org-roam-ui-browser-function #'eaf-open-browser-other-window))
-#+end_src
-*** consult-org-roam
-#+begin_src elisp :tangle no
-  (setup consult-org-roam
-    (:hook-into org-roam-mode))
-#+end_src
-*** org-roam-agenda
-The main purpose for this section is to add every node that has a "TODO" into org-agenda, so I can see all the "TODO"s
-among all the files in org-roam in a single agenda-view. The code was borrowed from vulpea and now in a repo "org-roam-agenda". You can see in [[https://github.com/nowislewis/org-roam-agenda.git][org-roam-agenda]]
-#+begin_src elisp :tangle no
-(require 'org-roam-agenda)
-#+end_src
 ** ox-hugo
 #+begin_src elisp
   (setup tomelr)
@@ -1782,12 +1599,6 @@ among all the files in org-roam in a single agenda-view. The code was borrowed f
 #+begin_src elisp :tangle no
   (setup org-pomodoro
     (:option org-pomodoro-finished-sound "~/Documents/emacs/other-files/applaud.wav"))
-#+end_src
-*** wakatime
-#+begin_src elisp :tangle no
-  ;; (setup wakatime
-  ;;   (:if-system 'darwin)
-  ;;   (:defer (global-wakatime-mode)))
 #+end_src
 ** org-noter
 #+begin_src elisp
@@ -1802,10 +1613,10 @@ among all the files in org-roam in a single agenda-view. The code was borrowed f
 #+begin_src elisp
   (setup org-present)
 #+end_src
-** org-citar
+** citar
 #+begin_src elisp
   (setup parsebib)
-  (setup citeproc) ;;<- (setup queue) (setup string-inflection)
+  ;; (setup citeproc) ;;<- (setup queue) (setup string-inflection)
   (setup citar
     (:option org-cite-global-bibliography '("~/Documents/emacs/orgmode/bibliography/better_zotero_bib.bib")
              org-cite-insert-processor 'citar
@@ -1813,30 +1624,6 @@ among all the files in org-roam in a single agenda-view. The code was borrowed f
              org-cite-activate-processor 'citar
              citar-bibliography org-cite-global-bibliography))
 #+end_src
-** citar-org-roam
-#+begin_src elisp :tangle no
-  (setup citar-org-roam
-    (:option citar-org-roam-subdir "reference"
-             citar-org-roam-note-title-template "${title}")
-    (:hook-into org-roam-mode)
-    (:when-loaded
-      (defun citar-org-roam--create-capture-note (citekey entry)
-        "Open or create org-roam node for CITEKEY and ENTRY."
-        ;; adapted from https://jethrokuan.github.io/org-roam-guide/#orgc48eb0d
-        (let ((title (citar-format--entry
-                      citar-org-roam-note-title-template entry)))
-          (org-roam-capture-
-           :templates
-           '(("r" "reference" plain "%?" :if-new
-              (file+head "reference/${title}.org"
-                         ":PROPERTIES:\n:ROAM_REFS: [cite:@${citekey}]\n:END:\n#+title: ${title}\n* Action notes\n* Idea notes\n* Sealed notes")
-              :unnarrowed t))
-        :info (list :citekey citekey)
-        :node (org-roam-node-create :title title)
-        :props '(:finalize find-file))))
-  ))
-#+end_src
-
 ** toc-org
 #+begin_src elisp
   (setup toc-org
@@ -1853,95 +1640,12 @@ among all the files in org-roam in a single agenda-view. The code was borrowed f
     (:option denote-directory (expand-file-name "~/Documents/emacs/orgmode/denote/"))
     (add-hook 'dired-mode-hook #'denote-dired-mode-in-directories)
     )
-  ;; (require 'denote)
-  ;; (find-dir "~/Documents/emacs/orgmode/denote/" "-ls")
   (defun find-denote-file-dir()
     (interactive)
     ;; (find-name-dired "~/Documents/emacs/orgmode/denote/" "*.org")
     (dirvish-dwim "~/Documents/emacs/orgmode/denote/")
     ;; (find-file "~/Documents/emacs/orgmode/denote/")
     )
-  ;; Remember to check the doc strings of those variables.
-
-  ;; You will not need to `require' all those individually once the
-  ;; package is available.
-  ;; (require 'denote-retrieve)
-  ;; (require 'denote-link)
-
-
-
-  ;; We use different ways to specify a path for demo purposes.
-  ;; (setq denote-dired-directories
-  ;;       (list denote-directory
-  ;;             (thread-last denote-directory (expand-file-name "attachments"))
-  ;;             (expand-file-name "~/Documents/books")))
-
-  ;; Generic (great if you rename files Denote-style in lots of places):
-  ;; (add-hook 'dired-mode-hook #'denote-dired-mode)
-  ;;
-  ;; OR if only want it in `denote-dired-directories':
-
-#+end_src
-** denote-convert-from-org-roam
-#+begin_src elisp :tangle no
-(defun org-roam-convert-to-denote (files dir)
-  "Convert org-roam notes to denote format and insert them into
-`denote-directory'. Works in Dired."
-  (interactive
-   (list (dired-get-marked-files t current-prefix-arg nil nil t)
-         (read-directory-name "Denote directory: " (denote-directory))))
-  (unless (file-exists-p dir) (error "Directory does not exist: %s" dir))
-
-  (dolist (file files)
-    (let* ((filename (file-name-base file))
-           (org-roam-filename-regex
-             (rx
-              ;; date: YYYY-MM-DD
-              (group (= 4 digit) "-" (= 2 digit) "-" (= 2 digit))
-              "-"
-              ;; title
-              (group (* any))))
-           (match? (string-match org-roam-filename-regex filename)))
-      (unless match?
-        (warn "Filename doesn't match org-roam-filename-regex: %s" filename))
-      (let* ((date (match-string 1 filename))
-
-             (format-time-string "%H%M%S")
-             ;; (time (match-string 2 filename))
-             (title (or ;; Try to get title with spaces.
-                        (denote-retrieve--value-title file)
-                        (replace-regexp-in-string "_" " " (match-string 2 filename))))
-             (decoded-time (date-to-time (concat date "T" (format-time-string "%H%M%S"))))
-             (id (format-time-string denote--id-format decoded-time))
-             ;; Code from `org-roam-tag-add'.
-             (keywords (with-temp-buffer (insert-file-contents file nil 0 1024)
-                         (split-string (or (cadr (assoc "filetags"
-                                                        (org-collect-keywords '("filetags"))))
-                                           "")
-                                       ":" 'omit-nulls)))
-             (keywords (denote--sluggify-keywords
-                        (if (cdr keywords) keywords (car keywords))))
-             (new-name (denote--format-file
-                        (denote-directory)
-                        id
-                        keywords
-                        (denote--sluggify title)
-                        (denote--file-extension))))
-        ;; Ask for confirmation when overwriting, but don't throw an error if
-        ;; the user declines.
-        (ignore-errors (copy-file file new-name 1))
-
-        (with-current-buffer (find-file-noselect new-name t)
-          (when-let* (((denote--only-note-p file))
-                      (filetype (denote-dired--filetype-heuristics file))
-                      (date (denote--date (date-to-time id)))
-                      (new-front-matter (denote--file-meta-header title date keywords id filetype)))
-              (goto-char (point-min))
-              (insert new-front-matter)))
-
-        (message "Converted %s -> %s" file new-name))))
-  (denote-dired-update-dired-buffers))
-
 #+end_src
 * 翻译
 ** go-translate

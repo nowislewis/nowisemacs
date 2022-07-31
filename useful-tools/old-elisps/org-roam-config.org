@@ -1,0 +1,191 @@
+* org-roam
+** org-roam
+#+begin_src elisp :tangle no
+  (setup emacsql-sqlite-builtin)
+  (setup org-roam
+    (:option org-roam-database-connector 'sqlite-builtin
+             org-roam-mode-sections       '(org-roam-backlinks-section
+                                            org-roam-reflinks-section
+                                            ;; org-roam-unlinked-references-section
+                                            )
+             org-roam-directory (concat nowisemacs-doc-root-dir "/orgmode/roam/")
+             org-roam-dailies-directory (concat nowisemacs-doc-root-dir "/orgmode/roam/dailies")
+
+             org-roam-db-gc-threshold most-positive-fixnum
+             ;; org-roam-node-display-template "${doom-hierarchy:*} ${tags:37}"
+             org-roam-node-display-template (concat "${namespace:15} ${doom-hierarchy:80} "
+                                                    (propertize "${tags:*}" 'face 'org-tag))
+
+             org-roam-capture-templates '(("m" "main" plain "%?"
+                                           :target
+                                           (file+head "main/%<%Y-%m-%d>-${slug}.org"
+                                                      "#+title: ${title}\n* Action notes\n* Idea notes\n* Sealed notes")
+                                           :unnarrowed t)
+                                          ("r" "reference" plain "%?"
+                                           :target
+                                           (file+head "reference/%<%Y-%m-%d>-${slug}.org"
+                                                      "#+title: ${title}\n* Action notes\n* Idea notes\n* Sealed notes")
+                                           :unnarrowed t)
+                                          ("a" "article" plain "%?"
+                                           ;; :target
+                                           :if-new
+                                           (file+head "articles/%<%Y-%m-%d>-${slug}.org"
+                                                      "#+title: ${title}\n* Action notes\n* Idea notes\n* Sealed notes")
+                                           :unnarrowed t))
+             )
+    (:when-loaded
+      (org-roam-db-autosync-mode)
+
+      ;; Codes blow are used to general a hierachy for title nodes that under a file
+      (cl-defmethod org-roam-node-doom-filetitle ((node org-roam-node))
+        "Return the value of \"#+title:\" (if any) from file that NODE resides in.
+       If there's no file-level title in the file, return empty string."
+        (or (if (= (org-roam-node-level node) 0)
+                (org-roam-node-title node)
+              (org-roam-get-keyword "TITLE" (org-roam-node-file node)))
+            ""))
+      (cl-defmethod org-roam-node-doom-hierarchy ((node org-roam-node))
+        "Return hierarchy for NODE, constructed of its file title, OLP and direct title.
+         If some elements are missing, they will be stripped out."
+        (let ((title     (org-roam-node-title node))
+              (olp       (org-roam-node-olp   node))
+              (level     (org-roam-node-level node))
+              (filetitle (org-roam-node-doom-filetitle node))
+              (separator (propertize " > " 'face 'shadow)))
+          (cl-case level
+            ;; node is a top-level file
+            (0 filetitle)
+            ;; node is a level 1 heading
+            (1 (concat (propertize filetitle 'face '(shadow italic))
+                       separator title))
+            ;; node is a heading with an arbitrary outline path
+            (t (concat (propertize filetitle 'face '(shadow italic))
+                       separator (propertize (string-join olp " > ") 'face '(shadow italic))
+                       separator title)))))
+
+
+      (cl-defmethod org-roam-node-namespace ((node org-roam-node))
+        "Return the TYPE of NODE."
+        (condition-case nil
+            (file-name-nondirectory
+             (directory-file-name
+              (file-name-directory
+               (file-relative-name (org-roam-node-file node) org-roam-directory))))
+          (error "")))
+      (add-to-list 'display-buffer-alist
+             '("\\*org-roam\\*"
+               (display-buffer-in-direction)
+               (direction . right)
+               (window-width . 0.33)
+               (window-height . fit-window-to-buffer)))
+      (org-roam-buffer-toggle)
+      ;; (magit-section-show-level-2-all)
+
+      ;; Every Zettel is a Draft until Declared Otherwise
+      (add-hook 'org-roam-capture-new-node-hook (lambda()
+                                                  (org-roam-tag-add '("draft"))))
+      ))
+#+end_src
+
+** org-roam-ui
+#+begin_src elisp :tangle no
+    (setup websocket)
+    (setup simple-httpd)
+    (setup org-roam-ui
+      (:option org-roam-ui-browser-function #'eaf-open-browser-other-window))
+#+end_src
+** consult-org-roam
+#+begin_src elisp :tangle no
+  (setup consult-org-roam
+    (:hook-into org-roam-mode))
+#+end_src
+** org-roam-agenda
+The main purpose for this section is to add every node that has a "TODO" into org-agenda, so I can see all the "TODO"s
+among all the files in org-roam in a single agenda-view. The code was borrowed from vulpea and now in a repo "org-roam-agenda". You can see in [[https://github.com/nowislewis/org-roam-agenda.git][org-roam-agenda]]
+#+begin_src elisp :tangle no
+(require 'org-roam-agenda)
+#+end_src
+** citar-org-roam
+#+begin_src elisp :tangle no
+  (setup citar-org-roam
+    (:option citar-org-roam-subdir "reference"
+             citar-org-roam-note-title-template "${title}")
+    (:hook-into org-roam-mode)
+    (:when-loaded
+      (defun citar-org-roam--create-capture-note (citekey entry)
+        "Open or create org-roam node for CITEKEY and ENTRY."
+        ;; adapted from https://jethrokuan.github.io/org-roam-guide/#orgc48eb0d
+        (let ((title (citar-format--entry
+                      citar-org-roam-note-title-template entry)))
+          (org-roam-capture-
+           :templates
+           '(("r" "reference" plain "%?" :if-new
+              (file+head "reference/${title}.org"
+                         ":PROPERTIES:\n:ROAM_REFS: [cite:@${citekey}]\n:END:\n#+title: ${title}\n* Action notes\n* Idea notes\n* Sealed notes")
+              :unnarrowed t))
+        :info (list :citekey citekey)
+        :node (org-roam-node-create :title title)
+        :props '(:finalize find-file))))
+  ))
+#+end_src
+** denote-convert-from-org-roam
+#+begin_src elisp :tangle no
+(defun org-roam-convert-to-denote (files dir)
+  "Convert org-roam notes to denote format and insert them into
+`denote-directory'. Works in Dired."
+  (interactive
+   (list (dired-get-marked-files t current-prefix-arg nil nil t)
+         (read-directory-name "Denote directory: " (denote-directory))))
+  (unless (file-exists-p dir) (error "Directory does not exist: %s" dir))
+
+  (dolist (file files)
+    (let* ((filename (file-name-base file))
+           (org-roam-filename-regex
+             (rx
+              ;; date: YYYY-MM-DD
+              (group (= 4 digit) "-" (= 2 digit) "-" (= 2 digit))
+              "-"
+              ;; title
+              (group (* any))))
+           (match? (string-match org-roam-filename-regex filename)))
+      (unless match?
+        (warn "Filename doesn't match org-roam-filename-regex: %s" filename))
+      (let* ((date (match-string 1 filename))
+
+             (format-time-string "%H%M%S")
+             ;; (time (match-string 2 filename))
+             (title (or ;; Try to get title with spaces.
+                        (denote-retrieve--value-title file)
+                        (replace-regexp-in-string "_" " " (match-string 2 filename))))
+             (decoded-time (date-to-time (concat date "T" (format-time-string "%H%M%S"))))
+             (id (format-time-string denote--id-format decoded-time))
+             ;; Code from `org-roam-tag-add'.
+             (keywords (with-temp-buffer (insert-file-contents file nil 0 1024)
+                         (split-string (or (cadr (assoc "filetags"
+                                                        (org-collect-keywords '("filetags"))))
+                                           "")
+                                       ":" 'omit-nulls)))
+             (keywords (denote--sluggify-keywords
+                        (if (cdr keywords) keywords (car keywords))))
+             (new-name (denote--format-file
+                        (denote-directory)
+                        id
+                        keywords
+                        (denote--sluggify title)
+                        (denote--file-extension))))
+        ;; Ask for confirmation when overwriting, but don't throw an error if
+        ;; the user declines.
+        (ignore-errors (copy-file file new-name 1))
+
+        (with-current-buffer (find-file-noselect new-name t)
+          (when-let* (((denote--only-note-p file))
+                      (filetype (denote-dired--filetype-heuristics file))
+                      (date (denote--date (date-to-time id)))
+                      (new-front-matter (denote--file-meta-header title date keywords id filetype)))
+              (goto-char (point-min))
+              (insert new-front-matter)))
+
+        (message "Converted %s -> %s" file new-name))))
+  (denote-dired-update-dired-buffers))
+
+#+end_src
