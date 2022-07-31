@@ -81,6 +81,9 @@
 [submodule "diff-hl"]
 	path = lib/diff-hl
 	url = https://github.com/dgutov/diff-hl.git
+[submodule "diredfl"]
+	path = lib/diredfl
+	url = https://github.com/purcell/diredfl.git
 [submodule "dirvish"]
 	path = lib/dirvish
 	url = https://github.com/alexluigit/dirvish.git

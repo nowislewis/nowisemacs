@@ -60,6 +60,7 @@ I feel in love denote, preview org-roam configs are refiled in [[file:useful-too
   - [[#file-browsing][file browsing]]
   - [[#structure-browsing][structure browsing]]
   - [[#perspective][perspective]]
+  - [[#project][project]]
 - [[#shell][shell]]
   - [[#vterm][vterm]]
   - [[#vterm-toggle][vterm-toggle]]
@@ -90,7 +91,6 @@ I feel in love denote, preview org-roam configs are refiled in [[file:useful-too
   - [[#pdf-tools][pdf-tools]]
   - [[#elfeed][elfeed]]
   - [[#nov][nov]]
-  - [[#nov-xwidget][nov-xwidget]]
   - [[#darkroom][darkroom]]
 - [[#tools][tools]]
   - [[#xwidget][xwidget]]
@@ -1157,6 +1157,11 @@ borrowed from citre, now you can always jump-back use "M-,"
 #+end_src
 * File and Browsing
 ** file browsing
+*** diredfl
+#+begin_src elisp
+  (setup diredfl
+    (:hook-into dired-mode))
+#+end_src
 *** dirvish
 Dirvish is a minimalistic file manager based on Dired. It's fast
 #+begin_src elisp
@@ -1195,6 +1200,11 @@ Dirvish is a minimalistic file manager based on Dired. It's fast
     ;; Running `persp-mode' multiple times resets the perspective list...
     (unless (equal persp-mode t)
       (persp-mode)))
+#+end_src
+** project
+#+begin_src elisp
+  (setup project
+    )
 #+end_src
 * shell
 ** vterm
@@ -1638,13 +1648,10 @@ eglot client leveraging LTEX Language Server.
 #+begin_src elisp
   (setup denote
     (:option denote-directory (expand-file-name "~/Documents/emacs/orgmode/denote/"))
-    (add-hook 'dired-mode-hook #'denote-dired-mode-in-directories)
-    )
+    (add-hook 'dired-mode-hook #'denote-dired-mode-in-directories))
   (defun find-denote-file-dir()
     (interactive)
-    ;; (find-name-dired "~/Documents/emacs/orgmode/denote/" "*.org")
     (dirvish-dwim "~/Documents/emacs/orgmode/denote/")
-    ;; (find-file "~/Documents/emacs/orgmode/denote/")
     )
 #+end_src
 * 翻译
@@ -1723,13 +1730,6 @@ I use corfu english helper instead of company-english-helper.
   (setup esxml) ;; <- (setup kv)
   (setup nov
     (:file-match "\\.epub\\'"))
-#+end_src
-** nov-xwidget
-#+begin_src elisp :tangle no
-  (setup nov-xwidget
-    (:when-loaded
-      (require 'nov-xwidget)
-      (add-hook 'nov-mode-hook 'nov-xwidget-inject-all-files)))
 #+end_src
 ** darkroom
 Simple distraction-free editing. I use darkroom instead of writeroom because it's more simple
