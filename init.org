@@ -1,6 +1,6 @@
  #+TITLE: Emacs Configuration
 #+PROPERTY: header-args:elisp :tangle ~/.emacs.d/init.el
-some old configs are refiled in [[file:useful-tools/old-elisp/]]
+I feel in love denote, preview org-roam configs are refiled in [[file:useful-tools/old-elisps/org-roam-config.org][org-roam configs]]
 * Content                                                               :toc:
 - [[#startup-config][Startup config]]
   - [[#ui-speed-up][UI speed up]]
