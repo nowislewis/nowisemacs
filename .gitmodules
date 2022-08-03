@@ -38,6 +38,9 @@
 [submodule "closql"]
 	path = lib/closql
 	url = https://github.com/emacscollective/closql.git
+[submodule "cmake-mode"]
+	path = lib/cmake-mode
+	url = https://github.com/emacsmirror/cmake-mode.git
 [submodule "compat"]
 	path = lib/compat
 	url = https://github.com/emacs-straight/compat
@@ -115,6 +118,9 @@
 [submodule "eglot-ltex"]
 	path = lib/eglot-ltex
 	url = https://github.com/emacs-languagetool/eglot-ltex.git
+[submodule "eldoc-box"]
+	path = lib/eldoc-box
+	url = https://github.com/casouri/eldoc-box.git
 [submodule "elfeed"]
 	path = lib/elfeed
 	url = https://github.com/skeeto/elfeed.git
@@ -168,6 +174,9 @@
 [submodule "helpful"]
 	path = lib/helpful
 	url = https://github.com/Wilfred/helpful.git
+[submodule "hl-indent-scope"]
+	path = lib/hl-indent-scope
+	url = https://codeberg.org/ideasman42/emacs-hl-indent-scope.git
 [submodule "hl-todo"]
 	path = lib/hl-todo
 	url = https://github.com/tarsius/hl-todo.git
@@ -186,12 +195,9 @@
 [submodule "language-id"]
 	path = lib/language-id
 	url = https://github.com/lassik/emacs-language-id.git
-[submodule "lsp-bridge"]
-	path = lib/lsp-bridge
-	url = https://github.com/manateelazycat/lsp-bridge.git
-    load-path = .
-    load-path = acm
-    no-byte-compile = acm/acm-backend-tempel.el
+[submodule "lua-mode"]
+	path = lib/lua-mode
+	url = https://github.com/immerrr/lua-mode.git
 [submodule "magit"]
 	path = lib/magit
 	url = https://github.com/magit/magit.git
