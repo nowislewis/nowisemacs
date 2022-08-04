@@ -236,9 +236,7 @@ I used to be a vim(evil) user, but now I use meow to manage all my keys.
                                      '("E" . meow-next-symbol)
                                      '("f" . meow-find)
                                      ;; '("F" . meow-find-expand)
-
                                      '("g" . g-extra-commands)
-
                                      '("G" . meow-grab)
                                      '("h" . meow-left)
                                      '("H" . meow-left-expand)
@@ -382,7 +380,6 @@ I used to be a vim(evil) user, but now I use meow to manage all my keys.
      ["Youdao"
       ("yp" "Translate posframe" my-gts-translate-posframe)
       ("yi" "Translate input" gts-do-translate)]])
-
 #+end_src
 *** search-keybindings
 #+begin_src elisp
@@ -404,7 +401,6 @@ I used to be a vim(evil) user, but now I use meow to manage all my keys.
 
 *** notes-keybindings
 #+begin_src elisp
-
   (transient-define-prefix leader-map-for-notes()
     "Define notes leader-key maps"
     [["New notes"
@@ -441,6 +437,24 @@ I used to be a vim(evil) user, but now I use meow to manage all my keys.
       ("oh" "oj-open-home-dir" oj-open-home-dir)]
      ])
 #+end_src
+*** buffer-keybindings
+#+begin_src elisp
+  (transient-define-prefix leader-map-for-buffer()
+    "Define leader-key map for buffer functions"
+    [["Buffer"
+     ("b" "consult-buffer" consult-buffer) ;; work with C-x b
+     ("k" "kill-current-buffer" kill-current-buffer)
+     ("l" "meow-last-buffer" meow-last-buffer)
+     ("n" "next-buffer" next-buffer)
+     ("p" "previous-buffer" previous-buffer)
+     ("r" "revert-buffer" revert-buffer)]
+     ["Bookmark"
+     ("j" "bookmark-jump" bookmark-jump)
+     ("m" "bookmark-set" bookmark-set)
+     ("M" "bookmark-delete" bookmark-delete)]])
+
+
+#+end_src
 ** meow leader keys
 #+begin_src elisp
   ;; default
@@ -466,15 +480,7 @@ I used to be a vim(evil) user, but now I use meow to manage all my keys.
   ;; buffer
   (meow-leader-define-key
    ;; '("b b" . persp-switch-to-buffer)
-   '("b b" . consult-buffer) ;; work with C-x b
-   '("b k" . kill-current-buffer)
-   '("b l" . meow-last-buffer)
-   '("b m" . bookmark-set)
-   '("b M" . bookmark-delete)
-   '("b n" . next-buffer)
-   '("b j" . bookmark-jump)
-   '("b p" . previous-buffer)
-   '("b r" . revert-buffer))
+   '("b" . leader-map-for-buffer))
 
   ;; lewisliu
   (meow-leader-define-key
@@ -625,7 +631,7 @@ rainbow-delimiters is a "rainbow parentheses"-like mode which highlights delimit
 diff-hl-mode highlights uncommitted changes on the left side of the window (area also known as the "gutter"), allows you to jump between and revert them selectively.
 #+begin_src elisp
   (setup diff-hl
-    (:hook-into text-mode prog-mode)
+    ;; (:hook-into text-mode prog-mode)
     (:when-loaded
       (diff-hl-margin-mode)))
 #+end_src
@@ -1185,6 +1191,7 @@ Dirvish is a minimalistic file manager based on Dired. It's fast
 #+begin_src elisp
   (setup dirvish
     (:option dirvish-attributes '(subtree-state all-the-icons collapse file-size))
+    (:bind "TAB" dirvish-toggle-subtree)
     (:when-loaded
       (dirvish-override-dired-mode)))
 #+end_src
