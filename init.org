@@ -26,6 +26,7 @@ I feel in love denote, preview org-roam configs are refiled in [[file:useful-too
   - [[#awesome-tray][awesome-tray]]
   - [[#hl-todo][hl-todo]]
   - [[#pulsar][pulsar]]
+  - [[#tab-line][tab-line]]
 - [[#general-configuration][General Configuration]]
   - [[#simple][simple]]
   - [[#general-modes][general modes]]
@@ -211,8 +212,6 @@ I used to be a vim(evil) user, but now I use meow to manage all my keys.
              ;; motion keys
              (meow-motion-overwrite-define-key '("j" . meow-next)
                                                '("k" . meow-prev)
-                                               ;; '("h" . meow-left)
-                                               ;; '("l" . meow-right)
                                                '("<escape>" . ignore)
                                                '("." . repeat))
              ;; normal keys
@@ -238,15 +237,7 @@ I used to be a vim(evil) user, but now I use meow to manage all my keys.
                                      '("f" . meow-find)
                                      ;; '("F" . meow-find-expand)
 
-                                     '("g d" . xref-find-definitions)
-                                     '("g D" . xref-find-references)
-                                     '("g j" . xref-find-apropos)
-                                     '("g m" . consult-mark)
-                                     '("g a" . eglot-code-actions)
-                                     '("g r" . eglot-rename)
-                                     ;; '("g f" . eglot-format)
-                                     '("g f" . format-all-region)
-                                     '("g F" . format-all-buffer)
+                                     '("g" . g-extra-commands)
 
                                      '("G" . meow-grab)
                                      '("h" . meow-left)
@@ -340,7 +331,28 @@ I used to be a vim(evil) user, but now I use meow to manage all my keys.
 #+begin_src elisp
   (setup transient
     (require 'transient)
-    (:autoload transient-define-prefix))
+    (:with-map transient-base-map
+      (:bind "<escape>" transient-quit-one)))
+#+end_src
+*** G extra commands
+#+begin_src elisp
+  (transient-define-prefix g-extra-commands()
+    "Define notes leader-key maps"
+    [["Code find"
+      ("d" "find-definitions" xref-find-definitions)
+      ("D" "find-references" xref-find-references)
+      ("j" "find-apropos" xref-find-apropos)]
+     ["Code action"
+      ("a" "eglot-code-actions" eglot-code-actions)
+      ("r" "eglot-rename" eglot-rename)
+      ("f" "format-all-region" format-all-region)
+      ("F" "format-all-buffer" format-all-buffer)]
+     ["Navigate"
+      ("m" "consult-mark" consult-mark)
+      ("t" "next-tab" tab-line-switch-to-next-tab :transient t)
+      ("T" "preview-tab" tab-line-switch-to-prev-tab :transient t)
+      ]
+     ])
 #+end_src
 *** lewis-keybindings
 #+begin_src elisp
@@ -436,8 +448,6 @@ I used to be a vim(evil) user, but now I use meow to manage all my keys.
    ;; SPC j/k will run the original command in MOTION state.
    '("j" . "H-j")
    '("k" . "H-k")
-   ;; '("h" . "H-h")
-   ;; '("l" . "H-l")
    '("." . "H-.")
    ;; Use SPC (0-9) for digit arguments.
    '("1" . meow-digit-argument)
@@ -690,6 +700,14 @@ diff-hl-mode highlights uncommitted changes on the left side of the window (area
     (:defer
      (pulsar-global-mode 1)
      ))
+#+end_src
+** tab-line
+#+begin_src elisp
+    (setup tab-line
+      (:option tab-line-new-button-show nil
+               tab-line-close-button-show nil)
+      (:defer (global-tab-line-mode))
+      )
 #+end_src
 * General Configuration
 ** simple
@@ -1166,8 +1184,9 @@ borrowed from citre, now you can always jump-back use "M-,"
 Dirvish is a minimalistic file manager based on Dired. It's fast
 #+begin_src elisp
   (setup dirvish
-    (:option dirvish-attributes '(subtree-state all-the-icons file-size))
-    (:bind "TAB" dirvish-toggle-subtree))
+    (:option dirvish-attributes '(subtree-state all-the-icons collapse file-size))
+    (:when-loaded
+      (dirvish-override-dired-mode)))
 #+end_src
 ** structure browsing
 *** imenu-list
@@ -1226,10 +1245,6 @@ Dirvish is a minimalistic file manager based on Dired. It's fast
                            (or (equal major-mode 'vterm-mode)
                                (string-prefix-p vterm-buffer-name (buffer-name buffer))))))
                      (display-buffer-reuse-window display-buffer-at-bottom)
-                     ;;(display-buffer-reuse-window display-buffer-in-direction)
-                     ;;display-buffer-in-direction/direction/dedicated is added in emacs27
-                     ;;(direction . bottom)
-                     ;;(dedicated . t) ;dedicated is supported in emacs27
                      (reusable-frames . visible)
                      (window-height . 0.3)))
       )
@@ -1583,8 +1598,6 @@ eglot client leveraging LTEX Language Server.
          (latex . t)
          (C . t)
          (scheme . t)
-         ;; (C++ . t)
-         ;; (bash . t)
          ))
       (add-hook 'org-babel-after-execute-hook 'org-redisplay-inline-images)
       ;; open word
@@ -1627,7 +1640,8 @@ eglot client leveraging LTEX Language Server.
              org-download-image-dir "~/Documents/emacs/orgmode/PicturesForAll/org_download_images")
     (:when-loaded
       (when (eq system-type 'gnu/linux)
-        (setq-default org-download-screenshot-method "spectacle"))
+        (setq-default org-download-screenshot-method "scrot -s %s"))
+
       (when (eq system-type 'darwin)
         (setq org-download-screenshot-method "screencapture -i %s")))
     (:autoload org-download-screenshot))
@@ -1677,7 +1691,8 @@ eglot client leveraging LTEX Language Server.
 #+begin_src elisp
   (setup ebib
     (:option ebib-preload-bib-files '("~/Documents/emacs/orgmode/bibliography/better_zotero_bib.bib")
-             ebib-file-search-dirs "~/Documents/pdf-files-dir/")
+             ebib-file-search-dirs '("~/Documents/pdf-files-dir")
+             )
     (:when-loaded
       (defcustom ebib-zotero-translation-server "http://127.0.0.1:1969"
         "The address of Zotero translation server."
@@ -1717,7 +1732,7 @@ eglot client leveraging LTEX Language Server.
     (add-hook 'dired-mode-hook #'denote-dired-mode-in-directories))
   (defun find-denote-file-dir()
     (interactive)
-    (dirvish-dwim "~/Documents/emacs/orgmode/denote/")
+    (dired "~/Documents/emacs/orgmode/denote/")
     (project-find-file))
 
 #+end_src
