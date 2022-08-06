@@ -339,12 +339,19 @@ I used to be a vim(evil) user, but now I use meow to manage all my keys.
     [["Code find"
       ("d" "find-definitions" xref-find-definitions)
       ("D" "find-references" xref-find-references)
-      ("j" "find-apropos" xref-find-apropos)]
+      ("j" "find-apropos" xref-find-apropos)
+      ("i" "find-impl" lsp-bridge-find-impl)
+      ]
      ["Code action"
-      ("a" "eglot-code-actions" eglot-code-actions)
-      ("r" "eglot-rename" eglot-rename)
+      ("a" "code-actions" lsp-bridge-code-action)
+      ("r" "rename" lsp-bridge-rename)
       ("f" "format-all-region" format-all-region)
       ("F" "format-all-buffer" format-all-buffer)]
+     ["diagnostic"
+      ("n" "jump-to-next-diagnostic" lsp-bridge-jump-to-next-diagnostic)
+      ("p" "jump-to-prev-diagnostic" lsp-bridge-jump-to-prev-diagnostic)
+      ("l" "list-diagnostics" lsp-bridge-list-diagnostics)
+      ]
      ["Navigate"
       ("m" "consult-mark" consult-mark)
       ("t" "next-tab" tab-line-switch-to-next-tab :transient t)
@@ -920,7 +927,7 @@ should be check after reading the embark.el manual
   ;;0.585
   (setup corfu
     (:option corfu-cycle t                ;; Enable cycling for `corfu-next/previous'
-             corfu-auto t                 ;; Enable auto completion
+             ;; corfu-auto t                 ;; Enable auto completion
              corfu-quit-no-match t        ;; Automatically quit if there is no match
              corfu-preview-current nil    ;; Disable current candidate preview
              ;; corfu-echo-documentation nil ;; Disable documentation in the echo area
@@ -1125,6 +1132,24 @@ borrowed from citre, now you can always jump-back use "M-,"
 *** bookmark
 #+begin_src elisp
   (setq bookmark-default-file "~/Documents/emacs/other-files/bookmarks")
+#+end_src
+*** windmove
+#+begin_src elisp
+  (setup windmove
+  (transient-define-prefix windmove-transient-keybindings()
+    "Define windmove maps"
+    [[("h" "left" windmove-left :transient t)
+     ("H" "swap-left" windmove-swap-states-left :transient t)]
+    [("j" "down" windmove-down :transient t)
+       ("J" "swap-down" windmove-swap-states-down :transient t)]
+    [("k" "up" windmove-up :transient t)
+     ("K" "swap-up" windmove-swap-states-up :transient t)]
+    [("l" "right" windmove-right :transient t)
+     ("L" "swap-right" windmove-swap-states-right :transient t)]
+     ])
+  (:global "C-x o" windmove-transient-keybindings)
+  )
+
 #+end_src
 * ibuffer
 ** ibuffer
@@ -1362,11 +1387,7 @@ Emacs major-mode to work with Beancount ledger files
 (setup cmake-mode)
 #+end_src
 ** Useful programing tools
-*** quickrun
-#+begin_src elisp
-  (setup quickrun)
-#+end_src
-*** tree-sitter
+*** UI
 **** tree-sitter
 #+begin_src elisp
   (setup tree-sitter
@@ -1374,8 +1395,21 @@ Emacs major-mode to work with Beancount ledger files
     (:hook tree-sitter-hl-mode))
   (setup tree-sitter-langs)
 #+end_src
-*** lsp mode
-**** eglot
+**** symbol-overlay
+Highlight symbols with keymap-enabled overlays
+#+begin_src elisp
+  (setup symbol-overlay
+    (:autoload symbol-overlay-put))
+#+end_src
+**** hl-indent-scope
+#+begin_src elisp
+  (setup hl-indent-scope
+    (:defer
+     (global-hl-indent-scope-mode)))
+#+end_src
+*** Complete
+**** lsp mode
+***** eglot
 #+begin_src elisp
   (setup project)
   (setup xref
@@ -1400,21 +1434,26 @@ Emacs major-mode to work with Beancount ledger files
              eldoc-echo-area-display-truncation-message nil))
   ;; (setq eldoc-echo-area-prefer-doc-buffer nil)
 #+end_src
-**** consult-eglot
+***** consult-eglot
 #+begin_src elisp
   (setup consult-eglot
     (:load-after eglot)
     (:with-map eglot-mode-map
       (:bind [remap xref-find-apropos] #'consult-eglot-symbols)))
 #+end_src
-**** lsp-bridge
-#+begin_src elisp :tangle no
+***** lsp-bridge
+#+begin_src elisp
   (setup lsp-bridge
     (:option lsp-bridge-enable-signature-help t
              lsp-bridge-org-babel-lang-list '("python" "C++" "elisp")
-             ))
+             ;; acm-candidate-match-function 'orderless-regexp
+             )
+    (:bind [remap xref-find-definitions] #'lsp-bridge-find-def
+           [remap xref-find-references] #'lsp-bridge-find-references)
+    )
+
 #+end_src
-*** citre
+**** citre
 Citre is an advanced Ctags (or actually, readtags) frontend for Emacs.
 #+begin_src elisp
   (setup citre
@@ -1425,11 +1464,16 @@ Citre is an advanced Ctags (or actually, readtags) frontend for Emacs.
              ;; citre-auto-enable-citre-mode-modes '(prog-mode)
              ))
 #+end_src
-*** symbol-overlay
-Highlight symbols with keymap-enabled overlays
+**** eacl
 #+begin_src elisp
-  (setup symbol-overlay
-    (:autoload symbol-overlay-put))
+  (setup eacl
+    (:option eacl-grep-program "ripgrep")
+    (:global "M-l" eacl-complete-line
+             "M-L" eacl-complete-multiline))
+#+end_src
+*** quickrun
+#+begin_src elisp
+  (setup quickrun)
 #+end_src
 *** grammatical-edit
 #+begin_src elisp
@@ -1507,11 +1551,25 @@ eglot client leveraging LTEX Language Server.
   (setup language-id)
   (setup format-all)
 #+end_src
-*** hl-indent-scope
+*** gdb
 #+begin_src elisp
-  (setup hl-indent-scope
-    (:defer
-     (global-hl-indent-scope-mode)))
+    (setup gdb-mi
+      (:global "<f5>" gdb-transient-keybindings)
+      (:when-loaded
+        (transient-define-prefix gdb-transient-keybindings()
+          "Define map for gdb functions"
+          [[("b" "gud-break" gud-break)
+            ("c" "gud-cont" gud-cont)]
+           [("f" "gud-finish" gud-finish)
+            ("j" "gud-jump" gud-jump)]
+           [("n" "gud-next" gud-next)
+            ("p" "gud-print" gud-print)]
+           [("r" "gud-run" gud-run)
+            ("R" "gud-remove" gud-remove)]
+           [("s" "gud-step" gud-step)
+            ("u" "gud-until" gud-until)]
+           [("w" "gud-watch" gud-watch)]
+           ])))
 #+end_src
 * Org Mode
 ** org-mode

@@ -101,6 +101,9 @@
 	url = https://github.com/doomemacs/themes.git
     load-path = .
     load-path = extensions
+[submodule "eacl"]
+	path = lib/eacl
+	url = https://github.com/redguardtoo/eacl.git
 [submodule "eaf"]
 	path = lib/eaf
 	url = https://github.com/emacs-eaf/emacs-application-framework.git
@@ -196,6 +199,12 @@
 [submodule "language-id"]
 	path = lib/language-id
 	url = https://github.com/lassik/emacs-language-id.git
+[submodule "lsp-bridge"]
+	path = lib/lsp-bridge
+	url = https://github.com/manateelazycat/lsp-bridge.git
+    load-path = .
+    load-path = acm
+    no-byte-compile = acm/acm-backend-tempel.el
 [submodule "lua-mode"]
 	path = lib/lua-mode
 	url = https://github.com/immerrr/lua-mode.git
