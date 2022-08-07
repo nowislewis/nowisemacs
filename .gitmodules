@@ -199,12 +199,6 @@
 [submodule "language-id"]
 	path = lib/language-id
 	url = https://github.com/lassik/emacs-language-id.git
-[submodule "lsp-bridge"]
-	path = lib/lsp-bridge
-	url = https://github.com/manateelazycat/lsp-bridge.git
-    load-path = .
-    load-path = acm
-    no-byte-compile = acm/acm-backend-tempel.el
 [submodule "lua-mode"]
 	path = lib/lua-mode
 	url = https://github.com/immerrr/lua-mode.git
@@ -310,6 +304,9 @@
 [submodule "tablist"]
 	path = lib/tablist
 	url = https://github.com/politza/tablist.git
+[submodule "tabspaces"]
+	path = lib/tabspaces
+	url = https://github.com/mclear-tools/tabspaces.git
 [submodule "toc-org"]
 	path = lib/toc-org
 	url = https://github.com/snosov1/toc-org.git

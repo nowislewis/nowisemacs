@@ -26,7 +26,8 @@ I feel in love denote, preview org-roam configs are refiled in [[file:useful-too
   - [[#awesome-tray][awesome-tray]]
   - [[#hl-todo][hl-todo]]
   - [[#pulsar][pulsar]]
-  - [[#tab-line][tab-line]]
+  - [[#tab-line-and-tab-bar][tab-line and tab-bar]]
+  - [[#show-paren-mode][show-paren-mode]]
 - [[#general-configuration][General Configuration]]
   - [[#simple][simple]]
   - [[#general-modes][general modes]]
@@ -61,6 +62,7 @@ I feel in love denote, preview org-roam configs are refiled in [[file:useful-too
   - [[#file-browsing][file browsing]]
   - [[#structure-browsing][structure browsing]]
   - [[#perspective][perspective]]
+  - [[#tabspaces][tabspaces]]
   - [[#project][project]]
 - [[#shell][shell]]
   - [[#vterm][vterm]]
@@ -340,17 +342,17 @@ I used to be a vim(evil) user, but now I use meow to manage all my keys.
       ("d" "find-definitions" xref-find-definitions)
       ("D" "find-references" xref-find-references)
       ("j" "find-apropos" xref-find-apropos)
-      ("i" "find-impl" lsp-bridge-find-impl)
+      ("i" "find-impl" eglot-find-implementation)
       ]
      ["Code action"
-      ("a" "code-actions" lsp-bridge-code-action)
-      ("r" "rename" lsp-bridge-rename)
+      ("a" "code-actions" eglot-code-actions)
+      ("r" "rename" eglot-rename)
       ("f" "format-all-region" format-all-region)
       ("F" "format-all-buffer" format-all-buffer)]
      ["diagnostic"
-      ("n" "jump-to-next-diagnostic" lsp-bridge-jump-to-next-diagnostic)
-      ("p" "jump-to-prev-diagnostic" lsp-bridge-jump-to-prev-diagnostic)
-      ("l" "list-diagnostics" lsp-bridge-list-diagnostics)
+      ("n" "jump-to-next-diagnostic" flymake-goto-next-error)
+      ("p" "jump-to-prev-diagnostic" flymake-goto-prev-error)
+      ("l" "list-diagnostics" consult-flymake)
       ]
      ["Navigate"
       ("m" "consult-mark" consult-mark)
@@ -437,7 +439,9 @@ I used to be a vim(evil) user, but now I use meow to manage all my keys.
      ["Vterm-toggle"
       ("vt" "vterm-toggle" vterm-toggle)
       ("vf" "vterm-toggle-forward" vterm-toggle-forward)
-      ("vb" "vterm-toggle-backward" vterm-toggle-backward)]
+      ("vb" "vterm-toggle-backward" vterm-toggle-backward)
+      ("i" "vterm-toggle-insert-cd" vterm-toggle-insert-cd :transient t)
+      ]
      ["OJ"
       ("op" "oj-prepare" oj-prepare)
       ("ot" "oj-test" oj-test)
@@ -518,6 +522,7 @@ I used to be a vim(evil) user, but now I use meow to manage all my keys.
 
   (meow-leader-define-key
    ;;w workspace
+   ;; '("<tab>". tabspaces-keymap-prefix))
    '("TAB". perspective-map))
 #+end_src
 ** which-key
@@ -714,13 +719,21 @@ diff-hl-mode highlights uncommitted changes on the left side of the window (area
      (pulsar-global-mode 1)
      ))
 #+end_src
-** tab-line
+** tab-line and tab-bar
 #+begin_src elisp
-    (setup tab-line
-      (:option tab-line-new-button-show nil
-               tab-line-close-button-show nil)
-      (:defer (global-tab-line-mode))
-      )
+  (setup tab-bar
+    (:option tab-bar-new-button-show nil
+             tab-bar-close-button-show nil))
+  (setup tab-line
+    (:option tab-line-new-button-show nil
+             tab-line-close-button-show nil)
+    (:defer (global-tab-line-mode))
+    )
+#+end_src
+** show-paren-mode
+#+begin_src elisp
+  (setup paren
+    (:option show-paren-context-when-offscreen 'overlay))
 #+end_src
 * General Configuration
 ** simple
@@ -927,7 +940,7 @@ should be check after reading the embark.el manual
   ;;0.585
   (setup corfu
     (:option corfu-cycle t                ;; Enable cycling for `corfu-next/previous'
-             ;; corfu-auto t                 ;; Enable auto completion
+             corfu-auto t                 ;; Enable auto completion
              corfu-quit-no-match t        ;; Automatically quit if there is no match
              corfu-preview-current nil    ;; Disable current candidate preview
              ;; corfu-echo-documentation nil ;; Disable documentation in the echo area
@@ -1252,6 +1265,14 @@ Dirvish is a minimalistic file manager based on Dired. It's fast
     (unless (equal persp-mode t)
       (persp-mode)))
 #+end_src
+** tabspaces
+#+begin_src elisp
+  (setup tabspaces
+  (:option tabspaces-use-filtered-buffers-as-default t)
+           ;; tabspaces-keymap-prefix nil)
+    )
+
+#+end_src
 ** project
 #+begin_src elisp
   (setup project
@@ -1442,7 +1463,7 @@ Highlight symbols with keymap-enabled overlays
       (:bind [remap xref-find-apropos] #'consult-eglot-symbols)))
 #+end_src
 ***** lsp-bridge
-#+begin_src elisp
+#+begin_src elisp :tangle no
   (setup lsp-bridge
     (:option lsp-bridge-enable-signature-help t
              lsp-bridge-org-babel-lang-list '("python" "C++" "elisp")
