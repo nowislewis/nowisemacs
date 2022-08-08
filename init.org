@@ -61,7 +61,6 @@ I feel in love denote, preview org-roam configs are refiled in [[file:useful-too
 - [[#file-and-browsing][File and Browsing]]
   - [[#file-browsing][file browsing]]
   - [[#structure-browsing][structure browsing]]
-  - [[#perspective][perspective]]
   - [[#tabspaces][tabspaces]]
   - [[#project][project]]
 - [[#shell][shell]]
@@ -522,8 +521,7 @@ I used to be a vim(evil) user, but now I use meow to manage all my keys.
 
   (meow-leader-define-key
    ;;w workspace
-   ;; '("<tab>". tabspaces-keymap-prefix))
-   '("TAB". perspective-map))
+   '("TAB". leader-map-for-tabspaces))
 #+end_src
 ** which-key
 #+begin_src elisp
@@ -692,16 +690,13 @@ diff-hl-mode highlights uncommitted changes on the left side of the window (area
     (:when-loaded
       (defun pyim-awesome-tray()
         (concat current-input-method-title))
-      (defun persp-awesome-tray()
-        (concat "[" (persp-current-name) "]"))
 
       (defun meow-awesome-tray()
         (concat "<" (meow-indicator) ">"))
       (add-to-list 'awesome-tray-module-alist '("meow" . (meow-awesome-tray awesome-tray-module-last-command-face)))
       (add-to-list 'awesome-tray-module-alist '("pyim" . (pyim-awesome-tray awesome-tray-module-input-method-face)))
-      (add-to-list 'awesome-tray-module-alist '("persp" . (persp-awesome-tray awesome-tray-module-location-face)))
 
-      (setq awesome-tray-active-modules (list "meow" "flymake" "location" "belong" "buffer-read-only" "file-path"  "pyim" "persp"  "mode-name" "git"))
+      (setq awesome-tray-active-modules (list "meow" "flymake" "location" "belong" "buffer-read-only" "file-path"  "pyim"  "mode-name" "git"))
       ))
 #+end_src
 ** hl-todo
@@ -904,12 +899,6 @@ diff-hl-mode highlights uncommitted changes on the left side of the window (area
 #+begin_src elisp
   (setup consult-dir)
 #+end_src
-*** consult-notes
-#+begin_src elisp
-  (setup consult-notes
-    (:option consult-notes-sources '(("Name" ?n "~/Documents/emacs/orgmode/roam/"))))
-#+end_src
-
 ** Marginalia
 #+begin_src elisp
   (setup epkg-marginalia)
@@ -1256,23 +1245,31 @@ Dirvish is a minimalistic file manager based on Dired. It's fast
   (setup boxy-imenu)
   (setup boxy-info)
 #+end_src
-** perspective
-#+begin_src elisp
-  (setup perspective
-    (:option persp-initial-frame-name "Main"
-             persp-mode-prefix-key "")
-    ;; Running `persp-mode' multiple times resets the perspective list...
-    (unless (equal persp-mode t)
-      (persp-mode)))
-#+end_src
 ** tabspaces
 #+begin_src elisp
   (setup tabspaces
-  (:option tabspaces-use-filtered-buffers-as-default t)
-           ;; tabspaces-keymap-prefix nil)
-    )
-
-#+end_src
+    (:option tabspaces-use-filtered-buffers-as-default t)
+    (:defer
+     (tabspaces-mode))
+    (:when-loaded
+      (transient-define-prefix leader-map-for-tabspaces()
+        "Define tabspaces leader-key maps"
+        [["Create or close"
+          ("s" "tabspaces-switch-or-create-workspace" tabspaces-switch-or-create-workspace)
+          ("c" "tabspaces-close-workspace" tabspaces-close-workspace)
+          ("k" "tabspaces-remove-selected-buffer" tabspaces-remove-selected-buffer)
+          ("o" "tabspaces-open-or-create-project-and-workspace" tabspaces-open-or-create-project-and-workspace)
+          ("r" "tab-bar-rename-tab" tab-bar-rename-tab)
+          ("R" "tab-bar-rename-tab-by-name" tab-bar-rename-tab-by-name)
+          ]
+         ["Switch tab bar"
+          ("n" "tab-bar-switch-to-next-tab" tab-bar-switch-to-next-tab)
+          ("p" "tab-bar-switch-to-prev-tab" tab-bar-switch-to-prev-tab)
+          ("l" "tab-bar-switch-to-last-tab" tab-bar-switch-to-last-tab)
+          ("r" "tab-bar-switch-to-recent-tab" tab-bar-switch-to-recent-tab)]
+         ])
+      ))
+    #+end_src
 ** project
 #+begin_src elisp
   (setup project

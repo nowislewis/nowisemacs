@@ -256,9 +256,6 @@
 [submodule "pdf-tools"]
 	path = lib/pdf-tools
 	url = https://github.com/vedang/pdf-tools.git
-[submodule "perspective"]
-	path = lib/perspective
-	url = https://github.com/nex3/perspective-el.git
 [submodule "popper"]
 	path = lib/popper
 	url = https://github.com/karthink/popper.git
