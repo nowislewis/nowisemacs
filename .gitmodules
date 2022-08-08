@@ -214,6 +214,9 @@
 [submodule "meow"]
 	path = lib/meow
 	url = https://github.com/meow-edit/meow.git
+[submodule "minimap"]
+	path = lib/minimap
+	url = https://github.com/emacsmirror/minimap.git
 [submodule "mixed-pitch"]
 	path = lib/mixed-pitch
 	url = https://github.com/emacsmirror/mixed-pitch.git
