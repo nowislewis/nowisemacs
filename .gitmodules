@@ -51,9 +51,6 @@
 [submodule "consult-dash"]
 	path = lib/consult-dash
 	url = https://codeberg.org/ravi/consult-dash.git
-[submodule "consult-dir"]
-	path = lib/consult-dir
-	url = https://github.com/karthink/consult-dir.git
 [submodule "consult-eglot"]
 	path = lib/consult-eglot
 	url = https://github.com/mohkale/consult-eglot.git
@@ -214,9 +211,6 @@
 [submodule "meow"]
 	path = lib/meow
 	url = https://github.com/meow-edit/meow.git
-[submodule "minimap"]
-	path = lib/minimap
-	url = https://github.com/emacsmirror/minimap.git
 [submodule "mixed-pitch"]
 	path = lib/mixed-pitch
 	url = https://github.com/emacsmirror/mixed-pitch.git

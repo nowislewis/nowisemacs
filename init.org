@@ -26,9 +26,7 @@ I feel in love denote, preview org-roam configs are refiled in [[file:useful-too
   - [[#awesome-tray][awesome-tray]]
   - [[#hl-todo][hl-todo]]
   - [[#pulsar][pulsar]]
-  - [[#tab-line-and-tab-bar][tab-line and tab-bar]]
   - [[#show-paren-mode][show-paren-mode]]
-  - [[#minimap][minimap]]
 - [[#general-configuration][General Configuration]]
   - [[#simple][simple]]
   - [[#general-modes][general modes]]
@@ -62,6 +60,7 @@ I feel in love denote, preview org-roam configs are refiled in [[file:useful-too
 - [[#file-and-browsing][File and Browsing]]
   - [[#file-browsing][file browsing]]
   - [[#structure-browsing][structure browsing]]
+  - [[#tab-line-and-tab-bar][tab-line and tab-bar]]
   - [[#tabspaces][tabspaces]]
   - [[#project][project]]
 - [[#shell][shell]]
@@ -89,6 +88,7 @@ I feel in love denote, preview org-roam configs are refiled in [[file:useful-too
 - [[#翻译][翻译]]
   - [[#go-translate][go-translate]]
   - [[#corfu-english-helper][corfu-english-helper]]
+  - [[#insert-translated-name][insert-translated-name]]
 - [[#阅读][阅读]]
   - [[#pdf-tools][pdf-tools]]
   - [[#elfeed][elfeed]]
@@ -402,7 +402,6 @@ I used to be a vim(evil) user, but now I use meow to manage all my keys.
       ("g" "rg" rg)
       ("h" "consult-history" consult-history)
       ("i" "consult-imenu" consult-imenu)
-      ("j" "consult-dir" consult-dir)
       ("s" "consult-line" consult-line)
       ]])
 #+end_src
@@ -714,30 +713,10 @@ diff-hl-mode highlights uncommitted changes on the left side of the window (area
      (pulsar-global-mode 1)
      ))
 #+end_src
-** tab-line and tab-bar
-#+begin_src elisp
-  (setup tab-bar
-    (:option tab-bar-new-button-show nil
-             tab-bar-close-button-show nil))
-  (setup tab-line
-    (:option tab-line-new-button-show nil
-             tab-line-close-button-show nil)
-    (:defer (global-tab-line-mode))
-    )
-#+end_src
 ** show-paren-mode
 #+begin_src elisp
   (setup paren
     (:option show-paren-context-when-offscreen 'overlay))
-#+end_src
-** minimap
-#+begin_src elisp
-  (setup minimap
-    (:option minimap-window-location 'right)
-    (:defer
-     (minimap-mode))
-    (:when-loaded
-      (minimap-sb-mode)))
 #+end_src
 * General Configuration
 ** simple
@@ -904,10 +883,6 @@ diff-hl-mode highlights uncommitted changes on the left side of the window (area
     )
   (setup consult-dash)
     #+end_src
-*** consult-dir
-#+begin_src elisp
-  (setup consult-dir)
-#+end_src
 ** Marginalia
 #+begin_src elisp
   (setup epkg-marginalia)
@@ -1254,6 +1229,35 @@ Dirvish is a minimalistic file manager based on Dired. It's fast
   (setup boxy-imenu)
   (setup boxy-info)
 #+end_src
+** tab-line and tab-bar
+#+begin_src elisp
+  (setup tab-bar
+    (:option tab-bar-new-button-show nil
+             tab-bar-close-button-show nil)
+    (:when-loaded
+      (defun tab-bar-select-tab-1st()
+        (interactive)
+        (tab-bar-select-tab 1))
+      (defun tab-bar-select-tab-2nd()
+        (interactive)
+        (tab-bar-select-tab 2))
+      (defun tab-bar-select-tab-3rd()
+        (interactive)
+        (tab-bar-select-tab 3))
+      (defun tab-bar-select-tab-4th()
+        (interactive)
+        (tab-bar-select-tab 4))
+      (defun tab-bar-select-tab-5th()
+        (interactive)
+        (tab-bar-select-tab 5))
+      )
+    )
+  (setup tab-line
+    (:option tab-line-new-button-show nil
+             tab-line-close-button-show nil)
+    ;; (:defer (global-tab-line-mode))
+    )
+#+end_src
 ** tabspaces
 #+begin_src elisp
   (setup tabspaces
@@ -1276,13 +1280,19 @@ Dirvish is a minimalistic file manager based on Dired. It's fast
           ("p" "tab-bar-switch-to-prev-tab" tab-bar-switch-to-prev-tab)
           ("l" "tab-bar-switch-to-last-tab" tab-bar-switch-to-last-tab)
           ("r" "tab-bar-switch-to-recent-tab" tab-bar-switch-to-recent-tab)]
-         ])
+         ["Switch tab bar by index"
+          ("1" "tab-bar-select-tab-1st" tab-bar-select-tab-1st)
+          ("2" "tab-bar-select-tab-2nd" tab-bar-select-tab-2nd)
+          ("3" "tab-bar-select-tab-3rd" tab-bar-select-tab-3rd)
+          ("4" "tab-bar-select-tab-4th" tab-bar-select-tab-4th)
+          ("5" "tab-bar-select-tab-5th" tab-bar-select-tab-5th)]
+         ]
+        )
       ))
     #+end_src
 ** project
 #+begin_src elisp
-  (setup project
-    )
+  (setup project)
 #+end_src
 * shell
 ** vterm
@@ -1854,6 +1864,12 @@ I use corfu english helper instead of company-english-helper.
 #+begin_src elisp
   (setup corfu-english-helper
     (:autoload toggle-corfu-english-helper))
+#+end_src
+** insert-translated-name
+#+begin_src elisp
+  (setup insert-translated-name
+    (:autoload insert-translated-name-insert
+      insert-translated-name-replace))
 #+end_src
 * 阅读
 ** pdf-tools
