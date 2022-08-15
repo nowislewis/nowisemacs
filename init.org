@@ -48,6 +48,7 @@ I feel in love denote, preview org-roam configs are refiled in [[file:useful-too
   - [[#corfuinstead-of-company][corfu(instead of company)]]
   - [[#corfu-all-the-icons][corfu-all-the-icons]]
   - [[#yasnippet][yasnippet]]
+  - [[#tempel][tempel]]
   - [[#rgel][rg.el]]
 - [[#window-management][Window Management]]
   - [[#winner-mode][winner-mode]]
@@ -1055,6 +1056,20 @@ should be check after reading the embark.el manual
     (:option yas-snippet-dirs (list (concat nowisemacs-config-useful-tools "snippets")))
     (:defer (yas-global-mode)))
 #+end_src
+** tempel
+#+begin_src elisp
+  (setup tempel
+    (:option tempel-path "~/.emacs.d/useful-tools/tempel-snippets")
+    (defun tempel-setup-capf ()
+      (setq-local completion-at-point-functions
+                  (cons #'tempel-complete
+                        completion-at-point-functions)))
+
+    (add-hook 'prog-mode-hook 'tempel-setup-capf)
+    (add-hook 'text-mode-hook 'tempel-setup-capf)
+    )
+
+#+end_src
 ** rg.el
 #+begin_src elisp
   (setup rg)
@@ -1366,9 +1381,9 @@ Dirvish is a minimalistic file manager based on Dired. It's fast
 #+end_src
 *** graphviz-dot-mode
 #+begin_src elisp
-  (setup graphviz-dot-mode
-    (:file-match "\\.dot\\'")
-    (:option graphviz-dot-indent-width 4))
+    (setup graphviz-dot-mode
+      (:file-match "\\.dot\\'")
+      (:option graphviz-dot-indent-width 4))
 #+end_src
 *** beancount
 Emacs major-mode to work with Beancount ledger files
@@ -1830,7 +1845,9 @@ eglot client leveraging LTEX Language Server.
 ** denote
 #+begin_src elisp
   (setup denote
-    (:option denote-directory (expand-file-name "~/Documents/emacs/orgmode/denote/"))
+    (:option denote-directory (expand-file-name "~/Documents/emacs/orgmode/denote/")
+             denote-dired-directories (list denote-directory
+                                            (thread-last denote-directory (expand-file-name "attachments"))))
     (add-hook 'dired-mode-hook #'denote-dired-mode-in-directories))
   (defun find-denote-file-dir()
     (interactive)
@@ -1894,21 +1911,19 @@ I use corfu english helper instead of company-english-helper.
 ** elfeed
 #+begin_src elisp
   (setup elfeed
-    (setq elfeed-feeds
-          '("http://ruzkuku.com/all.atom"
-            "https://karthinks.com/index.xml"
-            "https://shom.dev/index.xml"
-            "https://blog.benoitj.ca/posts/index.xml"
-            "https://protesilaos.com/codelog.xml"
-            "https://sachachua.com/blog/feed/"
-            "https://nullprogram.com/feed/"
-            "https://irreal.org/blog/?feed=rss2"
-            "https://ambrevar.xyz/atom.xml"
-            "https://guix.gnu.org/feeds/blog.atom"
-            "https://valdyas.org/fading/feed/"
-            "https://manateelazycat.github.io/feed.xml")))
-#+end_src
-
+    (setq elfeed-feeds '("http://ruzkuku.com/all.atom"
+                         "https://karthinks.com/index.xml"
+                         "https://shom.dev/index.xml"
+                         "https://blog.benoitj.ca/posts/index.xml"
+                         "https://protesilaos.com/codelog.xml"
+                         "https://sachachua.com/blog/feed/"
+                         "https://nullprogram.com/feed/"
+                         "https://irreal.org/blog/?feed=rss2"
+                         "https://ambrevar.xyz/atom.xml"
+                         "https://guix.gnu.org/feeds/blog.atom"
+                         "https://valdyas.org/fading/feed/"
+                         "https://manateelazycat.github.io/feed.xml")))
+  #+end_src
 ** nov
 #+begin_src elisp
   (setup esxml) ;; <- (setup kv)
@@ -2026,10 +2041,9 @@ Simple distraction-free editing. I use darkroom instead of writeroom because it'
 ** gif-screencast
 #+begin_src elisp
   (setup gif-screencast
-    (:if-system 'darwin)
     (:autoload gif-screencast-start-or-stop
                gif-screencast-toggle-pause)
-
+    (:if-system 'darwin)
     (:when-loaded
       (:option gif-screencast-args '("-x") ;; To shut up the shutter sound of `screencapture' (see `gif-screencast-command').
                gif-screencast-cropping-program "mogrify" ;; Optional: Used to crop the capture to the Emacs frame.

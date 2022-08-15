@@ -301,6 +301,9 @@
 [submodule "tabspaces"]
 	path = lib/tabspaces
 	url = https://github.com/mclear-tools/tabspaces.git
+[submodule "tempel"]
+	path = lib/tempel
+	url = https://github.com/minad/tempel.git
 [submodule "toc-org"]
 	path = lib/toc-org
 	url = https://github.com/snosov1/toc-org.git
