@@ -1,0 +1,5 @@
+# -*- mode: snippet -*-
+# name: C4_Layout_With_Legend
+# key: Layout with legend
+# --
+LAYOUT_WITH_LEGEND()

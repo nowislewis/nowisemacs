@@ -1,0 +1,5 @@
+# -*- mode: snippet -*-
+# name: C4_System_Descr
+# key: System with Description
+# --
+System(${1:alias}, "${2:label}", "${3:description}")

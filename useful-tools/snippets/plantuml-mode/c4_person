@@ -1,0 +1,5 @@
+# -*- mode: snippet -*-
+# name: C4_Person
+# key: Person
+# --
+Person(${1:alias}, "${2:label}")

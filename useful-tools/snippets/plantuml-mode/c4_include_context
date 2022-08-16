@@ -1,0 +1,5 @@
+# -*- mode: snippet -*-
+# name: C4_Include_Context
+# key: Include C4 Context Diagram
+# --
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Context.puml

@@ -1,0 +1,5 @@
+# -*- mode: snippet -*-
+# name: C4_Relationship_Index
+# key: Relationship with Index
+# --
+RelIndex(${1:index}, ${2:from_alias}, ${3:to_alias}, "${4:label}")

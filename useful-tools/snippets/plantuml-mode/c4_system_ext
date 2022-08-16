@@ -1,0 +1,5 @@
+# -*- mode: snippet -*-
+# name: C4_System_Ext
+# key: External System
+# --
+System_Ext(${1:alias}, "${2:label}")

@@ -1,0 +1,5 @@
+# -*- mode: snippet -*-
+# name: C4_SystemDb_Ext_Descr
+# key: External Database System with Description
+# --
+SystemDb_Ext(${1:alias}, "${2:label}", "${3:description}")

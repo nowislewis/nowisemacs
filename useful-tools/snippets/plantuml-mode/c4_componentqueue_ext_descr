@@ -1,0 +1,5 @@
+# -*- mode: snippet -*-
+# name: C4_ComponentQueue_Ext_Descr
+# key: External Queue Component with Description
+# --
+ComponentQueue_Ext(${1:alias}, "${2:label}", "${3:technology}", "${4:description}")

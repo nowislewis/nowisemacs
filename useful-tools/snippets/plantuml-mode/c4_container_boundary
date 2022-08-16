@@ -1,0 +1,7 @@
+# -*- mode: snippet -*-
+# name: C4_Container_Boundary
+# key: Container Boundary
+# --
+Container_Boundary(${1:alias}, "${2:label}"){
+	$0
+}

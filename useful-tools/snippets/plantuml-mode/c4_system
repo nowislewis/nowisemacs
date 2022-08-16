@@ -1,0 +1,5 @@
+# -*- mode: snippet -*-
+# name: C4_System
+# key: System
+# --
+System(${1:alias}, "${2:label}")

@@ -1,0 +1,5 @@
+# -*- mode: snippet -*-
+# name: C4_Include_Deployment
+# key: Include C4 Deployment Diagram
+# --
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Deployment.puml

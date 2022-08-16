@@ -1,0 +1,5 @@
+# -*- mode: snippet -*-
+# name: C4_Container_Descr
+# key: Container with Description
+# --
+Container(${1:alias}, "${2:label}", "${3:technology}", "${4:description}")

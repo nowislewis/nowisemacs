@@ -1,0 +1,5 @@
+# -*- mode: snippet -*-
+# name: C4_Layout_Left_Right
+# key: Layout left to right
+# --
+LAYOUT_LEFT_RIGHT()

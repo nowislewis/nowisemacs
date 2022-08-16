@@ -1,0 +1,5 @@
+# -*- mode: snippet -*-
+# name: C4_Hide_Stereotype
+# key: Hide stereotype
+# --
+HIDE_STEREOTYPE()

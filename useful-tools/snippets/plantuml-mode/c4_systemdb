@@ -1,0 +1,5 @@
+# -*- mode: snippet -*-
+# name: C4_SystemDb
+# key: Database System
+# --
+SystemDb(${1:alias}, "${2:label}")

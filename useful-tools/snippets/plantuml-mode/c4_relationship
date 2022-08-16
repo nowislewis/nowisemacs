@@ -1,0 +1,5 @@
+# -*- mode: snippet -*-
+# name: C4_Relationship
+# key: Relationship
+# --
+Rel(${1:from_alias}, ${2:to_alias}, "${3:label}")

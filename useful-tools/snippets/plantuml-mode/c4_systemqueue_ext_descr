@@ -1,0 +1,5 @@
+# -*- mode: snippet -*-
+# name: C4_SystemQueue_Ext_Descr
+# key: External Queue System with Description
+# --
+SystemQueue_Ext(${1:alias}, "${2:label}", "${3:description}")

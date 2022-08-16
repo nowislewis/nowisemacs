@@ -1,0 +1,5 @@
+# -*- mode: snippet -*-
+# name: C4_Layout_As_Sketch
+# key: Layout as sketch
+# --
+LAYOUT_AS_SKETCH()

@@ -1,0 +1,5 @@
+# -*- mode: snippet -*-
+# name: C4_SystemQueue_Descr
+# key: Queue System with Description
+# --
+SystemQueue(${1:alias}, "${2:label}", "${3:description}")

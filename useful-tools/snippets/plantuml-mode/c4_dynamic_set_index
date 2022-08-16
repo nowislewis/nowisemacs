@@ -1,0 +1,5 @@
+# -*- mode: snippet -*-
+# name: C4_Dynamic_Set_Index
+# key: Set index
+# --
+setIndex(${1:value})

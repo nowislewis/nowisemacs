@@ -48,6 +48,7 @@ I feel in love denote, preview org-roam configs are refiled in [[file:useful-too
   - [[#corfuinstead-of-company][corfu(instead of company)]]
   - [[#corfu-all-the-icons][corfu-all-the-icons]]
   - [[#yasnippet][yasnippet]]
+  - [[#consult-yasnippet][consult-yasnippet]]
   - [[#tempel][tempel]]
   - [[#rgel][rg.el]]
 - [[#window-management][Window Management]]
@@ -356,8 +357,8 @@ I used to be a vim(evil) user, but now I use meow to manage all my keys.
       ]
      ["Navigate"
       ("m" "consult-mark" consult-mark)
-      ("t" "next-tab" tab-line-switch-to-next-tab :transient t)
-      ("T" "preview-tab" tab-line-switch-to-prev-tab :transient t)
+      ;; ("t" "next-tab" tab-line-switch-to-next-tab :transient t)
+      ;; ("T" "preview-tab" tab-line-switch-to-prev-tab :transient t)
       ]
      ])
 #+end_src
@@ -613,14 +614,16 @@ Modus-themes is great especailly for org mode
 *** doom-themes
 #+begin_src elisp
   (setup doom-themes
-    (load-theme 'doom-monokai-classic t)
+    ;; (load-theme 'doom-monokai-classic t)
     (:when-loaded
-      ;; ;; Enable flashing mode-line on errors
       (doom-themes-visual-bell-config)
-      ;; Corrects (and improves) org-mode's native fontification.
       (doom-themes-org-config)))
 #+end_src
-
+*** ef-themes
+#+begin_src elisp
+  (setup ef-themes)
+  (load-theme 'ef-winter t)
+#+end_src
 ** all-the-icons
 I'm thinking about removing this package, but it's pretty good so far
 *** all-the-icons
@@ -1054,12 +1057,56 @@ should be check after reading the embark.el manual
   ;; 0.63
   (setup yasnippet
     (:option yas-snippet-dirs (list (concat nowisemacs-config-useful-tools "snippets")))
-    (:defer (yas-global-mode)))
+    (:defer (yas-global-mode))
+    (:when-loaded
+      (defun json-to-yas-map-keys (key value)
+        (pcase key
+          ("prefix" (insert
+                     (concat "# key: " value "\n")))
+          ("body"
+           (insert "# --\n")
+           (mapcar (lambda (x) (insert x) (insert "\n")) value))))
+
+      (defun json-to-yas-map (hash)
+        (let ((output-directory (read-directory-name "Select snippets output directory: "
+                                                     (when (boundp 'snippet-directory)
+                                                       (expand-file-name snippet-directory)))))
+          (unless (directory-name-p output-directory)
+            (make-directory output-directory t))
+          (maphash (lambda (key value)
+                     (with-temp-file (concat (file-name-as-directory output-directory)
+                                             (string-replace " " "_"
+                                                             (downcase key)))
+                       (insert "# -*- mode: snippet -*-\n")
+                       (insert "# name: " key "\n")
+                       (maphash (lambda (key value) (json-to-yas-map-keys key value)) value)))
+                   hash)))
+
+      (defun json-to-yas ()
+        (interactive)
+        (goto-char (point-min))
+        (json-to-yas-map
+         (json-parse-buffer :array-type 'list)))
+      )
+    )
+  (setup consult-yasnippet)
+
+
+#+end_src
+** consult-yasnippet
+#+begin_src elisp
+  (setup consult-yasnippet
+    (:global "C-M-i" consult-yasnippet))
 #+end_src
 ** tempel
 #+begin_src elisp
   (setup tempel
-    (:option tempel-path "~/.emacs.d/useful-tools/tempel-snippets")
+    (:option tempel-path "~/.emacs.d/useful-tools/tempel-snippets"
+             tempel-trigger-prefix "<")
+    (:with-map tempel-map
+      (:bind [tab] tempel-next
+             [backtab] tempel-previous
+             ))
     (defun tempel-setup-capf ()
       (setq-local completion-at-point-functions
                   (cons #'tempel-complete
@@ -1381,9 +1428,23 @@ Dirvish is a minimalistic file manager based on Dired. It's fast
 #+end_src
 *** graphviz-dot-mode
 #+begin_src elisp
-    (setup graphviz-dot-mode
-      (:file-match "\\.dot\\'")
-      (:option graphviz-dot-indent-width 4))
+  (setup graphviz-dot-mode
+    (:file-match "\\.dot\\'")
+    (:option graphviz-dot-indent-width 4)
+    )
+#+end_src
+*** plantuml-mode
+#+begin_src elisp
+  (setup plantuml-mode
+    (:option plantuml-jar-path "~/.emacs.d/var/plantuml.jar"))
+  (setup plantuml-emacs
+    (:option plantuml-theme "plain"
+             plantuml-add-index-number t
+             plantuml-log-command t
+             plantuml-mindmap-contains-org-content t
+             plantuml-org-headline-bold t)
+    (:defer (require 'plantuml))
+    )
 #+end_src
 *** beancount
 Emacs major-mode to work with Beancount ledger files
@@ -1452,12 +1513,6 @@ Highlight symbols with keymap-enabled overlays
 #+begin_src elisp
   (setup symbol-overlay
     (:autoload symbol-overlay-put))
-#+end_src
-**** hl-indent-scope
-#+begin_src elisp
-  (setup hl-indent-scope
-    (:defer
-     (global-hl-indent-scope-mode)))
 #+end_src
 *** Complete
 **** lsp mode

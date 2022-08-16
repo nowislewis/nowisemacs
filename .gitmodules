@@ -54,6 +54,9 @@
 [submodule "consult-eglot"]
 	path = lib/consult-eglot
 	url = https://github.com/mohkale/consult-eglot.git
+[submodule "consult-yasnippet"]
+	path = lib/consult-yasnippet
+	url = https://github.com/mohkale/consult-yasnippet.git
 [submodule "corfu"]
 	path = lib/corfu
 	url = https://github.com/minad/corfu.git
@@ -119,6 +122,9 @@
 [submodule "eglot-ltex"]
 	path = lib/eglot-ltex
 	url = https://github.com/emacs-languagetool/eglot-ltex.git
+[submodule "el-themes"]
+	path = lib/el-themes
+	url = https://github.com/protesilaos/ef-themes.git
 [submodule "eldoc-box"]
 	path = lib/eldoc-box
 	url = https://github.com/casouri/eldoc-box.git
@@ -175,9 +181,6 @@
 [submodule "helpful"]
 	path = lib/helpful
 	url = https://github.com/Wilfred/helpful.git
-[submodule "hl-indent-scope"]
-	path = lib/hl-indent-scope
-	url = https://codeberg.org/ideasman42/emacs-hl-indent-scope.git
 [submodule "hl-todo"]
 	path = lib/hl-todo
 	url = https://github.com/tarsius/hl-todo.git
@@ -253,6 +256,12 @@
 [submodule "pdf-tools"]
 	path = lib/pdf-tools
 	url = https://github.com/vedang/pdf-tools.git
+[submodule "plantuml-emacs"]
+	path = lib/plantuml-emacs
+	url = https://github.com/ginqi7/plantuml-emacs.git
+[submodule "plantuml-mode"]
+	path = lib/plantuml-mode
+	url = https://github.com/skuro/plantuml-mode.git
 [submodule "popper"]
 	path = lib/popper
 	url = https://github.com/karthink/popper.git

@@ -1,0 +1,5 @@
+# -*- mode: snippet -*-
+# name: C4_Include_Component
+# key: Include C4 Component Diagram
+# --
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Component.puml

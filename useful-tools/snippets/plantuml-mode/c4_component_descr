@@ -1,0 +1,5 @@
+# -*- mode: snippet -*-
+# name: C4_Component_Descr
+# key: Component with Description
+# --
+Component(${1:alias}, "${2:label}", "${3:technology}", "${4:description}")

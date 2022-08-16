@@ -1,0 +1,7 @@
+# -*- mode: snippet -*-
+# name: C4_Boundary
+# key: Boundary
+# --
+Boundary(${1:alias}, "${2:label}"){
+	$0
+}

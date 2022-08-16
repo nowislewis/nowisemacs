@@ -1,0 +1,5 @@
+# -*- mode: snippet -*-
+# name: C4_ComponentDb_Ext_Descr
+# key: External Database Component with Description
+# --
+ComponentDb_Ext(${1:alias}, "${2:label}", "${3:technology}", "${4:description}")

@@ -1,0 +1,7 @@
+# -*- mode: snippet -*-
+# name: C4_Deployment_Node
+# key: Deployment Node
+# --
+Deployment_Node(${1:alias}, "${2:label}"){
+	$0
+}

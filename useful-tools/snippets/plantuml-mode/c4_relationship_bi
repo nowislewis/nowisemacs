@@ -1,0 +1,5 @@
+# -*- mode: snippet -*-
+# name: C4_Relationship_Bi
+# key: Bidirectional Relationship
+# --
+BiRel(${1:from_alias}, ${2:to_alias}, "${3:label}")

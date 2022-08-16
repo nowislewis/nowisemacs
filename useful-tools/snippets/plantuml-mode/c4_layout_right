@@ -1,0 +1,5 @@
+# -*- mode: snippet -*-
+# name: C4_Layout_Right
+# key: Layout to Right side
+# --
+Lay_R(${1:from_alias}, ${2:to_alias})

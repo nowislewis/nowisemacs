@@ -1,0 +1,5 @@
+# -*- mode: snippet -*-
+# name: C4_ContainerDb
+# key: Database Container
+# --
+ContainerDb(${1:alias}, "${2:label}", "${3:technology}")
