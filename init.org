@@ -96,6 +96,7 @@ I feel in love denote, preview org-roam configs are refiled in [[file:useful-too
   - [[#elfeed][elfeed]]
   - [[#nov][nov]]
   - [[#darkroom][darkroom]]
+  - [[#shrface][shrface]]
 - [[#tools][tools]]
   - [[#xwidget][xwidget]]
   - [[#ojel-for-online-program-contest][oj.el for online program contest]]
@@ -1989,6 +1990,27 @@ I use corfu english helper instead of company-english-helper.
 Simple distraction-free editing. I use darkroom instead of writeroom because it's more simple
 #+begin_src elisp
   (setup darkroom)
+#+end_src
+** shrface
+#+begin_src elisp
+  (setup shrface
+    (:option shrface-href-versatile t)
+    (:when-loaded
+      (shrface-basic)
+      (shrface-trial)
+      (shrface-default-keybindings) ; setup default keybindings
+      )
+    )
+  (setup eww
+    (add-hook 'eww-after-render-hook #'shrface-mode)
+    )
+
+  (setup nov
+    (:option nov-shr-rendering-functions '((img . nov-render-img) (title . nov-render-title))
+             nov-shr-rendering-functions (append nov-shr-rendering-functions shr-external-rendering-functions))
+    (:hook shrface-mode)
+    )
+
 #+end_src
 * tools
 ** xwidget
