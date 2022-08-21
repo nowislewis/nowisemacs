@@ -87,6 +87,7 @@ I feel in love denote, preview org-roam configs are refiled in [[file:useful-too
   - [[#toc-org][toc-org]]
   - [[#ebib][ebib]]
   - [[#denote][denote]]
+  - [[#find-xnotes-and-find-papers][find-xnotes and find-papers]]
 - [[#翻译][翻译]]
   - [[#go-translate][go-translate]]
   - [[#corfu-english-helper][corfu-english-helper]]
@@ -414,8 +415,8 @@ I used to be a vim(evil) user, but now I use meow to manage all my keys.
   (transient-define-prefix leader-map-for-notes()
     "Define notes leader-key maps"
     [["find notes/papers"
-      ("f" "find notes" project-find-denote-files)
-      ("p" "find papers" project-find-paper-files)]
+      ("f" "find notes" project-find-xnotes-files)
+      ("p" "find papers" project-find-papers-files)]
      ["New notes"
       ("n" "denote" denote)
       ("d" "date" denote-date)
@@ -1907,21 +1908,29 @@ eglot client leveraging LTEX Language Server.
              denote-dired-directories (list denote-directory
                                             (thread-last denote-directory (expand-file-name "attachments"))))
     (add-hook 'dired-mode-hook #'denote-dired-mode-in-directories))
+#+end_src
+** find-xnotes and find-papers
+#+begin_src elisp
 
-  (defun project-find-denote-files (&optional include-all)
+  (setq xnote-directory (concat denote-directory "xnotes"))
+  (setq papers-directory (concat denote-directory "papers"))
+
+  (defun project-find-xnotes-files (&optional include-all)
     (interactive "P")
+    (dired xnote-directory)
     (let* ((pr (project-current t))
-           (root (concat denote-directory "xnotes"))
+           (root xnote-directory)
            (dirs (list root)))
       (project-find-file-in
        (or (thing-at-point 'filename)
            (and buffer-file-name (file-relative-name buffer-file-name root)))
        dirs pr include-all)))
 
-  (defun project-find-paper-files (&optional include-all)
+  (defun project-find-papers-files (&optional include-all)
     (interactive "P")
+    (dired papers-directory)
     (let* ((pr (project-current t))
-           (root (concat denote-directory "papers"))
+           (root papers-directory)
            (dirs (list root)))
       (project-find-file-in
        (or (thing-at-point 'filename)
@@ -2010,7 +2019,7 @@ Simple distraction-free editing. I use darkroom instead of writeroom because it'
   (setup darkroom)
 #+end_src
 ** shrface
-#+begin_src elisp
+#+begin_src elisp :tangle no
   (setup shrface
     (:option shrface-href-versatile t)
     (:when-loaded
