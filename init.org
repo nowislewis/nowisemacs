@@ -413,8 +413,10 @@ I used to be a vim(evil) user, but now I use meow to manage all my keys.
 #+begin_src elisp
   (transient-define-prefix leader-map-for-notes()
     "Define notes leader-key maps"
-    [["New notes"
-      ("f" "find notes" find-denote-file-dir)
+    [["find notes/papers"
+      ("f" "find notes" project-find-denote-files)
+      ("p" "find papers" project-find-paper-files)]
+     ["New notes"
       ("n" "denote" denote)
       ("d" "date" denote-date)
       ("t" "type" denote-type)
@@ -1901,14 +1903,30 @@ eglot client leveraging LTEX Language Server.
 ** denote
 #+begin_src elisp
   (setup denote
-    (:option denote-directory (expand-file-name "~/Documents/emacs/orgmode/denote/")
+    (:option denote-directory (expand-file-name "~/Documents/emacs/orgmode/")
              denote-dired-directories (list denote-directory
                                             (thread-last denote-directory (expand-file-name "attachments"))))
     (add-hook 'dired-mode-hook #'denote-dired-mode-in-directories))
-  (defun find-denote-file-dir()
-    (interactive)
-    (dired "~/Documents/emacs/orgmode/denote/")
-    (project-find-file))
+
+  (defun project-find-denote-files (&optional include-all)
+    (interactive "P")
+    (let* ((pr (project-current t))
+           (root (concat denote-directory "xnotes"))
+           (dirs (list root)))
+      (project-find-file-in
+       (or (thing-at-point 'filename)
+           (and buffer-file-name (file-relative-name buffer-file-name root)))
+       dirs pr include-all)))
+
+  (defun project-find-paper-files (&optional include-all)
+    (interactive "P")
+    (let* ((pr (project-current t))
+           (root (concat denote-directory "papers"))
+           (dirs (list root)))
+      (project-find-file-in
+       (or (thing-at-point 'filename)
+           (and buffer-file-name (file-relative-name buffer-file-name root)))
+       dirs pr include-all)))
 
 #+end_src
 * 翻译
@@ -2005,11 +2023,11 @@ Simple distraction-free editing. I use darkroom instead of writeroom because it'
     (add-hook 'eww-after-render-hook #'shrface-mode)
     )
 
-  (setup nov
-    (:option nov-shr-rendering-functions '((img . nov-render-img) (title . nov-render-title))
-             nov-shr-rendering-functions (append nov-shr-rendering-functions shr-external-rendering-functions))
-    (:hook shrface-mode)
-    )
+  ;; (setup nov
+  ;;   (:option nov-shr-rendering-functions '((img . nov-render-img) (title . nov-render-title))
+  ;;            nov-shr-rendering-functions (append nov-shr-rendering-functions shr-external-rendering-functions))
+  ;;   (:hook shrface-mode)
+  ;;   )
 
 #+end_src
 * tools
