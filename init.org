@@ -1199,7 +1199,7 @@ borrowed from citre, now you can always jump-back use "M-,"
     [("l" "right" windmove-right :transient t)
      ("L" "swap-right" windmove-swap-states-right :transient t)]
      ])
-  (:global "C-x o" windmove-transient-keybindings)
+  (:global "C-x O" windmove-transient-keybindings)
   )
 
 #+end_src
@@ -1389,7 +1389,15 @@ Dirvish is a minimalistic file manager based on Dired. It's fast
 ** magit
 #+begin_src elisp
   (setup with-editor)
-  (setup magit)
+  (setup magit
+    (:hook magit-gerrit-mode))
+
+  (setup magit-gerrit
+    (:option magit-gerrit-ssh-creds "dev_a@prj1.server.com"
+             magit-gerrit-remote "origin"
+             magit-gerrit-push-to "HEAD:/ref/master")
+    (:autoload magit-gerrit-mode)
+    )
 #+end_src
 ** ediff
 #+begin_src elisp

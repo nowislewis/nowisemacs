@@ -205,6 +205,9 @@
 [submodule "magit"]
 	path = lib/magit
 	url = https://github.com/magit/magit.git
+[submodule "magit-gerrit"]
+	path = lib/magit-gerrit
+	url = https://github.com/emacsorphanage/magit-gerrit.git
 [submodule "marginalia"]
 	path = lib/marginalia
 	url = https://github.com/minad/marginalia.git
