@@ -121,7 +121,8 @@ I feel in love denote, preview org-roam configs are refiled in [[file:useful-too
   ;; Inhibit resizing frame
   (setq frame-inhibit-implied-resize t)
 
-  ;; (add-to-list 'default-frame-alist '(undecorated . t))
+  ;; no title bar
+  (add-to-list 'default-frame-alist '(undecorated . t))
   ;; Faster to disable these here (before they've been initialized)
   (push '(alpha-background . 85) default-frame-alist)
   (push '(menu-bar-lines . 0) default-frame-alist)
@@ -416,17 +417,19 @@ I used to be a vim(evil) user, but now I use meow to manage all my keys.
     "Define notes leader-key maps"
     [["find notes/papers"
       ("f" "find notes" project-find-xnotes-files)
-      ("p" "find papers" project-find-papers-files)]
-     ["New notes"
-      ("n" "denote" denote)
-      ("d" "date" denote-date)
-      ("t" "type" denote-type)
-      ("s" "subdirectory" denote-subdirectory)]
-     ["Link"
-      ("l" "link(add)" denote-link)
-      ("L" "add links(add)" denote-link-add-links)
-      ("b" "backlinks" denote-link-backlinks)]
-     ])
+      ("p" "find papers" project-find-papers-files)
+      ("e" "open org noter" org-noter)
+     ]
+    ["New notes"
+     ("n" "denote" denote)
+     ("d" "date" denote-date)
+     ("t" "type" denote-type)
+     ("s" "subdirectory" denote-subdirectory)]
+    ["Link"
+     ("l" "link(add)" denote-link)
+     ("L" "add links(add)" denote-link-add-links)
+     ("b" "backlinks" denote-link-backlinks)]
+    ])
 #+end_src
 *** Apps-keybindings
 #+begin_src elisp
@@ -520,9 +523,7 @@ I used to be a vim(evil) user, but now I use meow to manage all my keys.
 
   ;; notes
   (meow-leader-define-key
-   '("n r" . leader-map-for-notes)
-   '("n d" . find-denote-file-dir)
-   '("n e" . org-noter))
+   '("n" . leader-map-for-notes))
 
   (meow-leader-define-key
    ;;w workspace
@@ -868,7 +869,10 @@ diff-hl-mode highlights uncommitted changes on the left side of the window (area
                                              (when-let (project (project-current))
                                                (car (project-roots project)))))
   (:with-map minibuffer-local-map
-    (:bind "C-r" consult-history)))
+    (:bind "C-r" consult-history))
+  (:when-loaded
+    (consult-customize consult-line :preview-key '(:debounce 0.2 any)))
+  )
   ;; (advice-add #'completing-read-multiple :override #'consult-completing-read-multiple))
 #+end_src
 *** search other cwd
