@@ -5,6 +5,7 @@ I feel in love denote, preview org-roam configs are refiled in [[file:useful-too
 - [[#startup-config][Startup config]]
   - [[#ui-speed-up][UI speed up]]
   - [[#generic][generic]]
+  - [[#set-vars][set vars]]
 - [[#package-management][Package Management]]
 - [[#gcmh][gcmh]]
 - [[#keyboard-bindings][Keyboard Bindings]]
@@ -65,6 +66,7 @@ I feel in love denote, preview org-roam configs are refiled in [[file:useful-too
   - [[#tab-line-and-tab-bar][tab-line and tab-bar]]
   - [[#tabspaces][tabspaces]]
   - [[#project][project]]
+  - [[#project-rootfile][project-rootfile]]
 - [[#shell][shell]]
   - [[#vterm][vterm]]
   - [[#vterm-toggle][vterm-toggle]]
@@ -87,7 +89,8 @@ I feel in love denote, preview org-roam configs are refiled in [[file:useful-too
   - [[#toc-org][toc-org]]
   - [[#ebib][ebib]]
   - [[#denote][denote]]
-  - [[#find-xnotes-and-find-papers][find-xnotes and find-papers]]
+  - [[#find-orgmode-dir-files][find orgmode dir files]]
+  - [[#org-excalidraw][org-excalidraw]]
 - [[#翻译][翻译]]
   - [[#go-translate][go-translate]]
   - [[#corfu-english-helper][corfu-english-helper]]
@@ -176,6 +179,14 @@ The following content is not enabled yet, because I want to minimize unnecessary
   ;; (add-hook 'find-file-hook 'highlight-parentheses-mode t) ;增强的括号高亮
   (setq ad-redefinition-action 'accept)   ;不要烦人的 redefine warning
 #+end_src
+** set vars
+#+begin_src elisp
+  (defvar nowisemacs-config-file (expand-file-name "init.org" user-emacs-directory))
+  (defvar nowisemacs-config-useful-tools (expand-file-name "useful-tools/" user-emacs-directory))
+  (defvar nowisemacs-doc-emacs-dir (file-truename "~/Documents/emacs/"))
+  (defvar nowisemacs-doc-other-files-dir (concat nowisemacs-doc-emacs-dir "other-files/"))
+  (defvar nowisemacs-doc-org-mode-dir (concat nowisemacs-doc-emacs-dir "orgmode/"))
+#+end_src
 
 * Package Management
 I use borg to manage packages, so setup.el is only used to config packages quickly, I write several macros in [[https://github.com/nowislewis/nowisemacs-base.git][nowisemacs-base]]. It should be noticed that if you use only a =init.el= file, all the funcs or macros defined in =init.el= can't pass native comp, so move these things that you defined yourself to a seperate repo(nowisemacs-base) will resolve this problem.
@@ -185,7 +196,7 @@ I use borg to manage packages, so setup.el is only used to config packages quick
   (setup emacsql)
   (setup epkg)
   ;;setup
-  (require 'nowisemacs-base)
+  (require 'nowisemacs-functions)
 #+end_src
 * gcmh
 Enforce a sneaky Garbage Collection strategy to minimize GC interference with user activity.
@@ -215,109 +226,109 @@ I used to be a vim(evil) user, but now I use meow to manage all my keys.
              meow-keypad-start-keys '((?c . ?c)
                                       (?x . ?x))
              )
-             ;; motion keys
-             (meow-motion-overwrite-define-key '("j" . meow-next)
-                                               '("k" . meow-prev)
-                                               '("<escape>" . ignore)
-                                               '("." . repeat))
-             ;; normal keys
-             (meow-normal-define-key '("0" . meow-expand-0)
-                                     '("9" . meow-expand-9)
-                                     '("8" . meow-expand-8)
-                                     '("7" . meow-expand-7)
-                                     '("6" . meow-expand-6)
-                                     '("5" . meow-expand-5)
-                                     '("4" . meow-expand-4)
-                                     '("3" . meow-expand-3)
-                                     '("2" . meow-expand-2)
-                                     '("1" . meow-expand-1)
-                                     '("a" . meow-append)
-                                     '("A" . meow-append-vim)
-                                     '("b" . meow-back-word)
-                                     '("B" . meow-back-symbol)
-                                     '("c" . meow-change)
-                                     ;; '("C" . meow-change-save)
-                                     '("d" . meow-kill)
-                                     '("e" . meow-next-word)
-                                     '("E" . meow-next-symbol)
-                                     '("f" . meow-find)
-                                     ;; '("F" . meow-find-expand)
-                                     '("g" . g-extra-commands)
-                                     '("G" . meow-grab)
-                                     '("h" . meow-left)
-                                     '("H" . meow-left-expand)
-                                     '("i" . meow-insert)
-                                     '("I" . meow-insert-vim)
-                                     '("j" . meow-next)
-                                     '("J" . meow-next-expand)
-                                     '("k" . meow-prev)
-                                     '("K" . meow-prev-expand)
-                                     '("l" . meow-right)
-                                     '("L" . meow-right-expand)
-                                     '("m" . consult-register-store)
-                                     ;; '("M" . meow-mark-symbol)
-                                     '("M" . meow-block)
-                                     '("n" . meow-search)
-                                     '("N" . meow-pop-selection)
+    ;; motion keys
+    (meow-motion-overwrite-define-key '("j" . meow-next)
+                                      '("k" . meow-prev)
+                                      '("<escape>" . ignore)
+                                      '("." . repeat))
+    ;; normal keys
+    (meow-normal-define-key '("0" . meow-expand-0)
+                            '("9" . meow-expand-9)
+                            '("8" . meow-expand-8)
+                            '("7" . meow-expand-7)
+                            '("6" . meow-expand-6)
+                            '("5" . meow-expand-5)
+                            '("4" . meow-expand-4)
+                            '("3" . meow-expand-3)
+                            '("2" . meow-expand-2)
+                            '("1" . meow-expand-1)
+                            '("a" . meow-append)
+                            '("A" . meow-append-vim)
+                            '("b" . meow-back-word)
+                            '("B" . meow-back-symbol)
+                            '("c" . meow-change)
+                            ;; '("C" . meow-change-save)
+                            '("d" . meow-kill)
+                            '("e" . meow-next-word)
+                            '("E" . meow-next-symbol)
+                            '("f" . meow-find)
+                            ;; '("F" . meow-find-expand)
+                            '("g" . g-extra-commands)
+                            '("G" . meow-grab)
+                            '("h" . meow-left)
+                            '("H" . meow-left-expand)
+                            '("i" . meow-insert)
+                            '("I" . meow-insert-vim)
+                            '("j" . meow-next)
+                            '("J" . meow-next-expand)
+                            '("k" . meow-prev)
+                            '("K" . meow-prev-expand)
+                            '("l" . meow-right)
+                            '("L" . meow-right-expand)
+                            '("m" . consult-register-store)
+                            ;; '("M" . meow-mark-symbol)
+                            '("M" . meow-block)
+                            '("n" . meow-search)
+                            '("N" . meow-pop-selection)
 
-                                     '("o" . meow-open-below)
-                                     '("O" . meow-open-above)
-                                     '("p" . meow-yank)
-                                     '("P" . meow-yank-pop)
-                                     '("q" . meow-quit)
-                                     '("Q" . goto-line)
-                                     '("r" . meow-replace)
-                                     '("R" . meow-swap-grab)
-                                     '("s" . meow-line)
-                                     '("S" . meow-kmacro-lines)
-                                     '("t" . meow-till)
-                                     '("u" . meow-undo)
-                                     '("U" . vundo)
-                                     '("v v" . meow-visit)
-                                     '("V" . meow-kmacro-matches)
-                                     '("w" . meow-mark-word)
-                                     '("W" . meow-mark-symbol)
+                            '("o" . meow-open-below)
+                            '("O" . meow-open-above)
+                            '("p" . meow-yank)
+                            '("P" . meow-yank-pop)
+                            '("q" . meow-quit)
+                            '("Q" . goto-line)
+                            '("r" . meow-replace)
+                            '("R" . meow-swap-grab)
+                            '("s" . meow-line)
+                            '("S" . meow-kmacro-lines)
+                            '("t" . meow-till)
+                            '("u" . meow-undo)
+                            '("U" . vundo)
+                            '("v v" . meow-visit)
+                            '("V" . meow-kmacro-matches)
+                            '("w" . meow-mark-word)
+                            '("W" . meow-mark-symbol)
 
-                                     '("x" . meow-delete)
-                                     '("X" . meow-backward-delete)
-                                     '("y" . meow-save)
-                                     '("z a" . hs-toggle-hiding)
-                                     '("z c" . hs-hide-block)
-                                     '("z o" . hs-show-block)
-                                     '("z m" . hs-hide-all)
-                                     '("z r" . hs-show-all)
-                                     '("v i" . meow-inner-of-thing)
-                                     '("v a" . meow-bounds-of-thing)
-                                     '("v \'" . insert-quotations)
-                                     '("v \"" . insert-quotes)
-                                     '("v \`" . insert-backquote)
-                                     '("v *" . insert-star)
-                                     '("v (" . insert-parentheses)
-                                     '("v [" . insert-bracket)
-                                     '("v {" . insert-curly)
-                                     '("v =" . insert-equation)
+                            '("x" . meow-delete)
+                            '("X" . meow-backward-delete)
+                            '("y" . meow-save)
+                            '("z a" . hs-toggle-hiding)
+                            '("z c" . hs-hide-block)
+                            '("z o" . hs-show-block)
+                            '("z m" . hs-hide-all)
+                            '("z r" . hs-show-all)
+                            '("v i" . meow-inner-of-thing)
+                            '("v a" . meow-bounds-of-thing)
+                            '("v \'" . insert-quotations)
+                            '("v \"" . insert-quotes)
+                            '("v \`" . insert-backquote)
+                            '("v *" . insert-star)
+                            '("v (" . insert-parentheses)
+                            '("v [" . insert-bracket)
+                            '("v {" . insert-curly)
+                            '("v =" . insert-equation)
 
-                                     '("<escape>" . ignore)
-                                     '("!" . meow-start-kmacro-or-insert-counter)
-                                     '("@" . meow-end-or-call-kmacro)
-                                     '("#" . symbol-overlay-put)
-                                     '("^" . meow-join)
-                                     '("*" . symbol-overlay-put)
-                                     '("-" . negative-argument)
-                                     ;; '("=" . format-all-region)
-                                     '("=" . indent-region)
-                                     '("[" . meow-beginning-of-thing)
-                                     '("]" . meow-end-of-thing)
-                                     '("\\" . quoted-insert)
-                                     '(";" . meow-expand-1)
-                                     '(":" . async-shell-command)
-                                     '("'" . consult-register-load)
-                                     '("," . meow-reverse)
-                                     '("." . repeat)
-                                     ;; '("&" . meow-query-replace)
-                                     ;; '("%" . meow-query-replace-regexp)
-                                     '("/" . consult-line))
-             (meow-global-mode 1))
+                            '("<escape>" . ignore)
+                            '("!" . meow-start-kmacro-or-insert-counter)
+                            '("@" . meow-end-or-call-kmacro)
+                            '("#" . symbol-overlay-put)
+                            '("^" . meow-join)
+                            '("*" . symbol-overlay-put)
+                            '("-" . negative-argument)
+                            ;; '("=" . format-all-region)
+                            '("=" . indent-region)
+                            '("[" . meow-beginning-of-thing)
+                            '("]" . meow-end-of-thing)
+                            '("\\" . quoted-insert)
+                            '(";" . meow-expand-1)
+                            '(":" . async-shell-command)
+                            '("'" . consult-register-load)
+                            '("," . meow-reverse)
+                            '("." . repeat)
+                            ;; '("&" . meow-query-replace)
+                            ;; '("%" . meow-query-replace-regexp)
+                            '("/" . consult-line))
+    (meow-global-mode 1))
 #+end_src
 ** meow commands like vim
 #+begin_src elisp
@@ -416,8 +427,8 @@ I used to be a vim(evil) user, but now I use meow to manage all my keys.
   (transient-define-prefix leader-map-for-notes()
     "Define notes leader-key maps"
     [["find notes/papers"
-      ("f" "find notes" project-find-xnotes-files)
-      ("p" "find papers" project-find-papers-files)
+      ("r f" "find all files" project-find-orgmode-dir-files)
+      ;; ("p" "find papers" project-find-papers-files)
       ("e" "open org noter" org-noter)
      ]
     ["New notes"
@@ -453,6 +464,9 @@ I used to be a vim(evil) user, but now I use meow to manage all my keys.
       ("op" "oj-prepare" oj-prepare)
       ("ot" "oj-test" oj-test)
       ("oh" "oj-open-home-dir" oj-open-home-dir)]
+     ["Excalidraw"
+      ("e" "org-excalidraw-create-drawing" org-excalidraw-create-drawing)
+      ("E" "org-excalidraw-initialize" org-excalidraw-initialize)]
      ])
 #+end_src
 *** buffer-keybindings
@@ -470,8 +484,6 @@ I used to be a vim(evil) user, but now I use meow to manage all my keys.
      ("j" "bookmark-jump" bookmark-jump)
      ("m" "bookmark-set" bookmark-set)
      ("M" "bookmark-delete" bookmark-delete)]])
-
-
 #+end_src
 ** meow leader keys
 #+begin_src elisp
@@ -870,8 +882,8 @@ diff-hl-mode highlights uncommitted changes on the left side of the window (area
                                                (car (project-roots project)))))
   (:with-map minibuffer-local-map
     (:bind "C-r" consult-history))
-  (:when-loaded
-    (consult-customize consult-line :preview-key '(:debounce 0.2 any)))
+  ;; (:when-loaded
+  ;;   (consult-customize consult-line :preview-key '(:debounce 0.2 any)))
   )
   ;; (advice-add #'completing-read-multiple :override #'consult-completing-read-multiple))
 #+end_src
@@ -1192,19 +1204,19 @@ borrowed from citre, now you can always jump-back use "M-,"
 *** windmove
 #+begin_src elisp
   (setup windmove
-  (transient-define-prefix windmove-transient-keybindings()
-    "Define windmove maps"
-    [[("h" "left" windmove-left :transient t)
-     ("H" "swap-left" windmove-swap-states-left :transient t)]
-    [("j" "down" windmove-down :transient t)
-       ("J" "swap-down" windmove-swap-states-down :transient t)]
-    [("k" "up" windmove-up :transient t)
-     ("K" "swap-up" windmove-swap-states-up :transient t)]
-    [("l" "right" windmove-right :transient t)
-     ("L" "swap-right" windmove-swap-states-right :transient t)]
-     ])
-  (:global "C-x O" windmove-transient-keybindings)
-  )
+    (transient-define-prefix windmove-transient-keybindings()
+      "Define windmove maps"
+      [[("h" "left" windmove-left :transient t)
+        ("H" "swap-left" windmove-swap-states-left :transient t)]
+       [("j" "down" windmove-down :transient t)
+        ("J" "swap-down" windmove-swap-states-down :transient t)]
+       [("k" "up" windmove-up :transient t)
+        ("K" "swap-up" windmove-swap-states-up :transient t)]
+       [("l" "right" windmove-right :transient t)
+        ("L" "swap-right" windmove-swap-states-right :transient t)]
+       ])
+    (:global "C-x O" windmove-transient-keybindings)
+    )
 
 #+end_src
 * ibuffer
@@ -1362,7 +1374,17 @@ Dirvish is a minimalistic file manager based on Dired. It's fast
     #+end_src
 ** project
 #+begin_src elisp
-  (setup project)
+  (setup project
+    (:when-loaded
+      (add-to-list 'project-find-functions #'project-rootfile-try-detect)
+      )
+    )
+#+end_src
+** project-rootfile
+#+begin_src elisp
+  (setup project-rootfile
+    (:option project-rootfile-list '(".project"))
+   )
 #+end_src
 * shell
 ** vterm
@@ -1921,34 +1943,24 @@ eglot client leveraging LTEX Language Server.
                                             (thread-last denote-directory (expand-file-name "attachments"))))
     (add-hook 'dired-mode-hook #'denote-dired-mode-in-directories))
 #+end_src
-** find-xnotes and find-papers
+** find orgmode dir files
 #+begin_src elisp
 
-  (setq xnote-directory (concat denote-directory "xnotes"))
-  (setq papers-directory (concat denote-directory "papers"))
+  ;; (setq xnote-directory (concat denote-directory "xnotes"))
+  ;; (setq papers-directory (concat denote-directory "papers"))
 
-  (defun project-find-xnotes-files (&optional include-all)
-    (interactive "P")
-    (dired xnote-directory)
-    (let* ((pr (project-current t))
-           (root xnote-directory)
-           (dirs (list root)))
-      (project-find-file-in
-       (or (thing-at-point 'filename)
-           (and buffer-file-name (file-relative-name buffer-file-name root)))
-       dirs pr include-all)))
+  (defun project-find-orgmode-dir-files ()
+    (interactive)
+    (dired nowisemacs-doc-org-mode-dir)
+    (project-find-file t))
 
-  (defun project-find-papers-files (&optional include-all)
-    (interactive "P")
-    (dired papers-directory)
-    (let* ((pr (project-current t))
-           (root papers-directory)
-           (dirs (list root)))
-      (project-find-file-in
-       (or (thing-at-point 'filename)
-           (and buffer-file-name (file-relative-name buffer-file-name root)))
-       dirs pr include-all)))
 
+#+end_src
+** org-excalidraw
+#+begin_src elisp
+    (setup org-excalidraw
+      (:option org-excalidraw-directory (concat nowisemacs-doc-other-files-dir "excalidraw/"))
+      )
 #+end_src
 * 翻译
 ** go-translate
@@ -2069,56 +2081,88 @@ Simple distraction-free editing. I use darkroom instead of writeroom because it'
 #+end_src
 ** eaf
 #+begin_src elisp
-  (setup eaf
-    (add-to-list 'load-path "~/.emacs.d/lib/eaf")
-    (:option eaf-browser-enable-autofill t
-             eaf-webengine-font-family "Noto Sans CJK SC"
-             eaf-webengine-fixed-font-family "JetBrainsMono Nerd Font"
-             eaf-config-location (concat no-littering-var-directory "eaf/")
-             ;; eaf-find-alternate-file-in-dired t
-             )
-    ;; for consult preview
-    (:with-feature consult
-      (:when-loaded
-        (add-to-list 'consult-buffer-sources 'consult--source-eaf-buffer)
-        (defvar consult--source-eaf-buffer
-          `(:name     "EAF Buffer"
-                      :narrow   ?e
-                      :category buffer
-                      :face     consult-buffer
-                      :history  buffer-name-history
-                      :state    ,#'consult--buffer-state
-                      :default  t
-                      :items
-                      ,(lambda ()
-                         (mapcar #'buffer-name
-                                 (seq-filter
-                                  (lambda (x)
-                                    (eq (buffer-local-value 'major-mode x) 'eaf-mode))
-                                  (buffer-list)))))
-          "EAF candidate source for `consult-buffer'."))))
-  (setup eaf-browser
-    (:autoload eaf-open-browser))
-  (setup eaf-pdf-viewer
-    (:autoload eaf-open-pdf-from-history))
-  (setup eaf-rss-reader
-    (:autoload eaf-open-rss-reader))
+    (setup eaf
+      (add-to-list 'load-path "~/.emacs.d/lib/eaf")
+      (:option eaf-browser-enable-autofill t
+               eaf-webengine-font-family "Noto Sans CJK SC"
+               eaf-webengine-fixed-font-family "JetBrainsMono Nerd Font"
+               eaf-config-location (concat no-littering-var-directory "eaf/")
+               ;; eaf-find-alternate-file-in-dired t
+               )
+      ;; for consult preview
+      (:with-feature consult
+        (:when-loaded
+          (add-to-list 'consult-buffer-sources 'consult--source-eaf-buffer)
+          (defvar consult--source-eaf-buffer
+            `(:name     "EAF Buffer"
+                        :narrow   ?e
+                        :category buffer
+                        :face     consult-buffer
+                        :history  buffer-name-history
+                        :state    ,#'consult--buffer-state
+                        :default  t
+                        :items
+                        ,(lambda ()
+                           (mapcar #'buffer-name
+                                   (seq-filter
+                                    (lambda (x)
+                                      (eq (buffer-local-value 'major-mode x) 'eaf-mode))
+                                    (buffer-list)))))
+            "EAF candidate source for `consult-buffer'."))))
 
-  (setup eaf-interleave-mode
-    (:option eaf-interleave-org-notes-dir-list '("~/org/interleave/")
-             eaf-interleave-split-direction 'vertical
-             eaf-interleave-disable-narrowing t
-             eaf-interleave-split-lines 20)
-    (:bind "M-." eaf-interleave-sync-current-note
-           "M-p" eaf-interleave-sync-previous-note
-           "M-n" eaf-interleave-sync-next-note)
-    (:with-feature eaf-interleave-app
-      (:bind "C-c M-i" eaf-interleave-add-note
-             "C-c M-o" eaf-interleave-open-notes-file
-             "C-c M-q" eaf-interleave-quit)
-      (:hook-into eaf-pdf-viewer
-                  eaf-browser)))
+    ;; for meow-leader map
+    (defcustom eaf-meow-leader-key "M-SPC"
+      "Leader key trigger" )
+
+    (defcustom eaf-meow-leader-keymap #'meow-keypad
+      "Leader key bind"
+      :type 'keymap)
+
+        ;;;###autoload
+    (defun eaf-enable-meow-intergration ()
+      "EAF evil intergration."
+      (interactive)
+      (add-hook 'meow-motion-mode-hook
+                (lambda ()
+                  ;; (when (not (derived-mode-p 'eaf-edit-mode))
+                  (when (derived-mode-p 'eaf-mode)
+                    (define-key eaf-mode-map (kbd eaf-meow-leader-key) eaf-meow-leader-keymap)
+                    ;; (setq emulation-mode-map-alists
+                    ;;       (delq 'meow-keymap-alist emulation-mode-map-alists))
+                    )))
+      ;; (add-to-list 'meow-mode-state-list '(eaf-mode . motion))
+        ;; (eaf-bind-key clear_focus "<escape>" eaf-browser-keybinding)
+  )
+
+
+    (with-eval-after-load "eaf"
+      (eaf-enable-meow-intergration)
+      (meow-motion-mode))
+
+    (setup eaf-browser
+      (:autoload eaf-open-browser)
+      )
+    (setup eaf-pdf-viewer
+      (:autoload eaf-open-pdf-from-history))
+    (setup eaf-rss-reader
+      (:autoload eaf-open-rss-reader))
+
+    (setup eaf-interleave-mode
+      (:option eaf-interleave-org-notes-dir-list '("~/org/interleave/")
+               eaf-interleave-split-direction 'vertical
+               eaf-interleave-disable-narrowing t
+               eaf-interleave-split-lines 20)
+      (:bind "M-." eaf-interleave-sync-current-note
+             "M-p" eaf-interleave-sync-previous-note
+             "M-n" eaf-interleave-sync-next-note)
+      (:with-feature eaf-interleave-app
+        (:bind "C-c M-i" eaf-interleave-add-note
+               "C-c M-o" eaf-interleave-open-notes-file
+               "C-c M-q" eaf-interleave-quit)
+        (:hook-into eaf-pdf-viewer
+                    eaf-browser)))
 #+end_src
+
 ** proxy
 #+begin_src elisp
   ;; Configure network proxy

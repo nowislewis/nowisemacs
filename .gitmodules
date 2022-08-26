@@ -226,9 +226,9 @@
 [submodule "nov"]
 	path = lib/nov
 	url = https://depp.brause.cc/nov.el.git
-[submodule "nowisemacs-base"]
-	path = lib/nowisemacs-base
-	url = https://github.com/nowislewis/nowisemacs-base.git
+[submodule "nowisemacs-functions"]
+	path = lib/nowisemacs-functions
+	url = https://github.com/nowislewis/nowisemacs-functions.git
 [submodule "oj"]
 	path = lib/oj
 	url = https://github.com/conao3/oj.el.git
@@ -241,12 +241,15 @@
 [submodule "org-download"]
 	path = lib/org-download
 	url = https://github.com/abo-abo/org-download.git
+[submodule "org-excalidraw"]
+	path = lib/org-excalidraw
+	url = https://github.com/wdavew/org-excalidraw.git
 [submodule "org-modern"]
 	path = lib/org-modern
 	url = https://github.com/minad/org-modern.git
 [submodule "org-noter"]
 	path = lib/org-noter
-	url = https://github.com/weirdNox/org-noter.git
+	url = https://github.com/c1-g/org-noter-plus-djvu.git
 [submodule "org-present"]
 	path = lib/org-present
 	url = https://github.com/rlister/org-present.git
@@ -271,6 +274,9 @@
 [submodule "posframe"]
 	path = lib/posframe
 	url = https://github.com/tumashu/posframe.git
+[submodule "project-rootfile"]
+	path = lib/project-rootfile
+	url = https://github.com/buzztaiki/project-rootfile.el.git
 [submodule "pulsar"]
 	path = lib/pulsar
 	url = https://gitlab.com/protesilaos/pulsar.git
