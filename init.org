@@ -814,7 +814,7 @@ diff-hl-mode highlights uncommitted changes on the left side of the window (area
 #+end_src
 ** 自动换行
 #+begin_src elisp
-  (setq fill-column 120)          ;默认显示 100列就换行
+  (setq fill-column 100)          ;默认显示 100列就换行
   (setq word-wrap t)
   (setq word-wrap-by-category t)
   (global-visual-line-mode)
@@ -1235,7 +1235,7 @@ borrowed from citre, now you can always jump-back use "M-,"
         (pyim-tsinghua-dict-enable)))
     (setup xr)
     (setup pyim
-      (:option pyim-cloudim 'google
+      (:option pyim-cloudim 'baidu
                pyim-punctuation-translate-p '(no yes auto)
                pyim-page-tooltip 'posframe
                pyim-page-length 5
