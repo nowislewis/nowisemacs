@@ -100,7 +100,6 @@ I feel in love denote, preview org-roam configs are refiled in [[file:useful-too
   - [[#elfeed][elfeed]]
   - [[#nov][nov]]
   - [[#darkroom][darkroom]]
-  - [[#shrface][shrface]]
 - [[#tools][tools]]
   - [[#xwidget][xwidget]]
   - [[#ojel-for-online-program-contest][oj.el for online program contest]]
@@ -162,7 +161,6 @@ The following content is not enabled yet, because I want to minimize unnecessary
   (setq initial-scratch-message "") ;关闭启动空白buffer, 这个buffer会干扰session恢复
   (setq-default comment-style 'indent)    ;设定自动缩进的注释风格
   (setq default-major-mode 'text-mode)    ;设置默认地主模式为TEXT模式
-  (setq x-select-enable-clipboard t)      ;支持emacs和外部程序的粘贴
   (setq split-width-threshold nil)        ;分屏的时候使用上下分屏
   (setq inhibit-compacting-font-caches t) ;使用字体缓存，避免卡顿
   (setq confirm-kill-processes nil)       ;退出自动杀掉进程
@@ -325,8 +323,6 @@ I used to be a vim(evil) user, but now I use meow to manage all my keys.
                             '("'" . consult-register-load)
                             '("," . meow-reverse)
                             '("." . repeat)
-                            ;; '("&" . meow-query-replace)
-                            ;; '("%" . meow-query-replace-regexp)
                             '("/" . consult-line))
     (meow-global-mode 1))
 #+end_src
@@ -791,11 +787,12 @@ diff-hl-mode highlights uncommitted changes on the left side of the window (area
 #+end_src
 *** savehist
 #+begin_src elisp
-    (setup savehist
-      (:option history-length 10000
-               history-delete-duplicates t)
-      (:defer
-       (savehist-mode)))
+  (setup savehist
+    (:option history-length 10000
+             history-delete-duplicates t
+             savehist-save-minibuffer-history t)
+    (:defer
+     (savehist-mode)))
 #+end_src
 ** no-littering
 #+begin_src lisp
@@ -1354,8 +1351,8 @@ Dirvish is a minimalistic file manager based on Dired. It's fast
           ("c" "tabspaces-close-workspace" tabspaces-close-workspace)
           ("k" "tabspaces-remove-selected-buffer" tabspaces-remove-selected-buffer)
           ("o" "tabspaces-open-or-create-project-and-workspace" tabspaces-open-or-create-project-and-workspace)
-          ("r" "tab-bar-rename-tab" tab-bar-rename-tab)
-          ("R" "tab-bar-rename-tab-by-name" tab-bar-rename-tab-by-name)
+          ("R" "tab-bar-rename-tab" tab-bar-rename-tab)
+          ("r" "tab-bar-rename-tab-by-name" tab-bar-rename-tab-by-name)
           ]
          ["Switch tab bar"
           ("n" "tab-bar-switch-to-next-tab" tab-bar-switch-to-next-tab)
@@ -1660,17 +1657,6 @@ eglot client leveraging LTEX Language Server.
                                                         "\\(\\<end\\>\\|\\<endcase\\>\\|\\<endmodule\\>\\|\\<endclass\\>\\|\\<endfunction\\>\\|\\<endtask\\>\\)" nil verilog-forward-sexp-function))
     )
 #+end_src
-*** realgud
-#+begin_src elisp :tangle no
-  (setup load-relative)
-  (setup loc-changes)
-  (setup realgud
-    (:with-map realgud:shortkey-mode-map
-      (:bind [mouse-3] realgud:tooltip-eval))
-    )
-  (setup realgud-lldb
-    (:autoload realgud--lldb))
-#+end_src
 *** separedit
 #+begin_src elisp
   (setup edit-indirect)
@@ -1731,7 +1717,6 @@ eglot client leveraging LTEX Language Server.
                                     (gnus . org-gnus-no-new-news)
                                     (file . find-file)
                                     (wl . wl-other-frame))
-             fill-column 120
              org-log-done 'time ;; 记录完成时间
              org-blank-before-new-entry '((heading . nil)
                                           (plain-list-item . nil))
@@ -1945,16 +1930,10 @@ eglot client leveraging LTEX Language Server.
 #+end_src
 ** find orgmode dir files
 #+begin_src elisp
-
-  ;; (setq xnote-directory (concat denote-directory "xnotes"))
-  ;; (setq papers-directory (concat denote-directory "papers"))
-
   (defun project-find-orgmode-dir-files ()
     (interactive)
     (dired nowisemacs-doc-org-mode-dir)
     (project-find-file t))
-
-
 #+end_src
 ** org-excalidraw
 #+begin_src elisp
@@ -2046,27 +2025,6 @@ I use corfu english helper instead of company-english-helper.
 Simple distraction-free editing. I use darkroom instead of writeroom because it's more simple
 #+begin_src elisp
   (setup darkroom)
-#+end_src
-** shrface
-#+begin_src elisp :tangle no
-  (setup shrface
-    (:option shrface-href-versatile t)
-    (:when-loaded
-      (shrface-basic)
-      (shrface-trial)
-      (shrface-default-keybindings) ; setup default keybindings
-      )
-    )
-  (setup eww
-    (add-hook 'eww-after-render-hook #'shrface-mode)
-    )
-
-  ;; (setup nov
-  ;;   (:option nov-shr-rendering-functions '((img . nov-render-img) (title . nov-render-title))
-  ;;            nov-shr-rendering-functions (append nov-shr-rendering-functions shr-external-rendering-functions))
-  ;;   (:hook shrface-mode)
-  ;;   )
-
 #+end_src
 * tools
 ** xwidget
