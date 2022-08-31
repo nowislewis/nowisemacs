@@ -1,4 +1,4 @@
- #+TITLE: Emacs Configuration
+#+TITLE: Emacs Configuration
 #+PROPERTY: header-args:elisp :tangle ~/.emacs.d/init.el
 I feel in love denote, preview org-roam configs are refiled in [[file:useful-tools/old-elisps/org-roam-config.org][org-roam configs]]
 * Content                                                               :toc:
@@ -414,7 +414,7 @@ I used to be a vim(evil) user, but now I use meow to manage all my keys.
       ("g" "rg" rg)
       ("h" "consult-history" consult-history)
       ("i" "consult-imenu" consult-imenu)
-      ("s" "consult-line" consult-line)
+      ("s" "consult-line" my-consult-ripgrep-or-line)
       ]])
 #+end_src
 
@@ -877,12 +877,53 @@ diff-hl-mode highlights uncommitted changes on the left side of the window (area
              consult-project-root-function (lambda ()
                                              (when-let (project (project-current))
                                                (car (project-roots project)))))
-  (:with-map minibuffer-local-map
-    (:bind "C-r" consult-history))
-  ;; (:when-loaded
-  ;;   (consult-customize consult-line :preview-key '(:debounce 0.2 any)))
-  )
+    (:with-map minibuffer-local-map
+      (:bind "C-r" consult-history))
+    ;; (:when-loaded
+    ;;   (consult-customize consult-line :preview-key '(:debounce 0.2 any)))
+    )
   ;; (advice-add #'completing-read-multiple :override #'consult-completing-read-multiple))
+#+end_src
+*** consult-ripgrep-one-file
+#+begin_src elisp
+  (defcustom my-consult-ripgrep-or-line-limit 1000
+    "Buffer size threshold for `my-consult-ripgrep-or-line'.
+  When the number of characters in a buffer exceeds this threshold,
+  `consult-ripgrep' will be used instead of `consult-line'."
+    :type 'integer)
+
+    (defun consult-ripgrep-one-file ()
+    "Call `consult-ripgrep' for the current buffer (a single file)."
+    (interactive)
+    (let ((consult-project-root-function (lambda nil nil))
+          (consult-ripgrep-args
+           (concat "rg "
+                   "--null "
+                   "--line-buffered "
+                   "--color=never "
+                   "--line-number "
+                   "--smart-case "
+                   "--no-heading "
+                   "--max-columns=1000 "
+                   "--max-columns-preview "
+                   "--search-zip "
+                   "--with-filename "
+                   (shell-quote-argument buffer-file-name))))
+      (consult-ripgrep)))
+
+  (defun my-consult-ripgrep-or-line ()
+    "Call `consult-line' for small buffers or `consult-ripgrep' for large files."
+    (interactive)
+    (if (or (not buffer-file-name)
+            (buffer-narrowed-p)
+            (ignore-errors
+              (file-remote-p buffer-file-name))
+            (jka-compr-get-compression-info buffer-file-name)
+            (<= (buffer-size)
+                (/ my-consult-ripgrep-or-line-limit
+                   (if (eq major-mode 'org-mode) 4 1))))
+        (consult-line)
+      (consult-ripgrep-one-file)))
 #+end_src
 *** search other cwd
 #+begin_src elisp
