@@ -625,7 +625,7 @@ Modus-themes is great especailly for org mode
   ;;   (load-theme 'modus-operandi))
 #+end_src
 *** doom-themes
-#+begin_src elisp
+#+begin_src elisp :tangle no
   (setup doom-themes
     ;; (load-theme 'doom-monokai-classic t)
     (:when-loaded
@@ -1908,7 +1908,7 @@ eglot client leveraging LTEX Language Server.
   (setup org-present)
 #+end_src
 ** citar
-#+begin_src elisp
+#+begin_src elisp :tangle no
   (setup parsebib)
   ;; (setup citeproc) ;;<- (setup queue) (setup string-inflection)
   (setup citar
@@ -1924,7 +1924,7 @@ eglot client leveraging LTEX Language Server.
     (:hook-into org-mode))
 #+end_src
 ** ebib
-#+begin_src elisp
+#+begin_src elisp :tangle no
   (setup ebib
     (:option ebib-preload-bib-files '("~/Documents/emacs/orgmode/bibliography/better_zotero_bib.bib")
              ebib-file-search-dirs '("~/Documents/pdf-files-dir")
@@ -1961,6 +1961,7 @@ eglot client leveraging LTEX Language Server.
       )
     )
 #+end_src
+
 ** denote
 #+begin_src elisp
   (setup denote

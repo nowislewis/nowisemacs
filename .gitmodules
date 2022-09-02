@@ -29,10 +29,6 @@
 [submodule "cape"]
 	path = lib/cape
 	url = https://github.com/minad/cape.git
-[submodule "citar"]
-	path = lib/citar
-	url = https://github.com/emacs-citar/citar.git
-    no-byte-compile = citar-citeproc.el
 [submodule "citre"]
 	path = lib/citre
 	url = https://github.com/universal-ctags/citre.git
@@ -96,11 +92,6 @@
 [submodule "doom-modeline"]
 	path = lib/doom-modeline
 	url = https://github.com/seagle0128/doom-modeline.git
-[submodule "doom-themes"]
-	path = lib/doom-themes
-	url = https://github.com/doomemacs/themes.git
-    load-path = .
-    load-path = extensions
 [submodule "eacl"]
 	path = lib/eacl
 	url = https://github.com/redguardtoo/eacl.git
@@ -110,9 +101,6 @@
     load-path = .
     load-path = core
     load-path = extension
-[submodule "ebib"]
-	path = lib/ebib
-	url = https://github.com/joostkremers/ebib.git
 [submodule "edit-indirect"]
 	path = lib/edit-indirect
 	url = https://github.com/Fanael/edit-indirect.git
@@ -256,9 +244,6 @@
 [submodule "ox-hugo"]
 	path = lib/ox-hugo
 	url = https://github.com/kaushalmodi/ox-hugo.git
-[submodule "parsebib"]
-	path = lib/parsebib
-	url = https://github.com/joostkremers/parsebib.git
 [submodule "pdf-tools"]
 	path = lib/pdf-tools
 	url = https://github.com/vedang/pdf-tools.git
