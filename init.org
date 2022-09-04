@@ -84,6 +84,7 @@ I feel in love denote, preview org-roam configs are refiled in [[file:useful-too
   - [[#ox-hugo][ox-hugo]]
   - [[#org-clock][org-clock]]
   - [[#org-noter][org-noter]]
+  - [[#org-pdftools][org-pdftools]]
   - [[#org-present][org-present]]
   - [[#citar][citar]]
   - [[#toc-org][toc-org]]
@@ -91,6 +92,8 @@ I feel in love denote, preview org-roam configs are refiled in [[file:useful-too
   - [[#denote][denote]]
   - [[#find-orgmode-dir-files][find orgmode dir files]]
   - [[#org-excalidraw][org-excalidraw]]
+  - [[#org-ql][org-ql]]
+  - [[#shrface][shrface]]
 - [[#翻译][翻译]]
   - [[#go-translate][go-translate]]
   - [[#corfu-english-helper][corfu-english-helper]]
@@ -99,6 +102,7 @@ I feel in love denote, preview org-roam configs are refiled in [[file:useful-too
   - [[#pdf-tools][pdf-tools]]
   - [[#elfeed][elfeed]]
   - [[#nov][nov]]
+  - [[#nov-xwidget][nov-xwidget]]
   - [[#darkroom][darkroom]]
 - [[#tools][tools]]
   - [[#xwidget][xwidget]]
@@ -183,7 +187,7 @@ The following content is not enabled yet, because I want to minimize unnecessary
   (defvar nowisemacs-config-useful-tools (expand-file-name "useful-tools/" user-emacs-directory))
   (defvar nowisemacs-doc-emacs-dir (file-truename "~/Documents/emacs/"))
   (defvar nowisemacs-doc-other-files-dir (concat nowisemacs-doc-emacs-dir "other-files/"))
-  (defvar nowisemacs-doc-org-mode-dir (concat nowisemacs-doc-emacs-dir "orgmode/"))
+  (defvar nowisemacs-doc-org-mode-dir (concat nowisemacs-doc-emacs-dir "orgmode"))
 #+end_src
 
 * Package Management
@@ -367,8 +371,8 @@ I used to be a vim(evil) user, but now I use meow to manage all my keys.
       ]
      ["Navigate"
       ("m" "consult-mark" consult-mark)
-      ;; ("t" "next-tab" tab-line-switch-to-next-tab :transient t)
-      ;; ("T" "preview-tab" tab-line-switch-to-prev-tab :transient t)
+      (";" "dogears-go" dogears-go)
+      ("'" "dogears-back" dogears-back)
       ]
      ])
 #+end_src
@@ -414,10 +418,10 @@ I used to be a vim(evil) user, but now I use meow to manage all my keys.
       ("g" "rg" rg)
       ("h" "consult-history" consult-history)
       ("i" "consult-imenu" consult-imenu)
-      ("s" "consult-line" my-consult-ripgrep-or-line)
+      ("s" "consult-line" consult-line)
+      ("S" "my-consult-line" my-consult-ripgrep-or-line)
       ]])
 #+end_src
-
 *** notes-keybindings
 #+begin_src elisp
   (transient-define-prefix leader-map-for-notes()
@@ -1221,7 +1225,7 @@ Jump anywhere in the world
 #+end_src
 *** jump-back
 borrowed from citre, now you can always jump-back use "M-,"
-#+begin_src elisp
+#+begin_src elisp :tangle no
   (defun my--push-point-to-xref-marker-stack (&rest r)
     (xref-push-marker-stack (point-marker))) ;; must autoload this command in xref
   (dolist (func '(find-function
@@ -1256,6 +1260,24 @@ borrowed from citre, now you can always jump-back use "M-,"
     (:global "C-x O" windmove-transient-keybindings)
     )
 
+#+end_src
+*** dogears
+#+begin_src elisp
+  (setup dogears
+    (:global "M-," #'dogears-back)
+    (:option dogears-functions '(find-function
+                                 consult-imenu
+                                 consult-ripgrep
+                                 consult-line
+                                 consult-find
+                                 find-file
+                                 goto-line
+                                 citre-jump
+                                 xref-find-definitions
+                                 isearch-forward))
+    (:defer
+     (dogears-mode))
+    )
 #+end_src
 * ibuffer
 ** ibuffer
@@ -1903,6 +1925,17 @@ eglot client leveraging LTEX Language Server.
              org-noter-hide-other nil
              org-noter-doc-split-percentage '(0.6 . 0.4)))
 #+end_src
+** org-pdftools
+#+begin_src elisp :tangle no
+  (setup org-noter-pdftools
+    (:option org-noter-pdftools-use-pdftools-link-location nil)
+    (:load-after org-noter)
+    (:when-loaded
+    (org-pdftools-setup-link)))
+    ;; Add a function to ensure precise note is inserted
+  (with-eval-after-load 'pdf-annot
+    (add-hook 'pdf-annot-activate-handler-functions #'org-noter-pdftools-jump-to-note)))
+#+end_src
 ** org-present
 #+begin_src elisp
   (setup org-present)
@@ -1984,6 +2017,28 @@ eglot client leveraging LTEX Language Server.
     (:autoload org-excalidraw-create-drawing)
     )
 #+end_src
+** org-ql
+#+begin_src elisp
+  (setup ts)
+  (setup peg)
+  (setup ht)
+  (setup org-super-agenda)
+  (setup ov)
+  (setup org-ql)
+#+end_src
+** shrface
+#+begin_src elisp
+  (setup shrface
+    (:load-after nov)
+    (:when-loaded
+  (shrface-basic)
+    (shrface-trial)
+    (shrface-default-keybindings) ; setup default keybindings
+    (setq shrface-href-versatile t)
+    (add-hook 'nov-mode-hook #'shrface-mode)
+    (setq nov-shr-rendering-functions '((img . nov-render-img) (title . nov-render-title)))
+    (setq nov-shr-rendering-functions (append nov-shr-rendering-functions shr-external-rendering-functions))))
+#+end_src
 * 翻译
 ** go-translate
 #+begin_src elisp
@@ -2062,6 +2117,16 @@ I use corfu english helper instead of company-english-helper.
   (setup esxml) ;; <- (setup kv)
   (setup nov
     (:file-match "\\.epub\\'"))
+
+#+end_src
+** nov-xwidget
+#+begin_src elisp :tangle no
+  (setup nov-xwidget
+    (:load-after nov)
+    (:when-loaded
+      (define-key nov-mode-map (kbd "o") 'nov-xwidget-view)
+      (add-hook 'nov-mode-hook 'nov-xwidget-inject-all-files)
+      ))
 #+end_src
 ** darkroom
 Simple distraction-free editing. I use darkroom instead of writeroom because it's more simple
