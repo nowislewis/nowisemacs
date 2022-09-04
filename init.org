@@ -357,6 +357,7 @@ I used to be a vim(evil) user, but now I use meow to manage all my keys.
       ("D" "find-references" xref-find-references)
       ("j" "find-apropos" xref-find-apropos)
       ("i" "find-impl" eglot-find-implementation)
+      ("o" "find-definitions" xref-find-definitions-other-window)
       ]
      ["Code action"
       ("a" "code-actions" eglot-code-actions)
@@ -1534,14 +1535,14 @@ Dirvish is a minimalistic file manager based on Dired. It's fast
 #+begin_src elisp
   (setup plantuml-mode
     (:option plantuml-jar-path "~/.emacs.d/var/plantuml.jar"))
-  (setup plantuml-emacs
-    (:option plantuml-theme "plain"
-             plantuml-add-index-number t
-             plantuml-log-command t
-             plantuml-mindmap-contains-org-content t
-             plantuml-org-headline-bold t)
-    (:defer (require 'plantuml))
-    )
+  ;; (setup plantuml-emacs
+  ;;   (:option plantuml-theme "plain"
+  ;;            plantuml-add-index-number t
+  ;;            plantuml-log-command t
+  ;;            plantuml-mindmap-contains-org-content t
+  ;;            plantuml-org-headline-bold t)
+  ;;   (:defer (require 'plantuml))
+  ;;   )
 #+end_src
 *** beancount
 Emacs major-mode to work with Beancount ledger files
@@ -1655,7 +1656,6 @@ Highlight symbols with keymap-enabled overlays
     (:bind [remap xref-find-definitions] #'lsp-bridge-find-def
            [remap xref-find-references] #'lsp-bridge-find-references)
     )
-
 #+end_src
 **** citre
 Citre is an advanced Ctags (or actually, readtags) frontend for Emacs.
@@ -1789,6 +1789,7 @@ eglot client leveraging LTEX Language Server.
              org-src-window-setup 'split-window-below
              org-refile-targets '(("~/Documents/emacs/orgmode/roam/2022-04-25-org_refile_notes.org" . (:maxlevel . 9)))
              org-ellipsis "⤵"
+             org-plantuml-jar-path plantuml-jar-path
              )
     (:hook org-num-mode)
     (:when-loaded
@@ -1855,6 +1856,7 @@ eglot client leveraging LTEX Language Server.
          (latex . t)
          (C . t)
          (scheme . t)
+         (plantuml . t)
          ))
       (add-hook 'org-babel-after-execute-hook 'org-redisplay-inline-images)
       ;; open word
@@ -1894,7 +1896,7 @@ eglot client leveraging LTEX Language Server.
   (setup org-download
     (:option org-download-method 'directory
              org-download-screenshot-basename "screenshot.jpg"
-             org-download-image-dir "~/Documents/emacs/orgmode/PicturesForAll/org_download_images")
+             org-download-image-dir (concat nowisemacs-doc-other-files-dir "PicturesForAll/org_download_images"))
     (:when-loaded
       (when (eq system-type 'gnu/linux)
         (setq-default org-download-screenshot-method "scrot -s %s"))
@@ -1933,7 +1935,7 @@ eglot client leveraging LTEX Language Server.
     (org-pdftools-setup-link)))
     ;; Add a function to ensure precise note is inserted
   (with-eval-after-load 'pdf-annot
-    (add-hook 'pdf-annot-activate-handler-functions #'org-noter-pdftools-jump-to-note)))
+    (add-hook 'pdf-annot-activate-handler-functions #'org-noter-pdftools-jump-to-note))
 #+end_src
 ** org-present
 #+begin_src elisp
@@ -1997,7 +1999,7 @@ eglot client leveraging LTEX Language Server.
 ** denote
 #+begin_src elisp
   (setup denote
-    (:option denote-directory (expand-file-name "~/Documents/emacs/orgmode/")
+    (:option denote-directory (expand-file-name nowisemacs-doc-org-mode-dir)
              denote-dired-directories (list denote-directory
                                             (thread-last denote-directory (expand-file-name "attachments"))))
     (add-hook 'dired-mode-hook #'denote-dired-mode-in-directories))

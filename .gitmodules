@@ -266,9 +266,6 @@
 [submodule "peg"]
 	path = lib/peg
 	url = https://github.com/emacsmirror/peg.git
-[submodule "plantuml-emacs"]
-	path = lib/plantuml-emacs
-	url = https://github.com/ginqi7/plantuml-emacs.git
 [submodule "plantuml-mode"]
 	path = lib/plantuml-mode
 	url = https://github.com/skuro/plantuml-mode.git
