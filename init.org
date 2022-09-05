@@ -458,7 +458,7 @@ I used to be a vim(evil) user, but now I use meow to manage all my keys.
       ("vt" "vterm-toggle" vterm-toggle)
       ("vf" "vterm-toggle-forward" vterm-toggle-forward)
       ("vb" "vterm-toggle-backward" vterm-toggle-backward)
-      ("i" "vterm-toggle-insert-cd" vterm-toggle-insert-cd :transient t)
+      ("i" "vterm-toggle-insert-cd" vterm-toggle-insert-cd)
       ]
      ["OJ"
       ("op" "oj-prepare" oj-prepare)
@@ -540,7 +540,7 @@ I used to be a vim(evil) user, but now I use meow to manage all my keys.
   (meow-leader-define-key
    ;;w workspace
    '("TAB". leader-map-for-tabspaces))
-#+end_src
+#+END_SRC
 ** which-key
 #+begin_src elisp
   (setup which-key
@@ -1343,7 +1343,8 @@ borrowed from citre, now you can always jump-back use "M-,"
 Dirvish is a minimalistic file manager based on Dired. It's fast
 #+begin_src elisp
   (setup dirvish
-    (:option dirvish-attributes '(subtree-state all-the-icons collapse file-size))
+    ;; (:option dirvish-attributes '(subtree-state all-the-icons collapse file-size))
+    (:option dirvish-attributes '(subtree-state all-the-icons collapse))
     (:bind "TAB" dirvish-toggle-subtree)
     (:when-loaded
       (dirvish-override-dired-mode)))
@@ -1808,11 +1809,12 @@ eglot client leveraging LTEX Language Server.
                             ("PHONE" :foreground "forest green" :weight bold))))
       ;; 导出相关的设置
 
-      (setq org-latex-pdf-process
-            '("xelatex -interaction nonstopmode %f"
-              "bibtex %b"
-              "xelatex -interaction nonstopmode %f"
-              "xelatex -interaction nonstopmode %f"))
+      ;; (setq org-latex-pdf-process
+      ;;       '("xelatex -interaction nonstopmode %f"
+      ;;         "bibtex %b"
+      ;;         "xelatex -interaction nonstopmode %f"
+      ;;         "xelatex -interaction nonstopmode %f"))
+      (setq org-latex-pdf-process '("tectonic %f"))
       (setq org-format-latex-options (plist-put org-format-latex-options :scale 2.0)) ;; use a large preview for latex
 
       (defface my-org-emphasis-bold
