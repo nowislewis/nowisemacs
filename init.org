@@ -406,7 +406,8 @@ I used to be a vim(evil) user, but now I use meow to manage all my keys.
       ("yi" "Translate input" gts-do-translate)]])
 #+end_src
 *** search-keybindings
-#+begin_src elisp
+not tangled because of transient, maybe due to single title
+#+begin_src elisp :tangle no
   (transient-define-prefix leader-map-for-search()
     "Define leader-key map for special functions"
     [["Search"
@@ -419,15 +420,16 @@ I used to be a vim(evil) user, but now I use meow to manage all my keys.
       ("h" "consult-history" consult-history)
       ("i" "consult-imenu" consult-imenu)
       ("s" "consult-line" consult-line)
-      ("S" "my-consult-line" my-consult-ripgrep-or-line)
+      ;; ("S" "my-consult-line" my-consult-ripgrep-or-line) ;
       ]])
 #+end_src
+
 *** notes-keybindings
 #+begin_src elisp
   (transient-define-prefix leader-map-for-notes()
     "Define notes leader-key maps"
     [["find notes/papers"
-      ("r f" "find all files" project-find-orgmode-dir-files)
+      ("rf" "find all files" project-find-orgmode-dir-files)
       ;; ("p" "find papers" project-find-papers-files)
       ("e" "open org noter" org-noter)
      ]
@@ -518,7 +520,16 @@ I used to be a vim(evil) user, but now I use meow to manage all my keys.
 
   ;; search
   (meow-leader-define-key
-   '("s" . leader-map-for-search)
+   ;; '("s" . leader-map-for-search)
+   '("s b" . consult-buffer)
+   '("s d" . consult-ripgrep)
+   '("s D" . lewis/ripgrep-search-other-dir)
+   '("s f" . consult-find)
+   '("s F" . lewis/find-file-other-dir)
+   '("s g" . rg)
+   '("s h" . consult-history)
+   '("s i" . consult-imenu)
+   '("s s" . consult-line)
    )
   ;; appss
   (meow-leader-define-key
