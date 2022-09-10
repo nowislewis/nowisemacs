@@ -357,7 +357,7 @@ I used to be a vim(evil) user, but now I use meow to manage all my keys.
       ("D" "find-references" xref-find-references)
       ("j" "find-apropos" xref-find-apropos)
       ("i" "find-impl" eglot-find-implementation)
-      ("o" "find-definitions" xref-find-definitions-other-window)
+      ("o" "find-def-other-window" xref-find-definitions-other-window)
       ]
      ["Code action"
       ("a" "code-actions" eglot-code-actions)
@@ -371,8 +371,8 @@ I used to be a vim(evil) user, but now I use meow to manage all my keys.
       ]
      ["Navigate"
       ("m" "consult-mark" consult-mark)
-      (";" "dogears-go" dogears-go)
-      ("'" "dogears-back" dogears-back)
+      ;; (";" "dogears-go" dogears-go)
+      ;; ("'" "dogears-back" dogears-back)
       ]
      ])
 #+end_src
@@ -420,29 +420,28 @@ not tangled because of transient, maybe due to single title
       ("h" "consult-history" consult-history)
       ("i" "consult-imenu" consult-imenu)
       ("s" "consult-line" consult-line)
-      ;; ("S" "my-consult-line" my-consult-ripgrep-or-line) ;
+      ;; ("S" "my-consult-line" my-consult-ripgrep-or-line)
       ]])
 #+end_src
 
 *** notes-keybindings
-#+begin_src elisp
+#+begin_src elisp :tangle no
   (transient-define-prefix leader-map-for-notes()
     "Define notes leader-key maps"
-    [["find notes/papers"
+    [["find notes"
       ("rf" "find all files" project-find-orgmode-dir-files)
-      ;; ("p" "find papers" project-find-papers-files)
+      ]
+     ["New notes"
       ("e" "open org noter" org-noter)
-     ]
-    ["New notes"
-     ("n" "denote" denote)
-     ("d" "date" denote-date)
-     ("t" "type" denote-type)
-     ("s" "subdirectory" denote-subdirectory)]
-    ["Link"
-     ("l" "link(add)" denote-link)
-     ("L" "add links(add)" denote-link-add-links)
-     ("b" "backlinks" denote-link-backlinks)]
-    ])
+      ("n" "denote" denote)
+      ("d" "date" denote-date)
+      ("t" "type" denote-type)
+      ("s" "subdirectory" denote-subdirectory)]
+     ["Link"
+      ("l" "link(add)" denote-link)
+      ("L" "add links(add)" denote-link-add-links)
+      ("b" "backlinks" denote-link-backlinks)]
+     ])
 #+end_src
 *** Apps-keybindings
 #+begin_src elisp
@@ -546,11 +545,13 @@ not tangled because of transient, maybe due to single title
 
   ;; notes
   (meow-leader-define-key
-   '("n" . leader-map-for-notes))
+   '("n r f" . project-find-orgmode-dir-files)
+   '("n e" . org-noter))
 
-  (meow-leader-define-key
-   ;;w workspace
-   '("TAB". leader-map-for-tabspaces))
+
+   (meow-leader-define-key
+    ;;w workspace
+    '("TAB". leader-map-for-tabspaces))
 #+END_SRC
 ** which-key
 #+begin_src elisp
@@ -1273,7 +1274,7 @@ borrowed from citre, now you can always jump-back use "M-,"
 
 #+end_src
 *** dogears
-#+begin_src elisp
+#+begin_src elisp :tangle no
   (setup dogears
     (:global "M-," #'dogears-back)
     (:option dogears-functions '(find-function

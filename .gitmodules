@@ -89,10 +89,6 @@
 	url = https://github.com/alexluigit/dirvish.git
     load-path = .
     load-path = extensions
-[submodule "dogears"]
-	path = lib/dogears
-	url = https://github.com/alphapapa/dogears.el.git
-    no-byte-compile = helm-dogears.el
 [submodule "doom-modeline"]
 	path = lib/doom-modeline
 	url = https://github.com/seagle0128/doom-modeline.git
