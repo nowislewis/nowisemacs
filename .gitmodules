@@ -247,6 +247,9 @@
 [submodule "org-ql"]
 	path = lib/org-ql
 	url = https://github.com/alphapapa/org-ql.git
+[submodule "org-remark"]
+	path = lib/org-remark
+	url = https://github.com/nobiot/org-remark
 [submodule "org-super-agenda"]
 	path = lib/org-super-agenda
 	url = https://github.com/alphapapa/org-super-agenda.git
