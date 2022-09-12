@@ -35,6 +35,9 @@
 [submodule "closql"]
 	path = lib/closql
 	url = https://github.com/emacscollective/closql.git
+[submodule "clue"]
+	path = lib/clue
+	url = https://github.com/AmaiKinono/clue.git
 [submodule "cmake-mode"]
 	path = lib/cmake-mode
 	url = https://github.com/emacsmirror/cmake-mode.git
