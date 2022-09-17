@@ -96,6 +96,8 @@ I feel in love denote, preview org-roam configs are refiled in [[file:useful-too
   - [[#shrface][shrface]]
   - [[#org-remark][org-remark]]
   - [[#clue][clue]]
+  - [[#org-transclusion][org-transclusion]]
+  - [[#emacs-plantuml][emacs-plantuml]]
 - [[#翻译][翻译]]
   - [[#go-translate][go-translate]]
   - [[#corfu-english-helper][corfu-english-helper]]
@@ -116,30 +118,30 @@ I feel in love denote, preview org-roam configs are refiled in [[file:useful-too
 * Startup config
 ** UI speed up
 #+begin_src elisp :tangle ~/.emacs.d/early-init.el
-  ;; -*- lexical-binding: t; -*-
-  (setq gc-cons-threshold most-positive-fixnum
-        gc-cons-percentage 0.5) ;;defer gc futher back
+    ;; -*- lexical-binding: t; -*-
+    (setq gc-cons-threshold most-positive-fixnum
+          gc-cons-percentage 0.5) ;;defer gc futher back
 
-  ;; Package initialize occurs automatically, before `user-init-file' is
-  ;; loaded, but after `early-init-file'. We handle package
-  ;; initialization, so we must prevent Emacs from doing it early!
-  (setq package-enable-at-startup nil)
+    ;; Package initialize occurs automatically, before `user-init-file' is
+    ;; loaded, but after `early-init-file'. We handle package
+    ;; initialization, so we must prevent Emacs from doing it early!
+    (setq package-enable-at-startup nil)
 
-  ;; Inhibit resizing frame
-  (setq frame-inhibit-implied-resize t)
+    ;; Inhibit resizing frame
+    (setq frame-inhibit-implied-resize t)
 
-  ;; no title bar
-  (add-to-list 'default-frame-alist '(undecorated . t))
-  ;; Faster to disable these here (before they've been initialized)
-  (push '(alpha-background . 85) default-frame-alist)
-  (push '(menu-bar-lines . 0) default-frame-alist)
-  (push '(tool-bar-lines . 0) default-frame-alist)
-  (push '(vertical-scroll-bars) default-frame-alist)
-  ;; (push '(undecorated . t) default-frame-alist)
-  (setq initial-major-mode 'fundamental-mode ;; 默认用最简单的模式
-        package--init-file-ensured t
-        inhibit-startup-message t             ; 关闭启动 Emacs 时的欢迎界面
-        )
+    ;; no title bar
+    (add-to-list 'default-frame-alist '(undecorated . t))
+    ;; Faster to disable these here (before they've been initialized)
+    (push '(alpha-background . 85) default-frame-alist)
+    (push '(menu-bar-lines . 0) default-frame-alist)
+    (push '(tool-bar-lines . 0) default-frame-alist)
+    (push '(vertical-scroll-bars) default-frame-alist)
+    ;; (push '(undecorated . t) default-frame-alist)
+    (setq initial-major-mode 'fundamental-mode ;; 默认用最简单的模式
+          package--init-file-ensured t
+          inhibit-startup-message t             ; 关闭启动 Emacs 时的欢迎界面
+          )
 #+end_src
 ** generic
 #+begin_src elisp
@@ -232,6 +234,8 @@ I used to be a vim(evil) user, but now I use meow to manage all my keys.
     ;; motion keys
     (meow-motion-overwrite-define-key '("j" . meow-next)
                                       '("k" . meow-prev)
+                                      '("h" . meow-left)
+                                      '("l" . meow-right)
                                       '("<escape>" . ignore)
                                       '("." . repeat))
     ;; normal keys
@@ -467,9 +471,11 @@ not tangled because of transient, maybe due to single title
       ("op" "oj-prepare" oj-prepare)
       ("ot" "oj-test" oj-test)
       ("oh" "oj-open-home-dir" oj-open-home-dir)]
-     ["Excalidraw"
+     ["Org draw"
       ("e" "org-excalidraw-create-drawing" org-excalidraw-create-drawing)
-      ("E" "org-excalidraw-initialize" org-excalidraw-initialize)]
+      ("E" "org-excalidraw-initialize" org-excalidraw-initialize)
+      ("w" "plantuml-org-to-wbs-open" plantuml-org-to-wbs-open)
+      ("m" "plantuml-org-to-mindmap-open" plantuml-org-to-mindmap-open)]
      ])
 #+end_src
 *** buffer-keybindings
@@ -495,6 +501,8 @@ not tangled because of transient, maybe due to single title
    ;; SPC j/k will run the original command in MOTION state.
    '("j" . "H-j")
    '("k" . "H-k")
+   '("h" . "H-h")
+   '("l" . "H-l")
    '("." . "H-.")
    ;; Use SPC (0-9) for digit arguments.
    '("1" . meow-digit-argument)
@@ -1224,9 +1232,8 @@ Popper is a minor-mode to tame the flood of ephemeral windows Emacs produces, wh
                                       win
                                       (floor (frame-height) 2)))
              )
-    (:global "C-~" popper-toggle-latest
-             "M-~" popper-cycle
-             "C-M-~" popper-toggle-type)
+    (:global "M-`" popper-toggle-latest ;; shadown tmm-menubar
+             "C-M-`" popper-toggle-type)
     (:defer
      (popper-mode +1)
      (popper-echo-mode +1))
@@ -1369,7 +1376,7 @@ Dirvish is a minimalistic file manager based on Dired. It's fast
 *** imenu-list
 #+begin_src elisp
   (setup imenu-list
-    (:autoload imenu-list-smart-toggle)
+    (:autoload himenu-list-smart-toggle)
     (:option imenu-list-focus-after-activate t
              imenu-list-auto-resize t
              imenu-list-position 'left
@@ -1380,6 +1387,8 @@ Dirvish is a minimalistic file manager based on Dired. It's fast
 *** boxy
 #+begin_src elisp
   (setup boxy
+    ;; (:bind "h" boxy-mode-uncycle
+    ;;        "l" boxy-mode-cycle)
     (:hook (defun boxy-font-set ()
              (make-local-variable 'default)
              (set-face-attribute 'default nil :family lewis-fixed-ch-en-font :height lewis-font-size)
@@ -2082,6 +2091,27 @@ Connecting clues while reading code.
 #+begin_src elisp
   (setup clue)
 #+end_src
+** org-transclusion
+#+begin_src elisp
+  (setup org-transclusion)
+#+end_src
+** emacs-plantuml
+#+begin_src elisp
+  (setup plantuml
+    (:option plantuml-jar-path org-plantuml-jar-path
+             plantuml-output-type "jpg"
+             plantuml-relative-path (concat nowisemacs-doc-other-files-dir ".temp_images/")
+             plantuml-theme "plain"
+             ;; plantuml-font "somefont"
+             plantuml-add-index-number t
+             plantuml-log-command t
+             plantuml-mindmap-contains-org-content nil
+             plantuml-org-headline-bold t)
+    (:autoload plantuml-org-to-wbs-open
+               plantuml-org-to-mindmap-open)
+    )
+#+end_src
+
 * 翻译
 ** go-translate
 #+begin_src elisp

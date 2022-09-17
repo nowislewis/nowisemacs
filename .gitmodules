@@ -128,10 +128,6 @@
 [submodule "elisp-refs"]
 	path = lib/elisp-refs
 	url = https://github.com/Wilfred/elisp-refs.git
-[submodule "emacsql"]
-	path = lib/emacsql
-	url = https://github.com/skeeto/emacsql.git
-	no-byte-compile = emacsql-pg.el
 [submodule "embark"]
 	path = lib/embark
 	url = https://github.com/oantolin/embark.git
@@ -256,6 +252,9 @@
 [submodule "org-super-agenda"]
 	path = lib/org-super-agenda
 	url = https://github.com/alphapapa/org-super-agenda.git
+[submodule "org-transclusion"]
+	path = lib/org-transclusion
+	url = https://github.com/nobiot/org-transclusion
 [submodule "ov"]
 	path = lib/ov
 	url = https://github.com/emacsorphanage/ov.git
@@ -268,6 +267,9 @@
 [submodule "peg"]
 	path = lib/peg
 	url = https://github.com/emacsmirror/peg.git
+[submodule "plantuml"]
+	path = lib/plantuml
+	url = https://github.com/ginqi7/plantuml-emacs.git
 [submodule "plantuml-mode"]
 	path = lib/plantuml-mode
 	url = https://github.com/skuro/plantuml-mode.git
@@ -380,3 +382,6 @@
 [submodule "yasnippet"]
 	path = lib/yasnippet
 	url = https://github.com/joaotavora/yasnippet.git
+[submodule "emacsql"]
+	path = lib/emacsql
+	url = git@github.com:skeeto/emacsql.git
