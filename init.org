@@ -98,6 +98,7 @@ I feel in love denote, preview org-roam configs are refiled in [[file:useful-too
   - [[#clue][clue]]
   - [[#org-transclusion][org-transclusion]]
   - [[#emacs-plantuml][emacs-plantuml]]
+  - [[#agendagtd][agenda/gtd]]
 - [[#翻译][翻译]]
   - [[#go-translate][go-translate]]
   - [[#corfu-english-helper][corfu-english-helper]]
@@ -191,6 +192,7 @@ The following content is not enabled yet, because I want to minimize unnecessary
   (defvar nowisemacs-doc-emacs-dir (file-truename "~/Documents/emacs/"))
   (defvar nowisemacs-doc-other-files-dir (concat nowisemacs-doc-emacs-dir "other-files/"))
   (defvar nowisemacs-doc-org-mode-dir (concat nowisemacs-doc-emacs-dir "orgmode"))
+  (defvar nowisemacs-gtd-dir (concat nowisemacs-doc-org-mode-dir "/xnotes/gtd"))
 #+end_src
 
 * Package Management
@@ -1813,25 +1815,12 @@ eglot client leveraging LTEX Language Server.
              org-preview-latex-image-directory (concat no-littering-var-directory "ltximg/")
              org-confirm-babel-evaluate nil
              org-src-window-setup 'split-window-below
-             org-refile-targets '(("~/Documents/emacs/orgmode/roam/2022-04-25-org_refile_notes.org" . (:maxlevel . 9)))
              org-ellipsis "⤵"
              org-plantuml-jar-path plantuml-jar-path
              )
     (:hook org-num-mode)
     (:when-loaded
       (require 'org-tempo) ;; so that <s is useful
-      (setq-default org-todo-keywords
-                    (quote ((sequence "TODO(t)" "NEXT(n)" "|" "DONE(d)")
-                            (sequence "WAITING(w@/!)" "HOLD(h@/!)" "|" "CANCELLED(c@/!)" "PHONE" "MEETING"))))
-      (setq-default org-todo-keyword-faces
-                    (quote (("TODO" :foreground "red" :weight bold)
-                            ("NEXT" :foreground "blue" :weight bold)
-                            ("DONE" :foreground "forest green" :weight bold)
-                            ("WAITING" :foreground "orange" :weight bold)
-                            ("HOLD" :foreground "magenta" :weight bold)
-                            ("CANCELLED" :foreground "forest green" :weight bold)
-                            ("MEETING" :foreground "forest green" :weight bold)
-                            ("PHONE" :foreground "forest green" :weight bold))))
       ;; 导出相关的设置
 
       ;; (setq org-latex-pdf-process
@@ -2059,13 +2048,13 @@ eglot client leveraging LTEX Language Server.
   (setup shrface
     (:load-after nov)
     (:when-loaded
-  (shrface-basic)
-    (shrface-trial)
-    (shrface-default-keybindings) ; setup default keybindings
-    (setq shrface-href-versatile t)
-    (add-hook 'nov-mode-hook #'shrface-mode)
-    (setq nov-shr-rendering-functions '((img . nov-render-img) (title . nov-render-title)))
-    (setq nov-shr-rendering-functions (append nov-shr-rendering-functions shr-external-rendering-functions))))
+      (shrface-basic)
+      (shrface-trial)
+      (shrface-default-keybindings) ; setup default keybindings
+      (setq shrface-href-versatile t)
+      (add-hook 'nov-mode-hook #'shrface-mode)
+      (setq nov-shr-rendering-functions '((img . nov-render-img) (title . nov-render-title)))
+      (setq nov-shr-rendering-functions (append nov-shr-rendering-functions shr-external-rendering-functions))))
 #+end_src
 ** org-remark
 Highlight and annotate any text file with using Org mode.
@@ -2110,6 +2099,41 @@ Connecting clues while reading code.
     (:autoload plantuml-org-to-wbs-open
                plantuml-org-to-mindmap-open)
     )
+#+end_src
+** agenda/gtd
+https://emacs.cafe/emacs/orgmode/gtd/2017/06/30/orgmode-gtd.html
+#+begin_src elisp
+  (defvar nowisemacs-index-org (concat nowisemacs-gtd-dir "/20220919T004950--gtd-index__agenda.org"))
+  (defvar nowisemacs-gtd-org (concat nowisemacs-gtd-dir "/20220919T005015--gtd-gtd__agenda.org"))
+  (defvar nowisemacs-tickler-org (concat nowisemacs-gtd-dir "/20220919T005033--gtd-tickler__agenda.org"))
+  (defvar nowisemacs-someday-org (concat nowisemacs-gtd-dir "/20220919T005046--someday__agenda.org"))
+  (setup org
+    (:option org-agenda-files (list nowisemacs-index-org
+                                    nowisemacs-gtd-org
+                                    nowisemacs-tickler-org)
+             org-todo-keywords (quote ((sequence "TODO(t)" "NEXT(n)" "|" "DONE(d)")
+                                       (sequence "WAITING(w@/!)" "HOLD(h@/!)" "|" "CANCELLED(c@/!)" "PHONE" "MEETING")))
+             org-todo-keyword-faces (quote (("TODO" :foreground "red" :weight bold)
+                                            ("NEXT" :foreground "blue" :weight bold)
+                                            ("DONE" :foreground "forest green" :weight bold)
+                                            ("WAITING" :foreground "orange" :weight bold)
+                                            ("HOLD" :foreground "magenta" :weight bold)
+                                            ("CANCELLED" :foreground "forest green" :weight bold)
+                                            ("MEETING" :foreground "forest green" :weight bold)
+                                            ("PHONE" :foreground "forest green" :weight bold)))
+             ))
+  (setup org-refile
+    (:option org-refile-targets (list (cons nowisemacs-gtd-org '(:maxlevel . 3))
+                                      (cons nowisemacs-someday-org '(:level . 1))
+                                      (cons nowisemacs-tickler-org '(:maxlevel . 2)))))
+  (setup org-capture
+    (:option org-capture-templates '(("t" "Todo [inbox]" entry
+                                      (file+headline nowisemacs-index-org "Tasks")
+                                      "* TODO %i%?")
+                                     ("T" "Tickler" entry
+                                      (file+headline nowisemacs-tickler-org "Tickler")
+                                      "* %i%? \n %U"))))
+
 #+end_src
 
 * 翻译
