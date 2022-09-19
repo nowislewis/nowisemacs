@@ -456,7 +456,8 @@ not tangled because of transient, maybe due to single title
   (transient-define-prefix leader-map-for-apps()
     "Define leader-key map for special functions"
     [["Agenda"
-      ("a" "org-agenda" org-agenda)]
+      ("a" "org-agenda" org-agenda)
+      ("c" "org-capture" org-capture)]
      ["Gif-screencast"
       ("gs" "gif-screen-start-or-stop" gif-screencast-start-or-stop)
       ("gp" "gif-screen-pause" gif-screencast-toggle-pause)
@@ -558,6 +559,8 @@ not tangled because of transient, maybe due to single title
   ;; notes
   (meow-leader-define-key
    '("n r f" . project-find-orgmode-dir-files)
+   '("n r g" . project-find-gtd-dir-files)
+
    '("n e" . org-noter)
    ;; org-remark
    '("n m m" . org-remark-mark))
@@ -2026,6 +2029,10 @@ eglot client leveraging LTEX Language Server.
     (interactive)
     (dired nowisemacs-doc-org-mode-dir)
     (project-find-file t))
+  (defun project-find-gtd-dir-files ()
+    (interactive)
+    (dired nowisemacs-gtd-dir)
+    (project-find-file t))
 #+end_src
 ** org-excalidraw
 #+begin_src elisp
@@ -2103,9 +2110,9 @@ Connecting clues while reading code.
 ** agenda/gtd
 https://emacs.cafe/emacs/orgmode/gtd/2017/06/30/orgmode-gtd.html
 #+begin_src elisp
-  (defvar nowisemacs-index-org (concat nowisemacs-gtd-dir "/20220919T004950--gtd-index__agenda.org"))
-  (defvar nowisemacs-gtd-org (concat nowisemacs-gtd-dir "/20220919T005015--gtd-gtd__agenda.org"))
-  (defvar nowisemacs-tickler-org (concat nowisemacs-gtd-dir "/20220919T005033--gtd-tickler__agenda.org"))
+  (defvar nowisemacs-index-org (concat nowisemacs-gtd-dir "/20220919T004950--index__agenda.org"))
+  (defvar nowisemacs-gtd-org (concat nowisemacs-gtd-dir "/20220919T005015--gtd__agenda.org"))
+  (defvar nowisemacs-tickler-org (concat nowisemacs-gtd-dir "/20220919T005033--tickler__agenda.org"))
   (defvar nowisemacs-someday-org (concat nowisemacs-gtd-dir "/20220919T005046--someday__agenda.org"))
   (setup org
     (:option org-agenda-files (list nowisemacs-index-org
