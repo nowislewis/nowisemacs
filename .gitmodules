@@ -237,6 +237,9 @@
 [submodule "org-excalidraw"]
 	path = lib/org-excalidraw
 	url = https://github.com/wdavew/org-excalidraw.git
+[submodule "org-mind-map"]
+	path = lib/org-mind-map
+	url = https://github.com/the-ted/org-mind-map.git
 [submodule "org-modern"]
 	path = lib/org-modern
 	url = https://github.com/minad/org-modern.git

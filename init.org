@@ -98,6 +98,7 @@ I feel in love denote, preview org-roam configs are refiled in [[file:useful-too
   - [[#clue][clue]]
   - [[#org-transclusion][org-transclusion]]
   - [[#emacs-plantuml][emacs-plantuml]]
+  - [[#org-mind-map][org-mind-map]]
   - [[#agendagtd][agenda/gtd]]
 - [[#翻译][翻译]]
   - [[#go-translate][go-translate]]
@@ -2108,6 +2109,20 @@ Connecting clues while reading code.
     (:autoload plantuml-org-to-wbs-open
                plantuml-org-to-mindmap-open)
     )
+#+end_src
+** org-mind-map
+#+begin_src elisp
+  (setup org-mind-map
+    (:require ox-org)
+    (:when-loaded
+      (setq org-mind-map-engine "dot")       ; Default. Directed Graph
+      ;; (setq org-mind-map-engine "neato")  ; Undirected Spring Graph
+      ;; (setq org-mind-map-engine "twopi")  ; Radial Layout
+      ;; (setq org-mind-map-engine "fdp")    ; Undirected Spring Force-Directed
+      ;; (setq org-mind-map-engine "sfdp")   ; Multiscale version of fdp for the layout of large graphs
+      ;; (setq org-mind-map-engine "twopi")  ; Radial layouts
+      ;; (setq org-mind-map-engine "circo")  ; Circular Layout
+      ))
 #+end_src
 ** agenda/gtd
 https://emacs.cafe/emacs/orgmode/gtd/2017/06/30/orgmode-gtd.html
