@@ -382,6 +382,10 @@ I used to be a vim(evil) user, but now I use meow to manage all my keys.
       ;; (";" "dogears-go" dogears-go)
       ;; ("'" "dogears-back" dogears-back)
       ]
+     ["Clue"
+      ("c" "clue-copy" clue-copy)
+      ("p" "clue-paste" clue-paste)
+      ]
      ])
 #+end_src
 *** lewis-keybindings
@@ -974,7 +978,7 @@ diff-hl-mode highlights uncommitted changes on the left side of the window (area
 #+begin_src elisp
   (setup dash-docs
     (:option dash-docs-docsets-path (concat no-littering-var-directory "dash-docsets")
-             dash-docs-common-docsets '("C++" "CMake"))
+             dash-docs-common-docsets '("C++"))
     )
   (setup consult-dash)
     #+end_src
@@ -1271,6 +1275,11 @@ borrowed from citre, now you can always jump-back use "M-,"
 #+begin_src elisp
   (setq bookmark-default-file "~/Documents/emacs/other-files/bookmarks")
 #+end_src
+*** ace-window
+#+begin_src elisp
+  (setup ace-window
+      (:global [remap other-window] #'ace-window))
+#+end_src
 *** windmove
 #+begin_src elisp
   (setup windmove
@@ -1288,24 +1297,6 @@ borrowed from citre, now you can always jump-back use "M-,"
     (:global "C-x O" windmove-transient-keybindings)
     )
 
-#+end_src
-*** dogears
-#+begin_src elisp :tangle no
-  (setup dogears
-    (:global "M-," #'dogears-back)
-    (:option dogears-functions '(find-function
-                                 consult-imenu
-                                 consult-ripgrep
-                                 consult-line
-                                 consult-find
-                                 find-file
-                                 goto-line
-                                 citre-jump
-                                 xref-find-definitions
-                                 isearch-forward))
-    (:defer
-     (dogears-mode))
-    )
 #+end_src
 * ibuffer
 ** ibuffer
@@ -1506,15 +1497,15 @@ Dirvish is a minimalistic file manager based on Dired. It's fast
 ** magit
 #+begin_src elisp
   (setup with-editor)
-  (setup magit
-    (:hook magit-gerrit-mode))
+  (setup magit)
+    ;; (:hook magit-gerrit-mode))
 
-  (setup magit-gerrit
-    (:option magit-gerrit-ssh-creds "dev_a@prj1.server.com"
-             magit-gerrit-remote "origin"
-             magit-gerrit-push-to "HEAD:/ref/master")
-    (:autoload magit-gerrit-mode)
-    )
+  ;; (setup magit-gerrit
+  ;;   (:option magit-gerrit-ssh-creds "dev_a@prj1.server.com"
+  ;;            magit-gerrit-remote "origin"
+  ;;            magit-gerrit-push-to "HEAD:/ref/master")
+  ;;   (:autoload magit-gerrit-mode)
+  ;;   )
 #+end_src
 ** ediff
 #+begin_src elisp
@@ -1662,6 +1653,7 @@ Highlight symbols with keymap-enabled overlays
   (setup eglot
     (:option eglot-events-buffer-size 0
              eglot-workspace-configuration '((:python.analysis :useLibraryCodeForTypes t)))
+    (:autoload eglot-find-implementation)
     (:when-loaded
       (set-face-attribute 'eglot-highlight-symbol-face nil :background "#b3d7ff")
     ))
@@ -1719,10 +1711,12 @@ Citre is an advanced Ctags (or actually, readtags) frontend for Emacs.
            ")" grammatical-edit-close-round
            "]" grammatical-edit-close-bracket
            "}" grammatical-edit-close-curly
-           ;; "=" grammatical-edit-equal
            "%" grammatical-edit-match-paren
            "\"" grammatical-edit-double-quote
-           "'" grammatical-edit-single-quote)
+           "'" grammatical-edit-single-quote
+           "C-k" grammatical-edit-kill
+           "M-p" grammatical-edit-jump-right
+           "M-n" grammatical-edit-jump-left)
     (:hook-into text-mode
                 prog-mode
                 maxima-mode
@@ -1794,6 +1788,11 @@ eglot client leveraging LTEX Language Server.
             ("u" "gud-until" gud-until)]
            [("w" "gud-watch" gud-watch)]
            ])))
+#+end_src
+*** aggresive
+#+begin_src elisp
+  (setup aggresive-indent
+    (:defer (global-aggressive-indent-mode)))
 #+end_src
 * Org Mode
 ** org-mode
@@ -1911,18 +1910,19 @@ eglot client leveraging LTEX Language Server.
 #+end_src
 ** org-download
 #+begin_src elisp
-  (setup async)
-  (setup org-download
-    (:option org-download-method 'directory
-             org-download-screenshot-basename "screenshot.jpg"
-             org-download-image-dir (concat nowisemacs-doc-other-files-dir "PicturesForAll/org_download_images"))
-    (:when-loaded
-      (when (eq system-type 'gnu/linux)
-        (setq-default org-download-screenshot-method "scrot -s %s"))
+    (setup async)
+    (setup org-download
+      (:option org-download-method 'directory
+               org-download-screenshot-basename "screenshot.jpg"
+               org-download-image-dir (concat nowisemacs-doc-other-files-dir "PicturesForAll/org_download_images"))
+      (:when-loaded
+        (when (eq system-type 'gnu/linux)
+          (setq-default org-download-screenshot-method "scrot -s %s"))
 
-      (when (eq system-type 'darwin)
-        (setq org-download-screenshot-method "screencapture -i %s")))
-    (:autoload org-download-screenshot))
+        (when (eq system-type 'darwin)
+          (setq org-download-screenshot-method "screencapture -i %s")))
+      (:autoload org-download-screenshot
+                 org-download-yank))
 #+end_src
 ** ox-hugo
 #+begin_src elisp
@@ -2042,7 +2042,7 @@ eglot client leveraging LTEX Language Server.
     )
 #+end_src
 ** org-ql
-#+begin_src elisp
+#+begin_src elisp :tangle no
   (setup ts)
   (setup peg)
   (setup ht)
@@ -2053,16 +2053,18 @@ eglot client leveraging LTEX Language Server.
 ** shrface
 #+begin_src elisp
   (setup shrface
-    (:load-after nov)
+    (:load-after nov eww)
+    (:hook-into nov-mode
+                eww-after-render)
     (:when-loaded
       (shrface-basic)
       (shrface-trial)
       (shrface-default-keybindings) ; setup default keybindings
       (setq shrface-href-versatile t)
-      (add-hook 'nov-mode-hook #'shrface-mode)
       (setq nov-shr-rendering-functions '((img . nov-render-img) (title . nov-render-title)))
       (setq nov-shr-rendering-functions (append nov-shr-rendering-functions shr-external-rendering-functions))))
 #+end_src
+
 ** org-remark
 Highlight and annotate any text file with using Org mode.
 #+begin_src elisp
@@ -2085,7 +2087,7 @@ Highlight and annotate any text file with using Org mode.
 ** clue
 Connecting clues while reading code.
 #+begin_src elisp
-  (setup clue)
+    (setup clue)
 #+end_src
 ** org-transclusion
 #+begin_src elisp
@@ -2237,7 +2239,9 @@ Simple distraction-free editing. I use darkroom instead of writeroom because it'
                    (browse-url-interactive-arg "xwidget-webkit URL: ")))
     (xwidget-webkit-browse-url url t))
 
-  (setq browse-url-browser-function 'lewis/url-browser-new-buffer)
+  ;; now use eww
+  ;; (setq browse-url-browser-function 'lewis/url-browser-new-buffer)
+  (setq browse-url-browser-function 'eww-browse-url)
 #+end_src
 ** oj.el for online program contest
 #+begin_src elisp

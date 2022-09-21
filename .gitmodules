@@ -1,4 +1,10 @@
 
+[submodule "ace-window"]
+	path = lib/ace-window
+	url = https://github.com/abo-abo/ace-window.git
+[submodule "aggressive-indent"]
+	path = lib/aggressive-indent
+	url = https://github.com/Malabarba/aggressive-indent-mode.git
 [submodule "all-the-icons"]
 	path = lib/all-the-icons
 	url = https://github.com/domtronn/all-the-icons.el.git
@@ -174,9 +180,6 @@
 [submodule "hl-todo"]
 	path = lib/hl-todo
 	url = https://github.com/tarsius/hl-todo.git
-[submodule "ht"]
-	path = lib/ht
-	url = https://github.com/Wilfred/ht.el.git
 [submodule "imenu-list"]
 	path = lib/imenu-list
 	url = https://github.com/bmag/imenu-list.git
@@ -198,9 +201,6 @@
 [submodule "magit"]
 	path = lib/magit
 	url = https://github.com/magit/magit.git
-[submodule "magit-gerrit"]
-	path = lib/magit-gerrit
-	url = https://github.com/emacsorphanage/magit-gerrit.git
 [submodule "marginalia"]
 	path = lib/marginalia
 	url = https://github.com/minad/marginalia.git
@@ -246,30 +246,18 @@
 [submodule "org-present"]
 	path = lib/org-present
 	url = https://github.com/rlister/org-present.git
-[submodule "org-ql"]
-	path = lib/org-ql
-	url = https://github.com/alphapapa/org-ql.git
 [submodule "org-remark"]
 	path = lib/org-remark
 	url = https://github.com/nobiot/org-remark
-[submodule "org-super-agenda"]
-	path = lib/org-super-agenda
-	url = https://github.com/alphapapa/org-super-agenda.git
 [submodule "org-transclusion"]
 	path = lib/org-transclusion
 	url = https://github.com/nobiot/org-transclusion
-[submodule "ov"]
-	path = lib/ov
-	url = https://github.com/emacsorphanage/ov.git
 [submodule "ox-hugo"]
 	path = lib/ox-hugo
 	url = https://github.com/kaushalmodi/ox-hugo.git
 [submodule "pdf-tools"]
 	path = lib/pdf-tools
 	url = https://github.com/vedang/pdf-tools.git
-[submodule "peg"]
-	path = lib/peg
-	url = https://github.com/emacsmirror/peg.git
 [submodule "plantuml"]
 	path = lib/plantuml
 	url = https://github.com/ginqi7/plantuml-emacs.git
@@ -348,9 +336,6 @@
 [submodule "tree-sitter-langs"]
 	path = lib/tree-sitter-langs
 	url = https://github.com/emacs-tree-sitter/tree-sitter-langs.git
-[submodule "ts"]
-	path = lib/ts
-	url = https://github.com/alphapapa/ts.el.git
 [submodule "vertico"]
 	path = lib/vertico
 	url = https://github.com/minad/vertico.git
