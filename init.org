@@ -380,12 +380,10 @@ I used to be a vim(evil) user, but now I use meow to manage all my keys.
       ]
      ["Navigate"
       ("m" "consult-mark" consult-mark)
-      ;; (";" "dogears-go" dogears-go)
-      ;; ("'" "dogears-back" dogears-back)
       ]
      ["Clue"
-      ("c" "clue-copy" clue-copy)
-      ("p" "clue-paste" clue-paste)
+      ("w" "clue-copy" clue-copy)
+      ("y" "clue-paste" clue-paste)
       ]
      ])
 #+end_src
