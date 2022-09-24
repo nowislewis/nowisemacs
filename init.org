@@ -2052,7 +2052,8 @@ eglot client leveraging LTEX Language Server.
 ** shrface
 #+begin_src elisp
   (setup shrface
-    (:load-after nov eww)
+    (:load-after nov)
+    (:load-after eww)
     (:hook-into nov-mode
                 eww-after-render)
     (:when-loaded
