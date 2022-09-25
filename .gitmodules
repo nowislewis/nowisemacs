@@ -20,6 +20,9 @@
 [submodule "avy"]
 	path = lib/avy
 	url = https://github.com/abo-abo/avy.git
+[submodule "aweshell"]
+	path = lib/aweshell
+	url = https://github.com/manateelazycat/aweshell.git
 [submodule "beancount"]
 	path = lib/beancount
 	url = https://github.com/beancount/beancount-mode.git
