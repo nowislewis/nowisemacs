@@ -222,9 +222,6 @@
 [submodule "nov"]
 	path = lib/nov
 	url = https://depp.brause.cc/nov.el.git
-[submodule "nowisemacs-functions"]
-	path = lib/nowisemacs-functions
-	url = https://github.com/nowislewis/nowisemacs-functions.git
 [submodule "oj"]
 	path = lib/oj
 	url = https://github.com/conao3/oj.el.git
