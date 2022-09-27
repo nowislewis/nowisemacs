@@ -6,3 +6,5 @@
 !README.org
 !useful-tools/
 !lib/
+!modules/
+init-config.el

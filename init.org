@@ -1059,11 +1059,12 @@ diff-hl-mode highlights uncommitted changes on the left side of the window (area
     (:hook-into text-mode prog-mode))
 #+end_src
 ** exec-path-from-shell
+可以优化速度, 建议看一下官网的一篇文章
 #+begin_src elisp
-  ;; 可以优化速度, 建议看一下官网的一篇文章
   (setup exec-path-from-shell
     (:defer
-     (exec-path-from-shell-initialize)))
+     (when (memq window-system '(mac ns x))
+       (exec-path-from-shell-initialize))))
 #+end_src
 ** Undo
 *** vundo for undo history
