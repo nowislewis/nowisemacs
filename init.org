@@ -8,8 +8,8 @@ I feel in love denote, preview org-roam configs are refiled in [[file:useful-too
   - [[#generic][generic]]
   - [[#set-vars][set vars]]
 - [[#package-management][Package Management]]
-  - [[#epkg][epkg]]
   - [[#setup][setup]]
+  - [[#epkg][epkg]]
 - [[#gcmh][gcmh]]
 - [[#keyboard-bindings][Keyboard Bindings]]
   - [[#meow][meow]]
@@ -229,18 +229,6 @@ The following content is not enabled yet, because I want to minimize unnecessary
 #+end_src
 
 * Package Management
-** epkg
-I use borg to manage packages, so setup.el is only used to config packages quickly, I write several macros in [[https://github.com/nowislewis/nowisemacs-base.git][nowisemacs-base]]. It should be noticed that if you use only a =init.el= file, all the funcs or macros defined in =init.el= can't pass native comp, so move these things that you defined yourself to a seperate repo(nowisemacs-base) will resolve this problem.
-#+begin_src elisp
-  (setup compat)
-  (setup closql)
-  (setup emacsql)
-
-  (setup sqlite3)
-  (setup emacsql-sqlite-builtin)
-  (setq epkg-database-connector 'sqlite-builtin)
-  (setup epkg)
-#+end_src
 ** setup
 #+begin_src elisp
   (require 'setup)
@@ -298,6 +286,18 @@ I use borg to manage packages, so setup.el is only used to config packages quick
            (setq start-time (current-time))
            )))
     :documentation "Messure the current feature after FEATURES.")
+#+end_src
+** epkg
+I use borg to manage packages, so setup.el is only used to config packages quickly, I write several macros in [[https://github.com/nowislewis/nowisemacs-base.git][nowisemacs-base]]. It should be noticed that if you use only a =init.el= file, all the funcs or macros defined in =init.el= can't pass native comp, so move these things that you defined yourself to a seperate repo(nowisemacs-base) will resolve this problem.
+#+begin_src elisp
+  (setup compat)
+  (setup closql)
+  (setup emacsql)
+
+  (setup sqlite3)
+  (setup emacsql-sqlite-builtin)
+  (setq epkg-database-connector 'sqlite-builtin)
+  (setup epkg)
 #+end_src
 * gcmh
 Enforce a sneaky Garbage Collection strategy to minimize GC interference with user activity.
@@ -509,25 +509,6 @@ I used to be a vim(evil) user, but now I use meow to manage all my keys.
       ("yp" "Translate posframe" my-gts-translate-posframe)
       ("yi" "Translate input" gts-do-translate)]])
 #+end_src
-*** search-keybindings
-not tangled because of transient, maybe due to single title
-#+begin_src elisp :tangle no
-  (transient-define-prefix leader-map-for-search()
-    "Define leader-key map for special functions"
-    [["Search"
-      ("b" "consult-buffer" consult-buffer)
-      ("d" "consult-ripgrep" consult-ripgrep)
-      ("D" "ripgrep-search-other-dir" lewis/ripgrep-search-other-dir)
-      ("f" "consult-find" consult-find)
-      ("F" "find-file-other-dir" lewis/find-file-other-dir)
-      ("g" "rg" rg)
-      ("h" "consult-history" consult-history)
-      ("i" "consult-imenu" consult-imenu)
-      ("s" "consult-line" consult-line)
-      ;; ("S" "my-consult-line" my-consult-ripgrep-or-line)
-      ]])
-#+end_src
-
 *** notes-keybindings
 #+begin_src elisp :tangle no
   (transient-define-prefix leader-map-for-notes()
@@ -638,6 +619,7 @@ not tangled because of transient, maybe due to single title
    '("s h" . consult-history)
    '("s i" . consult-imenu)
    '("s s" . consult-line)
+   '("s S" . consult-ripgrep-one-file)
    )
   ;; appss
   (meow-leader-define-key
@@ -1141,19 +1123,19 @@ diff-hl-mode highlights uncommitted changes on the left side of the window (area
                    (shell-quote-argument buffer-file-name))))
       (consult-ripgrep)))
 
-  (defun my-consult-ripgrep-or-line ()
-    "Call `consult-line' for small buffers or `consult-ripgrep' for large files."
-    (interactive)
-    (if (or (not buffer-file-name)
-            (buffer-narrowed-p)
-            (ignore-errors
-              (file-remote-p buffer-file-name))
-            (jka-compr-get-compression-info buffer-file-name)
-            (<= (buffer-size)
-                (/ my-consult-ripgrep-or-line-limit
-                   (if (eq major-mode 'org-mode) 4 1))))
-        (consult-line)
-      (consult-ripgrep-one-file)))
+  ;; (defun my-consult-ripgrep-or-line ()
+  ;;   "Call `consult-line' for small buffers or `consult-ripgrep' for large files."
+  ;;   (interactive)
+  ;;   (if (or (not buffer-file-name)
+  ;;           (buffer-narrowed-p)
+  ;;           (ignore-errors
+  ;;             (file-remote-p buffer-file-name))
+  ;;           (jka-compr-get-compression-info buffer-file-name)
+  ;;           (<= (buffer-size)
+  ;;               (/ my-consult-ripgrep-or-line-limit
+  ;;                  (if (eq major-mode 'org-mode) 4 1))))
+  ;;       (consult-line)
+  ;;     (consult-ripgrep-one-file)))
 #+end_src
 *** search other cwd
 #+begin_src elisp
