@@ -235,6 +235,10 @@ I use borg to manage packages, so setup.el is only used to config packages quick
   (setup compat)
   (setup closql)
   (setup emacsql)
+
+  (setup sqlite3)
+  (setup emacsql-sqlite-builtin)
+  (setq epkg-database-connector 'sqlite-builtin)
   (setup epkg)
 #+end_src
 ** setup
