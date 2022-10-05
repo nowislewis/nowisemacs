@@ -156,6 +156,7 @@ I feel in love denote, preview org-roam configs are refiled in [[file:useful-too
 #+end_src
 ** basic modes
 #+begin_src elisp
+;; -*- lexical-binding: t; -*-
   ;; basic modes
   (setq use-short-answers t)
   (setq confirm-kill-emacs 'y-or-n-p)
@@ -179,7 +180,6 @@ I feel in love denote, preview org-roam configs are refiled in [[file:useful-too
 #+end_src
 ** generic
 #+begin_src elisp
-  ;; -*- lexical-binding: t; -*-
   (add-to-list 'load-path (expand-file-name "lib/borg" user-emacs-directory))
   (require 'borg)
   (setq borg-rewrite-urls-alist
