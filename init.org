@@ -103,7 +103,6 @@ I feel in love denote, preview org-roam configs are refiled in [[file:useful-too
   - [[#org-remark][org-remark]]
   - [[#clue][clue]]
   - [[#org-transclusion][org-transclusion]]
-  - [[#emacs-plantuml][emacs-plantuml]]
   - [[#org-mind-map][org-mind-map]]
   - [[#agendagtd][agenda/gtd]]
 - [[#翻译][翻译]]
@@ -291,9 +290,9 @@ I use borg to manage packages, so setup.el is only used to config packages quick
   (setup closql)
   (setup emacsql)
 
-  (setup sqlite3)
-  (setup emacsql-sqlite-builtin)
-  (setq epkg-database-connector 'sqlite-builtin)
+  ;; (setup sqlite3)
+  ;; (setup emacsql-sqlite-builtin)
+  ;; (setq epkg-database-connector 'sqlite-builtin)
   (setup epkg)
 #+end_src
 * gcmh
@@ -2252,22 +2251,6 @@ Connecting clues while reading code.
 ** org-transclusion
 #+begin_src elisp
   (setup org-transclusion)
-#+end_src
-** emacs-plantuml
-#+begin_src elisp
-  (setup plantuml
-    (:option plantuml-jar-path org-plantuml-jar-path
-             plantuml-output-type "jpg"
-             plantuml-relative-path (concat nowisemacs-doc-other-files-dir ".temp_images/")
-             plantuml-theme "plain"
-             ;; plantuml-font "somefont"
-             plantuml-add-index-number t
-             plantuml-log-command t
-             plantuml-mindmap-contains-org-content nil
-             plantuml-org-headline-bold t)
-    (:autoload plantuml-org-to-wbs-open
-               plantuml-org-to-mindmap-open)
-    )
 #+end_src
 ** org-mind-map
 #+begin_src elisp

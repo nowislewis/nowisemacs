@@ -137,10 +137,6 @@
     no-byte-compile = emacsql-pg.el
 	path = lib/emacsql
 	url = https://github.com/skeeto/emacsql.git
-[submodule "emacsql-sqlite-builtin"]
-    no-byte-compile = emacsql-sqlite-module.el
-	path = lib/emacsql-sqlite-builtin
-	url = https://github.com/emacscollective/emacsql-sqlite-builtin.git
 [submodule "embark"]
 	path = lib/embark
 	url = https://github.com/oantolin/embark.git
@@ -260,9 +256,6 @@
 [submodule "pdf-tools"]
 	path = lib/pdf-tools
 	url = https://github.com/vedang/pdf-tools.git
-[submodule "plantuml"]
-	path = lib/plantuml
-	url = https://github.com/ginqi7/plantuml-emacs.git
 [submodule "plantuml-mode"]
 	path = lib/plantuml-mode
 	url = https://github.com/skuro/plantuml-mode.git
