@@ -218,9 +218,6 @@
 [submodule "meow"]
 	path = lib/meow
 	url = https://github.com/meow-edit/meow.git
-[submodule "mixed-pitch"]
-	path = lib/mixed-pitch
-	url = https://github.com/emacsmirror/mixed-pitch.git
 [submodule "no-littering"]
 	path = lib/no-littering
 	url = https://github.com/emacscollective/no-littering.git
@@ -254,9 +251,6 @@
 [submodule "org-present"]
 	path = lib/org-present
 	url = https://github.com/rlister/org-present.git
-[submodule "org-remark"]
-	path = lib/org-remark
-	url = https://github.com/nobiot/org-remark
 [submodule "org-transclusion"]
 	path = lib/org-transclusion
 	url = https://github.com/nobiot/org-transclusion

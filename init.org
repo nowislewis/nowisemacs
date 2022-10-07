@@ -174,9 +174,6 @@ I feel in love denote, preview org-roam configs are refiled in [[file:useful-too
 
   ;; (setq frame-resize-pixelwise t) ;设置缩放的模式,避免Mac平台最大化窗口以后右边和下边有空隙
   ;; (set-frame-parameter nil 'fullscreen 'maximized)
-
-  (savehist-mode)
-
 #+end_src
 ** generic
 #+begin_src elisp
@@ -714,6 +711,7 @@ I used to be a vim(evil) user, but now I use meow to manage all my keys.
     (cl-loop for font in '(
                            ;; "InconsolataGo QiHei NF"
                            ;; "yaheiInconsolata"
+                           ;; "Maple Mono"
                            "JetBrainsMono Nerd Font"
                            "JetBrains Mono"
                            "Sarasa Mono SC Nerd"
@@ -725,9 +723,9 @@ I used to be a vim(evil) user, but now I use meow to manage all my keys.
                       (set-face-attribute 'fixed-pitch nil :family font :height 1.0)))
 
     ;; variable-pitch
-    (cl-loop for font in '("Noto Sans CJK SC" "Arial" "Helvetica" "Times New Roman")
-             when (font-installed-p font)
-             return (set-face-attribute 'variable-pitch nil :family font :height 1.0))
+    ;; (cl-loop for font in '("Noto Sans CJK SC" "Arial" "Helvetica" "Times New Roman")
+    ;;          when (font-installed-p font)
+    ;;          return (set-face-attribute 'variable-pitch nil :family font :height 1.0))
 
     ;; Specify font for all unicode characters
     ;; (cl-loop for font in '("Symbola" "Symbol")
@@ -735,13 +733,13 @@ I used to be a vim(evil) user, but now I use meow to manage all my keys.
     ;;          return(set-fontset-font t 'unicode font nil 'prepend))
 
     ;; ;; Specify font for Chinese characters
-    ;; (cl-loop for font in '("Noto Sans CJK SC" "Microsoft Yahei")
-    ;;          when (font-installed-p font)
-    ;;          return (set-fontset-font t '(#x4e00 . #x9fff) font))
+    (cl-loop for font in '("Noto Sans CJK SC" "Sarasa Mono SC Nerd" "Microsoft Yahei")
+             when (font-installed-p font)
+             return (set-fontset-font t '(#x4e00 . #x9fff) font))
     )
 #+end_src
 ** variable-pitch  and cn-en-fixed-pitch faces
-#+begin_src elisp
+#+begin_src elisp :tangle no
   (setup mixed-pitch
     (:hook-into text-mode)
     (:when-loaded
@@ -779,14 +777,6 @@ Modus-themes is great especailly for org mode
   ;;            modus-themes-subtle-line-numbers t)
   ;;   ;; (load-theme 'modus-vivendi))
   ;;   (load-theme 'modus-operandi))
-#+end_src
-*** doom-themes
-#+begin_src elisp :tangle no
-  (setup doom-themes
-    ;; (load-theme 'doom-monokai-classic t)
-    (:when-loaded
-      (doom-themes-visual-bell-config)
-      (doom-themes-org-config)))
 #+end_src
 *** ef-themes
 #+begin_src elisp
@@ -1122,20 +1112,6 @@ diff-hl-mode highlights uncommitted changes on the left side of the window (area
                    "--with-filename "
                    (shell-quote-argument buffer-file-name))))
       (consult-ripgrep)))
-
-  ;; (defun my-consult-ripgrep-or-line ()
-  ;;   "Call `consult-line' for small buffers or `consult-ripgrep' for large files."
-  ;;   (interactive)
-  ;;   (if (or (not buffer-file-name)
-  ;;           (buffer-narrowed-p)
-  ;;           (ignore-errors
-  ;;             (file-remote-p buffer-file-name))
-  ;;           (jka-compr-get-compression-info buffer-file-name)
-  ;;           (<= (buffer-size)
-  ;;               (/ my-consult-ripgrep-or-line-limit
-  ;;                  (if (eq major-mode 'org-mode) 4 1))))
-  ;;       (consult-line)
-  ;;     (consult-ripgrep-one-file)))
 #+end_src
 *** search other cwd
 #+begin_src elisp
@@ -1526,6 +1502,11 @@ borrowed from citre, now you can always jump-back use "M-,"
 #+end_src
 * File and Browsing
 ** file browsing
+*** dired
+#+begin_src elisp
+  (setup dired
+    (:option dired-dwim-target t))
+#+end_src
 *** diredfl
 #+begin_src elisp
   (setup diredfl
@@ -2246,7 +2227,7 @@ eglot client leveraging LTEX Language Server.
 
 ** org-remark
 Highlight and annotate any text file with using Org mode.
-#+begin_src elisp
+#+begin_src elisp :tangle no
   (setup org-remark
     (require 'org-remark-global-tracking)
     (org-remark-global-tracking-mode +1)
