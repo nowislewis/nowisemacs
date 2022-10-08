@@ -1957,8 +1957,8 @@ eglot client leveraging LTEX Language Server.
 #+begin_src elisp
   (setup org
     (setq org-directory nowisemacs-doc-org-mode-dir)
-    (:option org-adapt-indentation t
-             org-startup-indented t
+    (:option org-adapt-indentation nil
+             org-startup-indented nil
              org-hide-emphasis-markers t
              org-imenu-depth 5
              org-return-follows-link t
@@ -2090,7 +2090,8 @@ eglot client leveraging LTEX Language Server.
 #+end_src
 ** org-clock
 *** org-pomodoro
-#+begin_src elisp :tangle no
+#+begin_src elisp
+  (setup alert)
   (setup org-pomodoro
     (:option org-pomodoro-finished-sound "~/Documents/emacs/other-files/applaud.wav"))
 #+end_src

@@ -4,6 +4,9 @@
 [submodule "aggressive-indent"]
 	path = lib/aggressive-indent
 	url = https://github.com/Malabarba/aggressive-indent-mode.git
+[submodule "alert"]
+	path = lib/alert
+	url = https://github.com/jwiegley/alert.git
 [submodule "all-the-icons"]
 	path = lib/all-the-icons
 	url = https://github.com/domtronn/all-the-icons.el.git
@@ -244,6 +247,9 @@
 [submodule "org-noter"]
 	path = lib/org-noter
 	url = https://github.com/weirdNox/org-noter.git
+[submodule "org-pomodoro"]
+	path = lib/org-pomodoro
+	url = https://github.com/marcinkoziej/org-pomodoro.git
 [submodule "org-present"]
 	path = lib/org-present
 	url = https://github.com/rlister/org-present.git
