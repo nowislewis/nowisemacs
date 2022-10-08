@@ -253,6 +253,9 @@
 [submodule "org-present"]
 	path = lib/org-present
 	url = https://github.com/rlister/org-present.git
+[submodule "org-remark"]
+	path = lib/org-remark
+	url = https://github.com/nobiot/org-remark
 [submodule "org-transclusion"]
 	path = lib/org-transclusion
 	url = https://github.com/nobiot/org-transclusion

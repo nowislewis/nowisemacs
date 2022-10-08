@@ -2227,15 +2227,16 @@ eglot client leveraging LTEX Language Server.
 
 ** org-remark
 Highlight and annotate any text file with using Org mode.
-#+begin_src elisp :tangle no
+#+begin_src elisp
   (setup org-remark
-    (require 'org-remark-global-tracking)
-    (org-remark-global-tracking-mode +1)
     (:bind "C-c n m o" #'org-remark-open
            "C-c n m ]" #'org-remark-view-next
            "C-c n m [" #'org-remark-view-prev
            "C-c n m d" #'org-remark-remove)
-
+    (:defer
+     (require 'org-remark-global-tracking)
+     (org-remark-global-tracking-mode +1)
+     )
     (:when-loaded
       (defun my/function ()
         (concat (concat nowisemacs-doc-org-mode-dir "/org-remark/")
@@ -2256,7 +2257,7 @@ Connecting clues while reading code.
 ** org-mind-map
 #+begin_src elisp
   (setup org-mind-map
-    (:require ox-org)
+    (:load-after ox-org)
     (:when-loaded
       (setq org-mind-map-engine "dot")       ; Default. Directed Graph
       ;; (setq org-mind-map-engine "neato")  ; Undirected Spring Graph
