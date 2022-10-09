@@ -310,6 +310,9 @@
 [submodule "shrink-path"]
 	path = lib/shrink-path
 	url = https://gitlab.com/bennya/shrink-path.el.git
+[submodule "sis"]
+	path = lib/sis
+	url = https://github.com/laishulu/emacs-smart-input-source.git
 [submodule "super-save"]
 	path = lib/super-save
 	url = https://github.com/bbatsov/super-save.git

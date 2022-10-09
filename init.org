@@ -65,6 +65,7 @@ I feel in love denote, preview org-roam configs are refiled in [[file:useful-too
   - [[#ibuffer-1][ibuffer]]
 - [[#input][Input]]
   - [[#pyim][pyim]]
+  - [[#sis][sis]]
 - [[#file-and-browsing][File and Browsing]]
   - [[#file-browsing][file browsing]]
   - [[#structure-browsing][structure browsing]]
@@ -1499,12 +1500,20 @@ borrowed from citre, now you can always jump-back use "M-,"
        (require 'pyim))
       (setq default-input-method "pyim"))
 #+end_src
+** sis
+#+begin_src elisp
+  (setup sis
+    (:if-system 'windows-nt)
+    (sis-ism-lazyman-config nil t 'w32)
+    )
+#+end_src
 * File and Browsing
 ** file browsing
 *** dired
 #+begin_src elisp
   (setup dired
     (:option dired-dwim-target t)
+    (:hook dired-hide-details-mode)
     (:when-loaded
       (defcustom prot-eshell-output-buffer "*Exported Eshell output*"
         "Name of buffer with the last output of Eshell command.
@@ -1548,8 +1557,8 @@ borrowed from citre, now you can always jump-back use "M-,"
     #+end_src
 *** diredfl
 #+begin_src elisp
-  (setup diredfl
-    (:hook-into dired-mode))
+  ;; (setup diredfl
+  ;;   (:hook-into dired-mode))
 #+end_src
 *** dirvish
 Dirvish is a minimalistic file manager based on Dired. It's fast
