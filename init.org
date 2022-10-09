@@ -1504,8 +1504,48 @@ borrowed from citre, now you can always jump-back use "M-,"
 *** dired
 #+begin_src elisp
   (setup dired
-    (:option dired-dwim-target t))
-#+end_src
+    (:option dired-dwim-target t)
+    (:when-loaded
+      (defcustom prot-eshell-output-buffer "*Exported Eshell output*"
+        "Name of buffer with the last output of Eshell command.
+  Used by `prot-eshell-export'."
+        :type 'string
+        :group 'prot-eshell)
+
+      (defcustom prot-eshell-output-delimiter "* * *"
+        "Delimiter for successive `prot-eshell-export' outputs.
+  This is formatted internally to have newline characters before
+  and after it."
+        :type 'string
+        :group 'prot-eshell)
+
+      (defun prot-eshell--command-prompt-output ()
+        "Capture last command prompt and its output."
+        (let ((beg (save-excursion
+                     (goto-char (eshell-beginning-of-input))
+                     (goto-char (point-at-bol)))))
+          (when (derived-mode-p 'eshell-mode)
+            (buffer-substring-no-properties beg (eshell-end-of-output)))))
+
+  ;;;###autoload
+      (defun prot-eshell-export ()
+        "Produce a buffer with output of the last Eshell command.
+  If `prot-eshell-output-buffer' does not exist, create it.  Else
+  append to it, while separating multiple outputs with
+  `prot-eshell-output-delimiter'."
+        (interactive)
+        (let ((eshell-output (prot-eshell--command-prompt-output)))
+          (with-current-buffer (get-buffer-create prot-eshell-output-buffer)
+            (let ((inhibit-read-only t))
+              (goto-char (point-max))
+              (unless (eq (point-min) (point-max))
+                (insert (format "\n%s\n\n" prot-eshell-output-delimiter)))
+              (goto-char (point-at-bol))
+              (insert eshell-output)
+              (switch-to-buffer-other-window (current-buffer))))))
+      )
+    )
+    #+end_src
 *** diredfl
 #+begin_src elisp
   (setup diredfl
@@ -2179,7 +2219,8 @@ eglot client leveraging LTEX Language Server.
   (setup denote
     (:option denote-directory (expand-file-name nowisemacs-doc-org-mode-dir)
              denote-dired-directories (list denote-directory
-                                            (thread-last denote-directory (expand-file-name "attachments"))))
+                                            (thread-last denote-directory (expand-file-name "attachments")))
+             denote-date-prompt-use-org-read-date t)
     (add-hook 'dired-mode-hook #'denote-dired-mode-in-directories))
 #+end_src
 ** find orgmode dir files
