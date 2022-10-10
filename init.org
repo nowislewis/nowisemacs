@@ -525,36 +525,6 @@ I used to be a vim(evil) user, but now I use meow to manage all my keys.
       ("b" "backlinks" denote-link-backlinks)]
      ])
 #+end_src
-*** Apps-keybindings
-#+begin_src elisp
-  (transient-define-prefix leader-map-for-apps()
-    "Define leader-key map for special functions"
-    [["Agenda"
-      ("a" "org-agenda" org-agenda)
-      ("c" "org-capture" org-capture)]
-     ["Gif-screencast"
-      ("gs" "gif-screen-start-or-stop" gif-screencast-start-or-stop)
-      ("gp" "gif-screen-pause" gif-screencast-toggle-pause)
-      ]
-     ["App-launcher"
-      ("l" "launcher" app-launcher-run-app)]
-     ["Vterm-toggle"
-      ("vt" "vterm-toggle" vterm-toggle)
-      ("vf" "vterm-toggle-forward" vterm-toggle-forward)
-      ("vb" "vterm-toggle-backward" vterm-toggle-backward)
-      ("i" "vterm-toggle-insert-cd" vterm-toggle-insert-cd)
-      ]
-     ["OJ"
-      ("op" "oj-prepare" oj-prepare)
-      ("ot" "oj-test" oj-test)
-      ("oh" "oj-open-home-dir" oj-open-home-dir)]
-     ["Org draw"
-      ("e" "org-excalidraw-create-drawing" org-excalidraw-create-drawing)
-      ("E" "org-excalidraw-initialize" org-excalidraw-initialize)
-      ("w" "plantuml-org-to-wbs-open" plantuml-org-to-wbs-open)
-      ("m" "plantuml-org-to-mindmap-open" plantuml-org-to-mindmap-open)]
-     ])
-#+end_src
 *** buffer-keybindings
 #+begin_src elisp
   (transient-define-prefix leader-map-for-buffer()
@@ -618,9 +588,23 @@ I used to be a vim(evil) user, but now I use meow to manage all my keys.
    '("s s" . consult-line)
    '("s S" . consult-ripgrep-one-file)
    )
-  ;; appss
+  ;; apps
   (meow-leader-define-key
-   '("a" . leader-map-for-apps))
+   '("a a" . org-agenda)
+   '("a c" . org-capture)
+   '("a g s" . gif-screencast-start-or-stop)
+   '("a g p" . gif-screencast-toggle-pause)
+   '("a l" . app-launcher-run-app)
+   '("a f" . vterm-toggle-forward)
+   '("a b" . vterm-toggle-backward)
+   '("a i" . vterm-toggle-insert-cd)
+   '("a o p" . oj-prepare)
+   '("a o t" . oj-test)
+   '("a o h" . oj-open-home-dir)
+   '("a e" . org-excalidraw-create-drawing)
+   '("a E" . org-excalidraw-initialize)
+   )
+
 
   (defun find-config-file()
     (interactive)
@@ -1456,52 +1440,57 @@ borrowed from citre, now you can always jump-back use "M-,"
 * Input
 ** pyim
 #+begin_src elisp
-    (setup posframe)
-    (setup pyim-tsinghua-dict
-      (:load-after pyim-dict)
-      (:when-loaded
-        (pyim-tsinghua-dict-enable)))
-    (setup xr)
-    (setup pyim
-      (:option pyim-cloudim 'baidu
-               pyim-punctuation-translate-p '(no yes auto)
-               pyim-page-tooltip 'posframe
-               pyim-page-length 5
-               pyim-dcache-backend 'pyim-dregcache)
-      (:when-loaded
-        (require 'popup nil t)
-        (require 'pyim-dregcache)
-        (require 'pyim-cregexp-utils)
-        (require 'pyim-cstring-utils)
-        (set-default 'pyim-punctuation-half-width-functions
-                     '(pyim-probe-punctuation-line-beginning pyim-probe-punctuation-after-punctuation))
-        ;; pyim-default-scheme 'xiaohe-shuangpin
-        (pyim-default-scheme 'quanpin)
-        (pyim-isearch-mode 1)
+  (setup posframe)
+  (setup pyim-tsinghua-dict
+    (:load-after pyim-dict)
+    (:when-loaded
+      (pyim-tsinghua-dict-enable)))
+  (setup pyim-greatdict
+    (:load-after pyim-dict)
+    (:when-loaded
+      ;; (pyim-greatdict-enable)
+      ))
+  (setup xr)
+  (setup pyim
+    (:option pyim-cloudim 'baidu
+             pyim-punctuation-translate-p '(no yes auto)
+             pyim-page-tooltip 'posframe
+             pyim-page-length 5
+             pyim-dcache-backend 'pyim-dregcache)
+    (:when-loaded
+      (require 'popup nil t)
+      (require 'pyim-dregcache)
+      (require 'pyim-cregexp-utils)
+      (require 'pyim-cstring-utils)
+      (set-default 'pyim-punctuation-half-width-functions
+                   '(pyim-probe-punctuation-line-beginning pyim-probe-punctuation-after-punctuation))
+      ;; pyim-default-scheme 'xiaohe-shuangpin
+      (pyim-default-scheme 'quanpin)
+      (pyim-isearch-mode 1)
 
-        (defalias 'pyim-probe-meow-normal-mode #'(lambda nil
-                                                   (meow-normal-mode-p)))
-        (set-default 'pyim-english-input-switch-functions '(pyim-probe-auto-english
-                                                            pyim-probe-isearch-mode
-                                                            pyim-probe-program-mode
-                                                            pyim-probe-org-structure-template
-                                                            pyim-probe-org-latex-mode
-                                                            pyim-probe-meow-normal-mode))
-        (defalias 'my-orderless-regexp
-          #'(lambda
-              (orig_func component)
-              (let
-                  ((result
-                    (funcall orig_func component)))
-                (pyim-cregexp-build result))))
-        (advice-add 'orderless-regexp :around #'my-orderless-regexp)
-        )
-      (:defer
-       (require 'pyim))
-      (setq default-input-method "pyim"))
+      (defalias 'pyim-probe-meow-normal-mode #'(lambda nil
+                                                 (meow-normal-mode-p)))
+      (set-default 'pyim-english-input-switch-functions '(pyim-probe-auto-english
+                                                          pyim-probe-isearch-mode
+                                                          pyim-probe-program-mode
+                                                          pyim-probe-org-structure-template
+                                                          pyim-probe-org-latex-mode
+                                                          pyim-probe-meow-normal-mode))
+      (defalias 'my-orderless-regexp
+        #'(lambda
+            (orig_func component)
+            (let
+                ((result
+                  (funcall orig_func component)))
+              (pyim-cregexp-build result))))
+      (advice-add 'orderless-regexp :around #'my-orderless-regexp)
+      )
+    (:defer
+     (require 'pyim))
+    (setq default-input-method "pyim"))
 #+end_src
 ** sis
-#+begin_src elisp
+#+begin_src elisp :tangle no
   (setup sis
     (:if-system 'windows-nt)
     (sis-ism-lazyman-config nil t 'w32)

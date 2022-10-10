@@ -283,6 +283,9 @@
 [submodule "pyim"]
 	path = lib/pyim
 	url = https://github.com/tumashu/pyim.git
+[submodule "pyim-greatdict"]
+	path = lib/pyim-greatdict
+	url = https://github.com/tumashu/pyim-greatdict.git
 [submodule "pyim-tsinghua-dict"]
 	path = lib/pyim-tsinghua-dict
 	url = https://github.com/redguardtoo/pyim-tsinghua-dict.git
@@ -310,9 +313,6 @@
 [submodule "shrink-path"]
 	path = lib/shrink-path
 	url = https://gitlab.com/bennya/shrink-path.el.git
-[submodule "sis"]
-	path = lib/sis
-	url = https://github.com/laishulu/emacs-smart-input-source.git
 [submodule "super-save"]
 	path = lib/super-save
 	url = https://github.com/bbatsov/super-save.git
