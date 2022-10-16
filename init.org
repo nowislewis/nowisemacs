@@ -1790,11 +1790,16 @@ Emacs major-mode to work with Beancount ledger files
       (with-eval-after-load 'exec-path-from-shell
         (exec-path-from-shell-copy-env "PYTHONPATH"))
       ))
-#+end_src
+#+end_src()
 *** scheme
 #+begin_src elisp :tangle no
   (setup geiser)
   (setup geiser-guile)
+#+end_src
+*** common lisp slime
+#+begin_src elisp
+  (setup slime
+    (:option inferior-lisp-program "sbcl"))
 #+end_src
 *** cc-mode
 #+begin_src emacs-lisp

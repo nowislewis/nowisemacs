@@ -312,6 +312,9 @@
 [submodule "shrink-path"]
 	path = lib/shrink-path
 	url = https://gitlab.com/bennya/shrink-path.el.git
+[submodule "slime"]
+	path = lib/slime
+	url = https://github.com/slime/slime.git
 [submodule "super-save"]
 	path = lib/super-save
 	url = https://github.com/bbatsov/super-save.git
