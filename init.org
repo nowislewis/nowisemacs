@@ -2140,7 +2140,13 @@ eglot client leveraging LTEX Language Server.
              org-noter-auto-save-last-location t
              org-noter-separate-notes-from-heading nil
              org-noter-hide-other nil
-             org-noter-doc-split-percentage '(0.6 . 0.4)))
+             org-noter-doc-split-percentage '(0.6 . 0.4))
+    (:when-loaded
+      (require 'org-noter-pdf)
+      (require 'org-noter-nov)
+      (require 'org-noter-dynamic-block)
+      (require 'org-noter-nov-overlay)
+      ))
 #+end_src
 ** org-pdftools
 #+begin_src elisp :tangle no

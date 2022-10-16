@@ -246,7 +246,10 @@
 	url = https://github.com/minad/org-modern.git
 [submodule "org-noter"]
 	path = lib/org-noter
-	url = https://github.com/weirdNox/org-noter.git
+	url = https://github.com/c1-g/org-noter-plus-djvu.git
+    load-path = .
+    load-path = modules
+    load-path = other
 [submodule "org-pomodoro"]
 	path = lib/org-pomodoro
 	url = https://github.com/marcinkoziej/org-pomodoro.git
