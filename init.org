@@ -97,6 +97,7 @@ I feel in love denote, preview org-roam configs are refiled in [[file:useful-too
   - [[#toc-org][toc-org]]
   - [[#ebib][ebib]]
   - [[#denote][denote]]
+  - [[#denote-citar][denote-citar]]
   - [[#find-orgmode-dir-files][find orgmode dir files]]
   - [[#org-excalidraw][org-excalidraw]]
   - [[#org-ql][org-ql]]
@@ -603,6 +604,7 @@ I used to be a vim(evil) user, but now I use meow to manage all my keys.
    '("a o h" . oj-open-home-dir)
    '("a e" . org-excalidraw-create-drawing)
    '("a E" . org-excalidraw-initialize)
+   '("a t" . org-pomodoro)
    )
 
 
@@ -934,7 +936,10 @@ diff-hl-mode highlights uncommitted changes on the left side of the window (area
              ;; show cwd when `shell-command' and `async-shell-command'
              shell-command-prompt-show-cwd t
              ;; show the name of character in `what-cursor-position'
-             what-cursor-show-names t))
+             what-cursor-show-names t)
+    (:defer
+     (global-visual-line-mode)
+     ))
 #+end_src
 ** general modes
 #+begin_src elisp
@@ -953,8 +958,8 @@ diff-hl-mode highlights uncommitted changes on the left side of the window (area
 
   (setup pixel-scroll
     (:defer
-     (pixel-scroll-precision-mode t)))
   ;; 最近发现和 pdf-view-mode 工作不协调
+     (pixel-scroll-precision-mode t)))
   (setup repeat
     (:defer (repeat-mode)))
 #+end_src
@@ -999,7 +1004,6 @@ diff-hl-mode highlights uncommitted changes on the left side of the window (area
   (setq fill-column 100)          ;默认显示 100列就换行
   (setq word-wrap t)
   (setq word-wrap-by-category t)
-  (global-visual-line-mode)
   ;; (add-hook 'org-mode-hook 'turn-on-auto-fill)
 #+end_src
 ** so-long
@@ -1007,7 +1011,8 @@ diff-hl-mode highlights uncommitted changes on the left side of the window (area
 #+begin_src elisp
   (setup so-long
     (:defer
-     (global-so-long-mode 1)))
+     (global-so-long-mode 1)
+     ))
 #+end_src
 ** TRAMP
 #+begin_src elisp
@@ -1790,7 +1795,7 @@ Emacs major-mode to work with Beancount ledger files
       (with-eval-after-load 'exec-path-from-shell
         (exec-path-from-shell-copy-env "PYTHONPATH"))
       ))
-#+end_src()
+#+end_src
 *** scheme
 #+begin_src elisp :tangle no
   (setup geiser)
@@ -2231,6 +2236,10 @@ eglot client leveraging LTEX Language Server.
                                             (thread-last denote-directory (expand-file-name "attachments")))
              denote-date-prompt-use-org-read-date t)
     (add-hook 'dired-mode-hook #'denote-dired-mode-in-directories))
+#+end_src
+** denote-citar
+#+begin_src elisp :tangle no
+
 #+end_src
 ** find orgmode dir files
 #+begin_src elisp
