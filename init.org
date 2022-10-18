@@ -328,8 +328,8 @@ I used to be a vim(evil) user, but now I use meow to manage all my keys.
     ;; motion keys
     (meow-motion-overwrite-define-key '("j" . meow-next)
                                       '("k" . meow-prev)
-                                      '("h" . meow-left)
-                                      '("l" . meow-right)
+                                      ;; '("h" . meow-left)
+                                      ;; '("l" . meow-right)
                                       '("<escape>" . ignore)
                                       '("." . repeat))
     ;; normal keys
@@ -494,9 +494,9 @@ I used to be a vim(evil) user, but now I use meow to manage all my keys.
      ["Imenu"
       ("l" "Imenu list smart toggle" imenu-list-smart-toggle)
       ("L" "Boxy imenu" boxy-imenu)]
-     ["Insert trsnlated"
-      ("ii" "name insert" insert-translated-name-insert)
-      ("ir" "name replace" insert-translated-name-replace)]
+     ;; ["Insert trsnlated"
+     ;;  ("ii" "name insert" insert-translated-name-insert)
+     ;;  ("ir" "name replace" insert-translated-name-replace)]
      ;; english help
      ["English helper"
       ("ht" "Toggle corfu english helper" toggle-corfu-english-helper)]
@@ -549,8 +549,8 @@ I used to be a vim(evil) user, but now I use meow to manage all my keys.
    ;; SPC j/k will run the original command in MOTION state.
    '("j" . "H-j")
    '("k" . "H-k")
-   '("h" . "H-h")
-   '("l" . "H-l")
+   ;; '("h" . "H-h")
+   ;; '("l" . "H-l")
    '("." . "H-.")
    ;; Use SPC (0-9) for digit arguments.
    '("1" . meow-digit-argument)
@@ -2025,8 +2025,10 @@ eglot client leveraging LTEX Language Server.
              org-src-window-setup 'split-window-below
              org-ellipsis "⤵"
              org-plantuml-jar-path plantuml-jar-path
+
+             fill-column 120
              )
-    (:hook org-num-mode)
+    ;; (:hook org-num-mode)
     (:when-loaded
       (require 'org-tempo) ;; so that <s is useful
       ;; 导出相关的设置
@@ -2104,6 +2106,7 @@ eglot client leveraging LTEX Language Server.
     (:option org-modern-list '((?+ . "➤")
                                (?- . "–")
                                (?* . "•"))
+             org-modern-star '("Ⓐ" "Ⓑ" "Ⓒ" "Ⓓ" "Ⓔ" "Ⓕ" "Ⓖ" "Ⓗ" "Ⓘ" "Ⓙ" "Ⓚ" "Ⓛ" "Ⓜ")
              org-modern-table nil)
     (:hook-into org-mode)
     (add-hook 'org-agenda-finalize-hook #'org-modern-agenda)
@@ -2152,20 +2155,49 @@ eglot client leveraging LTEX Language Server.
              org-noter-hide-other nil
              org-noter-doc-split-percentage '(0.6 . 0.4))
     (:when-loaded
+      ;; (require 'org-pdftools)
+      ;; (require 'org-noter-pdftools)
       (require 'org-noter-pdf)
       (require 'org-noter-nov)
-      (require 'org-noter-dynamic-block)
       (require 'org-noter-nov-overlay)
-      ))
+      (require 'org-noter-dynamic-block))
+      )
 #+end_src
 ** org-pdftools
 #+begin_src elisp :tangle no
+  ;; (setup org-pdftools
+  ;;   (add-hook 'org-mode-hook #'org-pdftools-setup-link))
   (setup org-noter-pdftools
-    (:option org-noter-pdftools-use-pdftools-link-location nil)
-    (:load-after org-noter)
-    (:when-loaded
-    (org-pdftools-setup-link)))
-    ;; Add a function to ensure precise note is inserted
+    ;; (:option org-noter-pdftools-use-pdftools-link-location nil)
+    (:load-after org-noter))
+  (defun org-noter-pdftools-insert-precise-note (&optional toggle-no-questions)
+    (interactive "P")
+    (org-noter--with-valid-session
+     (let ((org-noter-insert-note-no-questions (if toggle-no-questions
+                                                   (not org-noter-insert-note-no-questions)
+                                                 org-noter-insert-note-no-questions))
+           (org-pdftools-use-isearch-link t)
+           (org-pdftools-use-freepointer-annot t))
+       (org-noter-insert-note (org-noter--get-precise-info)))))
+
+  ;; fix https://github.com/weirdNox/org-noter/pull/93/commits/f8349ae7575e599f375de1be6be2d0d5de4e6cbf
+  (defun org-noter-set-start-location (&optional arg)
+    "When opening a session with this document, go to the current location.
+With a prefix ARG, remove start location."
+    (interactive "P")
+    (org-noter--with-valid-session
+     (let ((inhibit-read-only t)
+           (ast (org-noter--parse-root))
+           (location (org-noter--doc-approx-location (when (called-interactively-p 'any) 'interactive))))
+       (with-current-buffer (org-noter--session-notes-buffer session)
+         (org-with-wide-buffer
+          (goto-char (org-element-property :begin ast))
+          (if arg
+              (org-entry-delete nil org-noter-property-note-location)
+            (org-entry-put nil org-noter-property-note-location
+                           (org-noter--pretty-print-location location))))))))
+    ;; (:when-loaded
+    ;; (org-pdftools-setup-link)))
   (with-eval-after-load 'pdf-annot
     (add-hook 'pdf-annot-activate-handler-functions #'org-noter-pdftools-jump-to-note))
 #+end_src
@@ -2399,26 +2431,26 @@ I use corfu english helper instead of company-english-helper.
 * 阅读
 ** pdf-tools
 #+begin_src elisp
-    (setup tablist)
-    (setup pdf-tools
-      (:option pdf-view-use-scaling t
-               pdf-annot-list-format '((page . 3)
-                                       (type . 10)
-                                       (contents . 56)
-                                       (date . 24)))
-      (:with-map pdf-view-mode-map
-        (:bind "h" pdf-annot-add-highlight-markup-annotation
-               "[" pdf-view-scroll-down-or-previous-page
-               "]" pdf-view-scroll-up-or-next-page))
-      (pdf-loader-install)
-      (add-hook 'pdf-view-mode-hook (lambda() (linum-mode -1))))
+  (setup tablist)
+  (setup pdf-tools
+    (:option pdf-view-use-scaling t
+             pdf-annot-list-format '((page . 3)
+                                     (type . 10)
+                                     (contents . 56)
+                                     (date . 24)))
+    (:with-map pdf-view-mode-map
+      (:bind "h h" pdf-annot-add-highlight-markup-annotation
+             "[" pdf-view-scroll-down-or-previous-page
+             "]" pdf-view-scroll-up-or-next-page))
+    (pdf-loader-install))
+    ;; (add-hook 'pdf-view-mode-hook (lambda() (linum-mode -1))))
 
-    (setq TeX-view-program-selection '((output-pdf "PDF Tools"))
-          TeX-view-program-list '(("PDF Tools" TeX-pdf-tools-sync-view))
-          TeX-source-correlate-start-server t)
+  (setq TeX-view-program-selection '((output-pdf "PDF Tools"))
+        TeX-view-program-list '(("PDF Tools" TeX-pdf-tools-sync-view))
+        TeX-source-correlate-start-server t)
 
-    (add-hook 'TeX-after-compilation-finished-functions
-              #'TeX-revert-document-buffer)
+  (add-hook 'TeX-after-compilation-finished-functions
+            #'TeX-revert-document-buffer)
 #+end_src
 ** elfeed
 #+begin_src elisp
