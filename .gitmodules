@@ -124,9 +124,6 @@
 [submodule "el-themes"]
 	path = lib/el-themes
 	url = https://github.com/protesilaos/ef-themes.git
-[submodule "eldoc-box"]
-	path = lib/eldoc-box
-	url = https://github.com/casouri/eldoc-box.git
 [submodule "elfeed"]
 	path = lib/elfeed
 	url = https://github.com/skeeto/elfeed.git
@@ -189,9 +186,6 @@
 [submodule "inheritenv"]
 	path = lib/inheritenv
 	url = https://github.com/purcell/inheritenv.git
-[submodule "insert-translated-name"]
-	path = lib/insert-translated-name
-	url = https://github.com/manateelazycat/insert-translated-name.git
 [submodule "kv"]
 	path = lib/kv
 	url = https://github.com/nicferrier/emacs-kv.git
