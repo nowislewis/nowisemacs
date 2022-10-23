@@ -111,6 +111,7 @@ I feel in love denote, preview org-roam configs are refiled in [[file:useful-too
 - [[#阅读][阅读]]
   - [[#pdf-tools][pdf-tools]]
   - [[#elfeed][elfeed]]
+  - [[#efleed-org][efleed-org]]
   - [[#nov][nov]]
   - [[#darkroom][darkroom]]
 - [[#tools][tools]]
@@ -2416,19 +2417,24 @@ I use corfu english helper instead of company-english-helper.
 ** elfeed
 #+begin_src elisp
   (setup elfeed
-    (setq elfeed-feeds '("http://ruzkuku.com/all.atom"
-                         "https://karthinks.com/index.xml"
-                         "https://shom.dev/index.xml"
-                         "https://blog.benoitj.ca/posts/index.xml"
-                         "https://protesilaos.com/codelog.xml"
-                         "https://sachachua.com/blog/feed/"
-                         "https://nullprogram.com/feed/"
-                         "https://irreal.org/blog/?feed=rss2"
-                         "https://ambrevar.xyz/atom.xml"
-                         "https://guix.gnu.org/feeds/blog.atom"
-                         "https://valdyas.org/fading/feed/"
-                         "https://manateelazycat.github.io/feed.xml")))
+    (:option elfeed-feeds '("http://ruzkuku.com/all.atom"
+                            "https://karthinks.com/index.xml"
+                            "https://shom.dev/index.xml"
+                            "https://blog.benoitj.ca/posts/index.xml"
+                            "https://protesilaos.com/codelog.xml"
+                            "https://sachachua.com/blog/feed/"
+                            "https://nullprogram.com/feed/"
+                            "https://irreal.org/blog/?feed=rss2"
+                            "https://ambrevar.xyz/atom.xml"
+                            "https://guix.gnu.org/feeds/blog.atom"
+                            "https://valdyas.org/fading/feed/"
+                            "https://manateelazycat.github.io/feed.xml")
+             elfeed-show-entry-switch 'display-buffer))
   #+end_src
+** efleed-org
+#+begin_src elisp
+  (setup elfeed-org)
+#+end_src
 ** nov
 #+begin_src elisp
   (setup esxml) ;; <- (setup kv)
