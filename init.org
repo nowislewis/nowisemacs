@@ -2417,7 +2417,8 @@ I use corfu english helper instead of company-english-helper.
 ** elfeed
 #+begin_src elisp
   (setup elfeed
-    (:option elfeed-feeds '("http://ruzkuku.com/all.atom"
+    (:option
+     elfeed-feeds '("http://ruzkuku.com/all.atom"
                             "https://karthinks.com/index.xml"
                             "https://shom.dev/index.xml"
                             "https://blog.benoitj.ca/posts/index.xml"
@@ -2433,7 +2434,9 @@ I use corfu english helper instead of company-english-helper.
   #+end_src
 ** efleed-org
 #+begin_src elisp
-  (setup elfeed-org)
+  ;; (setup elfeed-org
+  ;;   (:option rmh-elfeed-org-files (list (concat nowisemacs-config-useful-tools "elfeed.org"))))
+     ;; (elfeed-org)))
 #+end_src
 ** nov
 #+begin_src elisp

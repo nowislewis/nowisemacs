@@ -1,0 +1,9 @@
+* feeds                                                              :elfeed:
+** emacs                                                               :emacs:
+*** https://sachachua.com/blog/feed/
+*** https://karthinks.com/index.xml
+*** https://protesilaos.com/codelog.xml
+*** https://sachachua.com/blog/feed/
+*** https://manateelazycat.github.io/feed.xml                            :life:
+** Guix                                                                :guix:
+*** https://guix.gnu.org/feeds/blog.atom
