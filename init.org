@@ -114,6 +114,8 @@ I feel in love denote, preview org-roam configs are refiled in [[file:useful-too
   - [[#efleed-org][efleed-org]]
   - [[#nov][nov]]
   - [[#darkroom][darkroom]]
+  - [[#markdown-mode][markdown-mode]]
+  - [[#markdown-xwidget][markdown-xwidget]]
 - [[#tools][tools]]
   - [[#xwidget][xwidget]]
   - [[#ojel-for-online-program-contest][oj.el for online program contest]]
@@ -1801,8 +1803,6 @@ Highlight symbols with keymap-enabled overlays
     (:option xref-search-program #'ripgrep)
     (:autoload xref-push-marker-stack)) ;; autoload this command for jump-back
 
-  (setup markdown-mode
-    (:file-match "\\.md\\'"))
 
   ;; (setup eldoc-box
   ;;   (add-hook 'eglot--managed-mode-hook #'eldoc-box-hover-at-point-mode t))
@@ -2452,6 +2452,18 @@ I use corfu english helper instead of company-english-helper.
 Simple distraction-free editing. I use darkroom instead of writeroom because it's more simple
 #+begin_src elisp
   (setup darkroom)
+#+end_src
+** markdown-mode
+#+begin_src elisp
+  (setup markdown-mode
+    (:file-match "\\.md\\'"))
+#+end_src
+** markdown-xwidget
+#+begin_src elisp
+  (setup ht)
+  (setup mustache)
+  (setup markdown-xwidget
+    )
 #+end_src
 * tools
 ** xwidget
