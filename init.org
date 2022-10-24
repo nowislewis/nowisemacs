@@ -2418,32 +2418,35 @@ I use corfu english helper instead of company-english-helper.
 #+begin_src elisp
   (setup elfeed
     (:option
-     elfeed-feeds '("http://ruzkuku.com/all.atom"
-                            "https://karthinks.com/index.xml"
-                            "https://shom.dev/index.xml"
-                            "https://blog.benoitj.ca/posts/index.xml"
-                            "https://protesilaos.com/codelog.xml"
-                            "https://sachachua.com/blog/feed/"
-                            "https://nullprogram.com/feed/"
-                            "https://irreal.org/blog/?feed=rss2"
-                            "https://ambrevar.xyz/atom.xml"
-                            "https://guix.gnu.org/feeds/blog.atom"
-                            "https://valdyas.org/fading/feed/"
-                            "https://manateelazycat.github.io/feed.xml")
+     ;; elfeed-feeds '("http://ruzkuku.com/all.atom"
+     ;;                        "https://karthinks.com/index.xml"
+     ;;                        "https://shom.dev/index.xml"
+     ;;                        "https://blog.benoitj.ca/posts/index.xml"
+     ;;                        "https://protesilaos.com/codelog.xml"
+     ;;                        "https://sachachua.com/blog/feed/"
+     ;;                        "https://nullprogram.com/feed/"
+     ;;                        "https://irreal.org/blog/?feed=rss2"
+     ;;                        "https://ambrevar.xyz/atom.xml"
+     ;;                        "https://guix.gnu.org/feeds/blog.atom"
+     ;;                        "https://valdyas.org/fading/feed/"
+     ;;                        "https://manateelazycat.github.io/feed.xml")
              elfeed-show-entry-switch 'display-buffer))
   #+end_src
 ** efleed-org
 #+begin_src elisp
-  ;; (setup elfeed-org
-  ;;   (:option rmh-elfeed-org-files (list (concat nowisemacs-config-useful-tools "elfeed.org"))))
-     ;; (elfeed-org)))
+  (setup elfeed-org
+    (:option rmh-elfeed-org-files (list (concat nowisemacs-config-useful-tools "elfeed.org"))))
+  (defun my-elfeed()
+    (interactive)
+    (unless (featurep 'elfeed-org)
+      (elfeed-org))
+    (elfeed))
 #+end_src
 ** nov
 #+begin_src elisp
   (setup esxml) ;; <- (setup kv)
   (setup nov
     (:file-match "\\.epub\\'"))
-
 #+end_src
 ** darkroom
 Simple distraction-free editing. I use darkroom instead of writeroom because it's more simple
