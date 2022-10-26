@@ -1968,7 +1968,7 @@ eglot client leveraging LTEX Language Server.
   (setup org
     (setq org-directory nowisemacs-doc-org-mode-dir)
     (:option org-adapt-indentation nil
-             org-startup-indented nil
+             org-startup-indented t
              org-hide-emphasis-markers t
              org-imenu-depth 5
              org-return-follows-link t
@@ -2254,13 +2254,23 @@ With a prefix ARG, remove start location."
     )
 #+end_src
 ** org-ql
-#+begin_src elisp :tangle no
+#+begin_src elisp
   (setup ts)
   (setup peg)
   (setup ht)
   (setup org-super-agenda)
   (setup ov)
   (setup org-ql)
+
+  (defun lewis-search-last-week()
+    "show any entry with a timestamp"
+    (interactive)
+    (org-ql-search (org-agenda-files)
+      '(ts :from -7 :to today)
+      :title "Recent Items"
+      :sort '(todo priority date)
+      :super-groups '((:auto-ts t)))
+    )
 #+end_src
 ** shrface
 #+begin_src elisp
