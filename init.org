@@ -289,12 +289,10 @@ The following content is not enabled yet, because I want to minimize unnecessary
 I use borg to manage packages, so setup.el is only used to config packages quickly, I write several macros in [[https://github.com/nowislewis/nowisemacs-base.git][nowisemacs-base]]. It should be noticed that if you use only a =init.el= file, all the funcs or macros defined in =init.el= can't pass native comp, so move these things that you defined yourself to a seperate repo(nowisemacs-base) will resolve this problem.
 #+begin_src elisp
   (setup compat)
-  (setup closql)
   (setup emacsql)
+  (setup closql)
 
-  ;; (setup sqlite3)
-  ;; (setup emacsql-sqlite-builtin)
-  ;; (setq epkg-database-connector 'sqlite-builtin)
+  (setq epkg-database-connector 'sqlite-builtin)
   (setup epkg)
 #+end_src
 * gcmh
