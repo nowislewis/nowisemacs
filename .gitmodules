@@ -57,7 +57,7 @@
 	url = https://github.com/minad/consult.git
 [submodule "consult-dash"]
 	path = lib/consult-dash
-	url = https://codeberg.org/ravi/consult-dash.git
+    url = https://github.com/emacsmirror/consult-dash.git
 [submodule "consult-eglot"]
 	path = lib/consult-eglot
 	url = https://github.com/mohkale/consult-eglot.git
@@ -293,7 +293,7 @@
 	url = https://github.com/buzztaiki/project-rootfile.el.git
 [submodule "pulsar"]
 	path = lib/pulsar
-	url = https://gitlab.com/protesilaos/pulsar.git
+    url = https://github.com/protesilaos/pulsar.git
 [submodule "pyim"]
 	path = lib/pyim
 	url = https://github.com/tumashu/pyim.git
