@@ -1443,8 +1443,8 @@ borrowed from citre, now you can always jump-back use "M-,"
       (require 'pyim-cstring-utils)
       (set-default 'pyim-punctuation-half-width-functions
                    '(pyim-probe-punctuation-line-beginning pyim-probe-punctuation-after-punctuation))
-      ;; pyim-default-scheme 'xiaohe-shuangpin
-      (pyim-default-scheme 'quanpin)
+      (pyim-default-scheme 'xiaohe-shuangpin)
+      ;; (pyim-default-scheme 'quanpin)
       (pyim-isearch-mode 1)
 
       (defalias 'pyim-probe-meow-normal-mode #'(lambda nil
