@@ -597,7 +597,7 @@ Maybe I should add a new state.
    '("a l" . app-launcher-run-app)
    '("a f" . vterm-toggle-forward)
    '("a b" . vterm-toggle-backward)
-   '("a i" . vterm-toggle-insert-cd)
+   '("a i" . double-vterm-toggle-insert-cd)
    '("a o p" . oj-prepare)
    '("a o t" . oj-test)
    '("a o h" . oj-open-home-dir)
@@ -1474,7 +1474,7 @@ borrowed from citre, now you can always jump-back use "M-,"
 #+begin_src elisp
   (setup dired
     (:option dired-dwim-target t)
-    (:hook dired-hide-details-mode)
+    (:hook dired-hide-details-mode dired-omit-mode)
     (:when-loaded
       (defcustom prot-eshell-output-buffer "*Exported Eshell output*"
         "Name of buffer with the last output of Eshell command.
@@ -1651,6 +1651,11 @@ Dirvish is a minimalistic file manager based on Dired. It's fast
                      (display-buffer-reuse-window display-buffer-at-bottom)
                      (reusable-frames . visible)
                      (window-height . 0.3)))
+      (defun double-vterm-toggle-insert-cd()
+        (interactive)
+        (vterm-toggle-insert-cd)
+        (vterm-toggle-insert-cd)
+        )
       )
     )
 #+end_src
