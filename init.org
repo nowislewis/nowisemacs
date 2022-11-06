@@ -123,6 +123,7 @@ I feel in love denote, preview org-roam configs are refiled in [[file:useful-too
   - [[#proxy][proxy]]
   - [[#app-launcher][app-launcher]]
   - [[#gif-screencast][gif-screencast]]
+- [[#guix-system][guix system]]
 - [[#use-single-file-to-load-configs][use single file to load configs]]
   - [[#provide][provide]]
   - [[#load-init-configel][load init-config.el]]
@@ -292,7 +293,8 @@ I use borg to manage packages, so setup.el is only used to config packages quick
   (setup emacsql)
   (setup closql)
 
-  (setq epkg-database-connector 'sqlite-builtin)
+  (when (>= emacs-major-version 29)
+    (setq epkg-database-connector 'sqlite-builtin))
   (setup epkg)
 #+end_src
 * gcmh
@@ -932,8 +934,9 @@ diff-hl-mode highlights uncommitted changes on the left side of the window (area
 
   (setup pixel-scroll
     (:defer
-  ;; 最近发现和 pdf-view-mode 工作不协调
-     (pixel-scroll-precision-mode t)))
+     ;; 最近发现和 pdf-view-mode 工作不协调
+     (when (>= emacs-major-version 29)
+       (pixel-scroll-precision-mode t))))
   (setup repeat
     (:defer (repeat-mode)))
 #+end_src
@@ -1754,7 +1757,7 @@ Emacs major-mode to work with Beancount ledger files
       ))
 #+end_src
 *** scheme
-#+begin_src elisp :tangle no
+#+begin_src elisp
   (setup geiser)
   (setup geiser-guile)
 #+end_src
@@ -2627,7 +2630,12 @@ Simple distraction-free editing. I use darkroom instead of writeroom because it'
                gif-screencast-capture-format "ppm" ;; Optional: Required to crop captured images.
                gif-screencast-scale-factor 2.0)))
 #+end_src
-
+* guix system
+#+begin_src elisp
+  (setup bui)
+  (setup magit-popup)
+  (setup guix)
+#+end_src
 * use single file to load configs
 this can avoid errors of native compilation of init.el
 ** provide

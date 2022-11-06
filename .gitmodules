@@ -34,6 +34,9 @@
 [submodule "boxy-imenu"]
 	path = lib/boxy-imenu
 	url = https://gitlab.com/tygrdev/boxy-imenu.git
+[submodule "bui"]
+	path = lib/bui
+	url = https://github.com/alezost/bui.el.git
 [submodule "cape"]
 	path = lib/cape
 	url = https://github.com/minad/cape.git
@@ -160,6 +163,12 @@
 [submodule "gcmh"]
 	path = lib/gcmh
 	url = https://github.com/emacsmirror/gcmh.git
+[submodule "geiser"]
+	path = lib/geiser
+	url = https://gitlab.com/emacs-geiser/geiser.git
+[submodule "geiser-guile"]
+	path = lib/geiser-guile
+	url = https://gitlab.com/emacs-geiser/guile.git
 [submodule "gif-screencast"]
 	path = lib/gif-screencast
 	url = https://gitlab.com/Ambrevar/emacs-gif-screencast.git
@@ -173,6 +182,9 @@
 	path = lib/graphviz-dot-mode
 	url = https://github.com/ppareit/graphviz-dot-mode.git
     no-byte-compile = company-graphviz-dot.el
+[submodule "guix"]
+	path = lib/guix
+	url = https://github.com/alezost/guix.el.git
 [submodule "helpful"]
 	path = lib/helpful
 	url = https://github.com/Wilfred/helpful.git
@@ -200,6 +212,9 @@
 [submodule "magit"]
 	path = lib/magit
 	url = https://github.com/magit/magit.git
+[submodule "magit-popup"]
+	path = lib/magit-popup
+	url = https://github.com/magit/magit-popup.git
 [submodule "marginalia"]
 	path = lib/marginalia
 	url = https://github.com/minad/marginalia.git
