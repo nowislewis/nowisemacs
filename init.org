@@ -1099,6 +1099,17 @@ diff-hl-mode highlights uncommitted changes on the left side of the window (area
     )
   (setup consult-dash)
     #+end_src
+*** consult-notes
+#+begin_src elisp
+  (setup consult-notes
+    (:option consult-notes-sources
+             '(("Xnotes"             ?x "~/Documents/emacs/orgmode/xnotes")
+               ("Papers"      ?p "~/Documents/emacs/orgmode/papers")))
+    (:when-loaded
+      (consult-customize consult-notes :sort t))
+    )
+
+#+end_src
 ** Marginalia
 #+begin_src elisp
   (setup epkg-marginalia)
@@ -1844,7 +1855,7 @@ Highlight symbols with keymap-enabled overlays
       (:bind [remap xref-find-apropos] #'consult-eglot-symbols)))
 #+end_src
 ***** lsp-bridge
-#+begin_src elisp :tangle no
+#+begin_src elisp
   (setup lsp-bridge
     (:option lsp-bridge-enable-signature-help t
              lsp-bridge-org-babel-lang-list '("python" "C++" "elisp")

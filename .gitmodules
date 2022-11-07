@@ -64,6 +64,9 @@
 [submodule "consult-eglot"]
 	path = lib/consult-eglot
 	url = https://github.com/mohkale/consult-eglot.git
+[submodule "consult-notes"]
+	path = lib/consult-notes
+	url = https://github.com/mclear-tools/consult-notes.git
 [submodule "consult-yasnippet"]
 	path = lib/consult-yasnippet
 	url = https://github.com/mohkale/consult-yasnippet.git
@@ -206,6 +209,13 @@
 [submodule "language-id"]
 	path = lib/language-id
 	url = https://github.com/lassik/emacs-language-id.git
+[submodule "lsp-bridge"]
+	path = lib/lsp-bridge
+	url = https://github.com/manateelazycat/lsp-bridge.git
+    load-path = .
+    load-path = acm
+    no-byte-compile = acm/acm-backend-tempel.el
+    no-byte-compile = acm/acm-backend-telega.el
 [submodule "lua-mode"]
 	path = lib/lua-mode
 	url = https://github.com/immerrr/lua-mode.git
