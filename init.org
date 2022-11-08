@@ -1449,7 +1449,8 @@ borrowed from citre, now you can always jump-back use "M-,"
              pyim-punctuation-translate-p '(no yes auto)
              pyim-page-tooltip 'posframe
              pyim-page-length 5
-             pyim-dcache-backend 'pyim-dregcache)
+             pyim-dcache-backend 'pyim-dregcache
+             pyim-dcache-directory (concat nowisemacs-doc-other-files-dir "pyim/dcache/"))
     (:when-loaded
       (require 'popup nil t)
       (require 'pyim-dregcache)
@@ -1855,7 +1856,7 @@ Highlight symbols with keymap-enabled overlays
       (:bind [remap xref-find-apropos] #'consult-eglot-symbols)))
 #+end_src
 ***** lsp-bridge
-#+begin_src elisp
+#+begin_src elisp :tangle no
   (setup lsp-bridge
     (:option lsp-bridge-enable-signature-help t
              lsp-bridge-org-babel-lang-list '("python" "C++" "elisp")
