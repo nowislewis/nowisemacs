@@ -621,6 +621,7 @@ Maybe I should add a new state.
   ;; notes
   (meow-leader-define-key
    '("n r f" . project-find-orgmode-dir-files)
+   '("n r c" . consult-notes)
    '("n r g" . project-find-gtd-dir-files)
 
    '("n e" . org-noter)
@@ -1024,7 +1025,7 @@ diff-hl-mode highlights uncommitted changes on the left side of the window (area
     (:option vertico-cycle t)
     (:with-map vertico-map
       (:bind [backspace] vertico-directory-delete-char))
-     (vertico-mode)
+    (vertico-mode)
     )
 #+end_src
 ** Orderless
@@ -1095,8 +1096,7 @@ diff-hl-mode highlights uncommitted changes on the left side of the window (area
 #+begin_src elisp
   (setup dash-docs
     (:option dash-docs-docsets-path (concat no-littering-var-directory "dash-docsets")
-             dash-docs-common-docsets '("C++"))
-    )
+             dash-docs-common-docsets '("C++")))
   (setup consult-dash)
     #+end_src
 *** consult-notes
@@ -1104,12 +1104,16 @@ diff-hl-mode highlights uncommitted changes on the left side of the window (area
   (setup consult-notes
     (:option consult-notes-sources
              '(("Xnotes"             ?x "~/Documents/emacs/orgmode/xnotes")
-               ("Papers"      ?p "~/Documents/emacs/orgmode/papers")))
-    (:when-loaded
-      (consult-customize consult-notes :sort t))
+               ("Papers"      ?p "~/Documents/emacs/orgmode/papers"))
+             consult-notes-denote-display-id nil
+             )
+    (:defer
+     (consult-notes-denote-mode)
+     (vertico-multiform-mode)
+     (setq vertico-multiform-commands
+           '((consult-notes (vertico-sort-function . vertico-sort-alpha)))))
     )
-
-#+end_src
+             #+end_src
 ** Marginalia
 #+begin_src elisp
   (setup epkg-marginalia)
@@ -1590,6 +1594,12 @@ Dirvish is a minimalistic file manager based on Dired. It's fast
       (defun tab-bar-select-tab-5th()
         (interactive)
         (tab-bar-select-tab 5))
+      (defun tab-bar-select-tab-6th()
+        (interactive)
+        (tab-bar-select-tab 6))
+      (defun tab-bar-select-tab-7th()
+        (interactive)
+        (tab-bar-select-tab 7))
       )
     )
   (setup tab-line
@@ -1600,35 +1610,38 @@ Dirvish is a minimalistic file manager based on Dired. It's fast
 #+end_src
 ** tabspaces
 #+begin_src elisp
-  (setup tabspaces
-    (:option tabspaces-use-filtered-buffers-as-default t)
-    (:defer
-     (tabspaces-mode))
-    (:when-loaded
-      (transient-define-prefix leader-map-for-tabspaces()
-        "Define tabspaces leader-key maps"
-        [["Create or close"
-          ("s" "tabspaces-switch-or-create-workspace" tabspaces-switch-or-create-workspace)
-          ("c" "tabspaces-close-workspace" tabspaces-close-workspace)
-          ("k" "tabspaces-remove-selected-buffer" tabspaces-remove-selected-buffer)
-          ("o" "tabspaces-open-or-create-project-and-workspace" tabspaces-open-or-create-project-and-workspace)
-          ("R" "tab-bar-rename-tab" tab-bar-rename-tab)
-          ("r" "tab-bar-rename-tab-by-name" tab-bar-rename-tab-by-name)
-          ]
-         ["Switch tab bar"
-          ("n" "tab-bar-switch-to-next-tab" tab-bar-switch-to-next-tab)
-          ("p" "tab-bar-switch-to-prev-tab" tab-bar-switch-to-prev-tab)
-          ("l" "tab-bar-switch-to-last-tab" tab-bar-switch-to-last-tab)
-          ("r" "tab-bar-switch-to-recent-tab" tab-bar-switch-to-recent-tab)]
-         ["Switch tab bar by index"
-          ("1" "tab-bar-select-tab-1st" tab-bar-select-tab-1st)
-          ("2" "tab-bar-select-tab-2nd" tab-bar-select-tab-2nd)
-          ("3" "tab-bar-select-tab-3rd" tab-bar-select-tab-3rd)
-          ("4" "tab-bar-select-tab-4th" tab-bar-select-tab-4th)
-          ("5" "tab-bar-select-tab-5th" tab-bar-select-tab-5th)]
-         ]
-        )
-      ))
+      (setup tabspaces
+        (:option tabspaces-use-filtered-buffers-as-default t)
+        (:defer
+         (tabspaces-mode))
+        (:when-loaded
+          (transient-define-prefix leader-map-for-tabspaces()
+            "Define tabspaces leader-key maps"
+            [["Create or close"
+              ("s" "tabspaces-switch-or-create-workspace" tabspaces-switch-or-create-workspace)
+              ("c" "tabspaces-close-workspace" tabspaces-close-workspace)
+              ("k" "tabspaces-remove-selected-buffer" tabspaces-remove-selected-buffer)
+              ("o" "tabspaces-open-or-create-project-and-workspace" tabspaces-open-or-create-project-and-workspace)
+              ("R" "tab-bar-rename-tab" tab-bar-rename-tab)
+              ("r" "tab-bar-rename-tab-by-name" tab-bar-rename-tab-by-name)
+              ]
+             ["Switch tab bar"
+              ("n" "tab-bar-switch-to-next-tab" tab-bar-switch-to-next-tab)
+              ("p" "tab-bar-switch-to-prev-tab" tab-bar-switch-to-prev-tab)
+              ("l" "tab-bar-switch-to-last-tab" tab-bar-switch-to-last-tab)
+              ]
+             ["Switch tab bar by index"
+              ("1" "tab-bar-select-tab-1st" tab-bar-select-tab-1st)
+              ("2" "tab-bar-select-tab-2nd" tab-bar-select-tab-2nd)
+              ("3" "tab-bar-select-tab-3rd" tab-bar-select-tab-3rd)
+              ("4" "tab-bar-select-tab-4th" tab-bar-select-tab-4th)
+              ("5" "tab-bar-select-tab-5th" tab-bar-select-tab-5th)
+              ("5" "tab-bar-select-tab-6th" tab-bar-select-tab-6th)
+              ("5" "tab-bar-select-tab-7th" tab-bar-select-tab-7th)
+              ]
+             ]
+            )
+          ))
     #+end_src
 ** project
 #+begin_src elisp
