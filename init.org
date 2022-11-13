@@ -587,6 +587,7 @@ Maybe I should add a new state.
    '("s g" . rg)
    '("s h" . consult-history)
    '("s i" . consult-imenu)
+   '("s l" . consult-keep-lines)
    '("s s" . consult-line)
    '("s S" . consult-ripgrep-one-file)
    )
@@ -620,7 +621,9 @@ Maybe I should add a new state.
 
   ;; notes
   (meow-leader-define-key
-   '("n r f" . project-find-orgmode-dir-files)
+   '("n r f" . project-find-xnotes-dir-files)
+   '("n r p" . project-find-papers-dir-files)
+   '("n r o" . project-find-orgmode-dir-files)
    '("n r c" . consult-notes)
    '("n r g" . project-find-gtd-dir-files)
 
@@ -1026,6 +1029,12 @@ diff-hl-mode highlights uncommitted changes on the left side of the window (area
     (:with-map vertico-map
       (:bind [backspace] vertico-directory-delete-char))
     (vertico-mode)
+    (:defer
+     (vertico-multiform-mode)
+     (setq vertico-multiform-commands
+           '((consult-notes (vertico-sort-function . vertico-sort-alpha))
+             (denote-subdirectory (vertico-sort-function . vertico-sort-alpha))
+             )))
     )
 #+end_src
 ** Orderless
@@ -1109,10 +1118,7 @@ diff-hl-mode highlights uncommitted changes on the left side of the window (area
              )
     (:defer
      (consult-notes-denote-mode)
-     (vertico-multiform-mode)
-     (setq vertico-multiform-commands
-           '((consult-notes (vertico-sort-function . vertico-sort-alpha)))))
-    )
+    ))
              #+end_src
 ** Marginalia
 #+begin_src elisp
@@ -1285,36 +1291,6 @@ should be check after reading the embark.el manual
   (setup yasnippet
     (:option yas-snippet-dirs (list (concat nowisemacs-config-useful-tools "snippets")))
     (:defer (yas-global-mode))
-    (:when-loaded
-      (defun json-to-yas-map-keys (key value)
-        (pcase key
-          ("prefix" (insert
-                     (concat "# key: " value "\n")))
-          ("body"
-           (insert "# --\n")
-           (mapcar (lambda (x) (insert x) (insert "\n")) value))))
-
-      (defun json-to-yas-map (hash)
-        (let ((output-directory (read-directory-name "Select snippets output directory: "
-                                                     (when (boundp 'snippet-directory)
-                                                       (expand-file-name snippet-directory)))))
-          (unless (directory-name-p output-directory)
-            (make-directory output-directory t))
-          (maphash (lambda (key value)
-                     (with-temp-file (concat (file-name-as-directory output-directory)
-                                             (string-replace " " "_"
-                                                             (downcase key)))
-                       (insert "# -*- mode: snippet -*-\n")
-                       (insert "# name: " key "\n")
-                       (maphash (lambda (key value) (json-to-yas-map-keys key value)) value)))
-                   hash)))
-
-      (defun json-to-yas ()
-        (interactive)
-        (goto-char (point-min))
-        (json-to-yas-map
-         (json-parse-buffer :array-type 'list)))
-      )
     )
   (setup consult-yasnippet)
 #+end_src
@@ -1636,8 +1612,8 @@ Dirvish is a minimalistic file manager based on Dired. It's fast
               ("3" "tab-bar-select-tab-3rd" tab-bar-select-tab-3rd)
               ("4" "tab-bar-select-tab-4th" tab-bar-select-tab-4th)
               ("5" "tab-bar-select-tab-5th" tab-bar-select-tab-5th)
-              ("5" "tab-bar-select-tab-6th" tab-bar-select-tab-6th)
-              ("5" "tab-bar-select-tab-7th" tab-bar-select-tab-7th)
+              ("6" "tab-bar-select-tab-6th" tab-bar-select-tab-6th)
+              ("7" "tab-bar-select-tab-7th" tab-bar-select-tab-7th)
               ]
              ]
             )
@@ -1844,22 +1820,12 @@ Highlight symbols with keymap-enabled overlays
              eglot-workspace-configuration '((:python.analysis :useLibraryCodeForTypes t)))
     (:autoload eglot-find-implementation)
     (:when-loaded
-      (set-face-attribute 'eglot-highlight-symbol-face nil :background "#b3d7ff")
+      (set-face-attribute 'eglot-highlight-symbol-face nil :background "#227700")
     ))
   (setup eldoc
     (:option eldoc-echo-area-use-multiline-p t
-             eldoc-echo-area-display-truncation-message nil))
+             eldoc-echo-area-display-truncation-message t))
   ;; (setq eldoc-echo-area-prefer-doc-buffer nil)
-
-
-  ;; :hook (eglot-managed-mode . my/eglot-hook)
-  ;;   (defun my/eglot-hook ()
-  ;;     ;; Show flymake diagnostics first.
-  ;;     ;; https://github.com/joaotavora/eglot/discussions/898#discussioncomment-2609402
-  ;;     (setq eldoc-documentation-functions
-  ;;           (cons #'flymake-eldoc-function
-  ;;                 (remove #'flymake-eldoc-function eldoc-documentation-functions))))
-
 #+end_src
 ***** consult-eglot
 #+begin_src elisp
@@ -1871,7 +1837,8 @@ Highlight symbols with keymap-enabled overlays
 ***** lsp-bridge
 #+begin_src elisp :tangle no
   (setup lsp-bridge
-    (:option lsp-bridge-enable-signature-help t
+    (:option
+     ;; lsp-bridge-enable-signature-help t
              lsp-bridge-org-babel-lang-list '("python" "C++" "elisp")
              ;; acm-candidate-match-function 'orderless-regexp
              )
@@ -2260,8 +2227,49 @@ With a prefix ARG, remove start location."
              denote-dired-directories (list denote-directory
                                             (thread-last denote-directory (expand-file-name "attachments")))
              denote-date-prompt-use-org-read-date t)
-    (add-hook 'dired-mode-hook #'denote-dired-mode-in-directories))
+    (add-hook 'dired-mode-hook #'denote-dired-mode-in-directories)
+    (:when-loaded
+      (setq denote-faces--file-name-regexp (concat "\\(?8:[[:alnum:][:nonascii:]/]*\\)?"
+                                                   "\\(?1:[0-9]\\{8\\}\\)\\(?2:T[0-9]\\{6\\}\\)"
+                                                    "\\(?:\\(?3:--\\)\\(?4:[[:alnum:][:nonascii:]-]*\\)\\)?"
+                                                    "\\(?:\\(?5:__\\)\\(?6:[[:alnum:][:nonascii:]_-]*\\)\\)?"
+                                                    "\\(?7:\\..*\\)?$"))
+
+      (setq denote-faces-file-name-keywords `((,(concat " " denote-faces--file-name-regexp)
+                                               (1 'denote-faces-delimiter nil t)
+                                               (2 'denote-faces-delimiter nil t)
+                                               (3 'denote-faces-delimiter nil t)
+                                               (4 'denote-faces-title nil t)
+                                               (5 'denote-faces-delimiter nil t)
+                                               (6 'denote-faces-keywords nil t)
+                                               (7 'denote-faces-extension nil t )
+                                               (8 'denote-faces-time)
+                                               ;; (9 'denote-faces-delimiter nil t)
+                                               )))
+      )
+    )
+
+  (defun denote-rename-file-using-dired()
+    (interactive nil dired-mode)
+    (if-let ((marks (dired-get-marked-files)))
+        (progn
+          (dolist (file marks)
+            (let* ((dir (file-name-directory file))
+                   (id (denote-retrieve-or-create-file-identifier file))
+                   (file-type (denote-filetype-heuristics file))
+                   (title (denote-retrieve-filename-title file))
+                   (keywords (denote-retrieve-keywords-value file 'org))
+                   (extension (file-name-extension file t))
+                   (new-name (denote-format-file-name
+                              dir id keywords (denote-sluggify title) extension)))
+              (denote-rename-file-and-buffer file new-name)
+              (denote-update-dired-buffers)
+              (when (denote-file-is-writable-and-supported-p new-name)
+                (if (denote--edit-front-matter-p new-name file-type)
+                    (denote--rewrite-front-matter new-name title keywords file-type)
+                  (denote--add-front-matter new-name title keywords id file-type))))))))
 #+end_src
+
 ** denote-citar
 #+begin_src elisp :tangle no
 
@@ -2271,6 +2279,14 @@ With a prefix ARG, remove start location."
   (defun project-find-orgmode-dir-files ()
     (interactive)
     (dired nowisemacs-doc-org-mode-dir)
+    (project-find-file t))
+  (defun project-find-xnotes-dir-files ()
+    (interactive)
+    (dired (concat nowisemacs-doc-org-mode-dir "/xnotes"))
+    (project-find-file t))
+  (defun project-find-papers-dir-files ()
+    (interactive)
+    (dired (concat nowisemacs-doc-org-mode-dir "/papers"))
     (project-find-file t))
   (defun project-find-gtd-dir-files ()
     (interactive)

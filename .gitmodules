@@ -160,6 +160,9 @@
 [submodule "f"]
 	path = lib/f
 	url = https://github.com/rejeep/f.el.git
+[submodule "fd-dired"]
+	path = lib/fd-dired
+	url = https://github.com/yqrashawn/fd-dired.git
 [submodule "format-all"]
 	path = lib/format-all
 	url = https://github.com/lassik/emacs-format-all-the-code.git
