@@ -1291,8 +1291,7 @@ should be check after reading the embark.el manual
   (setup yasnippet
     (:option yas-snippet-dirs (list (concat nowisemacs-config-useful-tools "snippets")))
     (:defer (yas-global-mode))
-    )
-  (setup consult-yasnippet)
+   )
 #+end_src
 ** consult-yasnippet
 #+begin_src elisp
@@ -1300,7 +1299,7 @@ should be check after reading the embark.el manual
     (:global "C-M-i" consult-yasnippet))
 #+end_src
 ** tempel
-#+begin_src elisp
+#+begin_src elisp :tangle no
   (setup tempel
     (:option tempel-path "~/.emacs.d/useful-tools/tempel-snippets"
              tempel-trigger-prefix "<")
@@ -1955,11 +1954,6 @@ eglot client leveraging LTEX Language Server.
            [("w" "gud-watch" gud-watch)]
            ])))
 #+end_src
-*** aggresive
-#+begin_src elisp
-  (setup aggresive-indent
-    (:defer (global-aggressive-indent-mode)))
-#+end_src
 * Org Mode
 ** org-mode
 #+begin_src elisp
@@ -2225,7 +2219,7 @@ With a prefix ARG, remove start location."
   (setup denote
     (:option denote-directory (expand-file-name nowisemacs-doc-org-mode-dir)
              denote-dired-directories (list denote-directory
-                                            (thread-last denote-directory (expand-file-name "attachments")))
+                                            (thread-last denote-directory (expand-file-name "xnotes")))
              denote-date-prompt-use-org-read-date t)
     (add-hook 'dired-mode-hook #'denote-dired-mode-in-directories)
     (:when-loaded

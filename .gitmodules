@@ -1,9 +1,6 @@
 [submodule "ace-window"]
 	path = lib/ace-window
 	url = https://github.com/abo-abo/ace-window.git
-[submodule "aggressive-indent"]
-	path = lib/aggressive-indent
-	url = https://github.com/Malabarba/aggressive-indent-mode.git
 [submodule "alert"]
 	path = lib/alert
 	url = https://github.com/jwiegley/alert.git
@@ -367,9 +364,6 @@
 [submodule "tabspaces"]
 	path = lib/tabspaces
 	url = https://github.com/mclear-tools/tabspaces.git
-[submodule "tempel"]
-	path = lib/tempel
-	url = https://github.com/minad/tempel.git
 [submodule "toc-org"]
 	path = lib/toc-org
 	url = https://github.com/snosov1/toc-org.git
