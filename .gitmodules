@@ -27,7 +27,7 @@
 	url = https://github.com/emacscollective/borg.git
 [submodule "boxy"]
 	path = lib/boxy
-	url = https://gitlab.com/tygrdev/boxy.git
+	url = https://github.com/emacsmirror/boxy.git
 [submodule "boxy-imenu"]
 	path = lib/boxy-imenu
 	url = https://gitlab.com/tygrdev/boxy-imenu.git
@@ -61,18 +61,11 @@
 [submodule "consult-eglot"]
 	path = lib/consult-eglot
 	url = https://github.com/mohkale/consult-eglot.git
-[submodule "consult-notes"]
-	path = lib/consult-notes
-	url = https://github.com/mclear-tools/consult-notes.git
-[submodule "consult-yasnippet"]
-	path = lib/consult-yasnippet
-	url = https://github.com/mohkale/consult-yasnippet.git
 [submodule "corfu"]
 	path = lib/corfu
 	url = https://github.com/minad/corfu.git
-[submodule "corfu-doc"]
-	path = lib/corfu-doc
-	url = https://github.com/galeo/corfu-doc.git
+    load-path = .
+    load-path = extensions
 [submodule "corfu-english-helper"]
 	path = lib/corfu-english-helper
 	url = https://github.com/manateelazycat/corfu-english-helper.git
@@ -168,13 +161,13 @@
 	url = https://github.com/emacsmirror/gcmh.git
 [submodule "geiser"]
 	path = lib/geiser
-	url = https://gitlab.com/emacs-geiser/geiser.git
+	url = https://github.com/emacsmirror/geiser.git
 [submodule "geiser-guile"]
 	path = lib/geiser-guile
-	url = https://gitlab.com/emacs-geiser/guile.git
+	url = https://github.com/emacsmirror/geiser-guile.git
 [submodule "gif-screencast"]
 	path = lib/gif-screencast
-	url = https://gitlab.com/Ambrevar/emacs-gif-screencast.git
+	url = https://github.com/emacsmirror/gif-screencast.git
 [submodule "go-translate"]
 	path = lib/go-translate
 	url = https://github.com/lorniu/go-translate.git

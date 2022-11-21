@@ -88,13 +88,11 @@ I feel in love denote, preview org-roam configs are refiled in [[file:useful-too
   - [[#ox-hugo][ox-hugo]]
   - [[#org-clock][org-clock]]
   - [[#org-noter][org-noter]]
-  - [[#org-pdftools][org-pdftools]]
   - [[#org-present][org-present]]
   - [[#citar][citar]]
   - [[#toc-org][toc-org]]
   - [[#ebib][ebib]]
   - [[#denote][denote]]
-  - [[#denote-citar][denote-citar]]
   - [[#find-orgmode-dir-files][find orgmode dir files]]
   - [[#org-excalidraw][org-excalidraw]]
   - [[#org-ql][org-ql]]
@@ -756,19 +754,6 @@ Not enabled, now use mixed-pitch
     (set-face-attribute fixed-chinese-english-face nil :family lewis-fixed-ch-en-font :height 1.0))
 #+end_src
 ** Theme
-*** modus
-Modus-themes is great especailly for org mode
-#+begin_src elisp
-  ;; (setup modus-themes
-  ;;   (:option modus-themes-org-blocks 'tinted-background
-  ;;            ;; modus-themes-mode-line '(3d)
-  ;;            modus-themes-mode-line '(3d accented)
-  ;;            modus-themes-hl-line '(intense accented)
-  ;;            modus-themes-paren-match '(intense bold underline)
-  ;;            modus-themes-subtle-line-numbers t)
-  ;;   ;; (load-theme 'modus-vivendi))
-  ;;   (load-theme 'modus-operandi))
-#+end_src
 *** ef-themes
 #+begin_src elisp
   (setup ef-themes)
@@ -1109,7 +1094,7 @@ diff-hl-mode highlights uncommitted changes on the left side of the window (area
   (setup consult-dash)
     #+end_src
 *** consult-notes
-#+begin_src elisp
+#+begin_src elisp :tangle no
   (setup consult-notes
     (:option consult-notes-sources
              '(("Xnotes"             ?x "~/Documents/emacs/orgmode/xnotes")
@@ -1162,6 +1147,7 @@ should be check after reading the embark.el manual
        ;; [tab] corfu-next
        ;;       [backtab] corfu-previous
        "<escape>" corfu-quit))
+    (:hook corfu-popupinfo-mode)
     (:defer
      (global-corfu-mode)
      (add-hook 'minibuffer-setup-hook #'corfu-enable-always-in-minibuffer 1)
@@ -1182,9 +1168,6 @@ should be check after reading the embark.el manual
     ;; (add-to-list 'completion-at-point-functions #'cape-keyword)
     )
 
-  ;; Enable Corfu completion UI
-  (setup corfu-doc
-    (:hook-into corfu-mode))
 #+end_src
 ** corfu-all-the-icons
 #+begin_src elisp
@@ -1294,7 +1277,7 @@ should be check after reading the embark.el manual
    )
 #+end_src
 ** consult-yasnippet
-#+begin_src elisp
+#+begin_src elisp :tangle no
   (setup consult-yasnippet
     (:global "C-M-i" consult-yasnippet))
 #+end_src
@@ -1667,14 +1650,6 @@ Dirvish is a minimalistic file manager based on Dired. It's fast
 #+begin_src elisp
   (setup with-editor)
   (setup magit)
-    ;; (:hook magit-gerrit-mode))
-
-  ;; (setup magit-gerrit
-  ;;   (:option magit-gerrit-ssh-creds "dev_a@prj1.server.com"
-  ;;            magit-gerrit-remote "origin"
-  ;;            magit-gerrit-push-to "HEAD:/ref/master")
-  ;;   (:autoload magit-gerrit-mode)
-  ;;   )
 #+end_src
 ** ediff
 #+begin_src elisp
@@ -1919,14 +1894,6 @@ eglot client leveraging LTEX Language Server.
     (:autoload separedit))
 
   (define-key prog-mode-map        (kbd "C-c '") #'separedit)
-  ;; (define-key minibuffer-local-map (kbd "C-c '") #'separedit)
-  ;; (define-key help-mode-map        (kbd "C-c '") #'separedit)
-  ;; (define-key helpful-mode-map     (kbd "C-c '") #'separedit)
-
-
-  ;; feature options
-  ;; (setq separedit-preserve-string-indentation t)
-  ;; (setq separedit-write-file-when-execute-save t)
 #+end_src
 *** format-all
 #+begin_src elisp
@@ -1986,12 +1953,6 @@ eglot client leveraging LTEX Language Server.
     (:when-loaded
       (require 'org-tempo) ;; so that <s is useful
       ;; 导出相关的设置
-
-      ;; (setq org-latex-pdf-process
-      ;;       '("xelatex -interaction nonstopmode %f"
-      ;;         "bibtex %b"
-      ;;         "xelatex -interaction nonstopmode %f"
-      ;;         "xelatex -interaction nonstopmode %f"))
       (setq org-latex-pdf-process '("tectonic %f"))
       (setq org-format-latex-options (plist-put org-format-latex-options :scale 2.0)) ;; use a large preview for latex
 
@@ -2117,44 +2078,6 @@ eglot client leveraging LTEX Language Server.
       (require 'org-noter-dynamic-block))
       )
 #+end_src
-** org-pdftools
-#+begin_src elisp :tangle no
-  ;; (setup org-pdftools
-  ;;   (add-hook 'org-mode-hook #'org-pdftools-setup-link))
-  (setup org-noter-pdftools
-    ;; (:option org-noter-pdftools-use-pdftools-link-location nil)
-    (:load-after org-noter))
-  (defun org-noter-pdftools-insert-precise-note (&optional toggle-no-questions)
-    (interactive "P")
-    (org-noter--with-valid-session
-     (let ((org-noter-insert-note-no-questions (if toggle-no-questions
-                                                   (not org-noter-insert-note-no-questions)
-                                                 org-noter-insert-note-no-questions))
-           (org-pdftools-use-isearch-link t)
-           (org-pdftools-use-freepointer-annot t))
-       (org-noter-insert-note (org-noter--get-precise-info)))))
-
-  ;; fix https://github.com/weirdNox/org-noter/pull/93/commits/f8349ae7575e599f375de1be6be2d0d5de4e6cbf
-  (defun org-noter-set-start-location (&optional arg)
-    "When opening a session with this document, go to the current location.
-With a prefix ARG, remove start location."
-    (interactive "P")
-    (org-noter--with-valid-session
-     (let ((inhibit-read-only t)
-           (ast (org-noter--parse-root))
-           (location (org-noter--doc-approx-location (when (called-interactively-p 'any) 'interactive))))
-       (with-current-buffer (org-noter--session-notes-buffer session)
-         (org-with-wide-buffer
-          (goto-char (org-element-property :begin ast))
-          (if arg
-              (org-entry-delete nil org-noter-property-note-location)
-            (org-entry-put nil org-noter-property-note-location
-                           (org-noter--pretty-print-location location))))))))
-    ;; (:when-loaded
-    ;; (org-pdftools-setup-link)))
-  (with-eval-after-load 'pdf-annot
-    (add-hook 'pdf-annot-activate-handler-functions #'org-noter-pdftools-jump-to-note))
-#+end_src
 ** org-present
 #+begin_src elisp
   (setup org-present)
@@ -2213,7 +2136,6 @@ With a prefix ARG, remove start location."
       )
     )
 #+end_src
-
 ** denote
 #+begin_src elisp
   (setup denote
@@ -2264,10 +2186,6 @@ With a prefix ARG, remove start location."
                   (denote--add-front-matter new-name title keywords id file-type))))))))
 #+end_src
 
-** denote-citar
-#+begin_src elisp :tangle no
-
-#+end_src
 ** find orgmode dir files
 #+begin_src elisp
   (defun project-find-orgmode-dir-files ()
@@ -2513,8 +2431,7 @@ Simple distraction-free editing. I use darkroom instead of writeroom because it'
 #+begin_src elisp
   (setup ht)
   (setup mustache)
-  (setup markdown-xwidget
-    )
+  (setup markdown-xwidget)
 #+end_src
 * tools
 ** xwidget
