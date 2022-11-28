@@ -85,6 +85,9 @@
 [submodule "denote"]
 	path = lib/denote
 	url = https://github.com/protesilaos/denote.git
+[submodule "dictionary-overlay"]
+	path = lib/dictionary-overlay
+	url = https://github.com/ginqi7/dictionary-overlay.git
 [submodule "diff-hl"]
 	path = lib/diff-hl
 	url = https://github.com/dgutov/diff-hl.git
@@ -230,6 +233,9 @@
 [submodule "meow"]
 	path = lib/meow
 	url = https://github.com/meow-edit/meow.git
+[submodule "mixed-pitch"]
+	path = lib/mixed-pitch
+	url = https://gitlab.com/jabranham/mixed-pitch.git
 [submodule "mustache"]
 	path = lib/mustache
 	url = https://github.com/Wilfred/mustache.el.git
@@ -389,6 +395,12 @@
 [submodule "vundo"]
 	path = lib/vundo
 	url = https://github.com/casouri/vundo.git
+[submodule "websocket"]
+	path = lib/websocket
+	url = https://github.com/ahyatt/emacs-websocket.git
+[submodule "websocket-bridge"]
+	path = lib/websocket-bridge
+	url = https://github.com/ginqi7/websocket-bridge.git
 [submodule "wgrep"]
 	path = lib/wgrep
 	url = https://github.com/mhayashi1120/Emacs-wgrep.git

@@ -53,7 +53,6 @@ I feel in love denote, preview org-roam configs are refiled in [[file:useful-too
   - [[#corfuinstead-of-company][corfu(instead of company)]]
   - [[#corfu-all-the-icons][corfu-all-the-icons]]
   - [[#yasnippet][yasnippet]]
-  - [[#consult-yasnippet][consult-yasnippet]]
   - [[#tempel][tempel]]
   - [[#rgel][rg.el]]
 - [[#window-management][Window Management]]
@@ -106,6 +105,7 @@ I feel in love denote, preview org-roam configs are refiled in [[file:useful-too
   - [[#go-translate][go-translate]]
   - [[#corfu-english-helper][corfu-english-helper]]
   - [[#insert-translated-name][insert-translated-name]]
+  - [[#dictionary-overlay][dictionary-overlay]]
 - [[#阅读][阅读]]
   - [[#pdf-tools][pdf-tools]]
   - [[#elfeed][elfeed]]
@@ -1276,11 +1276,6 @@ should be check after reading the embark.el manual
     (:defer (yas-global-mode))
    )
 #+end_src
-** consult-yasnippet
-#+begin_src elisp :tangle no
-  (setup consult-yasnippet
-    (:global "C-M-i" consult-yasnippet))
-#+end_src
 ** tempel
 #+begin_src elisp :tangle no
   (setup tempel
@@ -2358,6 +2353,16 @@ I use corfu english helper instead of company-english-helper.
   (setup insert-translated-name
     (:autoload insert-translated-name-insert
       insert-translated-name-replace))
+#+end_src
+** dictionary-overlay
+#+begin_src elisp
+  (setup websocket)
+  (setup websocket-bridge)
+  (setup dictionary-overlay
+    (:when-loaded
+      (copy-face 'font-lock-keyword-face 'dictionary-overlay-unknownword)
+      (copy-face 'font-lock-comment-face 'dictionary-overlay-translation)
+      ))
 #+end_src
 * 阅读
 ** pdf-tools
