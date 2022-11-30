@@ -491,8 +491,8 @@ Maybe I should add a new state.
       ("cs" "peek-save-session" citre-peek-save-session)
       ("cl" "peek-load-session" citre-peek-load-session)]
      ["Imenu"
-      ("l" "Imenu list smart toggle" imenu-list-smart-toggle)
-      ("L" "Boxy imenu" boxy-imenu)]
+      ("l" "Imenu list smart toggle" imenu-list-smart-toggle)]
+      ;; ("L" "Boxy imenu" boxy-imenu)]
      ;; ["Insert trsnlated"
      ;;  ("ii" "name insert" insert-translated-name-insert)
      ;;  ("ir" "name replace" insert-translated-name-replace)]
