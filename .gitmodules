@@ -25,12 +25,6 @@
 [submodule "borg"]
 	path = lib/borg
 	url = https://github.com/emacscollective/borg.git
-[submodule "boxy"]
-	path = lib/boxy
-	url = https://github.com/emacsmirror/boxy.git
-[submodule "boxy-imenu"]
-	path = lib/boxy-imenu
-	url = https://gitlab.com/tygrdev/boxy-imenu.git
 [submodule "bui"]
 	path = lib/bui
 	url = https://github.com/alezost/bui.el.git
@@ -134,6 +128,7 @@
 	url = https://github.com/Wilfred/elisp-refs.git
 [submodule "emacsql"]
 	path = lib/emacsql
+    no-byte-compile = emacsql-sqlite-module.el
 	url = https://github.com/magit/emacsql.git
 [submodule "embark"]
 	path = lib/embark
@@ -205,13 +200,6 @@
 [submodule "language-id"]
 	path = lib/language-id
 	url = https://github.com/lassik/emacs-language-id.git
-[submodule "lsp-bridge"]
-	path = lib/lsp-bridge
-	url = https://github.com/manateelazycat/lsp-bridge.git
-    load-path = .
-    load-path = acm
-    no-byte-compile = acm/acm-backend-tempel.el
-    no-byte-compile = acm/acm-backend-telega.el
 [submodule "lua-mode"]
 	path = lib/lua-mode
 	url = https://github.com/immerrr/lua-mode.git
@@ -233,9 +221,6 @@
 [submodule "meow"]
 	path = lib/meow
 	url = https://github.com/meow-edit/meow.git
-[submodule "mixed-pitch"]
-	path = lib/mixed-pitch
-	url = https://gitlab.com/jabranham/mixed-pitch.git
 [submodule "mustache"]
 	path = lib/mustache
 	url = https://github.com/Wilfred/mustache.el.git
@@ -244,7 +229,7 @@
 	url = https://github.com/emacscollective/no-littering.git
 [submodule "nov"]
 	path = lib/nov
-	url = https://depp.brause.cc/nov.el.git
+    url = https://github.com/emacsmirror/nov.git
 [submodule "oj"]
 	path = lib/oj
 	url = https://github.com/conao3/oj.el.git
@@ -341,13 +326,13 @@
 	url = https://github.com/twlz0ne/separedit.el.git
 [submodule "setup"]
 	path = lib/setup
-	url = https://git.sr.ht/~pkal/setup
+    url = https://github.com/emacsmirror/setup
 [submodule "shrface"]
 	path = lib/shrface
 	url = https://github.com/chenyanming/shrface.git
 [submodule "shrink-path"]
 	path = lib/shrink-path
-	url = https://gitlab.com/bennya/shrink-path.el.git
+    url = https://github.com/emacsmirror/shrink-path
 [submodule "slime"]
 	path = lib/slime
 	url = https://github.com/slime/slime.git
