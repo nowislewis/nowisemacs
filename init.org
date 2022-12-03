@@ -21,7 +21,6 @@ I feel in love denote, preview org-roam configs are refiled in [[file:useful-too
 - [[#ui][UI]]
   - [[#font][Font]]
   - [[#variable-pitch--and-cn-en-fixed-pitch-faces][variable-pitch  and cn-en-fixed-pitch faces]]
-  - [[#variable-pitch-faces][variable-pitch faces]]
   - [[#theme][Theme]]
   - [[#line-number][line number]]
   - [[#all-the-icons][all-the-icons]]
@@ -115,7 +114,7 @@ I feel in love denote, preview org-roam configs are refiled in [[file:useful-too
   - [[#markdown-mode][markdown-mode]]
   - [[#markdown-xwidget][markdown-xwidget]]
 - [[#tools][tools]]
-  - [[#xwidget][xwidget]]
+  - [[#xwidget-and-browser][xwidget and browser]]
   - [[#ojel-for-online-program-contest][oj.el for online program contest]]
   - [[#eaf][eaf]]
   - [[#proxy][proxy]]
@@ -342,17 +341,16 @@ Maybe I should add a new state.
                             '("3" . meow-expand-3)
                             '("2" . meow-expand-2)
                             '("1" . meow-expand-1)
+
                             '("a" . meow-append)
                             '("A" . meow-append-vim)
                             '("b" . meow-back-word)
                             '("B" . meow-back-symbol)
                             '("c" . meow-change)
-                            ;; '("C" . meow-change-save)
                             '("d" . meow-kill)
                             '("e" . meow-next-word)
                             '("E" . meow-next-symbol)
                             '("f" . meow-find)
-                            ;; '("F" . meow-find-expand)
                             '("g" . g-extra-commands)
                             '("G" . meow-grab)
                             '("h" . meow-left)
@@ -366,37 +364,38 @@ Maybe I should add a new state.
                             '("l" . meow-right)
                             '("L" . meow-right-expand)
                             '("m" . consult-register-store)
-                            ;; '("M" . meow-mark-symbol)
                             '("M" . meow-block)
                             '("n" . meow-search)
-                            '("N" . meow-pop-selection)
+                            '("N" . meow-pop-selection);;
 
                             '("o" . meow-open-below)
                             '("O" . meow-open-above)
                             '("p" . meow-yank)
-                            '("P" . meow-yank-pop)
+                            '("P" . meow-yank-pop);;
                             '("q" . meow-quit)
-                            '("Q" . goto-line)
+                            '("Q" . meow-goto-line)
                             '("r" . meow-replace)
                             '("R" . meow-swap-grab)
                             '("s" . meow-line)
-                            '("S" . meow-kmacro-lines)
+                            '("S" . meow-kmacro-lines) ;;
                             '("t" . meow-till)
                             '("u" . meow-undo)
                             '("U" . vundo)
-                            '("v v" . meow-visit)
-                            '("V" . meow-kmacro-matches)
+                            '("v v" . meow-visit) ;;
+                            '("V" . meow-kmacro-matches) ;;
                             '("w" . meow-mark-word)
                             '("W" . meow-mark-symbol)
 
                             '("x" . meow-delete)
                             '("X" . meow-backward-delete)
                             '("y" . meow-save)
+                            ;; '("Y" . meow-sync-save)
                             '("z a" . hs-toggle-hiding)
                             '("z c" . hs-hide-block)
                             '("z o" . hs-show-block)
                             '("z m" . hs-hide-all)
                             '("z r" . hs-show-all)
+
                             '("v i" . meow-inner-of-thing)
                             '("v a" . meow-bounds-of-thing)
                             '("v \'" . insert-quotations)
@@ -408,12 +407,6 @@ Maybe I should add a new state.
                             '("v {" . insert-curly)
                             '("v =" . insert-equation)
 
-                            '("<escape>" . ignore)
-                            '("!" . meow-start-kmacro-or-insert-counter)
-                            '("@" . meow-end-or-call-kmacro)
-                            '("#" . symbol-overlay-put)
-                            '("^" . meow-join)
-                            '("*" . symbol-overlay-put)
                             '("-" . negative-argument)
                             ;; '("=" . format-all-region)
                             '("=" . indent-region)
@@ -425,6 +418,14 @@ Maybe I should add a new state.
                             '("'" . consult-register-load)
                             '("," . meow-reverse)
                             '("." . repeat)
+
+
+                            '("<escape>" . ignore)
+                            '("!" . meow-start-kmacro-or-insert-counter)
+                            '("@" . meow-end-or-call-kmacro)
+                            '("#" . symbol-overlay-put)
+                            '("^" . meow-join)
+                            '("*" . symbol-overlay-put)
                             '("/" . consult-line))
     (meow-global-mode 1))
 #+end_src
@@ -493,9 +494,6 @@ Maybe I should add a new state.
      ["Imenu"
       ("l" "Imenu list smart toggle" imenu-list-smart-toggle)]
       ;; ("L" "Boxy imenu" boxy-imenu)]
-     ;; ["Insert trsnlated"
-     ;;  ("ii" "name insert" insert-translated-name-insert)
-     ;;  ("ir" "name replace" insert-translated-name-replace)]
      ;; english help
      ["English helper"
       ("ht" "Toggle corfu english helper" toggle-corfu-english-helper)]
@@ -505,25 +503,6 @@ Maybe I should add a new state.
      ["Youdao"
       ("yp" "Translate posframe" my-gts-translate-posframe)
       ("yi" "Translate input" gts-do-translate)]])
-#+end_src
-*** notes-keybindings
-#+begin_src elisp :tangle no
-  (transient-define-prefix leader-map-for-notes()
-    "Define notes leader-key maps"
-    [["find notes"
-      ("rf" "find all files" project-find-orgmode-dir-files)
-      ]
-     ["New notes"
-      ("e" "open org noter" org-noter)
-      ("n" "denote" denote)
-      ("d" "date" denote-date)
-      ("t" "type" denote-type)
-      ("s" "subdirectory" denote-subdirectory)]
-     ["Link"
-      ("l" "link(add)" denote-link)
-      ("L" "add links(add)" denote-link-add-links)
-      ("b" "backlinks" denote-link-backlinks)]
-     ])
 #+end_src
 *** buffer-keybindings
 #+begin_src elisp
@@ -740,19 +719,6 @@ Maybe I should add a new state.
       (set-face-attribute fixed-chinese-english-face nil :family "Sarasa Mono SC Nerd" :height 1.0)))
 
 #+end_src
-** variable-pitch faces
-Not enabled, now use mixed-pitch
-#+begin_src elisp :tangle no
-  ;; 非等宽字体设置
-  (dolist (variable-face '(org-default))
-    (set-face-attribute variable-face nil :inherit 'variable-pitch))
-  ;; 英文等宽字体(无需中英文对齐)
-  (dolist (variable-face '(org-level-1))
-    (set-face-attribute variable-face nil :inherit 'fixed-pitch))
-  ;; 中英文等宽字体设置
-  (dolist (fixed-chinese-english-face '(org-table))
-    (set-face-attribute fixed-chinese-english-face nil :family lewis-fixed-ch-en-font :height 1.0))
-#+end_src
 ** Theme
 *** ef-themes
 #+begin_src elisp
@@ -895,12 +861,8 @@ diff-hl-mode highlights uncommitted changes on the left side of the window (area
     (:option line-number-mode t
              column-number-mode t
              size-indication-mode t
-             ;; visual-line-fringe-indicators '(nil right-curly-arrow)
-             ;; eliminate duplicates
              kill-do-not-save-duplicates t
-             ;; show cwd when `shell-command' and `async-shell-command'
              shell-command-prompt-show-cwd t
-             ;; show the name of character in `what-cursor-position'
              what-cursor-show-names t)
     (:defer
      (global-visual-line-mode)
@@ -1041,11 +1003,7 @@ diff-hl-mode highlights uncommitted changes on the left side of the window (area
                                              (when-let (project (project-current))
                                                (car (project-roots project)))))
     (:with-map minibuffer-local-map
-      (:bind "C-r" consult-history))
-    ;; (:when-loaded
-    ;;   (consult-customize consult-line :preview-key '(:debounce 0.2 any)))
-    )
-  ;; (advice-add #'completing-read-multiple :override #'consult-completing-read-multiple))
+      (:bind "C-r" consult-history)))
 #+end_src
 *** consult-ripgrep-one-file
 #+begin_src elisp
@@ -1093,18 +1051,6 @@ diff-hl-mode highlights uncommitted changes on the left side of the window (area
              dash-docs-common-docsets '("C++")))
   (setup consult-dash)
     #+end_src
-*** consult-notes
-#+begin_src elisp :tangle no
-  (setup consult-notes
-    (:option consult-notes-sources
-             '(("Xnotes"             ?x "~/Documents/emacs/orgmode/xnotes")
-               ("Papers"      ?p "~/Documents/emacs/orgmode/papers"))
-             consult-notes-denote-display-id nil
-             )
-    (:defer
-     (consult-notes-denote-mode)
-    ))
-             #+end_src
 ** Marginalia
 #+begin_src elisp
   (setup epkg-marginalia)
@@ -1270,7 +1216,6 @@ should be check after reading the embark.el manual
 #+end_src
 ** yasnippet
 #+begin_src elisp
-  ;; 0.63
   (setup yasnippet
     (:option yas-snippet-dirs (list (concat nowisemacs-config-useful-tools "snippets")))
     (:defer (yas-global-mode))
@@ -1309,7 +1254,6 @@ should be check after reading the embark.el manual
 ** popper
 Popper is a minor-mode to tame the flood of ephemeral windows Emacs produces, while still keeping them within arm’s reach.
 #+begin_src elisp
-  ;;0.67
   (setup popper
     (:option popper-reference-buffers '("\\*Messages\\*"
                                         "Output\\*$"
@@ -1349,8 +1293,7 @@ borrowed from citre, now you can always jump-back use "M-,"
                   consult-line
                   consult-find
                   find-file
-                  goto-line
-                  citre-jump
+                  meow-goto-line
                   isearch-forward))
     (advice-add func :before 'my--push-point-to-xref-marker-stack))
 #+end_src
@@ -1395,11 +1338,6 @@ borrowed from citre, now you can always jump-back use "M-,"
     (:load-after pyim-dict)
     (:when-loaded
       (pyim-tsinghua-dict-enable)))
-  ;; (setup pyim-greatdict
-  ;;   (:load-after pyim-dict)
-  ;;   (:when-loaded
-  ;;     ;; (pyim-greatdict-enable)
-  ;;     ))
   (setup xr)
   (setup pyim
     (:option pyim-cloudim 'baidu
@@ -1514,18 +1452,6 @@ Dirvish is a minimalistic file manager based on Dired. It's fast
              ))
 #+end_src
 
-*** boxy
-#+begin_src elisp :tangle no
-  (setup boxy
-    ;; (:bind "h" boxy-mode-uncycle
-    ;;        "l" boxy-mode-cycle)
-    (:hook (defun boxy-font-set ()
-             (make-local-variable 'default)
-             (set-face-attribute 'default nil :family lewis-fixed-ch-en-font :height lewis-font-size)
-             (make-local-variable 'fixed-pitch )
-             (set-face-attribute 'fixed-pitch nil :family lewis-fixed-ch-en-font :height 1.0))))
-  (setup boxy-imenu)
-#+end_src
 ** tab-line and tab-bar
 #+begin_src elisp
   (setup tab-bar
@@ -1779,9 +1705,6 @@ Highlight symbols with keymap-enabled overlays
     (:option xref-search-program #'ripgrep)
     (:autoload xref-push-marker-stack)) ;; autoload this command for jump-back
 
-
-  ;; (setup eldoc-box
-  ;;   (add-hook 'eglot--managed-mode-hook #'eldoc-box-hover-at-point-mode t))
 
   (setq read-process-output-max (* 1024 1024))
   (setup eglot
@@ -2391,20 +2314,7 @@ I use corfu english helper instead of company-english-helper.
 ** elfeed
 #+begin_src elisp
   (setup elfeed
-    (:option
-     ;; elfeed-feeds '("http://ruzkuku.com/all.atom"
-     ;;                        "https://karthinks.com/index.xml"
-     ;;                        "https://shom.dev/index.xml"
-     ;;                        "https://blog.benoitj.ca/posts/index.xml"
-     ;;                        "https://protesilaos.com/codelog.xml"
-     ;;                        "https://sachachua.com/blog/feed/"
-     ;;                        "https://nullprogram.com/feed/"
-     ;;                        "https://irreal.org/blog/?feed=rss2"
-     ;;                        "https://ambrevar.xyz/atom.xml"
-     ;;                        "https://guix.gnu.org/feeds/blog.atom"
-     ;;                        "https://valdyas.org/fading/feed/"
-     ;;                        "https://manateelazycat.github.io/feed.xml")
-             elfeed-show-entry-switch 'display-buffer))
+    (:option elfeed-show-entry-switch 'display-buffer))
   #+end_src
 ** efleed-org
 #+begin_src elisp
@@ -2439,7 +2349,7 @@ Simple distraction-free editing. I use darkroom instead of writeroom because it'
   (setup markdown-xwidget)
 #+end_src
 * tools
-** xwidget
+** xwidget and browser
 #+begin_src elisp
   (defun lewis/url-browser-new-buffer(url &optional new-session)
     (interactive (progn
@@ -2449,7 +2359,7 @@ Simple distraction-free editing. I use darkroom instead of writeroom because it'
 
   ;; now use eww
   ;; (setq browse-url-browser-function 'lewis/url-browser-new-buffer)
-  (setq browse-url-browser-function 'eww-browse-url)
+  ;; (setq browse-url-browser-function 'eww-browse-url)
 #+end_src
 ** oj.el for online program contest
 #+begin_src elisp

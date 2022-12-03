@@ -105,6 +105,9 @@
     load-path = .
     load-path = core
     load-path = extension
+[submodule "ebuku"]
+	path = lib/ebuku
+	url = https://github.com/flexibeast/ebuku
 [submodule "edit-indirect"]
 	path = lib/edit-indirect
 	url = https://github.com/Fanael/edit-indirect.git
