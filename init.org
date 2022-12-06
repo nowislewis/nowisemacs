@@ -105,6 +105,7 @@ I feel in love denote, preview org-roam configs are refiled in [[file:useful-too
   - [[#corfu-english-helper][corfu-english-helper]]
   - [[#insert-translated-name][insert-translated-name]]
   - [[#dictionary-overlay][dictionary-overlay]]
+  - [[#popweb][popweb]]
 - [[#阅读][阅读]]
   - [[#pdf-tools][pdf-tools]]
   - [[#elfeed][elfeed]]
@@ -1684,7 +1685,7 @@ Emacs major-mode to work with Beancount ledger files
 ** Useful programing tools
 *** UI
 **** tree-sitter
-#+begin_src elisp
+#+begin_src elisp :tangle no
   (setup tree-sitter
     (:hook-into c-mode-common python-mode)
     (:hook tree-sitter-hl-mode))
@@ -1761,7 +1762,7 @@ Citre is an advanced Ctags (or actually, readtags) frontend for Emacs.
   (setup quickrun)
 #+end_src
 *** grammatical-edit
-#+begin_src elisp
+#+begin_src elisp :tangle no
   (setup grammatical-edit
     (:bind "(" grammatical-edit-open-round
            "[" grammatical-edit-open-bracket
@@ -2252,7 +2253,7 @@ https://emacs.cafe/emacs/orgmode/gtd/2017/06/30/orgmode-gtd.html
     (:when-loaded
       (setq gts-default-translator (gts-translator
                                     :picker (gts-prompt-picker)
-                                    :engines (list (gts-google-engine))
+                                    :engines (list (gts-google-rpc-engine))
                                     :render (gts-buffer-render))))
     (defun my-gts-translate-posframe ()
       (interactive)
@@ -2286,6 +2287,19 @@ I use corfu english helper instead of company-english-helper.
       (copy-face 'font-lock-keyword-face 'dictionary-overlay-unknownword)
       (copy-face 'font-lock-comment-face 'dictionary-overlay-translation)
       ))
+#+end_src
+** popweb
+#+begin_src elisp
+  (setup popweb)
+;; LaTeX preview functionality
+(add-to-list 'load-path "<path-to-popweb>/extension/latex")
+(require 'popweb-latex)
+(add-hook 'latex-mode-hook #'popweb-latex-mode)
+
+;; Chinese-English translation popup
+(add-to-list 'load-path "<path-to-popweb>/extension/dict") ;
+(require 'popweb-dict-bing) ; Translation using Bing
+(require 'popweb-dict-youdao) ; Translation using Youdao
 #+end_src
 * 阅读
 ** pdf-tools

@@ -172,9 +172,6 @@
 [submodule "go-translate"]
 	path = lib/go-translate
 	url = https://github.com/lorniu/go-translate.git
-[submodule "grammatical-edit"]
-	path = lib/grammatical-edit
-	url = https://github.com/manateelazycat/grammatical-edit.git
 [submodule "graphviz-dot-mode"]
 	path = lib/graphviz-dot-mode
 	url = https://github.com/ppareit/graphviz-dot-mode.git
@@ -300,6 +297,13 @@
 [submodule "popper"]
 	path = lib/popper
 	url = https://github.com/karthink/popper.git
+[submodule "popweb"]
+	path = lib/popweb
+	url = https://github.com/manateelazycat/popweb.git
+    load-path = .
+    load-path = extension/dict
+    load-path = extension/latex
+    load-path = extension/url-preview
 [submodule "posframe"]
 	path = lib/posframe
 	url = https://github.com/tumashu/posframe.git
@@ -360,15 +364,6 @@
 [submodule "tomelr"]
 	path = lib/tomelr
 	url = https://github.com/kaushalmodi/tomelr.git
-[submodule "tree-sitter"]
-	path = lib/tree-sitter
-	url = https://github.com/emacs-tree-sitter/elisp-tree-sitter.git
-    load-path = core
-    load-path = lisp
-    no-byte-compile = core/tsc-dyn.dylib
-[submodule "tree-sitter-langs"]
-	path = lib/tree-sitter-langs
-	url = https://github.com/emacs-tree-sitter/tree-sitter-langs.git
 [submodule "ts"]
 	path = lib/ts
 	url = https://github.com/alphapapa/ts.el.git
