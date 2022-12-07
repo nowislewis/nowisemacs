@@ -374,7 +374,8 @@ Maybe I should add a new state.
                             '("p" . meow-yank)
                             '("P" . meow-yank-pop);;
                             '("q" . meow-quit)
-                            '("Q" . meow-goto-line)
+                            ;; '("Q" . meow-goto-line)
+                            '("Q" . consult-goto-line)
                             '("r" . meow-replace)
                             '("R" . meow-swap-grab)
                             '("s" . meow-line)

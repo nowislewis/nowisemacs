@@ -43,6 +43,9 @@
 [submodule "cmake-mode"]
 	path = lib/cmake-mode
 	url = https://github.com/emacsmirror/cmake-mode.git
+[submodule "company"]
+	path = lib/company
+	url = https://github.com/company-mode/company-mode
 [submodule "compat"]
 	path = lib/compat
 	url = https://github.com/emacs-straight/compat
