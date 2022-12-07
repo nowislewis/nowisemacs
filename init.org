@@ -2284,6 +2284,7 @@ I use corfu english helper instead of company-english-helper.
   (setup websocket)
   (setup websocket-bridge)
   (setup dictionary-overlay
+    (:autoload dictionary-overlay-toggle)
     (:when-loaded
       (copy-face 'font-lock-keyword-face 'dictionary-overlay-unknownword)
       (copy-face 'font-lock-comment-face 'dictionary-overlay-translation)
@@ -2291,16 +2292,10 @@ I use corfu english helper instead of company-english-helper.
 #+end_src
 ** popweb
 #+begin_src elisp
-  (setup popweb)
-;; LaTeX preview functionality
-(add-to-list 'load-path "<path-to-popweb>/extension/latex")
-(require 'popweb-latex)
-(add-hook 'latex-mode-hook #'popweb-latex-mode)
-
-;; Chinese-English translation popup
-(add-to-list 'load-path "<path-to-popweb>/extension/dict") ;
-(require 'popweb-dict-bing) ; Translation using Bing
-(require 'popweb-dict-youdao) ; Translation using Youdao
+    (setup popweb)
+  ;; (require 'popweb-latex)
+  ;; (add-hook 'latex-mode-hook #'popweb-latex-mode)
+  ;; (require 'popweb-dict)
 #+end_src
 * 阅读
 ** pdf-tools
