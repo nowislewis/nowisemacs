@@ -347,7 +347,7 @@ Maybe I should add a new state.
                             '("A" . meow-append-vim)
                             '("b" . meow-back-word)
                             '("B" . meow-back-symbol)
-                            '("c" . meow-change)
+                            '("c c" . meow-change)
                             '("d" . meow-kill)
                             '("e" . meow-next-word)
                             '("E" . meow-next-symbol)
@@ -468,7 +468,7 @@ Maybe I should add a new state.
       ("F" "format-all-buffer" format-all-buffer)]
      ["diagnostic"
       ("n" "jump-to-next-diagnostic" flymake-goto-next-error)
-      ("p" "jump-to-prev-diagnostic" flymake-goto-prev-error)
+      ;; ("p" "jump-to-prev-diagnostic" flymake-goto-prev-error)
       ("l" "list-diagnostics" consult-flymake)
       ]
      ["Navigate"
@@ -476,7 +476,11 @@ Maybe I should add a new state.
       ]
      ["Clue"
       ("w" "clue-copy" clue-copy)
-      ("y" "clue-paste" clue-paste)
+      ("y" "clue-yank" clue-paste)
+      ]
+     ["citre"
+      ("p" "citre-peek" citre-peek)
+      ("c" "citre-ace-peek" citre-ace-peek)
       ]
      ])
 #+end_src
@@ -801,7 +805,7 @@ rainbow-delimiters is a "rainbow parentheses"-like mode which highlights delimit
 diff-hl-mode highlights uncommitted changes on the left side of the window (area also known as the "gutter"), allows you to jump between and revert them selectively.
 #+begin_src elisp
   (setup diff-hl
-    ;; (:hook-into text-mode prog-mode)
+    (:hook-into text-mode prog-mode)
     (:when-loaded
       (diff-hl-margin-mode)))
 #+end_src
@@ -1749,7 +1753,9 @@ Citre is an advanced Ctags (or actually, readtags) frontend for Emacs.
     (:option citre-use-project-root-when-creating-tags t
              citre-prompt-language-for-ctags-command t
              ;; citre-auto-enable-citre-mode-modes '(prog-mode)
-             ))
+             )
+
+    )
 #+end_src
 **** eacl
 #+begin_src elisp
