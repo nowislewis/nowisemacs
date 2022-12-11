@@ -2513,7 +2513,14 @@ Simple distraction-free editing. I use darkroom instead of writeroom because it'
       (:option gif-screencast-args '("-x") ;; To shut up the shutter sound of `screencapture' (see `gif-screencast-command').
                gif-screencast-cropping-program "mogrify" ;; Optional: Used to crop the capture to the Emacs frame.
                gif-screencast-capture-format "ppm" ;; Optional: Required to crop captured images.
-               gif-screencast-scale-factor 2.0)))
+               gif-screencast-scale-factor 2.0))
+    (defun my/siri-ocr ()
+      (interactive)
+      (shell-command "shortcuts run \"OCR Selected Area\"")
+      (do-applescript "tell application id \"org.gnu.Emacs\" to activate")
+      )
+    (keymap-global-set "M-o" #'my/siri-ocr)
+    )
 #+end_src
 * guix system
 #+begin_src elisp

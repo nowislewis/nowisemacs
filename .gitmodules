@@ -242,6 +242,9 @@
 [submodule "org-appear"]
 	path = lib/org-appear
 	url = https://github.com/awth13/org-appear.git
+[submodule "org-contrib"]
+	path = lib/org-contrib
+	url = https://github.com/emacsmirror/org-contrib.git
 [submodule "org-download"]
 	path = lib/org-download
 	url = https://github.com/abo-abo/org-download.git
