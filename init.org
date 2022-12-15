@@ -16,7 +16,6 @@ I feel in love denote, preview org-roam configs are refiled in [[file:useful-too
   - [[#meow-commands-like-vim][meow commands like vim]]
   - [[#transient-for-leader-keybindings][transient for leader-keybindings]]
   - [[#meow-leader-keys][meow leader keys]]
-  - [[#which-key][which-key]]
   - [[#insert-pair][insert-pair]]
 - [[#ui][UI]]
   - [[#font][Font]]
@@ -52,7 +51,6 @@ I feel in love denote, preview org-roam configs are refiled in [[file:useful-too
   - [[#corfuinstead-of-company][corfu(instead of company)]]
   - [[#corfu-all-the-icons][corfu-all-the-icons]]
   - [[#yasnippet][yasnippet]]
-  - [[#tempel][tempel]]
   - [[#rgel][rg.el]]
 - [[#window-management][Window Management]]
   - [[#winner-mode][winner-mode]]
@@ -98,14 +96,11 @@ I feel in love denote, preview org-roam configs are refiled in [[file:useful-too
   - [[#org-remark][org-remark]]
   - [[#clue][clue]]
   - [[#org-transclusion][org-transclusion]]
-  - [[#org-mind-map][org-mind-map]]
   - [[#agendagtd][agenda/gtd]]
 - [[#翻译][翻译]]
   - [[#go-translate][go-translate]]
   - [[#corfu-english-helper][corfu-english-helper]]
-  - [[#insert-translated-name][insert-translated-name]]
   - [[#dictionary-overlay][dictionary-overlay]]
-  - [[#popweb][popweb]]
 - [[#阅读][阅读]]
   - [[#pdf-tools][pdf-tools]]
   - [[#elfeed][elfeed]]
@@ -116,10 +111,10 @@ I feel in love denote, preview org-roam configs are refiled in [[file:useful-too
   - [[#markdown-xwidget][markdown-xwidget]]
 - [[#tools][tools]]
   - [[#xwidget-and-browser][xwidget and browser]]
-  - [[#ojel-for-online-program-contest][oj.el for online program contest]]
   - [[#eaf][eaf]]
   - [[#proxy][proxy]]
   - [[#app-launcher][app-launcher]]
+  - [[#keyfreq][keyfreq]]
   - [[#gif-screencast][gif-screencast]]
 - [[#guix-system][guix system]]
 - [[#use-single-file-to-load-configs][use single file to load configs]]
@@ -299,8 +294,7 @@ I use borg to manage packages, so setup.el is only used to config packages quick
 Enforce a sneaky Garbage Collection strategy to minimize GC interference with user activity.
 #+begin_src elisp
   (setup gcmh
-    (:defer
-     (gcmh-mode 1)))
+     (gcmh-mode 1))
 #+end_src
 * Keyboard Bindings
 I used to be a vim(evil) user, but now I use meow to manage all my keys.
@@ -619,13 +613,6 @@ Maybe I should add a new state.
    ;;w workspace
    '("TAB". leader-map-for-tabspaces))
 #+END_SRC
-** which-key
-#+begin_src elisp
-  (setup which-key
-    (:option whick-key-idle-delay 0.1)
-    (:defer
-     (which-key-mode)))
-#+end_src
 ** insert-pair
 #+begin_src elisp
   ;; insert pairs
@@ -1227,25 +1214,6 @@ should be check after reading the embark.el manual
     (:defer (yas-global-mode))
    )
 #+end_src
-** tempel
-#+begin_src elisp :tangle no
-  (setup tempel
-    (:option tempel-path "~/.emacs.d/useful-tools/tempel-snippets"
-             tempel-trigger-prefix "<")
-    (:with-map tempel-map
-      (:bind [tab] tempel-next
-             [backtab] tempel-previous
-             ))
-    (defun tempel-setup-capf ()
-      (setq-local completion-at-point-functions
-                  (cons #'tempel-complete
-                        completion-at-point-functions)))
-
-    (add-hook 'prog-mode-hook 'tempel-setup-capf)
-    (add-hook 'text-mode-hook 'tempel-setup-capf)
-    )
-
-#+end_src
 ** rg.el
 #+begin_src elisp
   (setup rg)
@@ -1434,8 +1402,8 @@ borrowed from citre, now you can always jump-back use "M-,"
     #+end_src
 *** diredfl
 #+begin_src elisp
-  ;; (setup diredfl
-  ;;   (:hook-into dired-mode))
+  (setup diredfl
+    (:hook-into dired-mode))
 #+end_src
 *** dirvish
 Dirvish is a minimalistic file manager based on Dired. It's fast
@@ -1569,16 +1537,17 @@ Dirvish is a minimalistic file manager based on Dired. It's fast
       (defun double-vterm-toggle-insert-cd()
         (interactive)
         (vterm-toggle-insert-cd)
-        (vterm-toggle-insert-cd)
-        )
+        (vterm-toggle-insert-cd))
       )
     )
 #+end_src
 * git
 ** magit
 #+begin_src elisp
-  (setup with-editor)
-  (setup magit)
+        (setup with-editor)
+        (setup magit
+          (:defer
+           (require 'libgit))
 #+end_src
 ** ediff
 #+begin_src elisp
@@ -1704,6 +1673,12 @@ Highlight symbols with keymap-enabled overlays
   (setup symbol-overlay
     (:autoload symbol-overlay-put))
 #+end_src
+**** electric-pair
+#+begin_src elisp
+    (setup elec-pair
+      (:defer
+       (electric-pair-mode)))
+#+end_src
 *** Complete
 **** lsp mode
 ***** eglot
@@ -1734,18 +1709,6 @@ Highlight symbols with keymap-enabled overlays
     (:with-map eglot-mode-map
       (:bind [remap xref-find-apropos] #'consult-eglot-symbols)))
 #+end_src
-***** lsp-bridge
-#+begin_src elisp :tangle no
-  (setup lsp-bridge
-    (:option
-     ;; lsp-bridge-enable-signature-help t
-             lsp-bridge-org-babel-lang-list '("python" "C++" "elisp")
-             ;; acm-candidate-match-function 'orderless-regexp
-             )
-    (:bind [remap xref-find-definitions] #'lsp-bridge-find-def
-           [remap xref-find-references] #'lsp-bridge-find-references)
-    )
-#+end_src
 **** citre
 Citre is an advanced Ctags (or actually, readtags) frontend for Emacs.
 #+begin_src elisp
@@ -1770,30 +1733,6 @@ Citre is an advanced Ctags (or actually, readtags) frontend for Emacs.
 #+begin_src elisp
   (setup quickrun)
 #+end_src
-*** grammatical-edit
-#+begin_src elisp :tangle no
-  (setup grammatical-edit
-    (:bind "(" grammatical-edit-open-round
-           "[" grammatical-edit-open-bracket
-           "{" grammatical-edit-open-curly
-           ")" grammatical-edit-close-round
-           "]" grammatical-edit-close-bracket
-           "}" grammatical-edit-close-curly
-           "%" grammatical-edit-match-paren
-           "\"" grammatical-edit-double-quote
-           "'" grammatical-edit-single-quote
-           "C-k" grammatical-edit-kill
-           "M-p" grammatical-edit-jump-right
-           "M-n" grammatical-edit-jump-left)
-    (:hook-into text-mode
-                prog-mode
-                maxima-mode
-                ielm-mode
-                qml-mode
-                minibuffer-inactive-mode
-                ))
-#+end_src
-
 *** eglot-ltex
 eglot client leveraging LTEX Language Server.
 #+begin_src elisp
@@ -1821,7 +1760,7 @@ eglot client leveraging LTEX Language Server.
              separedit-remove-trailing-spaces-in-comment t)
     (:autoload separedit))
 
-  (define-key prog-mode-map        (kbd "C-c '") #'separedit)
+  (define-key prog-mode-map (kbd "C-c '") #'separedit)
 #+end_src
 *** format-all
 #+begin_src elisp
@@ -1927,7 +1866,8 @@ eglot client leveraging LTEX Language Server.
          (scheme . t)
          (plantuml . t)
          ))
-      (add-hook 'org-babel-after-execute-hook 'org-redisplay-inline-images)
+      ;; didn't redisplay for now
+      ;; (add-hook 'org-babel-after-execute-hook 'org-redisplay-inline-images)
       ;; open word
       (add-to-list 'org-file-apps '("\\.docx\\'" . default))
       (defun lewis/org-export-docx ()
@@ -2204,20 +2144,6 @@ Connecting clues while reading code.
 #+begin_src elisp
   (setup org-transclusion)
 #+end_src
-** org-mind-map
-#+begin_src elisp
-  (setup org-mind-map
-    (:load-after ox-org)
-    (:when-loaded
-      (setq org-mind-map-engine "dot")       ; Default. Directed Graph
-      ;; (setq org-mind-map-engine "neato")  ; Undirected Spring Graph
-      ;; (setq org-mind-map-engine "twopi")  ; Radial Layout
-      ;; (setq org-mind-map-engine "fdp")    ; Undirected Spring Force-Directed
-      ;; (setq org-mind-map-engine "sfdp")   ; Multiscale version of fdp for the layout of large graphs
-      ;; (setq org-mind-map-engine "twopi")  ; Radial layouts
-      ;; (setq org-mind-map-engine "circo")  ; Circular Layout
-      ))
-#+end_src
 ** agenda/gtd
 https://emacs.cafe/emacs/orgmode/gtd/2017/06/30/orgmode-gtd.html
 #+begin_src elisp
@@ -2281,12 +2207,6 @@ I use corfu english helper instead of company-english-helper.
   (setup corfu-english-helper
     (:autoload toggle-corfu-english-helper))
 #+end_src
-** insert-translated-name
-#+begin_src elisp :tangle no
-  (setup insert-translated-name
-    (:autoload insert-translated-name-insert
-      insert-translated-name-replace))
-#+end_src
 ** dictionary-overlay
 #+begin_src elisp
   (setup websocket)
@@ -2297,13 +2217,6 @@ I use corfu english helper instead of company-english-helper.
       (copy-face 'font-lock-keyword-face 'dictionary-overlay-unknownword)
       (copy-face 'font-lock-comment-face 'dictionary-overlay-translation)
       ))
-#+end_src
-** popweb
-#+begin_src elisp
-    (setup popweb)
-  ;; (require 'popweb-latex)
-  ;; (add-hook 'latex-mode-hook #'popweb-latex-mode)
-  ;; (require 'popweb-dict)
 #+end_src
 * 阅读
 ** pdf-tools
@@ -2378,11 +2291,6 @@ Simple distraction-free editing. I use darkroom instead of writeroom because it'
   ;; now use eww
   ;; (setq browse-url-browser-function 'lewis/url-browser-new-buffer)
   ;; (setq browse-url-browser-function 'eww-browse-url)
-#+end_src
-** oj.el for online program contest
-#+begin_src elisp
-  (setup oj
-    (:option oj-default-online-judge 'codeforces))
 #+end_src
 ** eaf
 #+begin_src elisp
@@ -2502,6 +2410,13 @@ Simple distraction-free editing. I use darkroom instead of writeroom because it'
 ** app-launcher
 #+begin_src elisp
 (setup app-launcher)
+#+end_src
+** keyfreq
+#+begin_src elisp
+  (setup keyfreq
+    (:defer
+     (keyfreq-mode 1)
+     (keyfreq-autosave-mode 1)))
 #+end_src
 ** gif-screencast
 #+begin_src elisp

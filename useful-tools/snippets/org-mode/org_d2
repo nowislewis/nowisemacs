@@ -1,0 +1,6 @@
+# -*- mode: snippet -*-
+# name: org_d2
+# key: d2
+# --
+#+BEGIN_SRC d2 :file ~/Documents/emacs/other-files/PicturesForAll/d2_pictures/`(format-time-string "%Y%m%d%H%M%S")`.svg
+#+END_SRC
