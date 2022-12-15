@@ -91,7 +91,6 @@ I feel in love denote, preview org-roam configs are refiled in [[file:useful-too
   - [[#denote][denote]]
   - [[#find-orgmode-dir-files][find orgmode dir files]]
   - [[#org-excalidraw][org-excalidraw]]
-  - [[#org-ql][org-ql]]
   - [[#shrface][shrface]]
   - [[#org-remark][org-remark]]
   - [[#clue][clue]]
@@ -108,7 +107,6 @@ I feel in love denote, preview org-roam configs are refiled in [[file:useful-too
   - [[#nov][nov]]
   - [[#darkroom][darkroom]]
   - [[#markdown-mode][markdown-mode]]
-  - [[#markdown-xwidget][markdown-xwidget]]
 - [[#tools][tools]]
   - [[#xwidget-and-browser][xwidget and browser]]
   - [[#eaf][eaf]]
@@ -282,13 +280,13 @@ The following content is not enabled yet, because I want to minimize unnecessary
 ** epkg
 I use borg to manage packages, so setup.el is only used to config packages quickly, I write several macros in [[https://github.com/nowislewis/nowisemacs-base.git][nowisemacs-base]]. It should be noticed that if you use only a =init.el= file, all the funcs or macros defined in =init.el= can't pass native comp, so move these things that you defined yourself to a seperate repo(nowisemacs-base) will resolve this problem.
 #+begin_src elisp
-  (setup compat)
-  (setup emacsql)
-  (setup closql)
+    (setup compat)
+    ;; (setup emacsql)
+    ;; (setup closql)
 
-  (when (>= emacs-major-version 29)
-    (setq epkg-database-connector 'sqlite-builtin))
-  (setup epkg)
+    ;; (when (>= emacs-major-version 29)
+    ;;   (setq epkg-database-connector 'sqlite-builtin))
+    ;; (setup epkg)
 #+end_src
 * gcmh
 Enforce a sneaky Garbage Collection strategy to minimize GC interference with user activity.
@@ -1731,6 +1729,7 @@ Citre is an advanced Ctags (or actually, readtags) frontend for Emacs.
 #+end_src
 *** quickrun
 #+begin_src elisp
+  (setup ht)
   (setup quickrun)
 #+end_src
 *** eglot-ltex
@@ -2080,25 +2079,6 @@ eglot client leveraging LTEX Language Server.
     (:autoload org-excalidraw-create-drawing)
     )
 #+end_src
-** org-ql
-#+begin_src elisp
-  (setup ts)
-  (setup peg)
-  (setup ht)
-  (setup org-super-agenda)
-  (setup ov)
-  (setup org-ql)
-
-  (defun lewis-search-last-week()
-    "show any entry with a timestamp"
-    (interactive)
-    (org-ql-search (org-agenda-files)
-      '(ts :from -7 :to today)
-      :title "Recent Items"
-      :sort '(todo priority date)
-      :super-groups '((:auto-ts t)))
-    )
-#+end_src
 ** shrface
 #+begin_src elisp
   (setup shrface
@@ -2272,12 +2252,6 @@ Simple distraction-free editing. I use darkroom instead of writeroom because it'
 #+begin_src elisp
   (setup markdown-mode
     (:file-match "\\.md\\'"))
-#+end_src
-** markdown-xwidget
-#+begin_src elisp
-  (setup ht)
-  (setup mustache)
-  (setup markdown-xwidget)
 #+end_src
 * tools
 ** xwidget and browser

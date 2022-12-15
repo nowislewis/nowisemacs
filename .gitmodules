@@ -31,9 +31,6 @@
 [submodule "citre"]
 	path = lib/citre
 	url = https://github.com/universal-ctags/citre.git
-[submodule "closql"]
-	path = lib/closql
-	url = https://github.com/emacscollective/closql.git
 [submodule "clue"]
 	path = lib/clue
 	url = https://github.com/AmaiKinono/clue.git
@@ -42,7 +39,7 @@
 	url = https://github.com/emacsmirror/cmake-mode.git
 [submodule "compat"]
 	path = lib/compat
-	url = https://github.com/emacs-straight/compat
+	url = https://github.com/emacsmirror/compat.git
 [submodule "consult"]
 	path = lib/consult
 	url = https://github.com/minad/consult.git
@@ -123,19 +120,9 @@
 [submodule "elisp-refs"]
 	path = lib/elisp-refs
 	url = https://github.com/Wilfred/elisp-refs.git
-[submodule "emacsql"]
-	path = lib/emacsql
-    no-byte-compile = emacsql-sqlite-module.el
-	url = https://github.com/magit/emacsql.git
 [submodule "embark"]
 	path = lib/embark
 	url = https://github.com/oantolin/embark.git
-[submodule "epkg"]
-	path = lib/epkg
-	url = https://github.com/emacscollective/epkg.git
-[submodule "epkg-marginalia"]
-	path = lib/epkg-marginalia
-	url = https://github.com/emacscollective/epkg-marginalia.git
 [submodule "esxml"]
 	path = lib/esxml
 	url = https://github.com/tali713/esxml.git
@@ -213,18 +200,12 @@
 [submodule "markdown-mode"]
 	path = lib/markdown-mode
 	url = https://github.com/jrblevin/markdown-mode.git
-[submodule "markdown-xwidget"]
-	path = lib/markdown-xwidget
-	url = https://github.com/cfclrk/markdown-xwidget.git
 [submodule "meow"]
 	path = lib/meow
 	url = https://github.com/meow-edit/meow.git
 [submodule "mixed-pitch"]
 	path = lib/mixed-pitch
 	url = https://github.com/emacsmirror/mixed-pitch.git
-[submodule "mustache"]
-	path = lib/mustache
-	url = https://github.com/Wilfred/mustache.el.git
 [submodule "no-littering"]
 	path = lib/no-littering
 	url = https://github.com/emacscollective/no-littering.git
@@ -258,31 +239,18 @@
 [submodule "org-present"]
 	path = lib/org-present
 	url = https://github.com/rlister/org-present.git
-[submodule "org-ql"]
-	path = lib/org-ql
-	url = https://github.com/alphapapa/org-ql.git
-    no-byte-compile = helm-org-ql.el
 [submodule "org-remark"]
 	path = lib/org-remark
 	url = https://github.com/nobiot/org-remark
-[submodule "org-super-agenda"]
-	path = lib/org-super-agenda
-	url = https://github.com/alphapapa/org-super-agenda.git
 [submodule "org-transclusion"]
 	path = lib/org-transclusion
 	url = https://github.com/nobiot/org-transclusion
-[submodule "ov"]
-	path = lib/ov
-	url = https://github.com/emacsorphanage/ov.git
 [submodule "ox-hugo"]
 	path = lib/ox-hugo
 	url = https://github.com/kaushalmodi/ox-hugo.git
 [submodule "pdf-tools"]
 	path = lib/pdf-tools
 	url = https://github.com/vedang/pdf-tools.git
-[submodule "peg"]
-	path = lib/peg
-	url = https://github.com/emacsmirror/peg.git
 [submodule "plantuml-mode"]
 	path = lib/plantuml-mode
 	url = https://github.com/skuro/plantuml-mode.git
@@ -349,9 +317,6 @@
 [submodule "tomelr"]
 	path = lib/tomelr
 	url = https://github.com/kaushalmodi/tomelr.git
-[submodule "ts"]
-	path = lib/ts
-	url = https://github.com/alphapapa/ts.el.git
 [submodule "vertico"]
 	path = lib/vertico
 	url = https://github.com/minad/vertico.git
