@@ -51,6 +51,7 @@ I feel in love denote, preview org-roam configs are refiled in [[file:useful-too
   - [[#corfuinstead-of-company][corfu(instead of company)]]
   - [[#corfu-all-the-icons][corfu-all-the-icons]]
   - [[#yasnippet][yasnippet]]
+  - [[#tempel][tempel]]
   - [[#rgel][rg.el]]
 - [[#window-management][Window Management]]
   - [[#winner-mode][winner-mode]]
@@ -1209,8 +1210,26 @@ should be check after reading the embark.el manual
 #+begin_src elisp
   (setup yasnippet
     (:option yas-snippet-dirs (list (concat nowisemacs-config-useful-tools "snippets")))
-    (:defer (yas-global-mode))
+    ;; (:defer (yas-global-mode))
    )
+#+end_src
+** tempel
+#+begin_src elisp
+  (setup tempel
+    (:option tempel-path "~/.emacs.d/useful-tools/tempel-snippets"
+             tempel-trigger-prefix "<")
+    (:global "M-*" tempel-insert
+             "M-+"  tempel-complete))
+    ;; (:with-map tempel-map
+    ;;   (:bind [tab]  tempel-next
+    ;;          [S-tab]  tempel-previous)))
+  ;; Setup completion at point
+  (defun tempel-setup-capf ()
+    (setq-local completion-at-point-functions
+                (cons #'tempel-complete
+                      completion-at-point-functions)))
+  (add-hook 'prog-mode-hook 'tempel-setup-capf)
+  (add-hook 'text-mode-hook 'tempel-setup-capf)
 #+end_src
 ** rg.el
 #+begin_src elisp
@@ -1542,10 +1561,10 @@ Dirvish is a minimalistic file manager based on Dired. It's fast
 * git
 ** magit
 #+begin_src elisp
-        (setup with-editor)
-        (setup magit
-          (:defer
-           (require 'libgit)))
+  (setup with-editor)
+  (setup magit
+    (:defer
+     (require 'libgit)))
 #+end_src
 ** ediff
 #+begin_src elisp

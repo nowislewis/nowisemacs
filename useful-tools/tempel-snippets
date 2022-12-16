@@ -14,3 +14,7 @@ org-mode
 ;; mode: lisp-data
 ;; outline-regexp: "[a-z]"
 ;; End:
+text-mode
+(asciibox "+-" (make-string (length str) ?-) "-+" n
+          "| " (s str)                       " |" n
+          "+-" (make-string (length str) ?-) "-+" n)
