@@ -87,6 +87,7 @@ I feel in love denote, preview org-roam configs are refiled in [[file:useful-too
   - [[#org-noter][org-noter]]
   - [[#org-present][org-present]]
   - [[#citar][citar]]
+  - [[#citar-denote][citar-denote]]
   - [[#toc-org][toc-org]]
   - [[#ebib][ebib]]
   - [[#denote][denote]]
@@ -1045,7 +1046,6 @@ diff-hl-mode highlights uncommitted changes on the left side of the window (area
     #+end_src
 ** Marginalia
 #+begin_src elisp
-  (setup epkg-marginalia)
   (setup marginalia
     (:option marginalia-annotators '(marginalia-annotators-heavy
                                      marginalia-annotators-light
@@ -1831,6 +1831,7 @@ eglot client leveraging LTEX Language Server.
              org-src-window-setup 'split-window-below
              org-ellipsis "⤵"
              org-plantuml-jar-path plantuml-jar-path
+             org-special-ctrl-a/e t
 
              fill-column 120
              )
@@ -1969,7 +1970,7 @@ eglot client leveraging LTEX Language Server.
   (setup org-present)
 #+end_src
 ** citar
-#+begin_src elisp :tangle no
+#+begin_src elisp
   (setup parsebib)
   ;; (setup citeproc) ;;<- (setup queue) (setup string-inflection)
   (setup citar
@@ -1978,6 +1979,10 @@ eglot client leveraging LTEX Language Server.
              org-cite-follow-processor 'citar
              org-cite-activate-processor 'citar
              citar-bibliography org-cite-global-bibliography))
+#+end_src
+** citar-denote
+#+begin_src elisp
+    (setup citar-denote)
 #+end_src
 ** toc-org
 #+begin_src elisp
@@ -2028,7 +2033,8 @@ eglot client leveraging LTEX Language Server.
     (:option denote-directory (expand-file-name (concat nowisemacs-doc-org-mode-dir "/xnotes"))
              denote-dired-directories (list denote-directory
                                             (thread-last denote-directory (expand-file-name "xnotes")))
-             denote-date-prompt-use-org-read-date t)
+             denote-date-prompt-use-org-read-date t
+             denote-modules '(project))
     (add-hook 'dired-mode-hook #'denote-dired-mode-in-directories)
     (:when-loaded
       (setq denote-faces--file-name-regexp (concat "\\(?8:[[:alnum:][:nonascii:]/]*\\)?"

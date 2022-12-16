@@ -28,6 +28,13 @@
 [submodule "cape"]
 	path = lib/cape
 	url = https://github.com/minad/cape.git
+[submodule "citar"]
+	path = lib/citar
+	url = https://github.com/emacs-citar/citar.git
+    no-byte-compile = citar-citeproc.el
+[submodule "citar-denote"]
+	path = lib/citar-denote
+	url = https://github.com/pprevos/citar-denote.git
 [submodule "citre"]
 	path = lib/citre
 	url = https://github.com/universal-ctags/citre.git
@@ -248,6 +255,9 @@
 [submodule "ox-hugo"]
 	path = lib/ox-hugo
 	url = https://github.com/kaushalmodi/ox-hugo.git
+[submodule "parsebib"]
+	path = lib/parsebib
+	url = https://github.com/joostkremers/parsebib.git
 [submodule "pdf-tools"]
 	path = lib/pdf-tools
 	url = https://github.com/vedang/pdf-tools.git
