@@ -279,6 +279,9 @@
 [submodule "pyim"]
 	path = lib/pyim
 	url = https://github.com/tumashu/pyim.git
+[submodule "pyim-sogou-scel-dict"]
+	path = lib/pyim-sogou-scel-dict
+	url = https://github.com/nowislewis/pyim-sogou-scel-dict.git
 [submodule "pyim-tsinghua-dict"]
 	path = lib/pyim-tsinghua-dict
 	url = https://github.com/redguardtoo/pyim-tsinghua-dict.git
