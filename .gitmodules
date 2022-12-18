@@ -228,9 +228,9 @@
 [submodule "org-download"]
 	path = lib/org-download
 	url = https://github.com/abo-abo/org-download.git
-[submodule "org-excalidraw"]
-	path = lib/org-excalidraw
-	url = https://github.com/wdavew/org-excalidraw.git
+[submodule "org-imagine"]
+	path = lib/org-imagine
+	url = https://github.com/metaescape/org-imagine.git
 [submodule "org-modern"]
 	path = lib/org-modern
 	url = https://github.com/minad/org-modern.git

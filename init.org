@@ -92,7 +92,7 @@ I feel in love denote, preview org-roam configs are refiled in [[file:useful-too
   - [[#ebib][ebib]]
   - [[#denote][denote]]
   - [[#find-orgmode-dir-files][find orgmode dir files]]
-  - [[#org-excalidraw][org-excalidraw]]
+  - [[#org-imagine-excalidraw][org-imagine, excalidraw]]
   - [[#shrface][shrface]]
   - [[#org-remark][org-remark]]
   - [[#clue][clue]]
@@ -1218,10 +1218,10 @@ should be check after reading the embark.el manual
     (:option tempel-path "~/.emacs.d/useful-tools/tempel-snippets"
              tempel-trigger-prefix "<")
     (:global "M-*" tempel-insert
-             "M-+"  tempel-complete))
-    ;; (:with-map tempel-map
-    ;;   (:bind [tab]  tempel-next
-    ;;          [S-tab]  tempel-previous)))
+             "M-+"  tempel-complete)
+    (:with-map tempel-map
+      (:bind "M-]"  tempel-next
+             "M-["  tempel-previous)))
   ;; Setup completion at point
   (defun tempel-setup-capf ()
     (setq-local completion-at-point-functions
@@ -2061,12 +2061,31 @@ eglot client leveraging LTEX Language Server.
     (dired nowisemacs-gtd-dir)
     (project-find-file t))
 #+end_src
-** org-excalidraw
+** org-imagine, excalidraw
 #+begin_src elisp
-  (setup org-excalidraw
-    (:option org-excalidraw-directory (concat nowisemacs-doc-other-files-dir "excalidraw/"))
-    (:autoload org-excalidraw-create-drawing)
-    )
+  (defun org-excalidraw--default-base ()
+    "Get default JSON template used for new excalidraw files."
+    "{
+      \"type\": \"excalidraw\",
+      \"version\": 2,
+      \"source\": \"https://excalidraw.com\",
+      \"elements\": [],
+      \"appState\": {
+        \"gridSize\": null,
+        \"viewBackgroundColor\": \"#ffffff\"
+      },
+      \"files\": {}
+    }
+  ")
+
+  (defun lewis-create-excalidraw()
+    (interactive)
+    (let* ((filename (concat (car (split-string (buffer-name) "\\.")) ".excalidraw"))
+           (path (concat nowisemacs-doc-other-files-dir "excalidraw/" filename))
+           (link (format "[[file:%s]]" path)))
+      (insert link)
+      (with-temp-file path (insert org-excalidraw-base))))
+  (setup org-imagine)
 #+end_src
 ** shrface
 #+begin_src elisp
