@@ -116,7 +116,6 @@ I feel in love denote, preview org-roam configs are refiled in [[file:useful-too
   - [[#app-launcher][app-launcher]]
   - [[#keyfreq][keyfreq]]
   - [[#gif-screencast][gif-screencast]]
-- [[#guix-system][guix system]]
 - [[#use-single-file-to-load-configs][use single file to load configs]]
   - [[#provide][provide]]
   - [[#load-init-configel][load init-config.el]]
@@ -143,7 +142,7 @@ I feel in love denote, preview org-roam configs are refiled in [[file:useful-too
   (push '(menu-bar-lines . 0) default-frame-alist)
   (push '(tool-bar-lines . 0) default-frame-alist)
   (push '(vertical-scroll-bars) default-frame-alist)
-  (push '(undecorated . t) default-frame-alist)
+  ;; (push '(undecorated . t) default-frame-alist)
   (setq initial-major-mode 'fundamental-mode ;; 默认用最简单的模式
         package--init-file-ensured t
         inhibit-startup-message t             ; 关闭启动 Emacs 时的欢迎界面
@@ -1349,8 +1348,8 @@ borrowed from citre, now you can always jump-back use "M-,"
     (require 'pyim-cstring-utils)
     (set-default 'pyim-punctuation-half-width-functions
                  '(pyim-probe-punctuation-line-beginning pyim-probe-punctuation-after-punctuation))
-    (pyim-default-scheme 'xiaohe-shuangpin)
-    ;; (pyim-default-scheme 'quanpin)
+    ;; (pyim-default-scheme 'xiaohe-shuangpin)
+    (pyim-default-scheme 'quanpin)
     (pyim-isearch-mode 1)
 
     (defalias 'pyim-probe-meow-normal-mode #'(lambda nil
@@ -1381,45 +1380,6 @@ borrowed from citre, now you can always jump-back use "M-,"
   (setup dired
     (:option dired-dwim-target t)
     (:hook dired-hide-details-mode dired-omit-mode)
-    (:when-loaded
-      (defcustom prot-eshell-output-buffer "*Exported Eshell output*"
-        "Name of buffer with the last output of Eshell command.
-  Used by `prot-eshell-export'."
-        :type 'string
-        :group 'prot-eshell)
-
-      (defcustom prot-eshell-output-delimiter "* * *"
-        "Delimiter for successive `prot-eshell-export' outputs.
-  This is formatted internally to have newline characters before
-  and after it."
-        :type 'string
-        :group 'prot-eshell)
-
-      (defun prot-eshell--command-prompt-output ()
-        "Capture last command prompt and its output."
-        (let ((beg (save-excursion
-                     (goto-char (eshell-beginning-of-input))
-                     (goto-char (point-at-bol)))))
-          (when (derived-mode-p 'eshell-mode)
-            (buffer-substring-no-properties beg (eshell-end-of-output)))))
-
-  ;;;###autoload
-      (defun prot-eshell-export ()
-        "Produce a buffer with output of the last Eshell command.
-  If `prot-eshell-output-buffer' does not exist, create it.  Else
-  append to it, while separating multiple outputs with
-  `prot-eshell-output-delimiter'."
-        (interactive)
-        (let ((eshell-output (prot-eshell--command-prompt-output)))
-          (with-current-buffer (get-buffer-create prot-eshell-output-buffer)
-            (let ((inhibit-read-only t))
-              (goto-char (point-max))
-              (unless (eq (point-min) (point-max))
-                (insert (format "\n%s\n\n" prot-eshell-output-delimiter)))
-              (goto-char (point-at-bol))
-              (insert eshell-output)
-              (switch-to-buffer-other-window (current-buffer))))))
-      )
     )
     #+end_src
 *** diredfl
@@ -1741,7 +1701,6 @@ Citre is an advanced Ctags (or actually, readtags) frontend for Emacs.
              citre-prompt-language-for-ctags-command t
              ;; citre-auto-enable-citre-mode-modes '(prog-mode)
              )
-
     )
 #+end_src
 **** eacl
@@ -2305,56 +2264,7 @@ Simple distraction-free editing. I use darkroom instead of writeroom because it'
                eaf-webengine-fixed-font-family "JetBrainsMono Nerd Font"
                eaf-config-location (concat no-littering-var-directory "eaf/")
                ;; eaf-find-alternate-file-in-dired t
-               )
-      ;; for consult preview
-      (:with-feature consult
-        (:when-loaded
-          (add-to-list 'consult-buffer-sources 'consult--source-eaf-buffer)
-          (defvar consult--source-eaf-buffer
-            `(:name     "EAF Buffer"
-                        :narrow   ?e
-                        :category buffer
-                        :face     consult-buffer
-                        :history  buffer-name-history
-                        :state    ,#'consult--buffer-state
-                        :default  t
-                        :items
-                        ,(lambda ()
-                           (mapcar #'buffer-name
-                                   (seq-filter
-                                    (lambda (x)
-                                      (eq (buffer-local-value 'major-mode x) 'eaf-mode))
-                                    (buffer-list)))))
-            "EAF candidate source for `consult-buffer'."))))
-
-    ;; for meow-leader map
-    (defcustom eaf-meow-leader-key "M-SPC"
-      "Leader key trigger" )
-
-    (defcustom eaf-meow-leader-keymap #'meow-keypad
-      "Leader key bind"
-      :type 'keymap)
-
-        ;;;###autoload
-    (defun eaf-enable-meow-intergration ()
-      "EAF evil intergration."
-      (interactive)
-      (add-hook 'meow-motion-mode-hook
-                (lambda ()
-                  ;; (when (not (derived-mode-p 'eaf-edit-mode))
-                  (when (derived-mode-p 'eaf-mode)
-                    (define-key eaf-mode-map (kbd eaf-meow-leader-key) eaf-meow-leader-keymap)
-                    ;; (setq emulation-mode-map-alists
-                    ;;       (delq 'meow-keymap-alist emulation-mode-map-alists))
-                    )))
-      ;; (add-to-list 'meow-mode-state-list '(eaf-mode . motion))
-        ;; (eaf-bind-key clear_focus "<escape>" eaf-browser-keybinding)
-  )
-
-
-    (with-eval-after-load "eaf"
-      (eaf-enable-meow-intergration)
-      (meow-motion-mode))
+               ))
 
     (setup eaf-browser
       (:autoload eaf-open-browser)
@@ -2440,12 +2350,6 @@ Simple distraction-free editing. I use darkroom instead of writeroom because it'
       )
     (keymap-global-set "M-o" #'my/siri-ocr)
     )
-#+end_src
-* guix system
-#+begin_src elisp
-  (setup bui)
-  (setup magit-popup)
-  (setup guix)
 #+end_src
 * use single file to load configs
 this can avoid errors of native compilation of init.el
