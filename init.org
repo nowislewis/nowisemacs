@@ -215,7 +215,7 @@ The following content is not enabled yet, because I want to minimize unnecessary
   (defvar nowisemacs-config-file (expand-file-name "init.org" user-emacs-directory))
   (defvar nowisemacs-config-useful-tools (expand-file-name "useful-tools/" user-emacs-directory))
   (defvar nowisemacs-doc-emacs-dir (file-truename "~/Documents/emacs/"))
-  (defvar nowisemacs-doc-other-files-dir (concat nowisemacs-doc-emacs-dir "other-files/"))
+  (defvar nowisemacs-doc-clutter-dir (concat nowisemacs-doc-emacs-dir "clutter-files/"))
   (defvar nowisemacs-doc-org-mode-dir (concat nowisemacs-doc-emacs-dir "orgmode"))
   (defvar nowisemacs-gtd-dir (concat nowisemacs-doc-org-mode-dir "/xnotes/gtd"))
 #+end_src
@@ -1289,7 +1289,7 @@ borrowed from citre, now you can always jump-back use "M-,"
 #+end_src
 *** bookmark
 #+begin_src elisp
-  (setq bookmark-default-file "~/Documents/emacs/other-files/bookmarks")
+  (setq bookmark-default-file "~/Documents/emacs/clutter-files/bookmarks")
 #+end_src
 *** ace-window
 #+begin_src elisp
@@ -1339,7 +1339,7 @@ borrowed from citre, now you can always jump-back use "M-,"
              pyim-page-tooltip 'posframe
              pyim-page-length 5
              pyim-dcache-backend 'pyim-dregcache
-             pyim-dcache-directory (concat nowisemacs-doc-other-files-dir "pyim/dcache/")
+             pyim-dcache-directory (concat nowisemacs-doc-clutter-dir "pyim/dcache/")
     )
   (:when-loaded
     (require 'popup nil t)
@@ -1889,7 +1889,7 @@ eglot client leveraging LTEX Language Server.
     (setup org-download
       (:option org-download-method 'directory
                org-download-screenshot-basename "screenshot.jpg"
-               org-download-image-dir (concat nowisemacs-doc-other-files-dir "PicturesForAll/org_download_images"))
+               org-download-image-dir (concat nowisemacs-doc-clutter-dir "PicturesForAll/org_download_images"))
       (:when-loaded
         (when (eq system-type 'gnu/linux)
           (setq-default org-download-screenshot-method "scrot -s %s"))
@@ -1910,7 +1910,7 @@ eglot client leveraging LTEX Language Server.
 #+begin_src elisp
   (setup alert)
   (setup org-pomodoro
-    (:option org-pomodoro-finished-sound "~/Documents/emacs/other-files/applaud.wav"))
+    (:option org-pomodoro-finished-sound "~/Documents/emacs/clutter-files/applaud.wav"))
 #+end_src
 ** org-noter
 #+begin_src elisp
@@ -1938,7 +1938,7 @@ eglot client leveraging LTEX Language Server.
   (setup parsebib)
   ;; (setup citeproc) ;;<- (setup queue) (setup string-inflection)
   (setup citar
-    (:option org-cite-global-bibliography '("~/Documents/emacs/orgmode/office-documents/bibliography/better_zotero_bib.bib")
+    (:option org-cite-global-bibliography '("~/Documents/emacs/orgmode/offices/bibliography/better_zotero_bib.bib")
              org-cite-insert-processor 'citar
              org-cite-follow-processor 'citar
              org-cite-activate-processor 'citar
@@ -2081,7 +2081,7 @@ eglot client leveraging LTEX Language Server.
   (defun lewis-create-excalidraw()
     (interactive)
     (let* ((filename (concat (car (split-string (buffer-name) "\\.")) ".excalidraw"))
-           (path (concat nowisemacs-doc-org-mode-dir "/office-documents/excalidraw/" filename))
+           (path (concat nowisemacs-doc-org-mode-dir "/offices/excalidraw/" filename))
            (link (format "[[file:%s]]" path)))
       (insert link)
       (with-temp-file path (insert org-excalidraw-base))))
