@@ -358,6 +358,9 @@
 	url = https://github.com/mhayashi1120/Emacs-wgrep.git
     no-byte-compile = wgrep-subtest.el
     no-byte-compile = wgrep-ag.el
+[submodule "which-key"]
+	path = lib/which-key
+	url = https://github.com/justbur/emacs-which-key.git
 [submodule "with-editor"]
 	path = lib/with-editor
 	url = https://github.com/magit/with-editor.git

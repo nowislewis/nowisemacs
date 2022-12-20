@@ -8,3 +8,4 @@
 !lib/
 !modules/
 init-config.el
+!init-minimal.el

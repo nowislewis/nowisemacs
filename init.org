@@ -16,6 +16,7 @@ I feel in love denote, preview org-roam configs are refiled in [[file:useful-too
   - [[#meow-commands-like-vim][meow commands like vim]]
   - [[#transient-for-leader-keybindings][transient for leader-keybindings]]
   - [[#meow-leader-keys][meow leader keys]]
+  - [[#which-key][which-key]]
   - [[#insert-pair][insert-pair]]
 - [[#ui][UI]]
   - [[#font][Font]]
@@ -612,6 +613,12 @@ Maybe I should add a new state.
    ;;w workspace
    '("TAB". leader-map-for-tabspaces))
 #+END_SRC
+** which-key
+#+begin_src elisp
+  (setup which-key
+    (:option which-key-idle-delay 0.1)
+    (:defer (which-key-mode)))
+#+end_src
 ** insert-pair
 #+begin_src elisp
   ;; insert pairs
@@ -967,13 +974,6 @@ diff-hl-mode highlights uncommitted changes on the left side of the window (area
     (:option vertico-cycle t)
     (:with-map vertico-map
       (:bind [backspace] vertico-directory-delete-char))
-    (vertico-mode)
-    (:defer
-     (vertico-multiform-mode)
-     (setq vertico-multiform-commands
-           '((consult-notes (vertico-sort-function . vertico-sort-alpha))
-             (denote-subdirectory (vertico-sort-function . vertico-sort-alpha))
-             )))
     )
 #+end_src
 ** Orderless
@@ -1938,7 +1938,7 @@ eglot client leveraging LTEX Language Server.
   (setup parsebib)
   ;; (setup citeproc) ;;<- (setup queue) (setup string-inflection)
   (setup citar
-    (:option org-cite-global-bibliography '("~/Documents/emacs/orgmode/bibliography/better_zotero_bib.bib")
+    (:option org-cite-global-bibliography '("~/Documents/emacs/orgmode/office-documents/bibliography/better_zotero_bib.bib")
              org-cite-insert-processor 'citar
              org-cite-follow-processor 'citar
              org-cite-activate-processor 'citar
@@ -2081,7 +2081,7 @@ eglot client leveraging LTEX Language Server.
   (defun lewis-create-excalidraw()
     (interactive)
     (let* ((filename (concat (car (split-string (buffer-name) "\\.")) ".excalidraw"))
-           (path (concat nowisemacs-doc-other-files-dir "excalidraw/" filename))
+           (path (concat nowisemacs-doc-org-mode-dir "/office-documents/excalidraw/" filename))
            (link (format "[[file:%s]]" path)))
       (insert link)
       (with-temp-file path (insert org-excalidraw-base))))
