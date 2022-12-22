@@ -974,7 +974,9 @@ diff-hl-mode highlights uncommitted changes on the left side of the window (area
     (:option vertico-cycle t)
     (:with-map vertico-map
       (:bind [backspace] vertico-directory-delete-char))
-    )
+    (:defer
+     (vertico-mode)
+    ))
 #+end_src
 ** Orderless
 #+begin_src elisp
