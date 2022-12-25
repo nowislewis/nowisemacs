@@ -18,6 +18,7 @@ I feel in love denote, preview org-roam configs are refiled in [[file:useful-too
   - [[#meow-leader-keys][meow leader keys]]
   - [[#which-key][which-key]]
   - [[#insert-pair][insert-pair]]
+  - [[#electric][electric]]
 - [[#ui][UI]]
   - [[#font][Font]]
   - [[#variable-pitch--and-cn-en-fixed-pitch-faces][variable-pitch  and cn-en-fixed-pitch faces]]
@@ -605,6 +606,8 @@ Maybe I should add a new state.
    '("n r g" . project-find-gtd-dir-files)
 
    '("n e" . org-noter)
+
+   '("n b" . citar-open)
    ;; org-remark
    '("n m m" . org-remark-mark))
 
@@ -663,6 +666,12 @@ Maybe I should add a new state.
     Leave point after open-quotation."
     (interactive "*P")
     (insert-pair arg ?\= ?\=))
+#+end_src
+** electric
+#+begin_src elisp
+  (setup elec-pair
+    (:defer
+     (electric-pair-mode)))
 #+end_src
 * UI
 ** Font
@@ -844,8 +853,7 @@ diff-hl-mode highlights uncommitted changes on the left side of the window (area
 #+begin_src elisp
   (setup pulsar
     (:defer
-     (pulsar-global-mode 1)
-     ))
+     (pulsar-global-mode 1)))
 #+end_src
 ** show-paren-mode
 #+begin_src elisp
@@ -1039,7 +1047,7 @@ diff-hl-mode highlights uncommitted changes on the left side of the window (area
       (call-interactively 'consult-find)))
 #+end_src
 *** consult-dash
-#+begin_src elisp
+#+begin_src elisp :tangle no
   (setup dash-docs
     (:option dash-docs-docsets-path (concat no-littering-var-directory "dash-docsets")
              dash-docs-common-docsets '("C++")))
@@ -1326,10 +1334,10 @@ borrowed from citre, now you can always jump-back use "M-,"
 ** pyim
 #+begin_src elisp
   (setup posframe)
-  (setup pyim-tsinghua-dict
-    (:load-after pyim-dict)
-    (:when-loaded
-      (pyim-tsinghua-dict-enable)))
+  ;; (setup pyim-tsinghua-dict
+  ;;   (:load-after pyim-dict)
+  ;;   (:when-loaded
+  ;;     (pyim-tsinghua-dict-enable)))
   (setup pyim-sogou-scel-dict
     (:load-after pyim-dict)
     (:when-loaded
@@ -1948,7 +1956,8 @@ eglot client leveraging LTEX Language Server.
 #+end_src
 ** citar-denote
 #+begin_src elisp
-    (setup citar-denote)
+      (setup citar-denote
+        (:defer (citar-denote-mode)))
 #+end_src
 ** toc-org
 #+begin_src elisp
@@ -2202,6 +2211,7 @@ I use corfu english helper instead of company-english-helper.
   (setup websocket)
   (setup websocket-bridge)
   (setup dictionary-overlay
+    (:option dictionary-overlay-sdcv-dictionary-path "~/Downloads/stardict-ecdict-2.4.2/")
     (:autoload dictionary-overlay-toggle)
     (:when-loaded
       (copy-face 'font-lock-keyword-face 'dictionary-overlay-unknownword)
