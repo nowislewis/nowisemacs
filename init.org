@@ -1570,9 +1570,9 @@ Dirvish is a minimalistic file manager based on Dired. It's fast
 ** magit
 #+begin_src elisp
   (setup with-editor)
-  (setup magit
-    (:defer
-     (require 'libgit)))
+  (setup magit)
+    ;; (:defer
+    ;;  (require 'libgit)))
 #+end_src
 ** ediff
 #+begin_src elisp
