@@ -1399,25 +1399,25 @@ borrowed from citre, now you can always jump-back use "M-,"
                                        rime-predicate-punctuation-line-begin-p ;;在行首要输入符号时
                                        ;; rime-predicate-after-alphabet-char-p ;;在英文字符串之后（必须为以字母开头的英文字符串）
                                        rime-predicate-current-input-punctuation-p ;;当要输入的是符号时
-                                       ;; rime-predicate-after-ascii-char-p ;;任意英文字符后
+                                       rime-predicate-after-ascii-char-p ;;任意英文字符后 ,enable this to use with <s
                                        )
              rime-inline-predicates '(
                                       rime-predicate-current-uppercase-letter-p ;; 将要输入的为大写字母时
                                       rime-predicate-space-after-cc-p ;;在中文字符且有空格之后
                                       )
-             rime-librime-root "~/Downloads/rime-1/dist"
              default-input-method "rime"
-             rime-show-candidate 'posframe
+             rime-show-candidate 'minibuffer ;;posframe not work well in wsl2
              rime-posframe-properties (list :font "Sarasa Mono SC Nerd"
                                             :internal-border-width 1)
              rime-user-data-dir "~/Documents/emacs-rime-user-data/"
              rime-inline-ascii-trigger 'shift-r
              )
     (when (eq system-type 'darwin)
-      (setq rime-emacs-module-header-root "/opt/homebrew/opt/emacs-plus@30/include"))
+      (setq rime-emacs-module-header-root "/opt/homebrew/opt/emacs-plus@30/include"
+            rime-librime-root "~/Downloads/rime-1/dist"
+            ))
     )
 #+end_src
-
 * File and Browsing
 ** file browsing
 *** dired
