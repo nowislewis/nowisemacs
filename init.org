@@ -1410,6 +1410,8 @@ borrowed from citre, now you can always jump-back use "M-,"
              rime-show-candidate 'posframe
              rime-posframe-properties (list :font "Sarasa Mono SC Nerd"
                                             :internal-border-width 1)
+             rime-user-data-dir "~/Documents/emacs-rime-user-data/"
+             rime-inline-ascii-trigger 'shift-r
              )
     (when (eq system-type 'darwin)
       (setq rime-emacs-module-header-root "/opt/homebrew/opt/emacs-plus@30/include"))
