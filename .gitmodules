@@ -269,15 +269,6 @@
 [submodule "pulsar"]
 	path = lib/pulsar
     url = https://github.com/protesilaos/pulsar.git
-[submodule "pyim"]
-	path = lib/pyim
-	url = https://github.com/tumashu/pyim.git
-[submodule "pyim-sogou-scel-dict"]
-	path = lib/pyim-sogou-scel-dict
-	url = https://github.com/nowislewis/pyim-sogou-scel-dict.git
-[submodule "pyim-tsinghua-dict"]
-	path = lib/pyim-tsinghua-dict
-	url = https://github.com/redguardtoo/pyim-tsinghua-dict.git
 [submodule "quickrun"]
 	path = lib/quickrun
 	url = https://github.com/emacsorphanage/quickrun.git
@@ -287,6 +278,9 @@
 [submodule "rg"]
 	path = lib/rg
 	url = https://github.com/dajva/rg.el.git
+[submodule "rime"]
+	path = lib/rime
+	url = https://github.com/DogLooksGood/emacs-rime.git
 [submodule "s"]
 	path = lib/s
 	url = https://github.com/magnars/s.el.git
@@ -360,9 +354,6 @@
 [submodule "ws-butler"]
 	path = lib/ws-butler
 	url = https://github.com/lewang/ws-butler.git
-[submodule "xr"]
-	path = lib/xr
-	url = https://github.com/mattiase/xr.git
 [submodule "yasnippet"]
 	path = lib/yasnippet
 	url = https://github.com/joaotavora/yasnippet.git

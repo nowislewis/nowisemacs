@@ -62,7 +62,9 @@ I feel in love denote, preview org-roam configs are refiled in [[file:useful-too
 - [[#ibuffer][ibuffer]]
   - [[#ibuffer-1][ibuffer]]
 - [[#input][Input]]
+- [[#posframe][posframe]]
   - [[#pyim][pyim]]
+  - [[#rime][rime]]
 - [[#file-and-browsing][File and Browsing]]
   - [[#file-browsing][file browsing]]
   - [[#structure-browsing][structure browsing]]
@@ -1331,17 +1333,20 @@ borrowed from citre, now you can always jump-back use "M-,"
     (:global [remap list-buffers] #'ibuffer))
 #+end_src
 * Input
-** pyim
+* posframe
 #+begin_src elisp
   (setup posframe)
+#+end_src
+** pyim
+#+begin_src elisp :tangle no
   ;; (setup pyim-tsinghua-dict
   ;;   (:load-after pyim-dict)
   ;;   (:when-loaded
   ;;     (pyim-tsinghua-dict-enable)))
-  (setup pyim-sogou-scel-dict
-    (:load-after pyim-dict)
-    (:when-loaded
-      (pyim-sogou-scel-dict-enable)))
+  ;; (setup pyim-sogou-scel-dict
+  ;;   (:load-after pyim-dict)
+  ;;   (:when-loaded
+  ;;     (pyim-sogou-scel-dict-enable)))
   (setup xr)
   (setup pyim
     (:option pyim-cloudim 'baidu
@@ -1381,8 +1386,36 @@ borrowed from citre, now you can always jump-back use "M-,"
     )
   (:defer
    (require 'pyim))
-  (setq default-input-method "pyim"))
+  ;; (setq default-input-method "pyim")
+  )
 #+end_src
+** rime
+#+begin_src elisp
+  (setup rime
+    (:option rime-disable-predicates '(meow-normal-mode-p
+                                       meow-motion-mode-p
+                                       meow-keypad-mode-p
+                                       rime-predicate-prog-in-code-p
+                                       rime-predicate-punctuation-line-begin-p ;;在行首要输入符号时
+                                       ;; rime-predicate-after-alphabet-char-p ;;在英文字符串之后（必须为以字母开头的英文字符串）
+                                       rime-predicate-current-input-punctuation-p ;;当要输入的是符号时
+                                       ;; rime-predicate-after-ascii-char-p ;;任意英文字符后
+                                       )
+             rime-inline-predicates '(
+                                      rime-predicate-current-uppercase-letter-p ;; 将要输入的为大写字母时
+                                      rime-predicate-space-after-cc-p ;;在中文字符且有空格之后
+                                      )
+             rime-librime-root "~/Downloads/rime-1/dist"
+             default-input-method "rime"
+             rime-show-candidate 'posframe
+             rime-posframe-properties (list :font "Sarasa Mono SC Nerd"
+                                            :internal-border-width 1)
+             )
+    (when (eq system-type 'darwin)
+      (setq rime-emacs-module-header-root "/opt/homebrew/opt/emacs-plus@30/include"))
+    )
+#+end_src
+
 * File and Browsing
 ** file browsing
 *** dired
