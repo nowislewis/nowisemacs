@@ -9,3 +9,4 @@
 !modules/
 init-config.el
 !init-minimal.el
+!init-quick-edit.el

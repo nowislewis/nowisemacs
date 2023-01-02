@@ -75,6 +75,7 @@ I feel in love denote, preview org-roam configs are refiled in [[file:useful-too
 - [[#shell][shell]]
   - [[#vterm][vterm]]
   - [[#vterm-toggle][vterm-toggle]]
+  - [[#eshell][eshell]]
 - [[#git][git]]
   - [[#magit][magit]]
   - [[#ediff][ediff]]
@@ -1544,6 +1545,11 @@ Dirvish is a minimalistic file manager based on Dired. It's fast
 #+begin_src elisp
   (setup vterm
     (:bind [(control return)] vterm-toggle-insert-cd))
+  (defun new-vterm(name)
+    "create a new vterm with a given name"
+    (interactive "sInput a name:")
+    (let ((vterm-buffer-name name))
+      (vterm)))
 #+end_src
 ** vterm-toggle
 #+begin_src elisp
@@ -1567,6 +1573,14 @@ Dirvish is a minimalistic file manager based on Dired. It's fast
         (vterm-toggle-insert-cd))
       )
     )
+#+end_src
+** eshell
+#+begin_src elisp
+  (defun new-eshell(name)
+    "create a new eshell with a given name"
+    (interactive "sInput a name:")
+    (let ((eshell-buffer-name name))
+    (eshell)))
 #+end_src
 * git
 ** magit
