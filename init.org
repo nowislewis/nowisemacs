@@ -131,7 +131,6 @@ I feel in love denote, preview org-roam configs are refiled in [[file:useful-too
   ;; -*- lexical-binding: t; -*-
   (setq gc-cons-threshold most-positive-fixnum
         gc-cons-percentage 0.5) ;;defer gc futher back
-
   ;; Package initialize occurs automatically, before `user-init-file' is
   ;; loaded, but after `early-init-file'. We handle package
   ;; initialization, so we must prevent Emacs from doing it early!
@@ -298,7 +297,9 @@ I use borg to manage packages, so setup.el is only used to config packages quick
 Enforce a sneaky Garbage Collection strategy to minimize GC interference with user activity.
 #+begin_src elisp
   (setup gcmh
-     (gcmh-mode 1))
+    (:option gcmh-auto-idle-delay-factor 10
+             gcmh-high-cons-threshold (* 16 1024 1024))
+    (gcmh-mode 1))
 #+end_src
 * Keyboard Bindings
 I used to be a vim(evil) user, but now I use meow to manage all my keys.
@@ -602,7 +603,8 @@ Maybe I should add a new state.
 
   ;; notes
   (meow-leader-define-key
-   '("n r f" . project-find-xnotes-dir-files)
+   ;; '("n r f" . project-find-xnotes-dir-files)
+   '("n r f" . denote-open-or-create-with-subdirectory)
    '("n r p" . project-find-papers-dir-files)
    '("n r o" . project-find-orgmode-dir-files)
    '("n r c" . consult-notes)
@@ -2063,9 +2065,9 @@ eglot client leveraging LTEX Language Server.
     (:when-loaded
       (setq denote-faces--file-name-regexp (concat "\\(?8:[[:alnum:][:nonascii:]/]*\\)?"
                                                    "\\(?1:[0-9]\\{8\\}\\)\\(?2:T[0-9]\\{6\\}\\)"
-                                                    "\\(?:\\(?3:--\\)\\(?4:[[:alnum:][:nonascii:]-]*\\)\\)?"
-                                                    "\\(?:\\(?5:__\\)\\(?6:[[:alnum:][:nonascii:]_-]*\\)\\)?"
-                                                    "\\(?7:\\..*\\)?$"))
+                                                   "\\(?:\\(?3:--\\)\\(?4:[[:alnum:][:nonascii:]-]*\\)\\)?"
+                                                   "\\(?:\\(?5:__\\)\\(?6:[[:alnum:][:nonascii:]_-]*\\)\\)?"
+                                                   "\\(?7:\\..*\\)?$"))
 
       (setq denote-faces-file-name-keywords `((,(concat " " denote-faces--file-name-regexp)
                                                (1 'denote-faces-delimiter nil t)
@@ -2079,7 +2081,24 @@ eglot client leveraging LTEX Language Server.
                                                ;; (9 'denote-faces-delimiter nil t)
                                                )))
       )
+        ;;;###autoload
+    (defun denote-open-or-create-with-subdirectory ()
+      "Invoke `denote-open-or-create' but also prompt for subdirectory.
+    This is the equivalent to calling `denote-open-or-create' when
+    `denote-prompts' is set to \\='(subdirectory title keywords)."
+      (declare (interactive-only t))
+      (interactive)
+      (let ((denote-prompts '(subdirectory title keywords)))
+        (call-interactively #'denote-open-or-create)))
     )
+  (defun denote-link-or-create-with-subdirectory ()
+    "Invoke `denote-link-or-create' but also prompt for subdirectory.
+  This is the equivalent to calling `denote-link-or-create' when
+  `denote-prompts' is set to \\='(subdirectory title keywords)."
+    (declare (interactive-only t))
+    (interactive)
+    (let ((denote-prompts '(subdirectory title keywords)))
+      (call-interactively #'denote-link-or-create)))
 
   (defun denote-rename-file-using-dired()
     (interactive nil dired-mode)
@@ -2194,6 +2213,7 @@ Connecting clues while reading code.
 #+end_src
 ** agenda/gtd
 https://emacs.cafe/emacs/orgmode/gtd/2017/06/30/orgmode-gtd.html
+https://dindi.garjola.net/org-agenda-weekly.html
 #+begin_src elisp
   (defvar nowisemacs-index-org (concat nowisemacs-gtd-dir "/20220919T004950--index__agenda.org"))
   (defvar nowisemacs-gtd-org (concat nowisemacs-gtd-dir "/20220919T005015--gtd__agenda.org"))
@@ -2203,16 +2223,19 @@ https://emacs.cafe/emacs/orgmode/gtd/2017/06/30/orgmode-gtd.html
     (:option org-agenda-files (list nowisemacs-index-org
                                     nowisemacs-gtd-org
                                     nowisemacs-tickler-org)
-             org-todo-keywords (quote ((sequence "TODO(t)" "NEXT(n)" "|" "DONE(d)")
-                                       (sequence "WAITING(w@/!)" "HOLD(h@/!)" "|" "CANCELLED(c@/!)" "PHONE" "MEETING")))
+             org-todo-keywords (quote ((sequence "TODO(t!/!)" "NEXT(n!/!)"  "STARTED(s!)" "|" "DONE(d!/!)")
+                                       (type "PROJECT(p!/!)" "|" "DONE_PROJECT(D!/!)")
+                                       (sequence "WAITING(w@/!)" "SOMEDAY(S!)" "HOLD(h@/!)" "|" "CANCELLED(c@/!)")))
+
              org-todo-keyword-faces (quote (("TODO" :foreground "red" :weight bold)
                                             ("NEXT" :foreground "blue" :weight bold)
+                                            ("STARTED" :foreground "blue" :weight bold)
                                             ("DONE" :foreground "forest green" :weight bold)
                                             ("WAITING" :foreground "orange" :weight bold)
-                                            ("HOLD" :foreground "magenta" :weight bold)
+                                            ("SOMEDAY" :foreground "magenta" :weight bold)
+                                            ("HOLD" :foreground "orange" :weight bold)
                                             ("CANCELLED" :foreground "forest green" :weight bold)
-                                            ("MEETING" :foreground "forest green" :weight bold)
-                                            ("PHONE" :foreground "forest green" :weight bold)))
+                                            ))
              ))
   (setup org-refile
     (:option org-refile-targets (list (cons nowisemacs-gtd-org '(:maxlevel . 3))
@@ -2227,7 +2250,6 @@ https://emacs.cafe/emacs/orgmode/gtd/2017/06/30/orgmode-gtd.html
                                       "* %i%? \n %U"))))
 
 #+end_src
-
 * 翻译
 ** go-translate
 #+begin_src elisp
