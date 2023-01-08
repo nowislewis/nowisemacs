@@ -48,13 +48,14 @@ It's designed by following principles:
 ** Features
 + Affected by lazycat-emacs, there is a clear process chain in nowisemacs.
 + Easy to expand new features, easy to understand the framework.
-+ Writing on the fly with a full configured org-mode, includes beautiful interfaces, a deep integration with org-roam.
-  and org-agenda to help take back-notes and manage daily work, many useful English auxiliary writing tools and so on.
++ Writing on the fly with a full configured org-mode, includes beautiful interfaces, a deep integration with denote and denote-citar to manage references with notes.
+  Use a GTD methods to manage personal trials based on org-agenda.
++ Many useful English auxiliary writing tools and so on.
 + Universal programming solution including completion, jump, search under different path or files. With the help of *Language Server Protocol* powered by Microsoft and the great ctags
   front-end *citre*, users can easily use and expand almost all programming languages under emacs.
-+ Pinyin search everywhere powered by PYIM, orderless completion.
++ Rime integration, orderless completion everywhere.
 ** How to use
-All configs can be seen [[file:init.org][here]] . It should be noticed that some common configurations that have been moved to [[https://github.com/nowislewis/nowisemacs-base][nowisemacs-base]] for a better reusability, and it also reduces codes  in this main configuration.
+All configs can be seen [[file:init.org][here]].
 
 Nowisemacs uses a single org file to manage all configurations. To reduce the startup time of emacs, users need to
 generate =.el= configuration files before the first startup:
@@ -68,7 +69,7 @@ generate =.el= configuration files before the first startup:
 *** Change configurations
 Nowisemacs use =setup.el= to config all the configuration but you can also use built-in methods, =setup= is just a simple wrapper of these methods. You can get a clear understand in anywhere by typing =M-x emacs-lisp-macroexpand=, and the =setup= code will be expanded to normal built-in methods.
 
-Every time you change some configs in =~/.emacs.d/init.org= (eg, write down =<s= and then use =tab= to get a expanded src code), you should run  =make build-init=. You can also just use =make= to config everything. This will overwrite =~/.emacs.d/init.el= and =early-init.el=. Nowisemacs use this method to guarantee the =init.el= will not be changed by mistake =custom-group= or something else.
+Every time you change some configs in =~/.emacs.d/init.org= (eg, write down =<s= and then use =tab= to get a expanded src code), you should run  =make init-build=. You can also just use =make= to config everything. This will overwrite =~/.emacs.d/init.el= and =early-init.el=. Nowisemacs use this method to guarantee the =init.el= will not be changed by mistake =custom-group= or something else.
 *** Add/remove/upgrade packages
 + If you want to *add* a package such as PackageA, you should run =epkg-describe-package= to get a clear dependencies of PackageA, and then =borg-assimilate= to install its dependencies and itself.
 + If you want to *remove* packages, you should do the same thing when you add packages except for chaning =borg-assimilate= to =borg-remove=.
@@ -80,7 +81,7 @@ That't to say, after installation, there are only things you need to remember fo
 2. =make update= for updates.
 3. =make= for everything else( eg, after you changed init.org, or changed packages, you can just run =make= to configure everything well) related to packages.
 
-*It's suggested to  read the [[https://emacsmirror.net/manual/borg/][borg]] for more details*.
+*It's suggested to read the [[https://emacsmirror.net/manual/borg/][borg]] for more details*.
 ** Ideas behind nowisemacs
 *** TL ; NR
 Concise + High maintainability

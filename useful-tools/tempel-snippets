@@ -6,8 +6,8 @@ org-mode
 (src "#+begin_src " p n> r> n> "#+end_src" :post (org-edit-src-code))
 (elisp "#+begin_src elisp" n> r> n "#+end_src" :post (org-edit-src-code))
 
-(dot "#+begin_src dot :file ~/Documents/emacs/other-files/PicturesForAll/dot_pictures/" (format-time-string "%Y%m%d%H%M%S") ".jpg" n> r> n> "#+end_src")
-(uml "#+BEGIN_SRC plantuml :file ~/Documents/emacs/other-files/PicturesForAll/plantuml_pictures/" (format-time-string "%Y%m%d%H%M%S") ".jpg"
+(dot "#+begin_src dot :file ~/Documents/emacs/clutter-files/PicturesForAll/dot_pictures/" (format-time-string "%Y%m%d%H%M%S") ".jpg" n> r> n> "#+end_src")
+(uml "#+BEGIN_SRC plantuml :file ~/Documents/emacs/clutter-files/PicturesForAll/plantuml_pictures/" (format-time-string "%Y%m%d%H%M%S") ".jpg"
      " :cmdline -charset UTF-8" n> "title " p n> "#+END_SRC")
 (excalidraw "#+IMAGINE: wget -O %{%o.png} %f" n> "[[" (buffer-file-name) ".excalidraw]]" n> "#+ATTR_HTML: :width 800 :align center")
 
@@ -19,3 +19,7 @@ text-mode
 (asciibox "+-" (make-string (length str) ?-) "-+" n
           "| " (s str)                       " |" n
           "+-" (make-string (length str) ?-) "-+" n)
+prog-mode
+(asciibox comment-start " +-" (make-string (length str) ?-) "-+" n
+          comment-start " | " (s str)                       " |" n
+          comment-start " +-" (make-string (length str) ?-) "-+" n)

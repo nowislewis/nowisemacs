@@ -21,7 +21,7 @@ I feel in love denote, preview org-roam configs are refiled in [[file:useful-too
   - [[#electric][electric]]
 - [[#ui][UI]]
   - [[#font][Font]]
-  - [[#variable-pitch--and-cn-en-fixed-pitch-faces][variable-pitch  and cn-en-fixed-pitch faces]]
+  - [[#variable-pitch-and-cn-en-fixed-pitch-faces][variable-pitch and cn-en-fixed-pitch faces]]
   - [[#theme][Theme]]
   - [[#line-number][line number]]
   - [[#all-the-icons][all-the-icons]]
@@ -103,6 +103,7 @@ I feel in love denote, preview org-roam configs are refiled in [[file:useful-too
   - [[#clue][clue]]
   - [[#org-transclusion][org-transclusion]]
   - [[#agendagtd][agenda/gtd]]
+  - [[#my-gtd][my-gtd]]
 - [[#翻译][翻译]]
   - [[#go-translate][go-translate]]
   - [[#corfu-english-helper][corfu-english-helper]]
@@ -124,9 +125,13 @@ I feel in love denote, preview org-roam configs are refiled in [[file:useful-too
 - [[#use-single-file-to-load-configs][use single file to load configs]]
   - [[#provide][provide]]
   - [[#load-init-configel][load init-config.el]]
+- [[#quick-edit-and-minimal-file][quick-edit and minimal-file]]
+  - [[#init-quick-edit][init-quick-edit]]
+  - [[#init-minimal][init-minimal]]
 
 * Startup config
 ** UI speed up
+#+name: ui-speed-up
 #+begin_src elisp :tangle ~/.emacs.d/early-init.el
   ;; -*- lexical-binding: t; -*-
   (setq gc-cons-threshold most-positive-fixnum
@@ -576,18 +581,16 @@ Maybe I should add a new state.
   ;; apps
   (meow-leader-define-key
    '("a a" . org-agenda)
+   '("a q" . my-gtd-q2-commands)
    '("a c" . org-capture)
+   '("a w" . my/weekly-agenda-review)
+   '("a e" . my/show-next-without-effort)
+
    '("a g s" . gif-screencast-start-or-stop)
    '("a g p" . gif-screencast-toggle-pause)
    '("a l" . app-launcher-run-app)
-   '("a f" . vterm-toggle-forward)
    '("a b" . vterm-toggle-backward)
    '("a i" . double-vterm-toggle-insert-cd)
-   '("a o p" . oj-prepare)
-   '("a o t" . oj-test)
-   '("a o h" . oj-open-home-dir)
-   '("a e" . org-excalidraw-create-drawing)
-   '("a E" . org-excalidraw-initialize)
    '("a t" . org-pomodoro)
    )
 
@@ -681,7 +684,9 @@ Maybe I should add a new state.
 * UI
 ** Font
 #+begin_src elisp
-  (defvar lewis-font-size 140)
+  (if (eq system-type 'darwin)
+      (defvar lewis-font-size 140)
+    (defvar lewis-font-size 120))
   (defvar lewis-fixed-ch-en-font "Sarasa Mono SC Nerd")
   (defun font-installed-p (font-name)
     "Check if font with FONT-NAME is available."
@@ -719,7 +724,7 @@ Maybe I should add a new state.
              return (set-fontset-font t '(#x4e00 . #x9fff) font))
     )
 #+end_src
-** variable-pitch  and cn-en-fixed-pitch faces
+** variable-pitch and cn-en-fixed-pitch faces
 #+begin_src elisp :tangle no
   (setup mixed-pitch
     (:hook-into text-mode)
@@ -2215,39 +2220,137 @@ Connecting clues while reading code.
 https://emacs.cafe/emacs/orgmode/gtd/2017/06/30/orgmode-gtd.html
 https://dindi.garjola.net/org-agenda-weekly.html
 #+begin_src elisp
-  (defvar nowisemacs-index-org (concat nowisemacs-gtd-dir "/20220919T004950--index__agenda.org"))
-  (defvar nowisemacs-gtd-org (concat nowisemacs-gtd-dir "/20220919T005015--gtd__agenda.org"))
-  (defvar nowisemacs-tickler-org (concat nowisemacs-gtd-dir "/20220919T005033--tickler__agenda.org"))
-  (defvar nowisemacs-someday-org (concat nowisemacs-gtd-dir "/20220919T005046--someday__agenda.org"))
-  (setup org
-    (:option org-agenda-files (list nowisemacs-index-org
-                                    nowisemacs-gtd-org
-                                    nowisemacs-tickler-org)
-             org-todo-keywords (quote ((sequence "TODO(t!/!)" "NEXT(n!/!)"  "STARTED(s!)" "|" "DONE(d!/!)")
-                                       (type "PROJECT(p!/!)" "|" "DONE_PROJECT(D!/!)")
-                                       (sequence "WAITING(w@/!)" "SOMEDAY(S!)" "HOLD(h@/!)" "|" "CANCELLED(c@/!)")))
+    (defvar nowisemacs-index-org (concat nowisemacs-gtd-dir "/index.org"))
+    (defvar nowisemacs-gtd-org (concat nowisemacs-gtd-dir "/action.org"))
+    (defvar nowisemacs-someday-org (concat nowisemacs-gtd-dir "/someday.org"))
+    (setup org
+      (:option org-agenda-files (list nowisemacs-index-org
+                                      nowisemacs-gtd-org
+                                      (concat nowisemacs-gtd-dir "/index.org_archive")
+                                      (concat nowisemacs-gtd-dir "/action.org_archive")
+                                      (concat nowisemacs-gtd-dir "/someday.org_archive"))
+               org-todo-keywords (quote ((sequence "TODO(t!/!)" "NEXT(n!/!)"  "STARTED(s!)" "|" "DONE(d!/!)")
+                                         (type "PROJECT(p!/!)" "|" "DONE_PROJECT(D!/!)")
+                                         (type "SOMEDAY(S!)" "|" "NEED_COLLECTED(N!)")
+                                         (sequence "WAIT(w@/!)" "HOLD(h@/!)" "|" "CANCELLED(c@/!)")))
 
-             org-todo-keyword-faces (quote (("TODO" :foreground "red" :weight bold)
-                                            ("NEXT" :foreground "blue" :weight bold)
-                                            ("STARTED" :foreground "blue" :weight bold)
-                                            ("DONE" :foreground "forest green" :weight bold)
-                                            ("WAITING" :foreground "orange" :weight bold)
-                                            ("SOMEDAY" :foreground "magenta" :weight bold)
-                                            ("HOLD" :foreground "orange" :weight bold)
-                                            ("CANCELLED" :foreground "forest green" :weight bold)
-                                            ))
-             ))
-  (setup org-refile
-    (:option org-refile-targets (list (cons nowisemacs-gtd-org '(:maxlevel . 3))
-                                      (cons nowisemacs-someday-org '(:level . 1))
-                                      (cons nowisemacs-tickler-org '(:maxlevel . 2)))))
-  (setup org-capture
-    (:option org-capture-templates '(("t" "Todo [inbox]" entry
-                                      (file+headline nowisemacs-index-org "Tasks")
-                                      "* TODO %i%?")
-                                     ("T" "Tickler" entry
-                                      (file+headline nowisemacs-tickler-org "Tickler")
-                                      "* %i%? \n %U"))))
+               org-todo-keyword-faces (quote (("TODO" :foreground "red" :weight bold)
+                                              ("NEXT" :foreground "blue" :weight bold)
+                                              ("STARTED" :foreground "blue" :weight bold)
+                                              ("DONE" :foreground "forest green" :weight bold)
+
+                                              ("PROJECT" :foreground "red" :weight bold)
+                                              ("DONE_PROJECT" :foreground "forest green" :weight bold)
+
+                                              ("WAIT" :foreground "orange" :weight bold)
+                                              ("HOLD" :foreground "orange" :weight bold)
+                                              ("CANCELLED" :foreground "forest green" :weight bold)
+
+                                              ("SOMEDAY" :foreground "orange" :weight bold)
+                                              ("NEED_COLLECTED" :foreground "orange" :weight bold)
+                                              ))
+               ))
+    (setup org-refile
+      (:option org-refile-targets (list (cons nowisemacs-gtd-org '(:maxlevel . 1))
+                                        (cons nowisemacs-someday-org '(:level . 1)))))
+    (setup org-capture
+      (:option org-capture-templates '(("t" "Todo [inbox]" entry
+                                        (file+headline nowisemacs-index-org "Tasks")
+                                        "* TODO %i%?"))))
+
+    (setup org-agenda
+      (:option org-agenda-custom-commands
+               '(
+                 ;; schedule or reschedule
+                 ("D" "Daily(last, Today and futuer) Action List" ((agenda ""
+                                                                           ((org-agenda-span 1)
+                                                                            (org-agenda-sorting-strategy
+                                                                             (quote
+                                                                              ((agenda time-up category-up tag-up))))
+                                                                            (org-deadline-warning-days 7)))))
+                 ;; next, should check effort
+                 ("n" . "Next Actions List")
+                 ("nn" tags "+TODO=\"NEXT\"|+TODO=\"STARTED\"")
+                 ("n2" tags "+2mins+TODO=\"NEXT\"|+2mins+TODO=\"STARTED\"")
+                 )
+               )
+      )
+    ;; (defun my/show-next-without-effort ()
+    ;;   (interactive)
+    ;;   (org-ql-search (org-agenda-files)
+    ;;                  '(and (todo "NEXT")
+    ;;                        (not (property "Effort")))))
+    (defun my/weekly-agenda-review ()
+      "Generate the agenda for the weekly review"
+      (interactive)
+      (let ((span-days 24)
+            (offset-past-days 10))
+        (message "Generating agenda for %s days starting %s days ago"
+                 span-days offset-past-days)
+        (org-agenda-list nil (- (time-to-days (date-to-time
+                                               (current-time-string)))
+                                offset-past-days)
+                         span-days)
+        (org-agenda-log-mode)
+        (goto-char (point-min))))
+#+end_src
+** my-gtd
+#+begin_src elisp
+  (defun my-gtd-refile-q2abc()
+    (interactive)
+    (org-todo)
+    (org-refile))
+
+  (defun my-gtd-refile-q3b()
+    (interactive)
+    (org-todo "NEXT")
+    (org-set-tags "2mins")
+    (org-refile)
+    )
+
+  (defun my-gtd-refile-q4a()
+    (interactive)
+    (org-todo "PROJECT")
+    (org-set-tags "Project")
+    (org-refile)
+    )
+  (defun my-gtd-refile-q5a()
+    (interactive)
+    (org-todo "NEXT")
+    (org-refile)
+    )
+  (defun my-gtd-refile-q5b()
+    (interactive)
+    (org-todo "WAIT")
+    (org-refile)
+    )
+
+
+  (transient-define-prefix my-gtd-q3-commands()
+    [["2 分钟内能做完"
+      ("n" "不能做完" my-gtd-q4-commands)
+      ("y" "可以做完" my-gtd-refile-q3b)
+      ]])
+
+  (transient-define-prefix my-gtd-q4-commands()
+    [["能否一步完成"
+      ("y" "yes 可以" my-gtd-q5-commands)
+      ("n" "no 不能, 是 project" my-gtd-refile-q4a)
+      ]])
+
+  (transient-define-prefix my-gtd-q5-commands()
+    [[" 自己做或者等别人做"
+      ("y" "yes 自己做" my-gtd-refile-q5a)
+      ("n" "no 等别人" my-gtd-refile-q5b)
+      ]])
+
+
+  (transient-define-prefix my-gtd-q2-commands()
+    ["现阶段考虑做"
+     ("y" "yes" my-gtd-q3-commands)
+     ("n" "no,Someday or need collected" my-gtd-refile-q2abc)
+     ]
+    )
 
 #+end_src
 * 翻译
@@ -2465,3 +2568,10 @@ this can avoid errors of native compilation of init.el
 (add-to-list 'load-path (expand-file-name "modules/" user-emacs-directory))
 (require 'init-config)
 #+end_src
+* quick-edit and minimal-file
+These 2 files are tangled using noweb and will be used for special purpose.
+
+1. =init-quick-edit.el= will be used to open a file, edit it and close it quickly.
+2. =init-mininal.el= is a file to start from scratch in which case you don't want the full-blown configurations.
+** init-quick-edit
+** init-minimal
