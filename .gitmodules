@@ -232,12 +232,22 @@
 [submodule "org-present"]
 	path = lib/org-present
 	url = https://github.com/rlister/org-present.git
+[submodule "org-ql"]
+	path = lib/org-ql
+	url = https://github.com/alphapapa/org-ql.git
+    no-byte-compile = helm-org-ql.el
 [submodule "org-remark"]
 	path = lib/org-remark
 	url = https://github.com/nobiot/org-remark
+[submodule "org-super-agenda"]
+	path = lib/org-super-agenda
+	url = https://github.com/alphapapa/org-super-agenda.git
 [submodule "org-transclusion"]
 	path = lib/org-transclusion
 	url = https://github.com/nobiot/org-transclusion
+[submodule "ov"]
+	path = lib/ov
+	url = https://github.com/emacsorphanage/ov.git
 [submodule "ox-hugo"]
 	path = lib/ox-hugo
 	url = https://github.com/kaushalmodi/ox-hugo.git
@@ -247,6 +257,9 @@
 [submodule "pdf-tools"]
 	path = lib/pdf-tools
 	url = https://github.com/vedang/pdf-tools.git
+[submodule "peg"]
+	path = lib/peg
+	url = https://github.com/emacsmirror/peg.git
 [submodule "plantuml-mode"]
 	path = lib/plantuml-mode
 	url = https://github.com/skuro/plantuml-mode.git
@@ -313,6 +326,9 @@
 [submodule "tomelr"]
 	path = lib/tomelr
 	url = https://github.com/kaushalmodi/tomelr.git
+[submodule "ts"]
+	path = lib/ts
+	url = https://github.com/alphapapa/ts.el.git
 [submodule "vertico"]
 	path = lib/vertico
 	url = https://github.com/minad/vertico.git
