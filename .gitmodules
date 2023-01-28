@@ -87,6 +87,9 @@
 	url = https://github.com/alexluigit/dirvish.git
     load-path = .
     load-path = extensions
+[submodule "disaster"]
+	path = lib/disaster
+	url = https://github.com/jart/disaster.git
 [submodule "doom-modeline"]
 	path = lib/doom-modeline
 	url = https://github.com/seagle0128/doom-modeline.git
@@ -187,6 +190,9 @@
 [submodule "magit"]
 	path = lib/magit
 	url = https://github.com/magit/magit
+[submodule "maple-explorer"]
+	path = lib/maple-explorer
+	url = https://github.com/honmaple/emacs-maple-explorer.git
 [submodule "marginalia"]
 	path = lib/marginalia
 	url = https://github.com/minad/marginalia.git
