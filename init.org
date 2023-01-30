@@ -582,7 +582,7 @@ Maybe I should add a new state.
   ;; apps
   (meow-leader-define-key
    '("a a" . org-agenda)
-   '("a q" . my-gtd-q2-commands)
+   '("a c" . my-gtd-choose)
    '("a c" . org-capture)
    '("a w" . my/weekly-agenda-review)
    '("a e" . my/show-next-without-effort)
@@ -1464,7 +1464,9 @@ Dirvish is a minimalistic file manager based on Dired. It's fast
 #+end_src
 *** maple-explorer
 #+begin_src elisp
-  (setup maple-explorer)
+  (setup maple-explorer
+    (:option maple-explorer-imenu-display-alist '((side . left) (slot . -1))
+          maple-explorer-imenu-width '(20 . 60)))
 #+end_src
 ** tab-line and tab-bar
 #+begin_src elisp
@@ -1759,6 +1761,10 @@ Highlight symbols with keymap-enabled overlays
     (:load-after eglot)
     (:with-map eglot-mode-map
       (:bind [remap xref-find-apropos] #'consult-eglot-symbols)))
+#+end_src
+***** lsp-bridge
+#+begin_src elisp
+(setup lsp-bridge)
 #+end_src
 **** citre
 Citre is an advanced Ctags (or actually, readtags) frontend for Emacs.
