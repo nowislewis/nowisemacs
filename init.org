@@ -726,9 +726,9 @@ Maybe I should add a new state.
     )
 #+end_src
 ** variable-pitch and cn-en-fixed-pitch faces
-#+begin_src elisp :tangle no
+#+begin_src elisp
   (setup mixed-pitch
-    (:hook-into text-mode)
+    ;; (:hook-into text-mode)
     (:when-loaded
       (delete 'org-table mixed-pitch-fixed-pitch-faces)))
 
@@ -1230,7 +1230,7 @@ should be check after reading the embark.el manual
 #+begin_src elisp
   (setup yasnippet
     (:option yas-snippet-dirs (list (concat nowisemacs-config-useful-tools "snippets")))
-    ;; (:defer (yas-global-mode))
+    (:defer (yas-global-mode))
    )
 #+end_src
 ** tempel
@@ -1770,7 +1770,17 @@ Highlight symbols with keymap-enabled overlays
 #+end_src
 ***** lsp-bridge
 #+begin_src elisp
-(setup lsp-bridge)
+    (setup lsp-bridge
+      (:option lsp-bridge-org-babel-lang-list '("emacs-lisp"
+                                                "python"
+                                                "dot"
+                                                "latex"
+                                                "C"
+                                                "C++"
+                                                "scheme"
+                                                "plantuml")
+               ))
+
 #+end_src
 **** citre
 Citre is an advanced Ctags (or actually, readtags) frontend for Emacs.
@@ -1875,7 +1885,7 @@ Disassemble C, C++ or Fortran code under cursor
              org-blank-before-new-entry '((heading . nil)
                                           (plain-list-item . nil))
 
-             org-image-actual-width 600
+             ;; org-image-actual-width 600 ;; this will use 600 for width for all the images.
              org-preview-latex-image-directory (concat no-littering-var-directory "ltximg/")
              org-confirm-babel-evaluate nil
              org-src-window-setup 'split-window-below
