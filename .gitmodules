@@ -28,6 +28,9 @@
 [submodule "cape"]
 	path = lib/cape
 	url = https://github.com/minad/cape.git
+[submodule "cdlatex"]
+	path = lib/cdlatex
+	url = https://github.com/cdominik/cdlatex.git
 [submodule "citar"]
 	path = lib/citar
 	url = https://github.com/emacs-citar/citar.git
@@ -225,6 +228,9 @@
 [submodule "org-download"]
 	path = lib/org-download
 	url = https://github.com/abo-abo/org-download.git
+[submodule "org-elp"]
+	path = lib/org-elp
+	url = https://github.com/guanyilun/org-elp.git
 [submodule "org-imagine"]
 	path = lib/org-imagine
 	url = https://github.com/metaescape/org-imagine.git
@@ -286,6 +292,9 @@
 [submodule "pulsar"]
 	path = lib/pulsar
     url = https://github.com/protesilaos/pulsar.git
+[submodule "pyim"]
+	path = lib/pyim
+	url = https://github.com/tumashu/pyim.git
 [submodule "quickrun"]
 	path = lib/quickrun
 	url = https://github.com/emacsorphanage/quickrun.git
@@ -374,6 +383,9 @@
 [submodule "ws-butler"]
 	path = lib/ws-butler
 	url = https://github.com/lewang/ws-butler.git
+[submodule "xr"]
+	path = lib/xr
+	url = https://github.com/mattiase/xr.git
 [submodule "yasnippet"]
 	path = lib/yasnippet
 	url = https://github.com/joaotavora/yasnippet.git

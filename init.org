@@ -1347,7 +1347,7 @@ borrowed from citre, now you can always jump-back use "M-,"
   (setup posframe)
 #+end_src
 ** pyim
-#+begin_src elisp :tangle no
+#+begin_src elisp
   ;; (setup pyim-tsinghua-dict
   ;;   (:load-after pyim-dict)
   ;;   (:when-loaded
@@ -1364,39 +1364,39 @@ borrowed from citre, now you can always jump-back use "M-,"
              pyim-page-length 5
              pyim-dcache-backend 'pyim-dregcache
              pyim-dcache-directory (concat nowisemacs-doc-clutter-dir "pyim/dcache/")
-    )
-  (:when-loaded
-    (require 'popup nil t)
-    (require 'pyim-dregcache)
-    (require 'pyim-cregexp-utils)
-    (require 'pyim-cstring-utils)
-    (set-default 'pyim-punctuation-half-width-functions
-                 '(pyim-probe-punctuation-line-beginning pyim-probe-punctuation-after-punctuation))
-    ;; (pyim-default-scheme 'xiaohe-shuangpin)
-    (pyim-default-scheme 'quanpin)
-    (pyim-isearch-mode 1)
+             )
+    (:when-loaded
+      (require 'popup nil t)
+      (require 'pyim-dregcache)
+      (require 'pyim-cregexp-utils)
+      (require 'pyim-cstring-utils)
+      (set-default 'pyim-punctuation-half-width-functions
+                   '(pyim-probe-punctuation-line-beginning pyim-probe-punctuation-after-punctuation))
+      ;; (pyim-default-scheme 'xiaohe-shuangpin)
+      (pyim-default-scheme 'quanpin)
+      (pyim-isearch-mode 1)
 
-    (defalias 'pyim-probe-meow-normal-mode #'(lambda nil
-                                               (meow-normal-mode-p)))
-    (set-default 'pyim-english-input-switch-functions '(pyim-probe-auto-english
-                                                        pyim-probe-isearch-mode
-                                                        pyim-probe-program-mode
-                                                        pyim-probe-org-structure-template
-                                                        pyim-probe-org-latex-mode
-                                                        pyim-probe-meow-normal-mode))
-    (defalias 'my-orderless-regexp
-      #'(lambda
-          (orig_func component)
-          (let
-              ((result
-                (funcall orig_func component)))
-            (pyim-cregexp-build result))))
-    (advice-add 'orderless-regexp :around #'my-orderless-regexp)
+      (defalias 'pyim-probe-meow-normal-mode #'(lambda nil
+                                                 (meow-normal-mode-p)))
+      (set-default 'pyim-english-input-switch-functions '(pyim-probe-auto-english
+                                                          pyim-probe-isearch-mode
+                                                          pyim-probe-program-mode
+                                                          pyim-probe-org-structure-template
+                                                          pyim-probe-org-latex-mode
+                                                          pyim-probe-meow-normal-mode))
+      (defalias 'my-orderless-regexp
+        #'(lambda
+            (orig_func component)
+            (let
+                ((result
+                  (funcall orig_func component)))
+              (pyim-cregexp-build result))))
+      (advice-add 'orderless-regexp :around #'my-orderless-regexp)
+      )
+    (:defer
+     (require 'pyim))
+    ;; (setq default-input-method "pyim")
     )
-  (:defer
-   (require 'pyim))
-  ;; (setq default-input-method "pyim")
-  )
 #+end_src
 ** rime
 #+begin_src elisp
@@ -1409,11 +1409,11 @@ borrowed from citre, now you can always jump-back use "M-,"
                                        ;; rime-predicate-after-alphabet-char-p ;;在英文字符串之后（必须为以字母开头的英文字符串）
                                        rime-predicate-current-input-punctuation-p ;;当要输入的是符号时
                                        rime-predicate-after-ascii-char-p ;;任意英文字符后 ,enable this to use with <s
-                                       )
-             rime-inline-predicates '(
                                       rime-predicate-current-uppercase-letter-p ;; 将要输入的为大写字母时
                                       rime-predicate-space-after-cc-p ;;在中文字符且有空格之后
-                                      )
+                                       )
+             ;; rime-inline-predicates '(
+             ;;                          )
              default-input-method "rime"
              rime-show-candidate 'posframe
              rime-posframe-properties (list :internal-border-width 1)
@@ -1662,9 +1662,15 @@ Emacs major-mode to work with Beancount ledger files
                (cons "\\.[pP][dD][fF]\\'" 'eaf-mode))
 #+end_src
 *** latex
-#+begin_src elisp :tangle no
-  (setup auctex)
+**** basic
+#+begin_src elisp
+;;  (setup auctex)
   (setup cdlatex)
+#+end_src
+**** org-elp
+#+begin_src elisp
+  (setup org-elp
+    (:option org-elp-idle-time 1))
 #+end_src
 *** python
 **** python
@@ -1795,7 +1801,7 @@ eglot client leveraging LTEX Language Server.
 #+begin_src elisp
   (setup eglot-ltex
     (:option eglot-languagetool-server-path "~/Downloads/ltex-ls/")
-    (:with-hook text-mode-hook
+    (:with-hook org-mode-hook
       (:hook (lambda ()
                (require 'eglot-ltex)))))
 #+end_src
