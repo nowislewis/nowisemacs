@@ -2177,8 +2177,7 @@ Disassemble C, C++ or Fortran code under cursor
 #+end_src
 ** org-imagine, excalidraw
 #+begin_src elisp
-  (defun org-excalidraw--default-base ()
-    "Get default JSON template used for new excalidraw files."
+  (defvar org-excalidraw--default-base
     "{
       \"type\": \"excalidraw\",
       \"version\": 2,
@@ -2190,7 +2189,9 @@ Disassemble C, C++ or Fortran code under cursor
       },
       \"files\": {}
     }
-  ")
+  "
+        "Get default JSON template used for new excalidraw files."
+    )
 
   (defun lewis-create-excalidraw()
     (interactive)
@@ -2198,7 +2199,7 @@ Disassemble C, C++ or Fortran code under cursor
            (path (concat nowisemacs-doc-org-mode-dir "/offices/excalidraw/" filename))
            (link (format "[[file:%s]]" path)))
       (insert link)
-      (with-temp-file path (insert org-excalidraw-base))))
+      (with-temp-file path (insert org-excalidraw--default-base))))
   (setup org-imagine)
 #+end_src
 ** shrface
