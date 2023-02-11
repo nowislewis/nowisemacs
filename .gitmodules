@@ -213,6 +213,9 @@
 [submodule "mixed-pitch"]
 	path = lib/mixed-pitch
 	url = https://github.com/emacsmirror/mixed-pitch.git
+[submodule "nasm-mode"]
+	path = lib/nasm-mode
+	url = https://github.com/skeeto/nasm-mode.git
 [submodule "no-littering"]
 	path = lib/no-littering
 	url = https://github.com/emacscollective/no-littering.git
@@ -346,6 +349,9 @@
 [submodule "tomelr"]
 	path = lib/tomelr
 	url = https://github.com/kaushalmodi/tomelr.git
+[submodule "treesit-auto"]
+	path = lib/treesit-auto
+	url = https://github.com/renzmann/treesit-auto.git
 [submodule "ts"]
 	path = lib/ts
 	url = https://github.com/alphapapa/ts.el.git
