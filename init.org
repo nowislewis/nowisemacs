@@ -224,9 +224,7 @@ The following content is not enabled yet, because I want to minimize unnecessary
   (defvar nowisemacs-config-file (expand-file-name "init.org" user-emacs-directory))
   (defvar nowisemacs-config-useful-tools (expand-file-name "useful-tools/" user-emacs-directory))
   (defvar nowisemacs-doc-emacs-dir (file-truename "~/Documents/emacs/"))
-  (defvar nowisemacs-doc-clutter-dir (concat nowisemacs-doc-emacs-dir "clutter-files/"))
-  (defvar nowisemacs-doc-org-mode-dir (concat nowisemacs-doc-emacs-dir "orgmode"))
-  (defvar nowisemacs-gtd-dir (concat nowisemacs-doc-org-mode-dir "/xnotes/gtd"))
+  (defvar nowisemacs-gtd-dir (concat nowisemacs-doc-emacs-dir "01-orgmode/xnotes/gtd"))
 #+end_src
 
 * Package Management
@@ -930,13 +928,6 @@ diff-hl-mode highlights uncommitted changes on the left side of the window (area
     (:defer
      (savehist-mode)))
 #+end_src
-*** rsync
-#+begin_src elisp
-  (defun rsync-backup-papers()
-    "back paper files in emacs"
-    (interactive)
-    (shell-command "rsync -anvh ~/Documents/emacs/orgmode/papers/ ~/Documents/backup" "rsync-backup-papers"))
-#+end_src
 ** no-littering
 #+begin_src lisp
   (setup no-littering)
@@ -1317,7 +1308,7 @@ borrowed from citre, now you can always jump-back use "M-,"
 #+end_src
 *** bookmark
 #+begin_src elisp
-  (setq bookmark-default-file "~/Documents/emacs/clutter-files/bookmarks")
+  (setq bookmark-default-file (concat nowisemacs-doc-emacs-dir "bookmarks"))
 #+end_src
 *** ace-window
 #+begin_src elisp
@@ -1370,7 +1361,7 @@ borrowed from citre, now you can always jump-back use "M-,"
              pyim-page-tooltip 'posframe
              pyim-page-length 5
              pyim-dcache-backend 'pyim-dregcache
-             pyim-dcache-directory (concat nowisemacs-doc-clutter-dir "pyim/dcache/")
+             pyim-dcache-directory (concat nowisemacs-doc-emacs-dir "01-binary-files/pyim/dcache/")
              )
     (:when-loaded
       (require 'popup nil t)
@@ -1887,7 +1878,7 @@ Disassemble C, C++ or Fortran code under cursor
 ** org-mode
 #+begin_src elisp
   (setup org
-    (setq org-directory nowisemacs-doc-org-mode-dir)
+    (setq org-directory (concat nowisemacs-doc-emacs-dir "orgmode/"))
     (:option org-adapt-indentation nil
              org-startup-indented t
              org-hide-emphasis-markers t
@@ -1969,8 +1960,8 @@ Disassemble C, C++ or Fortran code under cursor
       (defun lewis/org-export-docx ()
         (interactive)
         (let ((docx-file (concat (file-name-sans-extension (buffer-file-name)) ".docx"))
-              (template-file (concat (file-name-as-directory nowisemacs-doc-other-file-dir)
-                                     "template.docx")))
+              (template-file (concat nowisemacs-doc-emacs-dir
+                                     "02-binary-files/template.docx")))
           (shell-command (format "pandoc %s -o %s --reference-doc=%s"
                                  (buffer-file-name)
                                  docx-file
@@ -1998,19 +1989,20 @@ Disassemble C, C++ or Fortran code under cursor
 #+end_src
 ** org-download
 #+begin_src elisp
-    (setup async)
-    (setup org-download
-      (:option org-download-method 'directory
-               org-download-screenshot-basename "screenshot.jpg"
-               org-download-image-dir (concat nowisemacs-doc-clutter-dir "PicturesForAll/org_download_images"))
-      (:when-loaded
-        (when (eq system-type 'gnu/linux)
-          (setq-default org-download-screenshot-method "scrot -s %s"))
+  (setup async)
+  (setup org-download
+    (:option org-download-method 'directory
+             org-download-screenshot-basename "screenshot.jpg"
+             org-download-image-dir (concat nowisemacs-doc-emacs-dir "02-binary-files/01-pictures/org_download_images")
+             org-download-abbreviate-filename-function 'expand-file-name)
+    (:when-loaded
+      (when (eq system-type 'gnu/linux)
+        (setq-default org-download-screenshot-method "scrot -s %s"))
 
-        (when (eq system-type 'darwin)
-          (setq org-download-screenshot-method "screencapture -i %s")))
-      (:autoload org-download-screenshot
-                 org-download-yank))
+      (when (eq system-type 'darwin)
+        (setq org-download-screenshot-method "screencapture -i %s")))
+    (:autoload org-download-screenshot
+               org-download-yank))
 #+end_src
 ** ox-hugo
 #+begin_src elisp
@@ -2023,7 +2015,7 @@ Disassemble C, C++ or Fortran code under cursor
 #+begin_src elisp
   (setup alert)
   (setup org-pomodoro
-    (:option org-pomodoro-finished-sound "~/Documents/emacs/clutter-files/applaud.wav"))
+    (:option org-pomodoro-finished-sound (concat nowisemacs-doc-emacs-dir "02-binary-files/applaud.wav")))
 #+end_src
 ** org-noter
 #+begin_src elisp
@@ -2051,7 +2043,7 @@ Disassemble C, C++ or Fortran code under cursor
   (setup parsebib)
   ;; (setup citeproc) ;;<- (setup queue) (setup string-inflection)
   (setup citar
-    (:option org-cite-global-bibliography '("~/Documents/emacs/orgmode/other-texts/bibliography/better_zotero_bib.bib")
+    (:option org-cite-global-bibliography '("~/Documents/emacs/03-bibliography/better_zotero_bib.bib")
              org-cite-insert-processor 'citar
              org-cite-follow-processor 'citar
              org-cite-activate-processor 'citar
@@ -2070,8 +2062,8 @@ Disassemble C, C++ or Fortran code under cursor
 ** ebib
 #+begin_src elisp :tangle no
   (setup ebib
-    (:option ebib-preload-bib-files '("~/Documents/emacs/orgmode/bibliography/better_zotero_bib.bib")
-             ebib-file-search-dirs '("~/Documents/pdf-files-dir")
+    (:option ebib-preload-bib-files '("~/Documents/emacs/03-bibliography/better_zotero_bib.bib")
+             ebib-file-search-dirs '("~/Documents/emacs/02-binary-files/03-papers/")
              )
     (:when-loaded
       (defcustom ebib-zotero-translation-server "http://127.0.0.1:1969"
@@ -2108,7 +2100,7 @@ Disassemble C, C++ or Fortran code under cursor
 ** denote
 #+begin_src elisp
   (setup denote
-    (:option denote-directory (expand-file-name (concat nowisemacs-doc-org-mode-dir "/xnotes"))
+    (:option denote-directory (expand-file-name (concat nowisemacs-doc-emacs-dir "01-orgmode/xnotes"))
              denote-dired-directories (list denote-directory
                                             (thread-last denote-directory (expand-file-name "xnotes")))
              denote-date-prompt-use-org-read-date t
@@ -2177,15 +2169,15 @@ Disassemble C, C++ or Fortran code under cursor
 #+begin_src elisp
   (defun project-find-orgmode-dir-files ()
     (interactive)
-    (dired nowisemacs-doc-org-mode-dir)
-    (project-find-file t))
+    (dired (concat nowisemacs-doc-emacs-dir "01-orgmode")
+    (project-find-file t)))
   (defun project-find-xnotes-dir-files ()
     (interactive)
-    (dired (concat nowisemacs-doc-org-mode-dir "/xnotes"))
+    (dired (concat nowisemacs-doc-emacs-dir "01-orgmode/xnotes"))
     (project-find-file t))
   (defun project-find-papers-dir-files ()
     (interactive)
-    (dired (concat nowisemacs-doc-org-mode-dir "/papers"))
+    (dired (concat nowisemacs-doc-emacs-dir "02-binary-files/03-papers"))
     (project-find-file t))
   (defun project-find-gtd-dir-files ()
     (interactive)
@@ -2213,7 +2205,7 @@ Disassemble C, C++ or Fortran code under cursor
   (defun lewis-create-excalidraw()
     (interactive)
     (let* ((filename (concat (car (split-string (buffer-name) "\\.")) ".excalidraw"))
-           (path (concat nowisemacs-doc-org-mode-dir "/other-texts/excalidraw/" filename))
+           (path (concat nowisemacs-doc-emacs-dir "05-excalidraw/" filename))
            (link (format "[[file:%s]]" path)))
       (insert link)
       (with-temp-file path (insert org-excalidraw--default-base))))
@@ -2249,7 +2241,7 @@ Highlight and annotate any text file with using Org mode.
      )
     (:when-loaded
       (defun my/function ()
-        (concat (concat nowisemacs-doc-org-mode-dir "/org-remark/")
+        (concat (concat nowisemacs-doc-emacs-dir "01-orgmode/org-remark/")
                 (file-name-base (org-remark-notes-file-name-function))
                 ".org"))
       (setq org-remark-notes-file-name #'my/function)
@@ -2530,21 +2522,6 @@ Simple distraction-free editing. I use darkroom instead of writeroom because it'
       (:autoload eaf-open-pdf-from-history))
     (setup eaf-rss-reader
       (:autoload eaf-open-rss-reader))
-
-    (setup eaf-interleave-mode
-      (:option eaf-interleave-org-notes-dir-list '("~/org/interleave/")
-               eaf-interleave-split-direction 'vertical
-               eaf-interleave-disable-narrowing t
-               eaf-interleave-split-lines 20)
-      (:bind "M-." eaf-interleave-sync-current-note
-             "M-p" eaf-interleave-sync-previous-note
-             "M-n" eaf-interleave-sync-next-note)
-      (:with-feature eaf-interleave-app
-        (:bind "C-c M-i" eaf-interleave-add-note
-               "C-c M-o" eaf-interleave-open-notes-file
-               "C-c M-q" eaf-interleave-quit)
-        (:hook-into eaf-pdf-viewer
-                    eaf-browser)))
 #+end_src
 
 ** proxy
