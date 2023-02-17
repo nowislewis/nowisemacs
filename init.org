@@ -1,6 +1,6 @@
 #+TITLE: Emacs Configuration
 #+PROPERTY: header-args:elisp :tangle ~/.emacs.d/modules/init-config.el
-I feel in love denote, preview org-roam configs are refiled in [[file:useful-tools/old-elisps/org-roam-config.org][org-roam configs]]
+I feel in love denote, so the previous *org-roam* configs are refiled in [[file:useful-tools/old-elisps/org-roam-config.org][org-roam configs]]
 * Content                                                               :toc:
 - [[#startup-config][Startup config]]
   - [[#ui-speed-up][UI speed up]]
@@ -844,11 +844,12 @@ diff-hl-mode highlights uncommitted changes on the left side of the window (area
 
   (setup doom-modeline
     (:option doom-modeline-window-width-limit fill-column
-             doom-modeline-height 20
+             doom-modeline-height 5
              doom-modeline-hud t
              ;; doom-modeline-icon nil
              doom-modeline-unicode-fallback t)
     (:hook-into after-init))
+  (set-face-attribute 'mode-line nil :family "JetBrainsMono Nerd Font" :height 100)
 #+end_src
 ** hl-todo
 #+begin_src elisp
