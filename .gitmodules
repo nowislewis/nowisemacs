@@ -178,6 +178,9 @@
 [submodule "inheritenv"]
 	path = lib/inheritenv
 	url = https://github.com/purcell/inheritenv.git
+[submodule "iscroll"]
+	path = lib/iscroll
+	url = https://github.com/casouri/iscroll.git
 [submodule "keyfreq"]
 	path = lib/keyfreq
 	url = https://github.com/dacap/keyfreq
@@ -274,6 +277,9 @@
 [submodule "parsebib"]
 	path = lib/parsebib
 	url = https://github.com/joostkremers/parsebib.git
+[submodule "pdf-continuous-scroll-mode"]
+	path = lib/pdf-continuous-scroll-mode
+	url = https://github.com/dalanicolai/pdf-continuous-scroll-mode.el.git
 [submodule "pdf-tools"]
 	path = lib/pdf-tools
 	url = https://github.com/vedang/pdf-tools.git
@@ -389,6 +395,9 @@
 [submodule "ws-butler"]
 	path = lib/ws-butler
 	url = https://github.com/lewang/ws-butler.git
+[submodule "xeft"]
+	path = lib/xeft
+	url = https://github.com/casouri/xeft.git
 [submodule "xr"]
 	path = lib/xr
 	url = https://github.com/mattiase/xr.git
