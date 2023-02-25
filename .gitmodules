@@ -286,6 +286,9 @@
 [submodule "peg"]
 	path = lib/peg
 	url = https://github.com/emacsmirror/peg.git
+[submodule "pinyinlib"]
+	path = lib/pinyinlib
+	url = https://github.com/cute-jumper/pinyinlib.el.git
 [submodule "plantuml-mode"]
 	path = lib/plantuml-mode
 	url = https://github.com/skuro/plantuml-mode.git
@@ -301,9 +304,6 @@
 [submodule "pulsar"]
 	path = lib/pulsar
     url = https://github.com/protesilaos/pulsar.git
-[submodule "pyim"]
-	path = lib/pyim
-	url = https://github.com/tumashu/pyim.git
 [submodule "quickrun"]
 	path = lib/quickrun
 	url = https://github.com/emacsorphanage/quickrun.git
@@ -398,9 +398,6 @@
 [submodule "xeft"]
 	path = lib/xeft
 	url = https://github.com/casouri/xeft.git
-[submodule "xr"]
-	path = lib/xr
-	url = https://github.com/mattiase/xr.git
 [submodule "yasnippet"]
 	path = lib/yasnippet
 	url = https://github.com/joaotavora/yasnippet.git

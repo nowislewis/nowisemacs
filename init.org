@@ -47,7 +47,7 @@ I feel in love denote, so the previous *org-roam* configs are refiled in [[file:
   - [[#undo][Undo]]
 - [[#补全][补全]]
   - [[#completions-with-vertico][Completions with Vertico]]
-  - [[#orderless][Orderless]]
+  - [[#orderless-and-pinyinlib][Orderless and pinyinlib]]
   - [[#consult-commands][Consult Commands]]
   - [[#marginalia][Marginalia]]
   - [[#embark][embark]]
@@ -179,7 +179,7 @@ I feel in love denote, so the previous *org-roam* configs are refiled in [[file:
     (setq use-dialog-box nil)               ;never pop dialog
     (setq mouse-yank-at-point t)            ;粘贴于光标处,而不是鼠标指针处
 
-    (setq frame-resize-pixelwise t) ;设置缩放的模式,避免Mac平台最大化窗口以后右边和下边有空隙
+    ;; (setq frame-resize-pixelwise t) ;设置缩放的模式,避免Mac平台最大化窗口以后右边和下边有空隙
     ;; (set-frame-parameter nil 'fullscreen 'maximized)
 #+end_src
 ** generic
@@ -794,7 +794,7 @@ Maybe I should add a new state.
                  'conf-toml-mode-hook
                  'nxml-mode-hook
                  'nim-mode-hook
-                 'org-mode-hook
+                 ;;'org-mode-hook
                  'verilog-mode-hook
                  ))
     (add-hook hook (lambda () (display-line-numbers-mode))))
@@ -819,7 +819,7 @@ rainbow-delimiters is a "rainbow parentheses"-like mode which highlights delimit
 diff-hl-mode highlights uncommitted changes on the left side of the window (area also known as the "gutter"), allows you to jump between and revert them selectively.
 #+begin_src elisp
   (setup diff-hl
-    (:hook-into text-mode prog-mode)
+    (:hook-into prog-mode)
     (:when-loaded
       (diff-hl-margin-mode)))
 #+end_src
@@ -1004,12 +1004,18 @@ diff-hl-mode highlights uncommitted changes on the left side of the window (area
      (vertico-mode)
     ))
 #+end_src
-** Orderless
+** Orderless and pinyinlib
 #+begin_src elisp
   (setup orderless
     (:option completion-styles '(orderless)
              completion-category-defaults nil
-             completion-category-overrides '((file (styles . (partial-completion))))))
+             completion-category-overrides '((file (styles . (partial-completion)))))
+    (:when-loaded
+      (require 'pinyinlib)
+      (defun completion--regex-pinyin (str)
+        (orderless-regexp (pinyinlib-build-regexp-string str)))
+      (add-to-list 'orderless-matching-styles 'completion--regex-pinyin)
+      ))
 #+end_src
 ** Consult Commands
 *** consult
@@ -1354,7 +1360,7 @@ borrowed from citre, now you can always jump-back use "M-,"
   (setup posframe)
 #+end_src
 ** pyim
-#+begin_src elisp
+#+begin_src elisp :tangle no
   ;; (setup pyim-tsinghua-dict
   ;;   (:load-after pyim-dict)
   ;;   (:when-loaded
@@ -2479,7 +2485,7 @@ I use corfu english helper instead of company-english-helper.
             #'TeX-revert-document-buffer)
 #+end_src
 ** pdf-continuous-scroll-mode
-#+begin_src elisp
+#+begin_src elisp :tangle no
     (setup pdf-continuous-scroll-mode
       (:option pdf-continuous-suppress-introduction t)
       (:load-after pdf-tools))
@@ -2534,10 +2540,10 @@ Simple distraction-free editing. I use darkroom instead of writeroom because it'
     (add-to-list 'load-path "~/.emacs.d/lib/eaf")
     (:option eaf-browser-enable-autofill t
              eaf-webengine-font-family "Noto Sans CJK SC"
+             eaf-webengine-serif-font-family "Noto Sans CJK SC"
              eaf-webengine-fixed-font-family "JetBrainsMono Nerd Font"
              eaf-config-location (concat no-littering-var-directory "eaf/")
              eaf-python-command "~/.pyenv/shims/python3"
-             ;; eaf-find-alternate-file-in-dired t
              ))
 
   (setup eaf-browser
@@ -2550,6 +2556,25 @@ Simple distraction-free editing. I use darkroom instead of writeroom because it'
   (setup eaf-map
     (:autoload eaf-open-map))
   (setup eaf-markdown-previewer)
+
+  (setup eaf-interleave
+    (:option eaf-interleave-org-notes-dir-list '("~/Documents/emacs/01-orgmode/" ".")
+             eaf-interleave-disable-narrowing t
+             eaf-interleave-split-lines 20
+             eaf-find-alternate-file-in-dired t
+             )
+    (:bind "M-."  'eaf-interleave-sync-current-note
+           "M-p"  'eaf-interleave-sync-previous-note
+           "M-n"  'eaf-interleave-sync-next-note)
+    (:with-map eaf-interleave-app-mode-map
+      (:bind
+       "C-c M-i"  'eaf-interleave-add-note
+       "C-c M-o"  'eaf-interleave-open-notes-file
+       "C-c M-q"  'eaf-interleave-quit))
+    (add-hook 'eaf-pdf-viewer-hook 'eaf-interleave-app-mode)
+    (add-hook 'eaf-browser-hook 'eaf-interleave-app-mode)
+    ;; (add-hook 'org-mode-hook 'eaf-interleave-mode)
+    )
 #+end_src
 
 ** proxy
