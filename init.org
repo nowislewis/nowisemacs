@@ -113,7 +113,6 @@ I feel in love denote, so the previous *org-roam* configs are refiled in [[file:
   - [[#dictionary-overlay][dictionary-overlay]]
 - [[#阅读][阅读]]
   - [[#pdf-tools][pdf-tools]]
-  - [[#pdf-continuous-scroll-mode][pdf-continuous-scroll-mode]]
   - [[#elfeed][elfeed]]
   - [[#efleed-org][efleed-org]]
   - [[#nov][nov]]
@@ -2484,12 +2483,6 @@ I use corfu english helper instead of company-english-helper.
   (add-hook 'TeX-after-compilation-finished-functions
             #'TeX-revert-document-buffer)
 #+end_src
-** pdf-continuous-scroll-mode
-#+begin_src elisp :tangle no
-    (setup pdf-continuous-scroll-mode
-      (:option pdf-continuous-suppress-introduction t)
-      (:load-after pdf-tools))
-#+end_src
 ** elfeed
 #+begin_src elisp
   (setup elfeed
@@ -2543,8 +2536,10 @@ Simple distraction-free editing. I use darkroom instead of writeroom because it'
              eaf-webengine-serif-font-family "Noto Sans CJK SC"
              eaf-webengine-fixed-font-family "JetBrainsMono Nerd Font"
              eaf-config-location (concat no-littering-var-directory "eaf/")
-             eaf-python-command "~/.pyenv/shims/python3"
-             ))
+             )
+    (if (eq system-type 'darwin)
+             (setq eaf-python-command "~/.pyenv/shims/python3")))
+
 
   (setup eaf-browser
     (:autoload eaf-open-browser)

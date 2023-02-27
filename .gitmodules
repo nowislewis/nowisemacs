@@ -277,9 +277,6 @@
 [submodule "parsebib"]
 	path = lib/parsebib
 	url = https://github.com/joostkremers/parsebib.git
-[submodule "pdf-continuous-scroll-mode"]
-	path = lib/pdf-continuous-scroll-mode
-	url = https://github.com/dalanicolai/pdf-continuous-scroll-mode.el.git
 [submodule "pdf-tools"]
 	path = lib/pdf-tools
 	url = https://github.com/vedang/pdf-tools.git
