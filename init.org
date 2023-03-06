@@ -2551,6 +2551,7 @@ Simple distraction-free editing. I use darkroom instead of writeroom because it'
   (setup eaf-map
     (:autoload eaf-open-map))
   (setup eaf-markdown-previewer)
+  (setup eaf-markmap)
 
   (setup eaf-interleave
     (:option eaf-interleave-org-notes-dir-list '("~/Documents/emacs/01-orgmode/" ".")
