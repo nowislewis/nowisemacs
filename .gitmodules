@@ -225,6 +225,9 @@
 [submodule "nov"]
 	path = lib/nov
     url = https://github.com/emacsmirror/nov.git
+[submodule "nov-xwidget"]
+	path = lib/nov-xwidget
+	url = https://github.com/chenyanming/nov-xwidget.git
 [submodule "orderless"]
 	path = lib/orderless
 	url = https://github.com/oantolin/orderless.git

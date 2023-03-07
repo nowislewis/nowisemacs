@@ -116,6 +116,7 @@ I feel in love denote, so the previous *org-roam* configs are refiled in [[file:
   - [[#elfeed][elfeed]]
   - [[#efleed-org][efleed-org]]
   - [[#nov][nov]]
+  - [[#nov-xwidget][nov-xwidget]]
   - [[#darkroom][darkroom]]
   - [[#markdown-mode][markdown-mode]]
 - [[#tools][tools]]
@@ -2503,6 +2504,21 @@ I use corfu english helper instead of company-english-helper.
   (setup esxml) ;; <- (setup kv)
   (setup nov
     (:file-match "\\.epub\\'"))
+#+end_src
+** nov-xwidget
+#+begin_src elisp
+  (setup nov-xwidget
+    (:load-after nov)
+    (:with-map nov-xwidget-webkit-mode-map
+    (:bind "n" 'nov-xwidget-next-document
+           "p" 'nov-xwidget-previous-document
+           "]" 'nov-xwidget-next-document
+           "[" 'nov-xwidget-previous-document
+           "t" 'nov-xwidget-goto-toc
+           "S" 'nov-xwidget-find-source-file))
+    (:when-loaded
+      (define-key nov-mode-map (kbd "o") 'nov-xwidget-view)
+      (add-hook 'nov-mode-hook 'nov-xwidget-inject-all-files)))
 #+end_src
 ** darkroom
 Simple distraction-free editing. I use darkroom instead of writeroom because it's more simple
