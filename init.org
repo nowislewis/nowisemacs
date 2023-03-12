@@ -2099,6 +2099,7 @@ Disassemble C, C++ or Fortran code under cursor
              org-cite-insert-processor 'citar
              org-cite-follow-processor 'citar
              org-cite-activate-processor 'citar
+             citar-library-paths '("~/Documents/emacs/02-binary-files/03-papers/")
              citar-bibliography org-cite-global-bibliography))
 #+end_src
 *** citar-denote
