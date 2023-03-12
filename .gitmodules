@@ -105,6 +105,9 @@
     load-path = .
     load-path = core
     load-path = extension
+[submodule "ebib"]
+	path = lib/ebib
+	url = https://github.com/joostkremers/ebib.git
 [submodule "edit-indirect"]
 	path = lib/edit-indirect
 	url = https://github.com/Fanael/edit-indirect.git

@@ -92,10 +92,8 @@ I feel in love denote, so the previous *org-roam* configs are refiled in [[file:
   - [[#org-clock][org-clock]]
   - [[#org-noter][org-noter]]
   - [[#org-present][org-present]]
-  - [[#citar][citar]]
-  - [[#citar-denote][citar-denote]]
+  - [[#bibtex-related][bibtex related]]
   - [[#toc-org][toc-org]]
-  - [[#ebib][ebib]]
   - [[#denote][denote]]
   - [[#find-orgmode-dir-files][find orgmode dir files]]
   - [[#org-imagine-excalidraw][org-imagine, excalidraw]]
@@ -2053,32 +2051,70 @@ Disassemble C, C++ or Fortran code under cursor
 #+begin_src elisp
   (setup org-present)
 #+end_src
-** citar
+** bibtex related
+*** bibtex
+#+begin_src elisp
+  (setup bibtex
+    (:option bibtex-autokey-year-length 4
+             bibtex-autokey-titleword-separator "_"
+             bibtex-autokey-name-year-separator "_"
+             bibtex-autokey-year-title-separator "_"
+             bibtex-autokey-titleword-length 15
+             bibtex-autokey-titlewords 10
+             bibtex-autokey-titleword-ignore ;; I took "On" out of this
+             '("A" "An" "The" "Eine?" "Der" "Die" "Das")))
+
+  (defvar do.refs/pdf-dir nil
+    "The path to the directory containing the PDF files. The file
+    for the entry with key <key> is stored as <key>.pdf.")
+
+  (defvar do.refs/notes-dir nil
+    "The path to the directory containing my notes for the
+    references. The note for the item with key <key> is stored in
+    this folder as <key>.org")
+
+  (defvar do.refs/pdf-download-dir nil
+    "The path to the temporary directory to which we download PDF
+    files.")
+
+  (defun do.refs/get-db-file-list ()
+    "Get the list of all the bib files containing my bib database."
+    (directory-files "~/Documents/emacs/03-bibliography/" t "\\.bib\\'"))
+
+  (defun do.refs/update-db-file-list ()
+    "Update the list of bib files."
+    (interactive)
+    (let ((db-list (do.refs/get-db-file-list)))
+      (setq reftex-default-bibliography db-list)
+      (setq bibtex-completion-bibliography db-list)
+      (setq ebib-preload-bib-files db-list)))
+
+#+end_src
+*** citar
 #+begin_src elisp
   (setup parsebib)
   ;; (setup citeproc) ;;<- (setup queue) (setup string-inflection)
   (setup citar
-    (:option org-cite-global-bibliography '("~/Documents/emacs/03-bibliography/better_zotero_bib.bib")
+    (:option org-cite-global-bibliography (do.refs/get-db-file-list)
              org-cite-insert-processor 'citar
              org-cite-follow-processor 'citar
              org-cite-activate-processor 'citar
              citar-bibliography org-cite-global-bibliography))
 #+end_src
-** citar-denote
+*** citar-denote
 #+begin_src elisp
       (setup citar-denote
         (:defer (citar-denote-mode)))
 #+end_src
-** toc-org
+*** ebib
 #+begin_src elisp
-  (setup toc-org
-    (:hook-into org-mode))
-#+end_src
-** ebib
-#+begin_src elisp :tangle no
   (setup ebib
-    (:option ebib-preload-bib-files '("~/Documents/emacs/03-bibliography/better_zotero_bib.bib")
+    (:option ebib-preload-bib-files org-cite-global-bibliography
              ebib-file-search-dirs '("~/Documents/emacs/02-binary-files/03-papers/")
+             ebib-file-associations '(("pdf" . "xpdf")
+                                      ("ps" . "gv")
+                                      ("epub"))
+             ebib-index-window-size 25
              )
     (:when-loaded
       (defcustom ebib-zotero-translation-server "http://127.0.0.1:1969"
@@ -2111,6 +2147,12 @@ Disassemble C, C++ or Fortran code under cursor
           (ebib-import-entries ebib--cur-db)))
       )
     )
+#+end_src
+
+** toc-org
+#+begin_src elisp
+  (setup toc-org
+    (:hook-into org-mode))
 #+end_src
 ** denote
 #+begin_src elisp

@@ -7,3 +7,5 @@
 *** https://manateelazycat.github.io/feed.xml                            :life:
 ** Guix                                                                :guix:
 *** https://guix.gnu.org/feeds/blog.atom
+** org mode
+*** https://ogbe.net/blog.xml
