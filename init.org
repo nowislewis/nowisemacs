@@ -420,7 +420,7 @@ Maybe I should add a new state.
                             '("]" . meow-end-of-thing)
                             '("\\" . quoted-insert)
                             '(";" . meow-expand-1)
-                            '(":" . async-shell-command)
+                            ;; '(":" . async-shell-command)
                             '("'" . consult-register-load)
                             '("," . meow-reverse)
                             '("." . repeat)
@@ -609,6 +609,7 @@ Maybe I should add a new state.
    ;; '("n r f" . project-find-xnotes-dir-files)
    '("n r f" . denote-open-or-create-with-subdirectory)
    '("n r p" . project-find-papers-dir-files)
+   '("n r s" . project-find-searchable-dir-files)
    '("n r o" . project-find-orgmode-dir-files)
    '("n r c" . consult-notes)
    '("n r g" . project-find-gtd-dir-files)
@@ -684,58 +685,79 @@ Maybe I should add a new state.
 * UI
 ** Font
 #+begin_src elisp
-  (if (eq system-type 'darwin)
-      (defvar lewis-font-size 140)
-    (defvar lewis-font-size 120))
-  (defvar lewis-fixed-ch-en-font "Sarasa Mono SC Nerd")
   (defun font-installed-p (font-name)
     "Check if font with FONT-NAME is available."
     (find-font (font-spec :name font-name)))
 
+  ;; font size
+  (if (eq system-type 'darwin)
+      (defvar lewis-font-size 140)
+    (defvar lewis-font-size 120))
+
+  ;; fixed font
+  (setq lewis-fixed-font (cl-loop for font in '(
+                                                "Maple Mono SC NF"
+                                                ;; "InconsolataGo QiHei NF"
+                                                ;; "yaheiInconsolata"
+                                                "JetBrainsMono Nerd Font"
+                                                "JetBrains Mono"
+                                                "Sarasa Mono SC Nerd"
+                                                "Monaco"
+                                                "Consolas"
+                                                )
+                                  when (font-installed-p font)
+                                  return font))
+  ;; variable font
+  (setq lewis-variable-font (cl-loop for font in '(
+                                                   "Noto Sans CJK SC"
+                                                   "Arial"
+                                                   "Helvetica"
+                                                   "Times New Roman")
+                                     when (font-installed-p font)
+                                     return font))
+
+  ;; chinese font
+  (setq lewis-chinese-font (cl-loop for font in '("Maple Mono SC NF"
+                                                  "Sarasa Mono SC Nerd"
+                                                  "Microsoft Yahei")
+                                    when (font-installed-p font)
+                                    return font))
+
+  ;; symbol font
+  (setq lewis-symbol-font (cl-loop for font in '("Symbola"
+                                                 "Symbol")
+                                   when (font-installed-p font)
+                                   return font))
+
   (when (display-graphic-p)
     ;; Set default font
-    (cl-loop for font in '(
-                           ;; "InconsolataGo QiHei NF"
-                           ;; "yaheiInconsolata"
-                           ;; "Maple Mono"
-                           "JetBrainsMono Nerd Font"
-                           "JetBrains Mono"
-                           "Sarasa Mono SC Nerd"
-                           "Monaco"
-                           "Consolas")
-             when (font-installed-p font)
-             return (progn
-                      (set-face-attribute 'default nil :family font :height lewis-font-size)
-                      (set-face-attribute 'fixed-pitch nil :family font :height 1.0)))
+    (if lewis-fixed-font
+        (progn
+          (set-face-attribute 'default nil :family lewis-fixed-font :height lewis-font-size)
+          (set-face-attribute 'fixed-pitch nil :family lewis-fixed-font :height 1.0)))
 
     ;; variable-pitch
-    (cl-loop for font in '("Noto Sans CJK SC" "Arial" "Helvetica" "Times New Roman")
-             when (font-installed-p font)
-             return (set-face-attribute 'variable-pitch nil :family font :height 1.0))
+    (if lewis-variable-font
+        (set-face-attribute 'variable-pitch nil :family lewis-variable-font :height 1.0))
 
     ;; Specify font for all unicode characters
-    ;; (cl-loop for font in '("Symbola" "Symbol")
-    ;;          when (font-installed-p font)
-    ;;          return(set-fontset-font t 'unicode font nil 'prepend))
+    ;; (if lewis-symbol-font
+    ;;     return(set-fontset-font t 'unicode lewis-symbol-font nil 'prepend))
 
     ;; ;; Specify font for Chinese characters
-    (cl-loop for font in '("Sarasa Mono SC Nerd" "Microsoft Yahei")
-             when (font-installed-p font)
-             return (set-fontset-font t '(#x4e00 . #x9fff) font))
+    (if lewis-chinese-font
+        (set-fontset-font t '(#x4e00 . #x9fff) lewis-chinese-font))
     )
 #+end_src
 ** variable-pitch and cn-en-fixed-pitch faces
-#+begin_src elisp
+#+begin_src elisp :tangle no
   (setup mixed-pitch
-    ;; (:hook-into text-mode)
     (:when-loaded
       (delete 'org-table mixed-pitch-fixed-pitch-faces)))
-
   ;; 中英文严格等宽字体设置
   (with-eval-after-load 'org
     (dolist (fixed-chinese-english-face '(org-table))
       (set-face-attribute fixed-chinese-english-face nil :family "Sarasa Mono SC Nerd" :height 1.0)))
-
 #+end_src
 ** Theme
 *** ef-themes
@@ -850,7 +872,7 @@ diff-hl-mode highlights uncommitted changes on the left side of the window (area
              ;; doom-modeline-icon nil
              doom-modeline-unicode-fallback t)
     (:hook-into after-init))
-  (set-face-attribute 'mode-line nil :family "JetBrainsMono Nerd Font" :height 100)
+  (set-face-attribute 'mode-line nil :family lewis-fixed-font :height 100)
 #+end_src
 ** hl-todo
 #+begin_src elisp
@@ -1411,33 +1433,34 @@ borrowed from citre, now you can always jump-back use "M-,"
 #+end_src
 ** rime
 #+begin_src elisp
-  (setup rime
-    (:option rime-disable-predicates '(meow-normal-mode-p
-                                       meow-motion-mode-p
-                                       meow-keypad-mode-p
-                                       rime-predicate-prog-in-code-p
-                                       rime-predicate-punctuation-line-begin-p ;;在行首要输入符号时
-                                       ;; rime-predicate-after-alphabet-char-p ;;在英文字符串之后（必须为以字母开头的英文字符串）
-                                       rime-predicate-current-input-punctuation-p ;;当要输入的是符号时
-                                       rime-predicate-after-ascii-char-p ;;任意英文字符后 ,enable this to use with <s
-                                       rime-predicate-current-uppercase-letter-p ;; 将要输入的为大写字母时
-                                       rime-predicate-space-after-cc-p ;;在中文字符且有空格之后
-                                       )
-             ;; rime-inline-predicates '(
-             ;;                          )
-             default-input-method "rime"
-             rime-show-candidate 'posframe
-             rime-posframe-properties (list :internal-border-width 1)
-             rime-user-data-dir "~/Documents/emacs-rime-user-data/"
-             rime-inline-ascii-trigger 'shift-r
-             )
-    (when (eq system-type 'darwin)
-      (setq
-       rime-emacs-module-header-root "/Applications/Emacs.app/Contents/Resources/include/" ;; use build-emacs
-       ;; rime-emacs-module-header-root "/opt/homebrew/opt/emacs-plus@30/include" ;;use emacs-plus
-       rime-librime-root "~/Downloads/rime-1/dist"
-       ))
-    )
+    (setup rime
+      (:option rime-disable-predicates '(meow-normal-mode-p
+                                         meow-motion-mode-p
+                                         meow-keypad-mode-p
+                                         rime-predicate-prog-in-code-p
+                                         rime-predicate-punctuation-line-begin-p ;;在行首要输入符号时
+                                         ;; rime-predicate-after-alphabet-char-p ;;在英文字符串之后（必须为以字母开头的英文字符串）
+                                         rime-predicate-current-input-punctuation-p ;;当要输入的是符号时
+                                         rime-predicate-after-ascii-char-p ;;任意英文字符后 ,enable this to use with <s
+                                         rime-predicate-current-uppercase-letter-p ;; 将要输入的为大写字母时
+                                         rime-predicate-space-after-cc-p ;;在中文字符且有空格之后
+                                         )
+               ;; rime-inline-predicates '(
+               ;;                          )
+               default-input-method "rime"
+               rime-show-candidate 'posframe
+               rime-posframe-properties (list :internal-border-width 1
+                                              :font "Maple Mono SC NF")
+               rime-user-data-dir "~/Documents/emacs-rime-user-data/"
+               rime-inline-ascii-trigger 'shift-r
+               )
+      (when (eq system-type 'darwin)
+        (setq
+         rime-emacs-module-header-root "/Applications/Emacs.app/Contents/Resources/include/" ;; use build-emacs
+         ;; rime-emacs-module-header-root "/opt/homebrew/opt/emacs-plus@30/include" ;;use emacs-plus
+         rime-librime-root "~/Downloads/rime-1/dist"
+         ))
+      )
 #+end_src
 * File and Browsing
 ** file browsing
@@ -2099,19 +2122,20 @@ Disassemble C, C++ or Fortran code under cursor
              org-cite-insert-processor 'citar
              org-cite-follow-processor 'citar
              org-cite-activate-processor 'citar
-             citar-library-paths '("~/Documents/emacs/02-binary-files/03-papers/")
+             citar-library-paths '("~/Documents/emacs/02-binary-files/02-searchable/01-papers-markable/")
              citar-bibliography org-cite-global-bibliography))
 #+end_src
 *** citar-denote
 #+begin_src elisp
-      (setup citar-denote
-        (:defer (citar-denote-mode)))
+  (setup citar-denote
+    (:option citar-denote-title-format "title")
+    (:defer (citar-denote-mode)))
 #+end_src
 *** ebib
 #+begin_src elisp
   (setup ebib
     (:option ebib-preload-bib-files org-cite-global-bibliography
-             ebib-file-search-dirs '("~/Documents/emacs/02-binary-files/03-papers/")
+             ebib-file-search-dirs '("~/Documents/emacs/02-binary-files/02-searchable/01-papers-markable/")
              ebib-file-associations '(("pdf" . "xpdf")
                                       ("ps" . "gv")
                                       ("epub"))
@@ -2235,7 +2259,11 @@ Disassemble C, C++ or Fortran code under cursor
     (project-find-file t))
   (defun project-find-papers-dir-files ()
     (interactive)
-    (dired (concat nowisemacs-doc-emacs-dir "02-binary-files/03-papers"))
+    (dired (concat nowisemacs-doc-emacs-dir "02-binary-files/02-searchable/01-papers-markable"))
+    (project-find-file t))
+  (defun project-find-searchable-dir-files ()
+    (interactive)
+    (dired (concat nowisemacs-doc-emacs-dir "02-binary-files/02-searchable"))
     (project-find-file t))
   (defun project-find-gtd-dir-files ()
     (interactive)
@@ -2591,9 +2619,9 @@ Simple distraction-free editing. I use darkroom instead of writeroom because it'
   (setup eaf
     (add-to-list 'load-path "~/.emacs.d/lib/eaf")
     (:option eaf-browser-enable-autofill t
-             eaf-webengine-font-family "Noto Sans CJK SC"
-             eaf-webengine-serif-font-family "Noto Sans CJK SC"
-             eaf-webengine-fixed-font-family "JetBrainsMono Nerd Font"
+             eaf-webengine-font-family lewis-variable-font
+             eaf-webengine-serif-font-family lewis-variable-font
+             eaf-webengine-fixed-font-family lewis-fixed-font
              eaf-config-location (concat no-littering-var-directory "eaf/")
              )
     (if (eq system-type 'darwin)
