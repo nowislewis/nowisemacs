@@ -25,6 +25,9 @@
 [submodule "borg"]
 	path = lib/borg
 	url = https://github.com/emacscollective/borg.git
+[submodule "bui"]
+	path = lib/bui
+	url = https://github.com/alezost/bui.el.git
 [submodule "cape"]
 	path = lib/cape
 	url = https://github.com/minad/cape.git
@@ -129,6 +132,9 @@
 [submodule "elisp-refs"]
 	path = lib/elisp-refs
 	url = https://github.com/Wilfred/elisp-refs.git
+[submodule "emacs-guix"]
+	path = lib/emacs-guix
+	url = https://git.savannah.gnu.org/git/guix/emacs-guix.git/
 [submodule "embark"]
 	path = lib/embark
 	url = https://github.com/oantolin/embark.git
@@ -204,6 +210,9 @@
 [submodule "magit"]
 	path = lib/magit
 	url = https://github.com/magit/magit
+[submodule "magit-popup"]
+	path = lib/magit-popup
+	url = https://github.com/magit/magit-popup.git
 [submodule "maple-explorer"]
 	path = lib/maple-explorer
 	url = https://github.com/honmaple/emacs-maple-explorer.git
@@ -246,6 +255,9 @@
 [submodule "org-modern"]
 	path = lib/org-modern
 	url = https://github.com/minad/org-modern.git
+[submodule "org-modern-indent"]
+	path = lib/org-modern-indent
+	url = https://github.com/jdtsmith/org-modern-indent.git
 [submodule "org-noter"]
 	path = lib/org-noter
 	url = https://github.com/c1-g/org-noter-plus-djvu.git

@@ -86,6 +86,7 @@ I failed in love with denote, so previous *org-roam* configs were refiled into [
 - [[#org-mode][Org Mode]]
   - [[#org-mode-1][org-mode]]
   - [[#org-modern][org-modern]]
+  - [[#org-modern-indent][org-modern-indent]]
   - [[#org-appear][org-appear]]
   - [[#org-download][org-download]]
   - [[#ox-hugo][ox-hugo]]
@@ -124,6 +125,7 @@ I failed in love with denote, so previous *org-roam* configs were refiled into [
   - [[#app-launcher][app-launcher]]
   - [[#keyfreq][keyfreq]]
   - [[#gif-screencast][gif-screencast]]
+  - [[#emacs-guix][emacs-guix]]
 - [[#use-single-file-to-load-configs][use single file to load configs]]
   - [[#provide][provide]]
   - [[#load-init-configel][load init-config.el]]
@@ -2018,6 +2020,11 @@ Disassemble C, C++ or Fortran code under cursor
     ;; (add-hook 'org-agenda-finalize-hook #'org-modern-agenda)
     )
 #+end_src
+** org-modern-indent
+#+begin_src elisp
+  (setup org-modern-indent
+    (add-hook 'org-mode-hook #'org-modern-indent-mode 90))
+#+end_src
 ** org-appear
 #+begin_src elisp
   (setup org-appear
@@ -2720,6 +2727,12 @@ Simple distraction-free editing. I use darkroom instead of writeroom because it'
       )
     (keymap-global-set "M-o" #'my/siri-ocr)
     )
+#+end_src
+** emacs-guix
+#+begin_src elisp
+  (setup bui)
+  (setup magit-popup)
+  (setup emacs-guix)
 #+end_src
 * use single file to load configs
 this can avoid errors of native compilation of init.el
