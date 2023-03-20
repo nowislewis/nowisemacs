@@ -225,6 +225,9 @@
 [submodule "meow"]
 	path = lib/meow
 	url = https://github.com/meow-edit/meow.git
+[submodule "mind-wave"]
+	path = lib/mind-wave
+	url = https://github.com/manateelazycat/mind-wave.git
 [submodule "nasm-mode"]
 	path = lib/nasm-mode
 	url = https://github.com/skeeto/nasm-mode.git

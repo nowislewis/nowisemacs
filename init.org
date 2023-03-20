@@ -126,6 +126,7 @@ I failed in love with denote, so previous *org-roam* configs were refiled into [
   - [[#keyfreq][keyfreq]]
   - [[#gif-screencast][gif-screencast]]
   - [[#emacs-guix][emacs-guix]]
+  - [[#mind-wave][mind-wave]]
 - [[#use-single-file-to-load-configs][use single file to load configs]]
   - [[#provide][provide]]
   - [[#load-init-configel][load init-config.el]]
@@ -173,8 +174,8 @@ I failed in love with denote, so previous *org-roam* configs were refiled into [
 
     (setq-default tab-width 4)
     ;; 平滑地进行半屏滚动，避免滚动后recenter操作
-    ;; (setq scroll-step 1
-    ;;       scroll-conservatively 10000)
+    (setq scroll-step 1
+          scroll-conservatively 10000)
     (setq completions-detailed t) ;;useful in emacs 28
     (setq use-dialog-box nil)               ;never pop dialog
     (setq mouse-yank-at-point t)            ;粘贴于光标处,而不是鼠标指针处
@@ -2670,7 +2671,7 @@ Simple distraction-free editing. I use darkroom instead of writeroom because it'
 ** proxy
 #+begin_src elisp
   ;; Configure network proxy
-  (setq my-proxy "socks://127.0.0.1:20170")
+  (setq my-proxy "socks://127.0.0.1:1089")
   (defun show-proxy ()
     "Show http/https proxy."
     (interactive)
@@ -2733,6 +2734,13 @@ Simple distraction-free editing. I use darkroom instead of writeroom because it'
   (setup bui)
   (setup magit-popup)
   (setup emacs-guix)
+#+end_src
+
+** mind-wave
+#+begin_src elisp
+  (setup mind-wave
+    ;; (:option mind-wave-api-key-path "~/Documents/emacs/08-keys/chatgpt_api_key.txt")
+    (:autoload mind-wave-chat-mode))
 #+end_src
 * use single file to load configs
 this can avoid errors of native compilation of init.el
