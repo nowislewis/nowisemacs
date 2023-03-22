@@ -127,6 +127,7 @@ I failed in love with denote, so previous *org-roam* configs were refiled into [
   - [[#gif-screencast][gif-screencast]]
   - [[#emacs-guix][emacs-guix]]
   - [[#mind-wave][mind-wave]]
+  - [[#whisperel][whisper.el]]
 - [[#use-single-file-to-load-configs][use single file to load configs]]
   - [[#provide][provide]]
   - [[#load-init-configel][load init-config.el]]
@@ -2741,6 +2742,14 @@ Simple distraction-free editing. I use darkroom instead of writeroom because it'
   (setup mind-wave
     ;; (:option mind-wave-api-key-path "~/Documents/emacs/08-keys/chatgpt_api_key.txt")
     (:autoload mind-wave-chat-mode))
+#+end_src
+** whisper.el
+#+begin_src elisp
+  (setup whisper
+    (:option whisper-install-directory (concat no-littering-var-directory "whisper")
+             whisper-language "zh"
+             whisper-model "small"
+             whisper-use-threads 8))
 #+end_src
 * use single file to load configs
 this can avoid errors of native compilation of init.el
