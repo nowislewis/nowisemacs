@@ -190,9 +190,6 @@
 [submodule "iscroll"]
 	path = lib/iscroll
 	url = https://github.com/casouri/iscroll.git
-[submodule "keyfreq"]
-	path = lib/keyfreq
-	url = https://github.com/dacap/keyfreq
 [submodule "kv"]
 	path = lib/kv
 	url = https://github.com/nicferrier/emacs-kv.git

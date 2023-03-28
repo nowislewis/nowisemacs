@@ -5,7 +5,8 @@ I failed in love with denote, so previous *org-roam* configs were refiled into [
 - [[#startup-config][Startup config]]
   - [[#ui-speed-up][UI speed up]]
   - [[#basic-modes][basic modes]]
-  - [[#generic][generic]]
+  - [[#load-path][load-path]]
+  - [[#drop][drop]]
   - [[#set-vars][set vars]]
 - [[#package-management][Package Management]]
   - [[#setup][setup]]
@@ -13,14 +14,13 @@ I failed in love with denote, so previous *org-roam* configs were refiled into [
 - [[#gcmh][gcmh]]
 - [[#keyboard-bindings][Keyboard Bindings]]
   - [[#meow][meow]]
-  - [[#meow-commands-like-vim][meow commands like vim]]
   - [[#transient-for-leader-keybindings][transient for leader-keybindings]]
   - [[#meow-leader-keys][meow leader keys]]
   - [[#which-key][which-key]]
   - [[#insert-pair][insert-pair]]
   - [[#electric][electric]]
 - [[#ui][UI]]
-  - [[#font][Font]]
+  - [[#font][font]]
   - [[#variable-pitch-and-cn-en-fixed-pitch-faces][variable-pitch and cn-en-fixed-pitch faces]]
   - [[#theme][Theme]]
   - [[#line-number][line number]]
@@ -35,7 +35,7 @@ I failed in love with denote, so previous *org-roam* configs were refiled into [
   - [[#iscroll][iscroll]]
 - [[#general-configuration][General Configuration]]
   - [[#simple][simple]]
-  - [[#general-modes][general modes]]
+  - [[#general-builtin-modes][general builtin modes]]
   - [[#backup][backup]]
   - [[#no-littering][no-littering]]
   - [[#recentf][recentf]]
@@ -63,7 +63,7 @@ I failed in love with denote, so previous *org-roam* configs were refiled into [
 - [[#ibuffer][ibuffer]]
   - [[#ibuffer-1][ibuffer]]
 - [[#input][Input]]
-- [[#posframe][posframe]]
+  - [[#posframe][posframe]]
   - [[#pyim][pyim]]
   - [[#rime][rime]]
 - [[#file-and-browsing][File and Browsing]]
@@ -121,9 +121,7 @@ I failed in love with denote, so previous *org-roam* configs were refiled into [
 - [[#tools][tools]]
   - [[#xwidget-and-browser][xwidget and browser]]
   - [[#eaf][eaf]]
-  - [[#proxy][proxy]]
   - [[#app-launcher][app-launcher]]
-  - [[#keyfreq][keyfreq]]
   - [[#gif-screencast][gif-screencast]]
   - [[#emacs-guix][emacs-guix]]
   - [[#mind-wave][mind-wave]]
@@ -137,7 +135,7 @@ I failed in love with denote, so previous *org-roam* configs were refiled into [
 
 * Startup config
 ** UI speed up
-#+name: ui-speed-up
+#+NAME: ui-speed-up
 #+begin_src elisp :tangle ~/.emacs.d/early-init.el
   ;; -*- lexical-binding: t; -*-
   (setq gc-cons-threshold most-positive-fixnum
@@ -164,6 +162,7 @@ I failed in love with denote, so previous *org-roam* configs were refiled into [
         )
 #+end_src
 ** basic modes
+#+NAME: basic-modes
 #+begin_src elisp
   ;; -*- lexical-binding: t; -*-
     ;; basic modes
@@ -184,7 +183,8 @@ I failed in love with denote, so previous *org-roam* configs were refiled into [
     ;; (setq frame-resize-pixelwise t) ;设置缩放的模式,避免Mac平台最大化窗口以后右边和下边有空隙
     ;; (set-frame-parameter nil 'fullscreen 'maximized)
 #+end_src
-** generic
+** load-path
+#+NAME: load-path
 #+begin_src elisp
   (add-to-list 'load-path (expand-file-name "lib/borg" user-emacs-directory))
   (require 'borg)
@@ -193,7 +193,7 @@ I failed in love with denote, so previous *org-roam* configs were refiled into [
           ("git@gitlab.com:" . "https://gitlab.com/")))
   (borg-initialize)
 #+end_src
-
+** drop
 The following content is not enabled yet, because I want to minimize unnecessary settings as much as possible
 #+begin_src elisp :tangle no
   ;; Restore emacs session.
@@ -234,6 +234,7 @@ The following content is not enabled yet, because I want to minimize unnecessary
 
 * Package Management
 ** setup
+#+NAME: setup
 #+begin_src elisp
   (require 'setup)
 
@@ -304,6 +305,7 @@ I use borg to manage packages, so setup.el is only used to config packages quick
 #+end_src
 * gcmh
 Enforce a sneaky Garbage Collection strategy to minimize GC interference with user activity.
+#+name: gcmh
 #+begin_src elisp
   (setup gcmh
     (:option gcmh-auto-idle-delay-factor 10
@@ -314,6 +316,7 @@ Enforce a sneaky Garbage Collection strategy to minimize GC interference with us
 I used to be a vim(evil) user, but now I use meow to manage all my keys.
 ** meow
 Maybe I should add a new state.
+#+name: meow
 #+begin_src elisp
   (setup meow
     (require 'meow)
@@ -438,9 +441,7 @@ Maybe I should add a new state.
                             '("*" . symbol-overlay-put)
                             '("/" . consult-line))
     (meow-global-mode 1))
-#+end_src
-** meow commands like vim
-#+begin_src elisp
+
   (defun meow-append-vim()
     (interactive)
     (progn (meow-line 1)
@@ -452,14 +453,13 @@ Maybe I should add a new state.
 #+end_src
 ** transient for leader-keybindings
 *** Transient
+#+name: transient
 #+begin_src elisp
   (setup transient
     (require 'transient)
     (:with-map transient-base-map
       (:bind "<escape>" transient-quit-one)))
-#+end_src
-*** G extra commands
-#+begin_src elisp
+
   (transient-define-prefix g-extra-commands()
     "Define notes leader-key maps"
     [["Code find"
@@ -491,9 +491,7 @@ Maybe I should add a new state.
       ("c" "citre-ace-peek" citre-ace-peek)
       ]
      ])
-#+end_src
-*** lewis-keybindings
-#+begin_src elisp
+
   (transient-define-prefix leader-map-for-lewis()
     "Define leader-key map for special functions"
     [["Citre"
@@ -517,9 +515,7 @@ Maybe I should add a new state.
      ["Youdao"
       ("yp" "Translate posframe" my-gts-translate-posframe)
       ("yi" "Translate input" gts-do-translate)]])
-#+end_src
-*** buffer-keybindings
-#+begin_src elisp
+
   (transient-define-prefix leader-map-for-buffer()
     "Define leader-key map for buffer functions"
     [["Buffer"
@@ -535,6 +531,7 @@ Maybe I should add a new state.
      ("M" "bookmark-delete" bookmark-delete)]])
 #+end_src
 ** meow leader keys
+#+name: meow-leader-keys
 #+begin_src elisp
   ;; default
   (meow-leader-define-key
@@ -630,10 +627,11 @@ Maybe I should add a new state.
    '("TAB". leader-map-for-tabspaces))
 #+END_SRC
 ** which-key
+#+name: which-key
 #+begin_src elisp
   (setup which-key
     (:option which-key-idle-delay 0.1)
-    (:defer (which-key-mode)))
+    (which-key-mode))
 #+end_src
 ** insert-pair
 #+begin_src elisp
@@ -683,11 +681,11 @@ Maybe I should add a new state.
 ** electric
 #+begin_src elisp
   (setup elec-pair
-    (:defer
-     (electric-pair-mode)))
+     (electric-pair-mode))
 #+end_src
 * UI
-** Font
+** font
+#+name: font
 #+begin_src elisp
   (defun font-installed-p (font-name)
     "Check if font with FONT-NAME is available."
@@ -765,11 +763,13 @@ Maybe I should add a new state.
 #+end_src
 ** Theme
 *** ef-themes
+#+name: themes
 #+begin_src elisp
   (setup ef-themes)
   (load-theme 'ef-winter t)
 #+end_src
 ** line number
+#+name: line-number
 #+begin_src elisp
   ;; line number
   ;; only enable line number in some modes, borrowed from lazycat-emacs
@@ -882,15 +882,12 @@ diff-hl-mode highlights uncommitted changes on the left side of the window (area
 #+begin_src elisp
   ;; 0.48
   (setup hl-todo
-    (:defer
      (global-hl-todo-mode))
-    )
 #+end_src
 ** pulsar
 #+begin_src elisp
   (setup pulsar
-    (:defer
-     (pulsar-global-mode 1)))
+     (pulsar-global-mode 1))
 #+end_src
 ** show-paren-mode
 #+begin_src elisp
@@ -904,6 +901,7 @@ diff-hl-mode highlights uncommitted changes on the left side of the window (area
 #+end_src
 * General Configuration
 ** simple
+#+name: simple
 #+begin_src elisp
   (setup simple
     ;; show line/column/filesize in modeline
@@ -913,32 +911,30 @@ diff-hl-mode highlights uncommitted changes on the left side of the window (area
              kill-do-not-save-duplicates t
              shell-command-prompt-show-cwd t
              what-cursor-show-names t)
-    (:defer
      (global-visual-line-mode)
-     ))
+     )
 #+end_src
-** general modes
+** general builtin modes
+#+name: general-builtin-modes
 #+begin_src elisp
   (setup save-place
-    (:defer save-place-mode))
+    (save-place-mode))
 
   (setup autorevert
     (:option global-auto-revert-non-file-buffers t)
-    (:defer (global-auto-revert-mode t)))                  ; 当另一程序修改了文件时，让 Emacs 及时刷新 Buffer
+    (global-auto-revert-mode t))                  ; 当另一程序修改了文件时，让 Emacs 及时刷新 Buffer
   (setup hl-line
-    (:defer
-     (global-hl-line-mode)))
+     (global-hl-line-mode))
   (setup frame
-    (:defer (blink-cursor-mode -1)                  ;指针不闪动
-            ))
+    (blink-cursor-mode -1)                  ;指针不闪动
+            )
 
   (setup pixel-scroll
-    (:defer
      ;; 最近发现和 pdf-view-mode 工作不协调
      (when (>= emacs-major-version 29)
-       (pixel-scroll-precision-mode t))))
+       (pixel-scroll-precision-mode t)))
   (setup repeat
-    (:defer (repeat-mode)))
+    (repeat-mode))
 #+end_src
 ** backup
 *** super-save
@@ -1002,6 +998,7 @@ diff-hl-mode highlights uncommitted changes on the left side of the window (area
 #+end_src
 ** exec-path-from-shell
 可以优化速度, 建议看一下官网的一篇文章
+#+name: exec-path-from-shell
 #+begin_src elisp
   (setup exec-path-from-shell
     (:defer
@@ -1010,6 +1007,7 @@ diff-hl-mode highlights uncommitted changes on the left side of the window (area
 #+end_src
 ** Undo
 *** vundo for undo history
+#+name: vundo
 #+begin_src elisp
   (setup vundo
     (:bind "l" vundo-forward
@@ -1019,16 +1017,17 @@ diff-hl-mode highlights uncommitted changes on the left side of the window (area
 #+end_src
 * 补全
 ** Completions with Vertico
+#+name: vertico
 #+begin_src elisp
   (setup vertico
     (:option vertico-cycle t)
     (:with-map vertico-map
       (:bind [backspace] vertico-directory-delete-char))
-    (:defer
      (vertico-mode)
-    ))
+    )
 #+end_src
 ** Orderless and pinyinlib
+#+name: orderless
 #+begin_src elisp
   (setup orderless
     (:option completion-styles '(orderless)
@@ -1043,6 +1042,7 @@ diff-hl-mode highlights uncommitted changes on the left side of the window (area
 #+end_src
 ** Consult Commands
 *** consult
+#+name: consult
 #+begin_src elisp
   (setup consult
     (:option register-preview-delay 0.1
@@ -1143,10 +1143,8 @@ should be check after reading the embark.el manual
        ;;       [backtab] corfu-previous
        "<escape>" corfu-quit))
     (:hook corfu-popupinfo-mode)
-    (:defer
      (global-corfu-mode)
      (add-hook 'minibuffer-setup-hook #'corfu-enable-always-in-minibuffer 1)
-     )
     )
 
   (defun corfu-enable-always-in-minibuffer ()
@@ -1294,10 +1292,10 @@ should be check after reading the embark.el manual
 #+end_src
 * Window Management
 ** winner-mode
+#+name: winner-mode
 #+begin_src elisp
   (setup winner
-    (:defer
-     (winner-mode t)))
+     (winner-mode t))
 #+end_src
 ** popper
 Popper is a minor-mode to tame the flood of ephemeral windows Emacs produces, while still keeping them within arm’s reach.
@@ -1318,10 +1316,8 @@ Popper is a minor-mode to tame the flood of ephemeral windows Emacs produces, wh
              )
     (:global "M-`" popper-toggle-latest ;; shadown tmm-menubar
              "C-M-`" popper-toggle-type)
-    (:defer
      (popper-mode +1)
      (popper-echo-mode +1))
-    )
 #+end_src
 ** Move
 *** avy
@@ -1374,12 +1370,13 @@ borrowed from citre, now you can always jump-back use "M-,"
 #+end_src
 * ibuffer
 ** ibuffer
+#+name: ibuffer
 #+begin_src elisp
   (setup ibuffer
     (:global [remap list-buffers] #'ibuffer))
 #+end_src
 * Input
-* posframe
+** posframe
 #+begin_src elisp
   (setup posframe)
 #+end_src
@@ -1472,8 +1469,9 @@ borrowed from citre, now you can always jump-back use "M-,"
 #+begin_src elisp
   (setup dired
     (:option dired-dwim-target t)
-    (:hook dired-hide-details-mode dired-omit-mode)
-    )
+    (:hook dired-hide-details-mode
+           ;; dired-omit-mode
+           ))
     #+end_src
 *** diredfl
 #+begin_src elisp
@@ -1509,6 +1507,7 @@ Dirvish is a minimalistic file manager based on Dired. It's fast
           maple-explorer-imenu-width '(20 . 60)))
 #+end_src
 ** tab-line and tab-bar
+#+name: tab-bar
 #+begin_src elisp
   (setup tab-bar
     (:option tab-bar-new-button-show nil
@@ -1544,39 +1543,44 @@ Dirvish is a minimalistic file manager based on Dired. It's fast
     )
 #+end_src
 ** tabspaces
+#+name: tabspaces
 #+begin_src elisp
-      (setup tabspaces
-        (:option tabspaces-use-filtered-buffers-as-default t)
-        (:defer
-         (tabspaces-mode))
-        (:when-loaded
-          (transient-define-prefix leader-map-for-tabspaces()
-            "Define tabspaces leader-key maps"
-            [["Create or close"
-              ("s" "tabspaces-switch-or-create-workspace" tabspaces-switch-or-create-workspace)
-              ("c" "tabspaces-close-workspace" tabspaces-close-workspace)
-              ("k" "tabspaces-remove-selected-buffer" tabspaces-remove-selected-buffer)
-              ("o" "tabspaces-open-or-create-project-and-workspace" tabspaces-open-or-create-project-and-workspace)
-              ("R" "tab-bar-rename-tab" tab-bar-rename-tab)
-              ("r" "tab-bar-rename-tab-by-name" tab-bar-rename-tab-by-name)
-              ]
-             ["Switch tab bar"
-              ("n" "tab-bar-switch-to-next-tab" tab-bar-switch-to-next-tab)
-              ("p" "tab-bar-switch-to-prev-tab" tab-bar-switch-to-prev-tab)
-              ("l" "tab-bar-switch-to-last-tab" tab-bar-switch-to-last-tab)
-              ]
-             ["Switch tab bar by index"
-              ("1" "tab-bar-select-tab-1st" tab-bar-select-tab-1st)
-              ("2" "tab-bar-select-tab-2nd" tab-bar-select-tab-2nd)
-              ("3" "tab-bar-select-tab-3rd" tab-bar-select-tab-3rd)
-              ("4" "tab-bar-select-tab-4th" tab-bar-select-tab-4th)
-              ("5" "tab-bar-select-tab-5th" tab-bar-select-tab-5th)
-              ("6" "tab-bar-select-tab-6th" tab-bar-select-tab-6th)
-              ("7" "tab-bar-select-tab-7th" tab-bar-select-tab-7th)
-              ]
-             ]
-            )
-          ))
+  (setup tabspaces
+    (:option tabspaces-use-filtered-buffers-as-default t
+             tabspaces-keymap-prefix nil)
+  (tabspaces-mode)
+    (:when-loaded
+      (transient-define-prefix leader-map-for-tabspaces()
+        "Define tabspaces leader-key maps"
+        [["Create or close"
+          ("s" "tabspaces-switch-or-create-workspace" tabspaces-switch-or-create-workspace)
+          ("b" "tabspaces-switch-to-buffer" tabspaces-switch-to-buffer)
+          ("d" "tabspaces-close-workspace" tabspaces-close-workspace)
+          ("k" "tabspaces-remove-selected-buffer" tabspaces-remove-selected-buffer)
+          ("K" "tabspaces-kill-buffers-close-workspace" tabspaces-kill-buffers-close-workspace)
+          ("o" "tabspaces-open-or-create-project-and-workspace" tabspaces-open-or-create-project-and-workspace)
+          ("R" "tabspaces-remove-selected-buffer" tabspaces-remove-selected-buffer)
+          ("r" "tab-bar-rename-tab-by-name" tab-bar-rename-tab-by-name)
+          ("t" "tabspaces-switch-buffer-and-tab" tabspaces-switch-buffer-and-tab)
+          ]
+         ["Switch tab bar"
+          ("n" "tab-bar-switch-to-next-tab" tab-bar-switch-to-next-tab)
+          ("p" "tab-bar-switch-to-prev-tab" tab-bar-switch-to-prev-tab)
+          ("l" "tab-bar-switch-to-last-tab" tab-bar-switch-to-last-tab)
+          ]
+         ["Switch tab bar by index"
+          ("1" "tab-bar-select-tab-1st" tab-bar-select-tab-1st)
+          ("2" "tab-bar-select-tab-2nd" tab-bar-select-tab-2nd)
+          ("3" "tab-bar-select-tab-3rd" tab-bar-select-tab-3rd)
+          ("4" "tab-bar-select-tab-4th" tab-bar-select-tab-4th)
+          ("5" "tab-bar-select-tab-5th" tab-bar-select-tab-5th)
+          ("6" "tab-bar-select-tab-6th" tab-bar-select-tab-6th)
+          ("7" "tab-bar-select-tab-7th" tab-bar-select-tab-7th)
+          ]
+         ]
+        )
+      )
+    )
     #+end_src
 ** project
 #+begin_src elisp
@@ -1594,6 +1598,7 @@ Dirvish is a minimalistic file manager based on Dired. It's fast
 #+end_src
 * shell
 ** vterm
+#+name: vterm
 #+begin_src elisp
   (setup vterm
     (:bind [(control return)] vterm-toggle-insert-cd))
@@ -1627,6 +1632,7 @@ Dirvish is a minimalistic file manager based on Dired. It's fast
     )
 #+end_src
 ** eshell
+#+name: eshell
 #+begin_src elisp
   (defun new-eshell(name)
     "create a new eshell with a given name"
@@ -1759,13 +1765,6 @@ Emacs major-mode to work with Beancount ledger files
 #+end_src
 ** Useful programing tools
 *** UI
-**** tree-sitter
-#+begin_src elisp :tangle no
-  (setup tree-sitter
-    (:hook-into c-mode-common python-mode)
-    (:hook tree-sitter-hl-mode))
-  (setup tree-sitter-langs)
-#+end_src
 **** treesit-auto
 #+begin_src elisp
   (setup treesit-auto
@@ -1781,8 +1780,7 @@ Highlight symbols with keymap-enabled overlays
 **** electric-pair
 #+begin_src elisp
     (setup elec-pair
-      (:defer
-       (electric-pair-mode)))
+       (electric-pair-mode))
 #+end_src
 *** Complete
 **** lsp mode
@@ -2668,48 +2666,9 @@ Simple distraction-free editing. I use darkroom instead of writeroom because it'
     ;; (add-hook 'org-mode-hook 'eaf-interleave-mode)
     )
 #+end_src
-
-** proxy
-#+begin_src elisp
-  ;; Configure network proxy
-  (setq my-proxy "socks://127.0.0.1:1089")
-  (defun show-proxy ()
-    "Show http/https proxy."
-    (interactive)
-    (if url-proxy-services
-        (message "Current proxy is \"%s\"" my-proxy)
-      (message "No proxy")))
-
-  (defun set-proxy ()
-    "Set http/https proxy."
-    (interactive)
-    (setq url-proxy-services `(("http" . ,my-proxy)
-                               ("https" . ,my-proxy)))
-    (show-proxy))
-
-  (defun unset-proxy ()
-    "Unset http/https proxy."
-    (interactive)
-    (setq url-proxy-services nil)
-    (show-proxy))
-
-  (defun toggle-proxy ()
-    "Toggle http/https proxy."
-    (interactive)
-    (if url-proxy-services
-        (unset-proxy)
-      (set-proxy)))
-#+end_src
 ** app-launcher
 #+begin_src elisp
 (setup app-launcher)
-#+end_src
-** keyfreq
-#+begin_src elisp
-  (setup keyfreq
-    (:defer
-     (keyfreq-mode 1)
-     (keyfreq-autosave-mode 1)))
 #+end_src
 ** gif-screencast
 #+begin_src elisp
@@ -2769,4 +2728,36 @@ These 2 files are tangled using noweb and will be used for special purpose.
 1. =init-quick-edit.el= will be used to open a file, edit it and close it quickly.
 2. =init-mininal.el= is a file to start from scratch in which case you don't want the full-blown configurations.
 ** init-quick-edit
+use the following commands in shell:
+#+begin_src bash
+  emacs -Q --daemon -l ~/.emacs.d/init-quick-edit.el
+  emacsclient -t -r
+#+end_src
+
+#+begin_src elisp :noweb yes :tangle init-quick-edit.el
+<<ui-speed-up>>
+<<basic-modes>>
+<<load-path>>
+<<setup>>
+<<gcmh>>
+<<meow>>
+<<transient>>
+<<meow-leader-keys>>
+<<which-key>>
+<<font>>
+<<line-number>>
+<<simple>>
+<<general-builtin-modes>>
+<<exec-path-from-shell>>
+<<vundo>>
+<<vertico>>
+<<orderless>>
+<<consult>>
+<<winner-mode>>
+<<ibuffer>>
+<<tab-bar>>
+<<tabspaces>>
+<<vterm>>
+<<eshell>>
+#+end_src
 ** init-minimal
