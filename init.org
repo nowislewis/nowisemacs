@@ -126,6 +126,7 @@ I failed in love with denote, so previous *org-roam* configs were refiled into [
   - [[#emacs-guix][emacs-guix]]
   - [[#mind-wave][mind-wave]]
   - [[#whisperel][whisper.el]]
+  - [[#backup-scripts][backup scripts]]
 - [[#use-single-file-to-load-configs][use single file to load configs]]
   - [[#provide][provide]]
   - [[#load-init-configel][load init-config.el]]
@@ -2710,6 +2711,22 @@ Simple distraction-free editing. I use darkroom instead of writeroom because it'
              whisper-model "small"
              whisper-use-threads 8))
 #+end_src
+** backup scripts
+#+begin_src elisp
+  (defun lewis-backup-to-nas-rsync()
+    (interactive)
+    (async-shell-command "rsync -avbizh --delete --backup-dir=../back_restore/ ~/Documents/emacs/02-binary-files/02-searchable/ lewis-nas@192.168.31.108:/share/my_webdav/rsync/02-searchable/")
+    )
+  (defun lewis-backup-to-pc-rsync()
+    (interactive)
+    (async-shell-command "rsync -avbizh --delete --backup-dir=../back_restore/ lewis-nas@192.168.31.108:/share/my_webdav/rsync/02-searchable/  ~/Documents/emacs/02-binary-files/02-searchable/")
+    )
+
+  (defun lewis-backup-to-nas-restic()
+    (interactive)
+    (async-shell-command "~/Documents/my-bins/restic -r sftp:lewis-nas@192.168.31.108:/share/my_webdav/restic backup ~/Documents/emacs/02-binary-files/")
+    )
+#+end_src
 * use single file to load configs
 this can avoid errors of native compilation of init.el
 ** provide
@@ -2735,29 +2752,29 @@ use the following commands in shell:
 #+end_src
 
 #+begin_src elisp :noweb yes :tangle init-quick-edit.el
-<<ui-speed-up>>
-<<basic-modes>>
-<<load-path>>
-<<setup>>
-<<gcmh>>
-<<meow>>
-<<transient>>
-<<meow-leader-keys>>
-<<which-key>>
-<<font>>
-<<line-number>>
-<<simple>>
-<<general-builtin-modes>>
-<<exec-path-from-shell>>
-<<vundo>>
-<<vertico>>
-<<orderless>>
-<<consult>>
-<<winner-mode>>
-<<ibuffer>>
-<<tab-bar>>
-<<tabspaces>>
-<<vterm>>
-<<eshell>>
+  <<ui-speed-up>>
+  <<basic-modes>>
+  <<load-path>>
+  <<setup>>
+  <<gcmh>>
+  <<meow>>
+  <<transient>>
+  <<meow-leader-keys>>
+  <<which-key>>
+  <<font>>
+  <<line-number>>
+  <<simple>>
+  <<general-builtin-modes>>
+  <<exec-path-from-shell>>
+  <<vundo>>
+  <<vertico>>
+  <<orderless>>
+  <<consult>>
+  <<winner-mode>>
+  <<ibuffer>>
+  ;; <<tab-bar>>
+  ;; <<tabspaces>>
+  <<vterm>>
+  <<eshell>>
 #+end_src
 ** init-minimal
