@@ -64,9 +64,6 @@
 	url = https://github.com/minad/corfu.git
     load-path = .
     load-path = extensions
-[submodule "corfu-english-helper"]
-	path = lib/corfu-english-helper
-	url = https://github.com/manateelazycat/corfu-english-helper.git
 [submodule "darkroom"]
 	path = lib/darkroom
 	url = https://github.com/joaotavora/darkroom.git
@@ -225,6 +222,9 @@
 [submodule "mind-wave"]
 	path = lib/mind-wave
 	url = https://github.com/manateelazycat/mind-wave.git
+[submodule "mpv"]
+	path = lib/mpv
+	url = https://github.com/kljohann/mpv.el.git
 [submodule "nasm-mode"]
 	path = lib/nasm-mode
 	url = https://github.com/skeeto/nasm-mode.git
@@ -258,6 +258,9 @@
 [submodule "org-modern-indent"]
 	path = lib/org-modern-indent
 	url = https://github.com/jdtsmith/org-modern-indent.git
+[submodule "org-mpvi"]
+	path = lib/org-mpvi
+	url = https://github.com/lorniu/org-mpvi.git
 [submodule "org-noter"]
 	path = lib/org-noter
 	url = https://github.com/c1-g/org-noter-plus-djvu.git
@@ -331,6 +334,9 @@
 [submodule "s"]
 	path = lib/s
 	url = https://github.com/magnars/s.el.git
+[submodule "sdcv"]
+	path = lib/sdcv
+	url = https://github.com/manateelazycat/sdcv.git
 [submodule "separedit"]
 	path = lib/separedit
 	url = https://github.com/twlz0ne/separedit.el.git

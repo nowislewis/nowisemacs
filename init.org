@@ -96,6 +96,7 @@ I failed in love with denote, so previous *org-roam* configs were refiled into [
   - [[#bibtex-related][bibtex related]]
   - [[#toc-org][toc-org]]
   - [[#denote][denote]]
+  - [[#denote-menu][denote-menu]]
   - [[#find-orgmode-dir-files][find orgmode dir files]]
   - [[#org-imagine-excalidraw][org-imagine, excalidraw]]
   - [[#shrface][shrface]]
@@ -106,10 +107,11 @@ I failed in love with denote, so previous *org-roam* configs were refiled into [
   - [[#my-gtd][my-gtd]]
   - [[#org-ql][org-ql]]
   - [[#xeft][xeft]]
-- [[#翻译][翻译]]
+  - [[#org-mpvi][org-mpvi]]
+- [[#english-翻译][english 翻译]]
   - [[#go-translate][go-translate]]
-  - [[#corfu-english-helper][corfu-english-helper]]
   - [[#dictionary-overlay][dictionary-overlay]]
+  - [[#sdcv][sdcv]]
 - [[#阅读][阅读]]
   - [[#pdf-tools][pdf-tools]]
   - [[#elfeed][elfeed]]
@@ -1435,34 +1437,34 @@ borrowed from citre, now you can always jump-back use "M-,"
 #+end_src
 ** rime
 #+begin_src elisp
-    (setup rime
-      (:option rime-disable-predicates '(meow-normal-mode-p
-                                         meow-motion-mode-p
-                                         meow-keypad-mode-p
-                                         rime-predicate-prog-in-code-p
-                                         rime-predicate-punctuation-line-begin-p ;;在行首要输入符号时
-                                         ;; rime-predicate-after-alphabet-char-p ;;在英文字符串之后（必须为以字母开头的英文字符串）
-                                         rime-predicate-current-input-punctuation-p ;;当要输入的是符号时
-                                         rime-predicate-after-ascii-char-p ;;任意英文字符后 ,enable this to use with <s
-                                         rime-predicate-current-uppercase-letter-p ;; 将要输入的为大写字母时
-                                         rime-predicate-space-after-cc-p ;;在中文字符且有空格之后
-                                         )
-               ;; rime-inline-predicates '(
-               ;;                          )
-               default-input-method "rime"
-               rime-show-candidate 'posframe
-               rime-posframe-properties (list :internal-border-width 1
-                                              :font "Maple Mono SC NF")
-               rime-user-data-dir "~/Documents/emacs-rime-user-data/"
-               rime-inline-ascii-trigger 'shift-r
-               )
-      (when (eq system-type 'darwin)
-        (setq
-         rime-emacs-module-header-root "/Applications/Emacs.app/Contents/Resources/include/" ;; use build-emacs
-         ;; rime-emacs-module-header-root "/opt/homebrew/opt/emacs-plus@30/include" ;;use emacs-plus
-         rime-librime-root "~/Downloads/rime-1/dist"
-         ))
-      )
+  (setup rime
+    (:option rime-disable-predicates '(meow-normal-mode-p
+                                       meow-motion-mode-p
+                                       meow-keypad-mode-p
+                                       rime-predicate-prog-in-code-p
+                                       rime-predicate-punctuation-line-begin-p ;;在行首要输入符号时
+                                       ;; rime-predicate-after-alphabet-char-p ;;在英文字符串之后（必须为以字母开头的英文字符串）
+                                       rime-predicate-current-input-punctuation-p ;;当要输入的是符号时
+                                       rime-predicate-after-ascii-char-p ;;任意英文字符后 ,enable this to use with <s
+                                       rime-predicate-current-uppercase-letter-p ;; 将要输入的为大写字母时
+                                       rime-predicate-space-after-cc-p ;;在中文字符且有空格之后
+                                       )
+             ;; rime-inline-predicates '(
+             ;;                          )
+             default-input-method "rime"
+             rime-show-candidate 'posframe
+             rime-posframe-properties (list :internal-border-width 1
+                                            :font "Maple Mono SC NF")
+             rime-user-data-dir "~/Documents/emacs-rime-user-data/"
+             rime-inline-ascii-trigger 'shift-r
+             )
+    (when (eq system-type 'darwin)
+      (setq
+       rime-emacs-module-header-root "/Applications/Emacs.app/Contents/Resources/include/" ;; use build-emacs
+       ;; rime-emacs-module-header-root "/opt/homebrew/opt/emacs-plus@30/include" ;;use emacs-plus
+       rime-librime-root "~/Downloads/rime-1/dist"
+       ))
+    )
 #+end_src
 * File and Browsing
 ** file browsing
@@ -1805,6 +1807,7 @@ Highlight symbols with keymap-enabled overlays
     (:option eldoc-echo-area-use-multiline-p t
              eldoc-echo-area-display-truncation-message t))
   ;; (setq eldoc-echo-area-prefer-doc-buffer nil)
+
 #+end_src
 ***** consult-eglot
 #+begin_src elisp
@@ -1815,16 +1818,17 @@ Highlight symbols with keymap-enabled overlays
 #+end_src
 ***** lsp-bridge
 #+begin_src elisp
-    (setup lsp-bridge
-      (:option lsp-bridge-org-babel-lang-list '("emacs-lisp"
-                                                "python"
-                                                "dot"
-                                                "latex"
-                                                "C"
-                                                "C++"
-                                                "scheme"
-                                                "plantuml")
-               ))
+  (setup lsp-bridge
+    (:option lsp-bridge-org-babel-lang-list '("emacs-lisp"
+                                              "python"
+                                              "dot"
+                                              "latex"
+                                              "C"
+                                              "C++"
+                                              "scheme"
+                                              "plantuml")
+             acm-candidate-match-function 'orderless-literal
+             ))
 
 #+end_src
 **** citre
@@ -1842,9 +1846,9 @@ Citre is an advanced Ctags (or actually, readtags) frontend for Emacs.
 **** eacl
 #+begin_src elisp
   (setup eacl
-    (:option eacl-grep-program "ripgrep")
-    (:global "M-l" eacl-complete-line
-             "M-L" eacl-complete-multiline))
+    (:option eacl-grep-program "ripgrep"))
+    ;; (:global "M-l" eacl-complete-line
+    ;;          "M-L" eacl-complete-multiline))
 #+end_src
 *** quickrun
 #+begin_src elisp
@@ -2148,6 +2152,7 @@ Disassemble C, C++ or Fortran code under cursor
                                       ("ps" . "gv")
                                       ("epub"))
              ebib-index-window-size 25
+             ebib-reading-list-file "~/Documents/emacs/01-orgmode/xnotes/20230403T125743--ebib-reading-lists.org"
              )
     (:when-loaded
       (defcustom ebib-zotero-translation-server "http://127.0.0.1:1969"
@@ -2254,6 +2259,7 @@ Disassemble C, C++ or Fortran code under cursor
                     (denote--rewrite-front-matter new-name title keywords file-type)
                   (denote--add-front-matter new-name title keywords id file-type))))))))
 #+end_src
+** denote-menu
 
 ** find orgmode dir files
 #+begin_src elisp
@@ -2500,11 +2506,19 @@ https://dindi.garjola.net/org-agenda-weekly.html
              xeft-recursive t
              ))
 #+end_src
-* 翻译
+** org-mpvi
+Integrate Org with Video
+#+begin_src elisp
+  (setup mpv)
+  (setup org-mpvi)
+#+end_src
+* english 翻译
 ** go-translate
 #+begin_src elisp
   (setup go-translate
     (:option gts-translate-list '(("en" "zh")))
+        (:global "M-l" gts-do-translate)
+
     (:when-loaded
       (setq gts-default-translator (gts-translator
                                     :picker (gts-prompt-picker)
@@ -2521,12 +2535,6 @@ https://dindi.garjola.net/org-agenda-weekly.html
          :render (gts-posframe-pop-render)))
       (gts-translate my-translator-posframe)))
 #+end_src
-** corfu-english-helper
-I use corfu english helper instead of company-english-helper.
-#+begin_src elisp
-  (setup corfu-english-helper
-    (:autoload toggle-corfu-english-helper))
-#+end_src
 ** dictionary-overlay
 #+begin_src elisp
   (setup websocket)
@@ -2538,6 +2546,10 @@ I use corfu english helper instead of company-english-helper.
       (copy-face 'font-lock-keyword-face 'dictionary-overlay-unknownword)
       (copy-face 'font-lock-comment-face 'dictionary-overlay-translation)
       ))
+#+end_src
+** sdcv
+#+begin_src elisp
+  (setup sdcv)
 #+end_src
 * 阅读
 ** pdf-tools
@@ -2624,48 +2636,49 @@ Simple distraction-free editing. I use darkroom instead of writeroom because it'
 #+end_src
 ** eaf
 #+begin_src elisp
-  (setup eaf
-    (add-to-list 'load-path "~/.emacs.d/lib/eaf")
-    (:option eaf-browser-enable-autofill t
-             eaf-webengine-font-family lewis-variable-font
-             eaf-webengine-serif-font-family lewis-variable-font
-             eaf-webengine-fixed-font-family lewis-fixed-font
-             eaf-config-location (concat no-littering-var-directory "eaf/")
-             )
-    (if (eq system-type 'darwin)
-             (setq eaf-python-command "~/.pyenv/shims/python3")))
+    (setup eaf
+      (add-to-list 'load-path "~/.emacs.d/lib/eaf")
+      (:option eaf-browser-enable-autofill t
+               eaf-webengine-font-family lewis-variable-font
+               eaf-webengine-serif-font-family lewis-variable-font
+               eaf-webengine-fixed-font-family lewis-fixed-font
+               eaf-config-location (concat no-littering-var-directory "eaf/")
+               )
+      (if (eq system-type 'darwin)
+               (setq eaf-python-command "~/.pyenv/shims/python3"))
+      (require 'eaf))
 
 
-  (setup eaf-browser
-    (:autoload eaf-open-browser)
-    )
-  (setup eaf-pdf-viewer
-    (:autoload eaf-open-pdf-from-history))
-  (setup eaf-rss-reader
-    (:autoload eaf-open-rss-reader))
-  (setup eaf-map
-    (:autoload eaf-open-map))
-  (setup eaf-markdown-previewer)
-  (setup eaf-markmap)
+    (setup eaf-browser
+      (:autoload eaf-open-browser)
+      )
+    (setup eaf-pdf-viewer
+      (:autoload eaf-open-pdf-from-history))
+    (setup eaf-rss-reader
+      (:autoload eaf-open-rss-reader))
+    (setup eaf-map
+      (:autoload eaf-open-map))
+    (setup eaf-markdown-previewer)
+    (setup eaf-markmap)
 
-  (setup eaf-interleave
-    (:option eaf-interleave-org-notes-dir-list '("~/Documents/emacs/01-orgmode/" ".")
-             eaf-interleave-disable-narrowing t
-             eaf-interleave-split-lines 20
-             eaf-find-alternate-file-in-dired t
-             )
-    (:bind "M-."  'eaf-interleave-sync-current-note
-           "M-p"  'eaf-interleave-sync-previous-note
-           "M-n"  'eaf-interleave-sync-next-note)
-    (:with-map eaf-interleave-app-mode-map
-      (:bind
-       "C-c M-i"  'eaf-interleave-add-note
-       "C-c M-o"  'eaf-interleave-open-notes-file
-       "C-c M-q"  'eaf-interleave-quit))
-    (add-hook 'eaf-pdf-viewer-hook 'eaf-interleave-app-mode)
-    (add-hook 'eaf-browser-hook 'eaf-interleave-app-mode)
-    ;; (add-hook 'org-mode-hook 'eaf-interleave-mode)
-    )
+    (setup eaf-interleave
+      (:option eaf-interleave-org-notes-dir-list '("~/Documents/emacs/01-orgmode/" ".")
+               eaf-interleave-disable-narrowing t
+               eaf-interleave-split-lines 20
+               eaf-find-alternate-file-in-dired t
+               )
+      (:bind "M-."  'eaf-interleave-sync-current-note
+             "M-p"  'eaf-interleave-sync-previous-note
+             "M-n"  'eaf-interleave-sync-next-note)
+      (:with-map eaf-interleave-app-mode-map
+        (:bind
+         "C-c M-i"  'eaf-interleave-add-note
+         "C-c M-o"  'eaf-interleave-open-notes-file
+         "C-c M-q"  'eaf-interleave-quit))
+      (add-hook 'eaf-pdf-viewer-hook 'eaf-interleave-app-mode)
+      (add-hook 'eaf-browser-hook 'eaf-interleave-app-mode)
+      ;; (add-hook 'org-mode-hook 'eaf-interleave-mode)
+      )
 #+end_src
 ** app-launcher
 #+begin_src elisp
