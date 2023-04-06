@@ -1827,7 +1827,8 @@ Highlight symbols with keymap-enabled overlays
                                               "C++"
                                               "scheme"
                                               "plantuml")
-             acm-candidate-match-function 'orderless-literal
+             ;; acm-candidate-match-function 'orderless-literal
+             ;; acm-backend-search-sdcv-words-dictionary (file-truename "~/Downloads/stardicts/stardict-langdao-ec-gb-2.4.2/langdao-ec-gb")
              ))
 
 #+end_src
@@ -1847,8 +1848,6 @@ Citre is an advanced Ctags (or actually, readtags) frontend for Emacs.
 #+begin_src elisp
   (setup eacl
     (:option eacl-grep-program "ripgrep"))
-    ;; (:global "M-l" eacl-complete-line
-    ;;          "M-L" eacl-complete-multiline))
 #+end_src
 *** quickrun
 #+begin_src elisp
@@ -2517,7 +2516,7 @@ Integrate Org with Video
 #+begin_src elisp
   (setup go-translate
     (:option gts-translate-list '(("en" "zh")))
-        (:global "M-l" gts-do-translate)
+        (:global "M-L" gts-do-translate)
 
     (:when-loaded
       (setq gts-default-translator (gts-translator
@@ -2540,7 +2539,7 @@ Integrate Org with Video
   (setup websocket)
   (setup websocket-bridge)
   (setup dictionary-overlay
-    (:option dictionary-overlay-sdcv-dictionary-path "~/Downloads/stardict-ecdict-2.4.2/")
+    (:option dictionary-overlay-sdcv-dictionary-path "~/Downloads/stardicts/")
     (:autoload dictionary-overlay-toggle)
     (:when-loaded
       (copy-face 'font-lock-keyword-face 'dictionary-overlay-unknownword)
@@ -2549,7 +2548,24 @@ Integrate Org with Video
 #+end_src
 ** sdcv
 #+begin_src elisp
-  (setup sdcv)
+  (setup sdcv
+    (:option sdcv-dictionary-data-dir (file-truename "~/Downloads/stardicts")
+             sdcv-dictionary-simple-list (list "简明英汉字典增强版")
+             sdcv-dictionary-complete-list (list "简明英汉字典增强版")
+             )
+    (:global "M-l" lewis-eaf-sdcv-search-pointer+)
+
+    ;; search in eaf mode
+    (defun lewis-sdcv-search-pointer-in-kill-ring()
+      (sdcv-search-input+ (substring-no-properties (car kill-ring) 0)))
+    (defun lewis-eaf-sdcv-search-pointer+()
+      (interactive)
+      (if (derived-mode-p 'eaf-mode)
+          (progn
+            (eaf-py-proxy-copy_select)
+            (run-with-timer 0.2 nil 'lewis-sdcv-search-pointer-in-kill-ring))
+        (sdcv-search-pointer+)))
+    )
 #+end_src
 * 阅读
 ** pdf-tools
@@ -2636,49 +2652,48 @@ Simple distraction-free editing. I use darkroom instead of writeroom because it'
 #+end_src
 ** eaf
 #+begin_src elisp
-    (setup eaf
-      (add-to-list 'load-path "~/.emacs.d/lib/eaf")
-      (:option eaf-browser-enable-autofill t
-               eaf-webengine-font-family lewis-variable-font
-               eaf-webengine-serif-font-family lewis-variable-font
-               eaf-webengine-fixed-font-family lewis-fixed-font
-               eaf-config-location (concat no-littering-var-directory "eaf/")
-               )
-      (if (eq system-type 'darwin)
-               (setq eaf-python-command "~/.pyenv/shims/python3"))
-      (require 'eaf))
+            (setup eaf
+              (add-to-list 'load-path "~/.emacs.d/lib/eaf")
+              (:option eaf-browser-enable-autofill t
+                       eaf-webengine-font-family lewis-variable-font
+                       eaf-webengine-serif-font-family lewis-variable-font
+                       eaf-webengine-fixed-font-family lewis-fixed-font
+                       eaf-config-location (concat no-littering-var-directory "eaf/")
+                       )
+              (if (eq system-type 'darwin)
+                       (setq eaf-python-command "~/.pyenv/shims/python3"))
+              (require 'eaf))
 
+            (setup eaf-browser
+              (:autoload eaf-open-browser)
+              )
+            (setup eaf-pdf-viewer
+              (:autoload eaf-open-pdf-from-history))
+            (setup eaf-rss-reader
+              (:autoload eaf-open-rss-reader))
+            (setup eaf-map
+              (:autoload eaf-open-map))
+            (setup eaf-markdown-previewer)
+            (setup eaf-markmap)
 
-    (setup eaf-browser
-      (:autoload eaf-open-browser)
-      )
-    (setup eaf-pdf-viewer
-      (:autoload eaf-open-pdf-from-history))
-    (setup eaf-rss-reader
-      (:autoload eaf-open-rss-reader))
-    (setup eaf-map
-      (:autoload eaf-open-map))
-    (setup eaf-markdown-previewer)
-    (setup eaf-markmap)
-
-    (setup eaf-interleave
-      (:option eaf-interleave-org-notes-dir-list '("~/Documents/emacs/01-orgmode/" ".")
-               eaf-interleave-disable-narrowing t
-               eaf-interleave-split-lines 20
-               eaf-find-alternate-file-in-dired t
-               )
-      (:bind "M-."  'eaf-interleave-sync-current-note
-             "M-p"  'eaf-interleave-sync-previous-note
-             "M-n"  'eaf-interleave-sync-next-note)
-      (:with-map eaf-interleave-app-mode-map
-        (:bind
-         "C-c M-i"  'eaf-interleave-add-note
-         "C-c M-o"  'eaf-interleave-open-notes-file
-         "C-c M-q"  'eaf-interleave-quit))
-      (add-hook 'eaf-pdf-viewer-hook 'eaf-interleave-app-mode)
-      (add-hook 'eaf-browser-hook 'eaf-interleave-app-mode)
-      ;; (add-hook 'org-mode-hook 'eaf-interleave-mode)
-      )
+            (setup eaf-interleave
+              (:option eaf-interleave-org-notes-dir-list '("~/Documents/emacs/01-orgmode/" ".")
+                       eaf-interleave-disable-narrowing t
+                       eaf-interleave-split-lines 20
+                       eaf-find-alternate-file-in-dired t
+                       )
+              (:bind "M-."  'eaf-interleave-sync-current-note
+                     "M-p"  'eaf-interleave-sync-previous-note
+                     "M-n"  'eaf-interleave-sync-next-note)
+              (:with-map eaf-interleave-app-mode-map
+                (:bind
+                 "C-c M-i"  'eaf-interleave-add-note
+                 "C-c M-o"  'eaf-interleave-open-notes-file
+                 "C-c M-q"  'eaf-interleave-quit))
+              (add-hook 'eaf-pdf-viewer-hook 'eaf-interleave-app-mode)
+              (add-hook 'eaf-browser-hook 'eaf-interleave-app-mode)
+              ;; (add-hook 'org-mode-hook 'eaf-interleave-mode)
+              )
 #+end_src
 ** app-launcher
 #+begin_src elisp
