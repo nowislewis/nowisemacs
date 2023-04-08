@@ -128,7 +128,7 @@ I failed in love with denote, so previous *org-roam* configs were refiled into [
   - [[#emacs-guix][emacs-guix]]
   - [[#mind-wave][mind-wave]]
   - [[#whisperel][whisper.el]]
-  - [[#backup-scripts][backup scripts]]
+  - [[#scripts][scripts]]
 - [[#use-single-file-to-load-configs][use single file to load configs]]
   - [[#provide][provide]]
   - [[#load-init-configel][load init-config.el]]
@@ -509,9 +509,6 @@ Maybe I should add a new state.
      ["Imenu"
       ("l" "Imenu list smart toggle" imenu-list-smart-toggle)]
       ;; ("L" "Boxy imenu" boxy-imenu)]
-     ;; english help
-     ["English helper"
-      ("ht" "Toggle corfu english helper" toggle-corfu-english-helper)]
      ;; org-download
      ["Org download"
       ("d" "Screenshot" org-download-screenshot)]
@@ -618,9 +615,9 @@ Maybe I should add a new state.
    '("n r c" . consult-notes)
    '("n r g" . project-find-gtd-dir-files)
 
-   '("n e" . org-noter)
-
+   '("n e" . ebib)
    '("n b" . citar-open)
+   '("n x" . xeft)
    ;; org-remark
    '("n m m" . org-remark-mark))
 
@@ -2147,6 +2144,8 @@ Disassemble C, C++ or Fortran code under cursor
   (setup ebib
     (:option ebib-preload-bib-files org-cite-global-bibliography
              ebib-file-search-dirs '("~/Documents/emacs/02-binary-files/02-searchable/01-papers-markable/")
+             ebib-bib-search-dirs '("~/Documents/emacs/03-bibliography/")
+             ebib-default-directory 'first-bib-dir
              ebib-file-associations '(("pdf" . "xpdf")
                                       ("ps" . "gv")
                                       ("epub"))
@@ -2200,25 +2199,6 @@ Disassemble C, C++ or Fortran code under cursor
              denote-date-prompt-use-org-read-date t
              denote-modules '(project))
     (add-hook 'dired-mode-hook #'denote-dired-mode-in-directories)
-    (:when-loaded
-      (setq denote-faces--file-name-regexp (concat "\\(?8:[[:alnum:][:nonascii:]/]*\\)?"
-                                                   "\\(?1:[0-9]\\{8\\}\\)\\(?2:T[0-9]\\{6\\}\\)"
-                                                   "\\(?:\\(?3:--\\)\\(?4:[[:alnum:][:nonascii:]-]*\\)\\)?"
-                                                   "\\(?:\\(?5:__\\)\\(?6:[[:alnum:][:nonascii:]_-]*\\)\\)?"
-                                                   "\\(?7:\\..*\\)?$"))
-
-      (setq denote-faces-file-name-keywords `((,(concat " " denote-faces--file-name-regexp)
-                                               (1 'denote-faces-delimiter nil t)
-                                               (2 'denote-faces-delimiter nil t)
-                                               (3 'denote-faces-delimiter nil t)
-                                               (4 'denote-faces-title nil t)
-                                               (5 'denote-faces-delimiter nil t)
-                                               (6 'denote-faces-keywords nil t)
-                                               (7 'denote-faces-extension nil t )
-                                               (8 'denote-faces-time)
-                                               ;; (9 'denote-faces-delimiter nil t)
-                                               )))
-      )
         ;;;###autoload
     (defun denote-open-or-create-with-subdirectory ()
       "Invoke `denote-open-or-create' but also prompt for subdirectory.
@@ -2728,7 +2708,6 @@ Simple distraction-free editing. I use darkroom instead of writeroom because it'
 ** mind-wave
 #+begin_src elisp
   (setup mind-wave
-    ;; (:option mind-wave-api-key-path "~/Documents/emacs/08-keys/chatgpt_api_key.txt")
     (:autoload mind-wave-chat-mode))
 #+end_src
 ** whisper.el
@@ -2739,7 +2718,8 @@ Simple distraction-free editing. I use darkroom instead of writeroom because it'
              whisper-model "small"
              whisper-use-threads 8))
 #+end_src
-** backup scripts
+** scripts
+*** backup scripts
 #+begin_src elisp
   (defun lewis-backup-to-nas-rsync()
     (interactive)
@@ -2754,6 +2734,18 @@ Simple distraction-free editing. I use darkroom instead of writeroom because it'
     (interactive)
     (async-shell-command "~/Documents/my-bins/restic -r sftp:lewis-nas@192.168.31.108:/share/my_webdav/restic backup ~/Documents/emacs/02-binary-files/")
     )
+#+end_src
+*** startup scripts
+#+begin_src elisp
+  (defun lewis-start-zotero-server()
+    "Starts the Zotero server by opening a new eshell, changing to the translation-server directory, and running 'npm start'."
+    (interactive)
+    (let ((default-directory "~/Downloads/translation-server"))
+      (eshell)
+      (rename-buffer "zotero-server")
+      (eshell-return-to-prompt)
+      (insert "npm start")
+      (eshell-send-input)))
 #+end_src
 * use single file to load configs
 this can avoid errors of native compilation of init.el
