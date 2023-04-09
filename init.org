@@ -56,6 +56,7 @@ I failed in love with denote, so previous *org-roam* configs were refiled into [
   - [[#yasnippet][yasnippet]]
   - [[#tempel][tempel]]
   - [[#rgel][rg.el]]
+  - [[#blink-search][blink-search]]
 - [[#window-management][Window Management]]
   - [[#winner-mode][winner-mode]]
   - [[#popper][popper]]
@@ -567,7 +568,8 @@ Maybe I should add a new state.
   ;; search
   (meow-leader-define-key
    ;; '("s" . leader-map-for-search)
-   '("s b" . consult-buffer)
+   ;; '("s b" . consult-buffer)
+   '("s b" . blink-search)
    '("s d" . consult-ripgrep)
    '("s D" . lewis/ripgrep-search-other-dir)
    '("s f" . consult-find)
@@ -1289,6 +1291,10 @@ should be check after reading the embark.el manual
 ** rg.el
 #+begin_src elisp
   (setup rg)
+#+end_src
+** blink-search
+#+begin_src elisp
+(setup blink-search)
 #+end_src
 * Window Management
 ** winner-mode

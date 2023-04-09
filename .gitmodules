@@ -22,6 +22,9 @@
 [submodule "beancount"]
 	path = lib/beancount
 	url = https://github.com/beancount/beancount-mode.git
+[submodule "blink-search"]
+	path = lib/blink-search
+	url = https://github.com/manateelazycat/blink-search.git
 [submodule "borg"]
 	path = lib/borg
 	url = https://github.com/emacscollective/borg.git
