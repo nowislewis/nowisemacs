@@ -105,7 +105,7 @@ I failed in love with denote, so previous *org-roam* configs were refiled into [
   - [[#clue][clue]]
   - [[#org-transclusion][org-transclusion]]
   - [[#agendagtd][agenda/gtd]]
-  - [[#my-gtd][my-gtd]]
+  - [[#org-super-agenda][org-super-agenda]]
   - [[#org-ql][org-ql]]
   - [[#xeft][xeft]]
   - [[#org-mpvi][org-mpvi]]
@@ -1294,7 +1294,8 @@ should be check after reading the embark.el manual
 #+end_src
 ** blink-search
 #+begin_src elisp
-(setup blink-search)
+  (setup blink-search
+    (add-to-list 'meow-mode-state-list '(blink-search-mode . insert)))
 #+end_src
 * Window Management
 ** winner-mode
@@ -2345,142 +2346,108 @@ Connecting clues while reading code.
 https://emacs.cafe/emacs/orgmode/gtd/2017/06/30/orgmode-gtd.html
 https://dindi.garjola.net/org-agenda-weekly.html
 #+begin_src elisp
-    (defvar nowisemacs-index-org (concat nowisemacs-gtd-dir "/index.org"))
-    (defvar nowisemacs-gtd-org (concat nowisemacs-gtd-dir "/action.org"))
-    (defvar nowisemacs-someday-org (concat nowisemacs-gtd-dir "/someday.org"))
-    (setup org
-      (:option org-agenda-files (list nowisemacs-index-org
-                                      nowisemacs-gtd-org
-                                      (concat nowisemacs-gtd-dir "/index.org_archive")
-                                      (concat nowisemacs-gtd-dir "/action.org_archive")
-                                      (concat nowisemacs-gtd-dir "/someday.org_archive"))
-               org-todo-keywords (quote ((sequence "TODO(t!/!)" "NEXT(n!/!)"  "STARTED(s!)" "|" "DONE(d!/!)")
-                                         (type "PROJECT(p!/!)" "|" "DONE_PROJECT(D!/!)")
-                                         (type "SOMEDAY(S!)" "|" "NEED_COLLECTED(N!)")
-                                         (sequence "WAIT(w@/!)" "HOLD(h@/!)" "|" "CANCELLED(c@/!)")))
+  (defvar nowisemacs-index-org (concat nowisemacs-gtd-dir "/20230411T002918--index.org"))
+  (defvar nowisemacs-gtd-org (concat nowisemacs-gtd-dir "/20230411T002424--action.org"))
+  (defvar nowisemacs-someday-org (concat nowisemacs-gtd-dir "/20230310T005150--someday.org"))
+  (setup org
+    (:option org-agenda-files (list nowisemacs-index-org
+                                    nowisemacs-gtd-org
+                                    ;; (concat nowisemacs-gtd-dir "/20230411T002918--index.org_archive")
+                                    ;; (concat nowisemacs-gtd-dir "/20230411T002424--action.org_archive")
+                                    )
+             org-todo-keywords (quote ((sequence "TODO(t!/!)" "NEXT(n!/!)" "|" "DONE(d!/!)")
+                                       (type "PROJECT(p!/!)" "|" "DONE_PROJECT(D!/!)")
+                                       (type "SOMEDAY(S!)" "|" "NEED_COLLECTED(N!)")
+                                       (sequence "WAIT(w@/!)" "|" "CANCELLED(c@/!)")))
 
-               org-todo-keyword-faces (quote (("TODO" :foreground "red" :weight bold)
-                                              ("NEXT" :foreground "blue" :weight bold)
-                                              ("STARTED" :foreground "blue" :weight bold)
-                                              ("DONE" :foreground "forest green" :weight bold)
+             org-todo-keyword-faces (quote (("TODO" :foreground "red" :weight bold)
+                                            ("NEXT" :foreground "blue" :weight bold)
+                                            ("DONE" :foreground "forest green" :weight bold)
+                                            ("PROJECT" :foreground "red" :weight bold)
+                                            ("DONE_PROJECT" :foreground "forest green" :weight bold)
+                                            ("SOMEDAY" :foreground "orange" :weight bold)
+                                            ("NEED_COLLECTED" :foreground "orange" :weight bold)
+                                            ("WAIT" :foreground "orange" :weight bold)
+                                            ("CANCELLED" :foreground "forest green" :weight bold)
+                                            ))
+             ))
+  (setup org-refile
+    (:option org-refile-targets (list (cons nowisemacs-gtd-org '(:maxlevel . 1))
+                                      (cons nowisemacs-someday-org '(:level . 1)))))
+  (setup org-capture
+    (:option org-capture-templates '(("t" "Todo [inbox]" entry
+                                      (file+headline nowisemacs-index-org "Tasks")
+                                      "* TODO %i%?"))))
 
-                                              ("PROJECT" :foreground "red" :weight bold)
-                                              ("DONE_PROJECT" :foreground "forest green" :weight bold)
-
-                                              ("WAIT" :foreground "orange" :weight bold)
-                                              ("HOLD" :foreground "orange" :weight bold)
-                                              ("CANCELLED" :foreground "forest green" :weight bold)
-
-                                              ("SOMEDAY" :foreground "orange" :weight bold)
-                                              ("NEED_COLLECTED" :foreground "orange" :weight bold)
-                                              ))
-               ))
-    (setup org-refile
-      (:option org-refile-targets (list (cons nowisemacs-gtd-org '(:maxlevel . 1))
-                                        (cons nowisemacs-someday-org '(:level . 1)))))
-    (setup org-capture
-      (:option org-capture-templates '(("t" "Todo [inbox]" entry
-                                        (file+headline nowisemacs-index-org "Tasks")
-                                        "* TODO %i%?"))))
-
-    (setup org-agenda
-      (:option org-agenda-custom-commands
-               '(
-                 ;; schedule or reschedule
-                 ("D" "Daily(last, Today and futuer) Action List" ((agenda ""
-                                                                           ((org-agenda-span 1)
-                                                                            (org-agenda-sorting-strategy
-                                                                             (quote
-                                                                              ((agenda time-up category-up tag-up))))
-                                                                            (org-deadline-warning-days 7)))))
-                 ;; next, should check effort
-                 ("n" . "Next Actions List")
-                 ("nn" tags "+TODO=\"NEXT\"|+TODO=\"STARTED\"")
-                 ("n2" tags "+2mins+TODO=\"NEXT\"|+2mins+TODO=\"STARTED\"")
-                 )
-               )
-      )
-    ;; (defun my/show-next-without-effort ()
-    ;;   (interactive)
-    ;;   (org-ql-search (org-agenda-files)
-    ;;                  '(and (todo "NEXT")
-    ;;                        (not (property "Effort")))))
-    (defun my/weekly-agenda-review ()
-      "Generate the agenda for the weekly review"
-      (interactive)
-      (let ((span-days 24)
-            (offset-past-days 10))
-        (message "Generating agenda for %s days starting %s days ago"
-                 span-days offset-past-days)
-        (org-agenda-list nil (- (time-to-days (date-to-time
-                                               (current-time-string)))
-                                offset-past-days)
-                         span-days)
-        (org-agenda-log-mode)
-        (goto-char (point-min))))
+  (setup org-agenda
+    (:option org-agenda-span 'day
+             org-agenda-skip-scheduled-if-done t
+             org-agenda-skip-deadline-if-done t
+             org-agenda-block-separator nil
+             org-agenda-compact-blocks t
+             org-agenda-start-with-log-mode t
+             )
+    )
 #+end_src
-** my-gtd
+** org-super-agenda
 #+begin_src elisp
+  (setup org-super-agenda
+    (:hook-into org-mode))
 
-    (defun my-gtd-2mins()
-      (interactive)
-      (org-todo "NEXT")
-      (org-set-tags "2mins")
-      (org-refile)
-      )
-
-    (defun my-gtd-next()
-      (interactive)
-      (org-todo "NEXT")
-      (org-refile)
-      )
-
-    (defun my-gtd-wait()
-      (interactive)
-      (org-todo "WAIT")
-      (org-refile)
-      )
-    (defun my-gtd-project()
-      (interactive)
-      (org-todo "PROJECT")
-      (org-set-tags "Project")
-      (org-refile)
-      )
-    (defun my-gtd-someday()
-      (interactive)
-      (org-todo "SOMEDAY")
-      (org-refile)
-      )
-    (defun my-gtd-need-collected()
-      (interactive)
-      (org-todo "NEED_COLLECTED")
-      (org-refile)
-      )
-
-  (transient-define-prefix my-gtd-choose ()
-    "Choose how to categorize the current item.
-  Note that this function is intended to be used only during inbox processing."
-    ["Actionable"
-     [("2" "2mins" my-gtd-2mins)
-      ("n" "next (one-step)" my-gtd-next)
-      ("w" "wait (wait someone)" my-gtd-wait)
-      ("p" "Project (multi-step)" my-gtd-project)
-      ;; ("c" "Calendar" my-gtd-calendar)
-      ]]
-    ["Non-actionable"
-     [("s" "Someday" my-gtd-someday)
-      ;; ("A" "Archive this knowledge" my-gtd-archive)
-      ("N" "Need collected" my-gtd-need-collected)]])
+  (setq org-agenda-custom-commands
+        '(("z" "Super zaen view"
+           ((agenda "" ((org-agenda-span 'day)
+                        (org-super-agenda-groups
+                         '((:name "Today"
+                                  :time-grid t
+                                  :date today
+                                  :todo "TODAY"
+                                  :scheduled today
+                                  :order 1)))))
+            (alltodo "" ((org-agenda-overriding-header "")
+                         (org-super-agenda-groups
+                          '((:name "Next to do"
+                                   :todo "NEXT"
+                                   :order 1)
+                            (:name "Important"
+                                   :tag "Important"
+                                   :priority "A"
+                                   :order 6)
+                            (:name "Due Today"
+                                   :deadline today
+                                   :order 2)
+                            (:name "Due Soon"
+                                   :deadline future
+                                   :order 8)
+                            (:name "Overdue"
+                                   :deadline past
+                                   :order 7)
+                            (:name "Wait"
+                                   :todo "WAIT"
+                                   :order 10)
+                            ;; (:name "Projects"
+                            ;;        :todo "PROJECT"
+                            ;;        :order 14)
+                            (:name "To read"
+                                   :tag "Read"
+                                   :order 30)
+                            (:name "trivial"
+                                   :priority<= "C"
+                                   :todo ("SOMEDAY" "NEED_COLLECTED")
+                                   :order 90)
+                            (:name "Projects"
+                                   :children t)
+                            ;; can be archived in month
+                            (:discard (:tag ("Chore" "Routine" "Daily")))))))))))
+  ;; TODO use let to add all files under gtd in agenda-files for full-search
 #+end_src
 ** org-ql
 #+begin_src elisp
   (setup ts)
   (setup peg)
-  (setup org-super-agenda)
+  ;; (setup org-super-agenda)
   (setup ov)
-  (setup org-ql
-    (:option org-super-agenda-groups '((:auto-parent t))
-             ))
+  (setup org-ql)
 #+end_src
 ** xeft
 #+begin_src elisp
@@ -2525,7 +2492,7 @@ Integrate Org with Video
   (setup websocket)
   (setup websocket-bridge)
   (setup dictionary-overlay
-    (:option dictionary-overlay-sdcv-dictionary-path "~/Downloads/stardicts/")
+    (:option dictionary-overlay-sdcv-dictionary-path "~/Documents/emacs/02-binary-files/03-stardicts/")
     (:autoload dictionary-overlay-toggle)
     (:when-loaded
       (copy-face 'font-lock-keyword-face 'dictionary-overlay-unknownword)
@@ -2535,7 +2502,7 @@ Integrate Org with Video
 ** sdcv
 #+begin_src elisp
   (setup sdcv
-    (:option sdcv-dictionary-data-dir (file-truename "~/Downloads/stardicts")
+    (:option sdcv-dictionary-data-dir (file-truename "~/Documents/emacs/02-binary-files/03-stardicts/")
              sdcv-dictionary-simple-list (list "简明英汉字典增强版")
              sdcv-dictionary-complete-list (list "简明英汉字典增强版")
              )
