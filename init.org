@@ -2392,10 +2392,10 @@ https://dindi.garjola.net/org-agenda-weekly.html
 ** org-super-agenda
 #+begin_src elisp
   (setup org-super-agenda
-    (:hook-into org-mode))
+    (org-super-agenda-mode))
 
   (setq org-agenda-custom-commands
-        '(("z" "Super zaen view"
+        '(("z" "Super view"
            ((agenda "" ((org-agenda-span 'day)
                         (org-super-agenda-groups
                          '((:name "Today"
@@ -2425,9 +2425,6 @@ https://dindi.garjola.net/org-agenda-weekly.html
                             (:name "Wait"
                                    :todo "WAIT"
                                    :order 10)
-                            ;; (:name "Projects"
-                            ;;        :todo "PROJECT"
-                            ;;        :order 14)
                             (:name "To read"
                                    :tag "Read"
                                    :order 30)
@@ -2438,8 +2435,11 @@ https://dindi.garjola.net/org-agenda-weekly.html
                             (:name "Projects"
                                    :children t)
                             ;; can be archived in month
-                            (:discard (:tag ("Chore" "Routine" "Daily")))))))))))
-  ;; TODO use let to add all files under gtd in agenda-files for full-search
+                            (:discard (:tag ("Chore" "Routine" "Daily")))))))))
+          ("p" "Projected TODO"
+           ((alltodo "" ((org-super-agenda-groups
+                          '((:auto-group t)))))))))
+  ;; TODO use let to add all files under gtd in agenda-files for full-search, with last 7 days and 30 days DOWN
 #+end_src
 ** org-ql
 #+begin_src elisp
