@@ -168,6 +168,9 @@
 [submodule "go-translate"]
 	path = lib/go-translate
 	url = https://github.com/lorniu/go-translate.git
+[submodule "gptel"]
+	path = lib/gptel
+	url = https://github.com/karthink/gptel.git
 [submodule "graphviz-dot-mode"]
 	path = lib/graphviz-dot-mode
 	url = https://github.com/ppareit/graphviz-dot-mode.git
@@ -210,9 +213,6 @@
 [submodule "magit-popup"]
 	path = lib/magit-popup
 	url = https://github.com/magit/magit-popup.git
-[submodule "maple-explorer"]
-	path = lib/maple-explorer
-	url = https://github.com/honmaple/emacs-maple-explorer.git
 [submodule "marginalia"]
 	path = lib/marginalia
 	url = https://github.com/minad/marginalia.git
@@ -376,9 +376,6 @@
 [submodule "tomelr"]
 	path = lib/tomelr
 	url = https://github.com/kaushalmodi/tomelr.git
-[submodule "treesit-auto"]
-	path = lib/treesit-auto
-	url = https://github.com/renzmann/treesit-auto.git
 [submodule "ts"]
 	path = lib/ts
 	url = https://github.com/alphapapa/ts.el.git

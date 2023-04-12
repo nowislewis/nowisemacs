@@ -18,6 +18,7 @@
   - [[#how-to-use][How to use]]
   - [[#how-to-customize][How to customize]]
   - [[#ideas-behind-nowisemacs][Ideas behind nowisemacs]]
+- [[#useful-keybindings][Useful Keybindings]]
 - [[#things-you-must-know-before-going-deeper][Things you must know before going deeper]]
   - [[#radical][Radical]]
   - [[#sacrifice-for-simplicity][Sacrifice for simplicity]]
@@ -58,23 +59,32 @@ It's designed by following principles:
 All configs can be seen [[file:init.org][here]].
 
 Nowisemacs uses a single org file to manage all configurations. To reduce the startup time of emacs, users need to
-generate =.el= configuration files before the first startup:
+generate =.el= configuration files before the first startup
+*** Installation
 1. =mv ~/.emacs.d ~/.emacs.d.back= ;; Backup your original configuration
 2. =git clone https://github.com/nowislewis/nowisemacs ~/.emacs.d= ;; Download nowisemacs
 3. =cd ~/.emacs.d=
-4. =make bootstrap-borg & make bootstrap= ;; download packages
-5. =emacs= ;; Launch emacs, the download, installation and configuration of packages will be done automatically.
-6. If you upgrade packages or install new packages, just run =make= in the =.emacs.d= dir.
+4. =make bootstrap-borg & make bootstrap= ;; download and build packages
+5. (optional) =make native= ;; if you build emacs with native-comp, use this command to build all packages ahead-of-time.
+6. =emacs= ;; Launch emacs, the download, installation and configuration of packages will be done automatically.
+7. If you upgrade packages or install new packages, just run =make= in the =.emacs.d= dir.
+*** Add packages
+1. Inside emacs, run =M-x borg-assimilate=, and then input your package name and git url sequentially.
+2. Run =M-x borg-active=, choose the package you just installed.
+*** Remove packages
+1. Inside emacs, run =M-x borg-remove=, choose the package you want to remove.
+*** Update packages
+1. =make update= ;; get all packages update latest
+2. =make bootstrap= ;; build packages
+3. (optional) =make native= ;; if you build emacs with native-comp, use this command to build all packages ahead-of-time.
 ** How to customize
 *** Change configurations
 Nowisemacs use =setup.el= to config all the configuration but you can also use built-in methods, =setup= is just a simple wrapper of these methods. You can get a clear understand in anywhere by typing =M-x emacs-lisp-macroexpand=, and the =setup= code will be expanded to normal built-in methods.
 
-Every time you change some configs in =~/.emacs.d/init.org= (eg, write down =<s= and then use =tab= to get a expanded src code), you should run  =make init-build=. You can also just use =make= to config everything. This will overwrite =~/.emacs.d/init.el= and =early-init.el=. Nowisemacs use this method to guarantee the =init.el= will not be changed by mistake =custom-group= or something else.
-*** Add/remove/upgrade packages
-+ If you want to *add* a package such as PackageA, you should run =epkg-describe-package= to get a clear dependencies of PackageA, and then =borg-assimilate= to install its dependencies and itself.
-+ If you want to *remove* packages, you should do the same thing when you add packages except for chaning =borg-assimilate= to =borg-remove=.
-+ If you want to *update* packages, you just need to run: =make update=.
-No matter what you did to packages, you should always run =make= in =~/.emacs.d= after above commands.
+Every time you make some changes on =~/.emacs.d/init.org= (eg, write down =<s= and then use =tab= to get a expanded src
+code), you should run =make init-build=. You can also just use =make= to config everything. This will overwrite
+=~/.emacs.d/init.el= and =early-init.el=. Nowisemacs use this method to guarantee the =init.el= will not be changed by mistake
+=custom-group= or something else.
 *** Everyday use
 That't to say, after installation, there are only things you need to remember for everyday use:
 1. =borg-assimilate= for install packages, and =borg-remove= for remove packages.
@@ -82,6 +92,7 @@ That't to say, after installation, there are only things you need to remember fo
 3. =make= for everything else( eg, after you changed init.org, or changed packages, you can just run =make= to configure everything well) related to packages.
 
 *It's suggested to read the [[https://emacsmirror.net/manual/borg/][borg]] for more details*.
+*** Some explanation about package configurations/setup.el
 ** Ideas behind nowisemacs
 *** TL ; NR
 Concise + High maintainability
@@ -107,6 +118,22 @@ concepts should be met as far as possible:
 I like rich functionality, which allows me to have suitable solutions for various scenarios. Usually adding a functionality
 will increase the complexity of configurations. Nowisemacs looks for a balance between functionality and complexity by
 "concise" choices.
+* Useful Keybindings
+Nowisemacs uses space bars as leader key, you can find most keybindings in the Meow-Leader-Keys section [[file:init.org][here]]. Some common usages are as following:
+| Button    | Function                                         |
+|-----------+--------------------------------------------------|
+| Space b   | Buffer-Menu                                      |
+| Space s s | Search the current buffer page                   |
+| Space s d | GREP operation on the current path               |
+| Space s f | Find operation of the current path               |
+| Space s i | Open imenu                                       |
+| Space f p | Open Personal Config                             |
+| Space Tab | Open the tabspace management menu                |
+| M-L       | Translation The current area or user input       |
+| M-L       | Translation Current Words (need to install SDCV) |
+| M-`       | Open/fold Vterm                                  |
+Nowisemacs choose meow instead of EVIL as modal editing, so you may need to read the meow configuration in the
+configuration or the website of Meow to get a better understanding.
 * Things you must know before going deeper
 ** Radical
 1. Nowisemacs always uses the latest emacs version and compile it locally, so there may be some incompatible when you use an older version.

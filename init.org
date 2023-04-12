@@ -128,6 +128,7 @@ I failed in love with denote, so previous *org-roam* configs were refiled into [
   - [[#gif-screencast][gif-screencast]]
   - [[#emacs-guix][emacs-guix]]
   - [[#mind-wave][mind-wave]]
+  - [[#gptel][gptel]]
   - [[#whisperel][whisper.el]]
   - [[#scripts][scripts]]
 - [[#use-single-file-to-load-configs][use single file to load configs]]
@@ -229,13 +230,41 @@ The following content is not enabled yet, because I want to minimize unnecessary
   (setq ad-redefinition-action 'accept)   ;不要烦人的 redefine warning
 #+end_src
 ** set vars
-#+begin_src elisp
-  (defvar nowisemacs-config-file (expand-file-name "init.org" user-emacs-directory))
-  (defvar nowisemacs-config-useful-tools (expand-file-name "useful-tools/" user-emacs-directory))
-  (defvar nowisemacs-doc-emacs-dir (file-truename "~/Documents/emacs/"))
-  (defvar nowisemacs-gtd-dir (concat nowisemacs-doc-emacs-dir "01-orgmode/xnotes/gtd"))
-#+end_src
+I use the following file paths to manage all the files in Nowisemacs:
+#+begin_example
+emacs
+├── 01-orgmode
+│   ├── org-remark
+│   └── xnotes
+├── 02-binary-files
+│   ├── 01-pictures
+│   ├── 02-searchable
+│   ├── 03-stardicts
+│   ├── 04-org-imagine
+│   └── 10-report-backup
+├── 03-bibliography
+├── 04-beancount
+├── 05-excalidraw
+├── 06-anki
+├── 07-pyim
+│   └── dcache
+├── 08-keys
+└── 09-scripts
+#+end_example
+1. All files and folders except =02-binary-files= are managed under git control, and =02-binary-file= is managed under =rsync= or =restic=.
+2. =01-orgmode= stores .org files, where =org-remark= is used to store remark notes, =xnote= is the default directory of =Denote= .
+3. =02-binary-files=, as its name, storing binary-fils. For example, =02-searchable= is used store the PDF of the literature
+   and daily MS Office files, the meaning of searchable means that all files under this folder maybe searched or
+   modified latter, and they should have nice naming specifications for convenience search.
 
+#+begin_src elisp
+  (defvar nowis-config-file (expand-file-name "init.org" user-emacs-directory))
+  (defvar nowis-config-useful-tools (expand-file-name "useful-tools/" user-emacs-directory))
+  (defvar nowis-doc-emacs-dir (file-truename "~/Documents/emacs/"))
+  (defvar nowis-gtd-dir (concat nowis-doc-emacs-dir "01-orgmode/xnotes/gtd"))
+  (defvar nowis-bib-dir (concat nowis-doc-emacs-dir "03-bibliography/"))
+  (defvar nowis-bib-pdf-dir (concat nowis-doc-emacs-dir "02-binary-files/02-searchable/01-papers-markable/"))
+#+end_src
 * Package Management
 ** setup
 #+NAME: setup
@@ -600,7 +629,7 @@ Maybe I should add a new state.
 
   (defun find-config-file()
     (interactive)
-    (find-file nowisemacs-config-file))
+    (find-file nowis-config-file))
 
   ;; file
   (meow-leader-define-key
@@ -860,7 +889,7 @@ diff-hl-mode highlights uncommitted changes on the left side of the window (area
              dashboard-set-heading-icons t
              dashboard-set-file-icons t
              dashboard-center-content t
-             dashboard-startup-banner (concat nowisemacs-config-useful-tools "banner.txt")
+             dashboard-startup-banner (concat nowis-config-useful-tools "banner.txt")
              dashboard-set-init-info t)
     (dashboard-setup-startup-hook))
 #+end_src
@@ -1266,7 +1295,7 @@ should be check after reading the embark.el manual
 ** yasnippet
 #+begin_src elisp
   (setup yasnippet
-    (:option yas-snippet-dirs (list (concat nowisemacs-config-useful-tools "snippets")))
+    (:option yas-snippet-dirs (list (concat nowis-config-useful-tools "snippets")))
     (:defer (yas-global-mode))
    )
 #+end_src
@@ -1350,7 +1379,7 @@ borrowed from citre, now you can always jump-back use "M-,"
 #+end_src
 *** bookmark
 #+begin_src elisp
-  (setq bookmark-default-file (concat nowisemacs-doc-emacs-dir "bookmarks"))
+  (setq bookmark-default-file (concat nowis-doc-emacs-dir "bookmarks"))
 #+end_src
 *** ace-window
 #+begin_src elisp
@@ -1404,7 +1433,7 @@ borrowed from citre, now you can always jump-back use "M-,"
              pyim-page-tooltip 'posframe
              pyim-page-length 5
              pyim-dcache-backend 'pyim-dregcache
-             pyim-dcache-directory (concat nowisemacs-doc-emacs-dir "01-binary-files/pyim/dcache/")
+             pyim-dcache-directory (concat nowis-doc-emacs-dir "01-binary-files/pyim/dcache/")
              )
     (:when-loaded
       (require 'popup nil t)
@@ -1458,14 +1487,14 @@ borrowed from citre, now you can always jump-back use "M-,"
              default-input-method "rime"
              rime-show-candidate 'posframe
              rime-posframe-properties (list :internal-border-width 1
-                                            :font "Maple Mono SC NF")
+                                            :font lewis-fixed-font)
              rime-user-data-dir "~/Documents/emacs-rime-user-data/"
              rime-inline-ascii-trigger 'shift-r
              )
     (when (eq system-type 'darwin)
       (setq
-       rime-emacs-module-header-root "/Applications/Emacs.app/Contents/Resources/include/" ;; use build-emacs
-       ;; rime-emacs-module-header-root "/opt/homebrew/opt/emacs-plus@30/include" ;;use emacs-plus
+       ;; rime-emacs-module-header-root "/Applications/Emacs.app/Contents/Resources/include/" ;; use build-emacs
+       rime-emacs-module-header-root "/opt/homebrew/opt/emacs-plus@29/include" ;;use emacs-plus
        rime-librime-root "~/Downloads/rime-1/dist"
        ))
     )
@@ -1506,12 +1535,6 @@ Dirvish is a minimalistic file manager based on Dired. It's fast
              imenu-list-position 'left
              imenu-list-auto-update nil
              ))
-#+end_src
-*** maple-explorer
-#+begin_src elisp
-  (setup maple-explorer
-    (:option maple-explorer-imenu-display-alist '((side . left) (slot . -1))
-          maple-explorer-imenu-width '(20 . 60)))
 #+end_src
 ** tab-line and tab-bar
 #+name: tab-bar
@@ -1704,7 +1727,7 @@ Dirvish is a minimalistic file manager based on Dired. It's fast
 *** plantuml-mode
 #+begin_src elisp
   (setup plantuml-mode
-    (:option plantuml-jar-path "~/.emacs.d/var/plantuml.jar"))
+    (:option plantuml-jar-path (concat no-littering-var-directory "plantuml.jar")))
 #+end_src
 *** beancount
 Emacs major-mode to work with Beancount ledger files
@@ -1772,12 +1795,6 @@ Emacs major-mode to work with Beancount ledger files
 #+end_src
 ** Useful programing tools
 *** UI
-**** treesit-auto
-#+begin_src elisp
-  (setup treesit-auto
-    (:defer
-    (global-treesit-auto-mode)))
-#+end_src
 **** symbol-overlay
 Highlight symbols with keymap-enabled overlays
 #+begin_src elisp
@@ -1924,7 +1941,7 @@ Disassemble C, C++ or Fortran code under cursor
 ** org-mode
 #+begin_src elisp
   (setup org
-    (setq org-directory (concat nowisemacs-doc-emacs-dir "01-orgmode/"))
+    (setq org-directory (concat nowis-doc-emacs-dir "01-orgmode/"))
     (:option org-adapt-indentation nil
              org-startup-indented t
              org-hide-emphasis-markers t
@@ -2006,7 +2023,7 @@ Disassemble C, C++ or Fortran code under cursor
       (defun lewis/org-export-docx ()
         (interactive)
         (let ((docx-file (concat (file-name-sans-extension (buffer-file-name)) ".docx"))
-              (template-file (concat nowisemacs-doc-emacs-dir
+              (template-file (concat nowis-doc-emacs-dir
                                      "02-binary-files/template.docx")))
           (shell-command (format "pandoc %s -o %s --reference-doc=%s"
                                  (buffer-file-name)
@@ -2044,7 +2061,7 @@ Disassemble C, C++ or Fortran code under cursor
   (setup org-download
     (:option org-download-method 'directory
              org-download-screenshot-basename "screenshot.jpg"
-             org-download-image-dir (concat nowisemacs-doc-emacs-dir "02-binary-files/01-pictures/org_download_images")
+             org-download-image-dir (concat nowis-doc-emacs-dir "02-binary-files/01-pictures/org_download_images")
              org-download-abbreviate-filename-function 'expand-file-name)
     (:when-loaded
       (when (eq system-type 'gnu/linux)
@@ -2066,7 +2083,7 @@ Disassemble C, C++ or Fortran code under cursor
 #+begin_src elisp
   (setup alert)
   (setup org-pomodoro
-    (:option org-pomodoro-finished-sound (concat nowisemacs-doc-emacs-dir "02-binary-files/applaud.wav")))
+    (:option org-pomodoro-finished-sound (concat nowis-doc-emacs-dir "02-binary-files/applaud.wav")))
 #+end_src
 ** org-noter
 #+begin_src elisp
@@ -2117,7 +2134,9 @@ Disassemble C, C++ or Fortran code under cursor
 
   (defun do.refs/get-db-file-list ()
     "Get the list of all the bib files containing my bib database."
-    (directory-files "~/Documents/emacs/03-bibliography/" t "\\.bib\\'"))
+    (if (file-exists-p nowis-bib-dir)
+        (directory-files nowis-bib-dir t "\\.bib\\'")
+      nil))
 
   (defun do.refs/update-db-file-list ()
     "Update the list of bib files."
@@ -2137,7 +2156,7 @@ Disassemble C, C++ or Fortran code under cursor
              org-cite-insert-processor 'citar
              org-cite-follow-processor 'citar
              org-cite-activate-processor 'citar
-             citar-library-paths '("~/Documents/emacs/02-binary-files/02-searchable/01-papers-markable/")
+             citar-library-paths (list nowis-bib-pdf-dir)
              citar-bibliography org-cite-global-bibliography))
 #+end_src
 *** citar-denote
@@ -2150,14 +2169,14 @@ Disassemble C, C++ or Fortran code under cursor
 #+begin_src elisp
   (setup ebib
     (:option ebib-preload-bib-files org-cite-global-bibliography
-             ebib-file-search-dirs '("~/Documents/emacs/02-binary-files/02-searchable/01-papers-markable/")
-             ebib-bib-search-dirs '("~/Documents/emacs/03-bibliography/")
+             ebib-file-search-dirs (list nowis-bib-pdf-dir)
+             ebib-bib-search-dirs (list nowis-bib-dir)
              ebib-default-directory 'first-bib-dir
              ebib-file-associations '(("pdf" . "xpdf")
                                       ("ps" . "gv")
                                       ("epub"))
              ebib-index-window-size 25
-             ebib-reading-list-file "~/Documents/emacs/01-orgmode/xnotes/20230403T125743--ebib-reading-lists.org"
+             ebib-reading-list-file (concat nowis-doc-emacs-dir "01-orgmode/xnotes/20230403T125743--ebib-reading-lists.org")
              )
     (:when-loaded
       (defcustom ebib-zotero-translation-server "http://127.0.0.1:1969"
@@ -2200,7 +2219,7 @@ Disassemble C, C++ or Fortran code under cursor
 ** denote
 #+begin_src elisp
   (setup denote
-    (:option denote-directory (expand-file-name (concat nowisemacs-doc-emacs-dir "01-orgmode/xnotes"))
+    (:option denote-directory (expand-file-name (concat nowis-doc-emacs-dir "01-orgmode/xnotes"))
              denote-dired-directories (list denote-directory
                                             (thread-last denote-directory (expand-file-name "xnotes")))
              denote-date-prompt-use-org-read-date t
@@ -2251,23 +2270,23 @@ Disassemble C, C++ or Fortran code under cursor
 #+begin_src elisp
   (defun project-find-orgmode-dir-files ()
     (interactive)
-    (dired (concat nowisemacs-doc-emacs-dir "01-orgmode")
+    (dired (concat nowis-doc-emacs-dir "01-orgmode")
     (project-find-file t)))
   (defun project-find-xnotes-dir-files ()
     (interactive)
-    (dired (concat nowisemacs-doc-emacs-dir "01-orgmode/xnotes"))
+    (dired (concat nowis-doc-emacs-dir "01-orgmode/xnotes"))
     (project-find-file t))
   (defun project-find-papers-dir-files ()
     (interactive)
-    (dired (concat nowisemacs-doc-emacs-dir "02-binary-files/02-searchable/01-papers-markable"))
+    (dired (concat nowis-doc-emacs-dir "02-binary-files/02-searchable/01-papers-markable"))
     (project-find-file t))
   (defun project-find-searchable-dir-files ()
     (interactive)
-    (dired (concat nowisemacs-doc-emacs-dir "02-binary-files/02-searchable"))
+    (dired (concat nowis-doc-emacs-dir "02-binary-files/02-searchable"))
     (project-find-file t))
   (defun project-find-gtd-dir-files ()
     (interactive)
-    (dired nowisemacs-gtd-dir)
+    (dired nowis-gtd-dir)
     (project-find-file t))
 #+end_src
 ** org-imagine, excalidraw
@@ -2291,7 +2310,7 @@ Disassemble C, C++ or Fortran code under cursor
   (defun lewis-create-excalidraw()
     (interactive)
     (let* ((filename (concat (car (split-string (buffer-name) "\\.")) ".excalidraw"))
-           (path (concat nowisemacs-doc-emacs-dir "05-excalidraw/" filename))
+           (path (concat nowis-doc-emacs-dir "05-excalidraw/" filename))
            (link (format "[[file:%s]]" path)))
       (insert link)
       (with-temp-file path (insert org-excalidraw--default-base))))
@@ -2327,7 +2346,7 @@ Highlight and annotate any text file with using Org mode.
      )
     (:when-loaded
       (defun my/function ()
-        (concat (concat nowisemacs-doc-emacs-dir "01-orgmode/org-remark/")
+        (concat (concat nowis-doc-emacs-dir "01-orgmode/org-remark/")
                 (file-name-base (org-remark-notes-file-name-function))
                 ".org"))
       (setq org-remark-notes-file-name #'my/function)
@@ -2346,14 +2365,14 @@ Connecting clues while reading code.
 https://emacs.cafe/emacs/orgmode/gtd/2017/06/30/orgmode-gtd.html
 https://dindi.garjola.net/org-agenda-weekly.html
 #+begin_src elisp
-  (defvar nowisemacs-index-org (concat nowisemacs-gtd-dir "/20230411T002918--index.org"))
-  (defvar nowisemacs-gtd-org (concat nowisemacs-gtd-dir "/20230411T002424--action.org"))
-  (defvar nowisemacs-someday-org (concat nowisemacs-gtd-dir "/20230310T005150--someday.org"))
+  (defvar nowis-index-org (concat nowis-gtd-dir "/20230411T002918--index.org"))
+  (defvar nowis-gtd-org (concat nowis-gtd-dir "/20230411T002424--action.org"))
+  (defvar nowis-someday-org (concat nowis-gtd-dir "/20230310T005150--someday.org"))
   (setup org
-    (:option org-agenda-files (list nowisemacs-index-org
-                                    nowisemacs-gtd-org
-                                    ;; (concat nowisemacs-gtd-dir "/20230411T002918--index.org_archive")
-                                    ;; (concat nowisemacs-gtd-dir "/20230411T002424--action.org_archive")
+    (:option org-agenda-files (list nowis-index-org
+                                    nowis-gtd-org
+                                    ;; (concat nowis-gtd-dir "/20230411T002918--index.org_archive")
+                                    ;; (concat nowis-gtd-dir "/20230411T002424--action.org_archive")
                                     )
              org-todo-keywords (quote ((sequence "TODO(t!/!)" "NEXT(n!/!)" "|" "DONE(d!/!)")
                                        (type "PROJECT(p!/!)" "|" "DONE_PROJECT(D!/!)")
@@ -2372,11 +2391,11 @@ https://dindi.garjola.net/org-agenda-weekly.html
                                             ))
              ))
   (setup org-refile
-    (:option org-refile-targets (list (cons nowisemacs-gtd-org '(:maxlevel . 1))
-                                      (cons nowisemacs-someday-org '(:level . 1)))))
+    (:option org-refile-targets (list (cons nowis-gtd-org '(:maxlevel . 1))
+                                      (cons nowis-someday-org '(:level . 1)))))
   (setup org-capture
     (:option org-capture-templates '(("t" "Todo [inbox]" entry
-                                      (file+headline nowisemacs-index-org "Tasks")
+                                      (file+headline nowis-index-org "Tasks")
                                       "* TODO %i%?"))))
 
   (setup org-agenda
@@ -2492,7 +2511,7 @@ Integrate Org with Video
   (setup websocket)
   (setup websocket-bridge)
   (setup dictionary-overlay
-    (:option dictionary-overlay-sdcv-dictionary-path "~/Documents/emacs/02-binary-files/03-stardicts/")
+    (:option dictionary-overlay-sdcv-dictionary-path (concat nowis-doc-emacs-dir "02-binary-files/03-stardicts/"))
     (:autoload dictionary-overlay-toggle)
     (:when-loaded
       (copy-face 'font-lock-keyword-face 'dictionary-overlay-unknownword)
@@ -2502,7 +2521,7 @@ Integrate Org with Video
 ** sdcv
 #+begin_src elisp
   (setup sdcv
-    (:option sdcv-dictionary-data-dir (file-truename "~/Documents/emacs/02-binary-files/03-stardicts/")
+    (:option sdcv-dictionary-data-dir (file-truename (concat nowis-doc-emacs-dir "02-binary-files/03-stardicts/"))
              sdcv-dictionary-simple-list (list "简明英汉字典增强版")
              sdcv-dictionary-complete-list (list "简明英汉字典增强版")
              )
@@ -2552,7 +2571,7 @@ Integrate Org with Video
 ** efleed-org
 #+begin_src elisp
   (setup elfeed-org
-    (:option rmh-elfeed-org-files (list (concat nowisemacs-config-useful-tools "elfeed.org"))))
+    (:option rmh-elfeed-org-files (list (concat nowis-config-useful-tools "elfeed.org"))))
   (defun my-elfeed()
     (interactive)
     (unless (featurep 'elfeed-org)
@@ -2605,48 +2624,50 @@ Simple distraction-free editing. I use darkroom instead of writeroom because it'
 #+end_src
 ** eaf
 #+begin_src elisp
-            (setup eaf
-              (add-to-list 'load-path "~/.emacs.d/lib/eaf")
-              (:option eaf-browser-enable-autofill t
-                       eaf-webengine-font-family lewis-variable-font
-                       eaf-webengine-serif-font-family lewis-variable-font
-                       eaf-webengine-fixed-font-family lewis-fixed-font
-                       eaf-config-location (concat no-littering-var-directory "eaf/")
-                       )
-              (if (eq system-type 'darwin)
-                       (setq eaf-python-command "~/.pyenv/shims/python3"))
-              (require 'eaf))
+  (setup eaf
+    (add-to-list 'load-path "~/.emacs.d/lib/eaf")
+    (:option eaf-browser-enable-autofill t
+             eaf-webengine-font-family lewis-variable-font
+             eaf-webengine-serif-font-family lewis-variable-font
+             eaf-webengine-fixed-font-family lewis-fixed-font
+             eaf-config-location (concat no-littering-var-directory "eaf/")
+             )
+    (if (eq system-type 'darwin)
+        (setq eaf-python-command "~/.pyenv/shims/python3"))
+    (if (eq system-type 'gnu/linux)
+        (require 'eaf)
+      ))
 
-            (setup eaf-browser
-              (:autoload eaf-open-browser)
-              )
-            (setup eaf-pdf-viewer
-              (:autoload eaf-open-pdf-from-history))
-            (setup eaf-rss-reader
-              (:autoload eaf-open-rss-reader))
-            (setup eaf-map
-              (:autoload eaf-open-map))
-            (setup eaf-markdown-previewer)
-            (setup eaf-markmap)
+  (setup eaf-browser
+    (:autoload eaf-open-browser)
+    )
+  (setup eaf-pdf-viewer
+    (:autoload eaf-open-pdf-from-history))
+  (setup eaf-rss-reader
+    (:autoload eaf-open-rss-reader))
+  (setup eaf-map
+    (:autoload eaf-open-map))
+  (setup eaf-markdown-previewer)
+  (setup eaf-markmap)
 
-            (setup eaf-interleave
-              (:option eaf-interleave-org-notes-dir-list '("~/Documents/emacs/01-orgmode/" ".")
-                       eaf-interleave-disable-narrowing t
-                       eaf-interleave-split-lines 20
-                       eaf-find-alternate-file-in-dired t
-                       )
-              (:bind "M-."  'eaf-interleave-sync-current-note
-                     "M-p"  'eaf-interleave-sync-previous-note
-                     "M-n"  'eaf-interleave-sync-next-note)
-              (:with-map eaf-interleave-app-mode-map
-                (:bind
-                 "C-c M-i"  'eaf-interleave-add-note
-                 "C-c M-o"  'eaf-interleave-open-notes-file
-                 "C-c M-q"  'eaf-interleave-quit))
-              (add-hook 'eaf-pdf-viewer-hook 'eaf-interleave-app-mode)
-              (add-hook 'eaf-browser-hook 'eaf-interleave-app-mode)
-              ;; (add-hook 'org-mode-hook 'eaf-interleave-mode)
-              )
+  (setup eaf-interleave
+    (:option eaf-interleave-org-notes-dir-list (list (concat nowis-doc-emacs-dir "01-orgmode/") ".")
+             eaf-interleave-disable-narrowing t
+             eaf-interleave-split-lines 20
+             eaf-find-alternate-file-in-dired t
+             )
+    (:bind "M-."  'eaf-interleave-sync-current-note
+           "M-p"  'eaf-interleave-sync-previous-note
+           "M-n"  'eaf-interleave-sync-next-note)
+    (:with-map eaf-interleave-app-mode-map
+      (:bind
+       "C-c M-i"  'eaf-interleave-add-note
+       "C-c M-o"  'eaf-interleave-open-notes-file
+       "C-c M-q"  'eaf-interleave-quit))
+    (add-hook 'eaf-pdf-viewer-hook 'eaf-interleave-app-mode)
+    (add-hook 'eaf-browser-hook 'eaf-interleave-app-mode)
+    ;; (add-hook 'org-mode-hook 'eaf-interleave-mode)
+    )
 #+end_src
 ** app-launcher
 #+begin_src elisp
@@ -2682,6 +2703,10 @@ Simple distraction-free editing. I use darkroom instead of writeroom because it'
 #+begin_src elisp
   (setup mind-wave
     (:autoload mind-wave-chat-mode))
+#+end_src
+** gptel
+#+begin_src elisp
+  (setup gptel)
 #+end_src
 ** whisper.el
 #+begin_src elisp
