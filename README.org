@@ -134,6 +134,23 @@ Nowisemacs uses space bars as leader key, you can find most keybindings in the M
 | M-`       | Open/fold Vterm                                  |
 Nowisemacs choose meow instead of EVIL as modal editing, so you may need to read the meow configuration in the
 configuration or the website of Meow to get a better understanding.
+
+Some useful keybindings for vim user:
+| Button | Function                                                                       |
+|--------+--------------------------------------------------------------------------------|
+| C-a    | Go to the beginning of the current visible line                                |
+| C-e    | Go to the end of the line, but before ellipsis, if any                         |
+| M->    | Move point to the end of the buffer                                            |
+| M-<    | Move point to the beginning of the buffer                                      |
+| M-v    | Scroll text of selected window down ARG lines; or near full screen if no ARG   |
+| C-v    | Scroll text of selected window upward ARG lines; or near full screen if no ARG |
+| C-w    | Kill ("cut") text between point and mark                                       |
+| e      | meow-next-word, select to the end of the next Nth word                         |
+| b      | meow-back-word, select to the beginning the previous Nth word                  |
+| f      | meow-find, find the next N char read from minibuffer                           |
+| c c    | meow-change, kill current selection and switch to INSERT state                 |
+| n      | moew-search, search and select with the car of the current regexp-search-ring  |
+
 * Things you must know before going deeper
 ** Radical
 1. Nowisemacs always uses the latest emacs version and compile it locally, so there may be some incompatible when you use an older version.
