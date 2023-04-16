@@ -1963,6 +1963,7 @@ Disassemble C, C++ or Fortran code under cursor
              org-ellipsis "⤵"
              org-plantuml-jar-path plantuml-jar-path
              org-special-ctrl-a/e t
+             org-attach-id-dir (concat nowis-doc-emacs-dir "02-binary-files/01-pictures/01-org-attach")
 
              fill-column 120
              )
@@ -2172,11 +2173,17 @@ Disassemble C, C++ or Fortran code under cursor
              ebib-file-search-dirs (list nowis-bib-pdf-dir)
              ebib-bib-search-dirs (list nowis-bib-dir)
              ebib-default-directory 'first-bib-dir
-             ebib-file-associations '(("pdf" . "xpdf")
+             ebib-file-associations '(("pdf")
                                       ("ps" . "gv")
                                       ("epub"))
              ebib-index-window-size 25
+             ebib-index-columns '(("Year" 6 t)
+                                  ("Title" 50 t)
+                                  ("Author/Editor" 40 t)
+                                  ("Entry Key" 40 t)
+                                  )
              ebib-reading-list-file (concat nowis-doc-emacs-dir "01-orgmode/xnotes/20230403T125743--ebib-reading-lists.org")
+             ebib-use-timestamp t
              )
     (:when-loaded
       (defcustom ebib-zotero-translation-server "http://127.0.0.1:1969"
@@ -2526,7 +2533,8 @@ Integrate Org with Video
              sdcv-dictionary-complete-list (list "简明英汉字典增强版")
              )
     (:global "M-l" lewis-eaf-sdcv-search-pointer+)
-
+    (if (eq system-type 'darwin)
+        (setq sdcv-program "sdcv"))
     ;; search in eaf mode
     (defun lewis-sdcv-search-pointer-in-kill-ring()
       (sdcv-search-input+ (substring-no-properties (car kill-ring) 0)))
@@ -2702,11 +2710,14 @@ Simple distraction-free editing. I use darkroom instead of writeroom because it'
 ** mind-wave
 #+begin_src elisp
   (setup mind-wave
+    (:option mind-wave-api-key-path "~/Documents/emacs/08-keys/chatgpt_api_key.txt")
     (:autoload mind-wave-chat-mode))
 #+end_src
 ** gptel
 #+begin_src elisp
-  (setup gptel)
+  (setup gptel
+    (:option gptel-default-mode 'org-mode)
+    (:global "M-p" gptel-menu))
 #+end_src
 ** whisper.el
 #+begin_src elisp
@@ -2730,7 +2741,7 @@ Simple distraction-free editing. I use darkroom instead of writeroom because it'
 
   (defun lewis-backup-to-nas-restic()
     (interactive)
-    (async-shell-command "~/Documents/my-bins/restic -r sftp:lewis-nas@192.168.31.108:/share/my_webdav/restic backup ~/Documents/emacs/02-binary-files/")
+    (async-shell-command "restic -r sftp:lewis-nas@192.168.31.108:/share/my_webdav/restic backup ~/Documents/emacs/02-binary-files/")
     )
 #+end_src
 *** startup scripts
