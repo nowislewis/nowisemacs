@@ -228,6 +228,9 @@
 [submodule "mpv"]
 	path = lib/mpv
 	url = https://github.com/kljohann/mpv.el.git
+[submodule "mpvi"]
+	path = lib/mpvi
+	url = https://github.com/lorniu/mpvi.git
 [submodule "nasm-mode"]
 	path = lib/nasm-mode
 	url = https://github.com/skeeto/nasm-mode.git
@@ -261,9 +264,6 @@
 [submodule "org-modern-indent"]
 	path = lib/org-modern-indent
 	url = https://github.com/jdtsmith/org-modern-indent.git
-[submodule "org-mpvi"]
-	path = lib/org-mpvi
-	url = https://github.com/lorniu/org-mpvi.git
 [submodule "org-noter"]
 	path = lib/org-noter
 	url = https://github.com/c1-g/org-noter-plus-djvu.git

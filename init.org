@@ -108,7 +108,7 @@ I failed in love with denote, so previous *org-roam* configs were refiled into [
   - [[#org-super-agenda][org-super-agenda]]
   - [[#org-ql][org-ql]]
   - [[#xeft][xeft]]
-  - [[#org-mpvi][org-mpvi]]
+  - [[#mpvi][mpvi]]
 - [[#english-翻译][english 翻译]]
   - [[#go-translate][go-translate]]
   - [[#dictionary-overlay][dictionary-overlay]]
@@ -2177,15 +2177,18 @@ Disassemble C, C++ or Fortran code under cursor
                                       ("ps" . "gv")
                                       ("epub"))
              ebib-index-window-size 25
-             ebib-index-columns '(("Year" 6 t)
+             ebib-index-columns '(("Score" 2 t)
+                                  ("Year" 6 t)
                                   ("Title" 50 t)
                                   ("Author/Editor" 40 t)
                                   ("Entry Key" 40 t)
                                   )
              ebib-reading-list-file (concat nowis-doc-emacs-dir "01-orgmode/xnotes/20230403T125743--ebib-reading-lists.org")
              ebib-use-timestamp t
+             ebib-bibtex-dialect 'biblatex
              )
     (:when-loaded
+
       (defcustom ebib-zotero-translation-server "http://127.0.0.1:1969"
         "The address of Zotero translation server."
         :group 'ebib
@@ -2484,11 +2487,11 @@ https://dindi.garjola.net/org-agenda-weekly.html
              xeft-recursive t
              ))
 #+end_src
-** org-mpvi
+** mpvi
 Integrate Org with Video
 #+begin_src elisp
   (setup mpv)
-  (setup org-mpvi)
+  (setup mpvi)
 #+end_src
 * english 翻译
 ** go-translate
