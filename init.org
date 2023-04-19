@@ -1839,18 +1839,11 @@ Highlight symbols with keymap-enabled overlays
 #+end_src
 ***** lsp-bridge
 #+begin_src elisp
-  (setup lsp-bridge
-    (:option lsp-bridge-org-babel-lang-list '("emacs-lisp"
-                                              "python"
-                                              "dot"
-                                              "latex"
-                                              "C"
-                                              "C++"
-                                              "scheme"
-                                              "plantuml")
-             ;; acm-candidate-match-function 'orderless-literal
-             ;; acm-backend-search-sdcv-words-dictionary (file-truename "~/Downloads/stardicts/stardict-langdao-ec-gb-2.4.2/langdao-ec-gb")
-             ))
+    (setup lsp-bridge
+      (:option
+               ;; acm-candidate-match-function 'orderless-literal
+               ;; acm-backend-search-sdcv-words-dictionary (file-truename "~/Downloads/stardicts/stardict-langdao-ec-gb-2.4.2/langdao-ec-gb")
+               ))
 
 #+end_src
 **** citre
@@ -1937,6 +1930,14 @@ Disassemble C, C++ or Fortran code under cursor
     (:option disaster-assembly-mode 'nasm-mode
              disaster-objdump "objdump -d -M att -Sl --no-show-raw-insn"))
 #+end_src
+*** jupyter
+#+begin_src elisp
+  (setup zmq)
+  (setup simple-httpd)
+  (setup jupyter
+    (setenv "PYDEVD_DISABLE_FILE_VALIDATION" "1") ;; to solve (json-number-format 5) problems because it fails to separate from stdout,
+    )
+#+end_src
 * Org Mode
 ** org-mode
 #+begin_src elisp
@@ -1974,6 +1975,7 @@ Disassemble C, C++ or Fortran code under cursor
       (setq org-latex-pdf-process '("tectonic %f"))
       (setq org-format-latex-options (plist-put org-format-latex-options :scale 2.0)) ;; use a large preview for latex
 
+      ;; emphasis
       (defface my-org-emphasis-bold
         '((default :inherit bold)
           (((class color) (min-colors 88) (background light))
@@ -2007,20 +2009,32 @@ Disassemble C, C++ or Fortran code under cursor
               ("+" (:strike-through t))
               ))
 
-      (org-babel-do-load-languages
-       'org-babel-load-languages
-       '((emacs-lisp . t)
-         (python . t)
-         (dot . t)
-         (latex . t)
-         (C . t)
-         (scheme . t)
-         (plantuml . t)
-         ))
+      ;; dynamic load org-src modules to accelerate speed
+      (defun my/org-babel-execute-src-block (&optional _arg info _params)
+        "Load language if needed"
+        (let* ((lang (nth 0 info))
+               (sym (cond ((member (downcase lang) '("c" "cpp" "c++")) 'C)
+                          ((member (downcase lang) '("jupyter-python")) 'jupyter)
+                          (t (intern lang))))
+               (backup-languages org-babel-load-languages))
+        (unless (assoc sym backup-languages)
+            (condition-case err
+                (progn
+                  (org-babel-do-load-languages 'org-babel-load-languages (list (cons sym t)))
+                  (setq-default org-babel-load-languages (append (list (cons sym t)) backup-languages)))
+              (file-missing
+               (setq-default org-babel-load-languages backup-languages)
+               err)))))
+      (advice-add 'org-babel-execute-src-block :before #'my/org-babel-execute-src-block )
+
+
       ;; didn't redisplay for now
       ;; (add-hook 'org-babel-after-execute-hook 'org-redisplay-inline-images)
-      ;; open word
+
+      ;; export and open word
       (add-to-list 'org-file-apps '("\\.docx\\'" . default))
+      (add-to-list 'org-structure-template-alist
+                   '("jp" . "src jupyter-python :async yes :kernel python3 :session py"))
       (defun lewis/org-export-docx ()
         (interactive)
         (let ((docx-file (concat (file-name-sans-extension (buffer-file-name)) ".docx"))
@@ -2095,8 +2109,6 @@ Disassemble C, C++ or Fortran code under cursor
              org-noter-hide-other nil
              org-noter-doc-split-percentage '(0.6 . 0.4))
     (:when-loaded
-      ;; (require 'org-pdftools)
-      ;; (require 'org-noter-pdftools)
       (require 'org-noter-pdf)
       (require 'org-noter-nov)
       (require 'org-noter-nov-overlay)
