@@ -138,6 +138,9 @@
 [submodule "embark"]
 	path = lib/embark
 	url = https://github.com/oantolin/embark.git
+[submodule "emms"]
+	path = lib/emms
+	url = https://github.com/emacsmirror/emms.git
 [submodule "esxml"]
 	path = lib/esxml
 	url = https://github.com/tali713/esxml.git
@@ -207,6 +210,7 @@
 	url = https://github.com/manateelazycat/lsp-bridge.git
     load-path = .
     load-path = acm
+    build-step = borg-update-autoloads
 [submodule "lua-mode"]
 	path = lib/lua-mode
 	url = https://github.com/immerrr/lua-mode.git
@@ -228,9 +232,6 @@
 [submodule "mind-wave"]
 	path = lib/mind-wave
 	url = https://github.com/manateelazycat/mind-wave.git
-[submodule "mpv"]
-	path = lib/mpv
-	url = https://github.com/kljohann/mpv.el.git
 [submodule "mpvi"]
 	path = lib/mpvi
 	url = https://github.com/lorniu/mpvi.git
