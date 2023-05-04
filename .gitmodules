@@ -79,6 +79,9 @@
 [submodule "denote"]
 	path = lib/denote
 	url = https://github.com/protesilaos/denote.git
+[submodule "denote-menu"]
+	path = lib/denote-menu
+	url = https://github.com/namilus/denote-menu.git
 [submodule "dictionary-overlay"]
 	path = lib/dictionary-overlay
 	url = https://github.com/ginqi7/dictionary-overlay.git
@@ -293,6 +296,9 @@
 [submodule "org-transclusion"]
 	path = lib/org-transclusion
 	url = https://github.com/nobiot/org-transclusion
+[submodule "orgtbl-aggregate"]
+	path = lib/orgtbl-aggregate
+	url = https://github.com/tbanel/orgaggregate.git
 [submodule "ov"]
 	path = lib/ov
 	url = https://github.com/emacsorphanage/ov.git

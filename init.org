@@ -66,7 +66,6 @@ I failed in love with denote, so previous *org-roam* configs were refiled into [
 - [[#input][Input]]
   - [[#posframe][posframe]]
   - [[#pyim][pyim]]
-  - [[#rime][rime]]
 - [[#file-and-browsing][File and Browsing]]
   - [[#file-browsing][file browsing]]
   - [[#structure-browsing][structure browsing]]
@@ -109,6 +108,7 @@ I failed in love with denote, so previous *org-roam* configs were refiled into [
   - [[#org-ql][org-ql]]
   - [[#xeft][xeft]]
   - [[#mpvi][mpvi]]
+  - [[#orgtbl-aggregate][orgtbl-aggregate]]
 - [[#english-翻译][english 翻译]]
   - [[#go-translate][go-translate]]
   - [[#dictionary-overlay][dictionary-overlay]]
@@ -626,6 +626,10 @@ Maybe I should add a new state.
    '("a b" . vterm-toggle-backward)
    '("a i" . double-vterm-toggle-insert-cd)
    '("a t" . org-pomodoro)
+ ;; mpvi
+   '("a m o" . mpvi-open)
+   '("a m s" . mpvi-seek)
+   '("a m a" . mpvi-emms-add)
    )
 
 
@@ -944,7 +948,8 @@ diff-hl-mode highlights uncommitted changes on the left side of the window (area
              kill-do-not-save-duplicates t
              shell-command-prompt-show-cwd t
              what-cursor-show-names t)
-     (global-visual-line-mode)
+  ;; for now, I need a clear line mode
+     ;; (global-visual-line-mode)
      )
 #+end_src
 ** general builtin modes
@@ -1470,7 +1475,7 @@ borrowed from citre, now you can always jump-back use "M-,"
     ;; (setq default-input-method "pyim")
     )
 #+end_src
-** rime
+** COMMENT rime
 #+begin_src elisp
   (setup rime
     (:option rime-disable-predicates '(meow-normal-mode-p
@@ -1478,14 +1483,12 @@ borrowed from citre, now you can always jump-back use "M-,"
                                        meow-keypad-mode-p
                                        rime-predicate-prog-in-code-p
                                        rime-predicate-punctuation-line-begin-p ;;在行首要输入符号时
-                                       ;; rime-predicate-after-alphabet-char-p ;;在英文字符串之后（必须为以字母开头的英文字符串）
+                                       rime-predicate-after-alphabet-char-p ;;在英文字符串之后（必须为以字母开头的英文字符串）
                                        rime-predicate-current-input-punctuation-p ;;当要输入的是符号时
-                                       rime-predicate-after-ascii-char-p ;;任意英文字符后 ,enable this to use with <s
+                                       ;; rime-predicate-after-ascii-char-p ;;任意英文字符后 ,enable this to use with <s
                                        rime-predicate-current-uppercase-letter-p ;; 将要输入的为大写字母时
                                        rime-predicate-space-after-cc-p ;;在中文字符且有空格之后
                                        )
-             ;; rime-inline-predicates '(
-             ;;                          )
              default-input-method "rime"
              rime-show-candidate 'posframe
              rime-posframe-properties (list :internal-border-width 1
@@ -1513,8 +1516,8 @@ borrowed from citre, now you can always jump-back use "M-,"
     #+end_src
 *** diredfl
 #+begin_src elisp
-  (setup diredfl
-    (:hook-into dired-mode))
+  ;; (setup diredfl
+  ;;   (:hook-into dired-mode))
 #+end_src
 *** dirvish
 Dirvish is a minimalistic file manager based on Dired. It's fast
@@ -2244,11 +2247,11 @@ Disassemble C, C++ or Fortran code under cursor
 #+begin_src elisp
   (setup denote
     (:option denote-directory (expand-file-name (concat nowis-doc-emacs-dir "01-orgmode/xnotes"))
-             denote-dired-directories (list denote-directory
-                                            (thread-last denote-directory (expand-file-name "xnotes")))
+             denote-dired-directories (ffap-all-subdirs denote-directory)
              denote-date-prompt-use-org-read-date t
              denote-modules '(project))
     (add-hook 'dired-mode-hook #'denote-dired-mode-in-directories)
+    ;; should add a hook for disable diredfl-mode
         ;;;###autoload
     (defun denote-open-or-create-with-subdirectory ()
       "Invoke `denote-open-or-create' but also prompt for subdirectory.
@@ -2289,7 +2292,9 @@ Disassemble C, C++ or Fortran code under cursor
                   (denote--add-front-matter new-name title keywords id file-type))))))))
 #+end_src
 ** denote-menu
-
+#+begin_src elisp
+  (setup denote-menu)
+#+end_src
 ** find orgmode dir files
 #+begin_src elisp
   (defun project-find-orgmode-dir-files ()
@@ -2506,6 +2511,10 @@ Integrate Org with Video
 #+begin_src elisp
   (setup emms)
   (setup mpvi)
+#+end_src
+** orgtbl-aggregate
+#+begin_src elisp
+  (setup orgtbl-qggregate)
 #+end_src
 * english 翻译
 ** go-translate
