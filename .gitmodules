@@ -424,3 +424,6 @@
 [submodule "zmq"]
 	path = lib/zmq
 	url = https://github.com/nnicandro/emacs-zmq.git
+[submodule "zotra"]
+	path = lib/zotra
+	url = https://github.com/mpedramfar/zotra.git
