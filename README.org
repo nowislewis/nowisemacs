@@ -60,13 +60,19 @@ All configs can be seen [[file:init.org][here]].
 
 Nowisemacs uses a single org file to manage all configurations. To reduce the startup time of emacs, users need to
 generate =.el= configuration files before the first startup
+
 *** Installation
+**** Dependences
+1. =pip install epc=.
+2. Install =ripgrep= and =fd=.
+**** Nowisemacs
 1. =mv ~/.emacs.d ~/.emacs.d.back= ;; Backup your original configuration
 2. =git clone https://github.com/nowislewis/nowisemacs ~/.emacs.d= ;; Download nowisemacs
 3. =cd ~/.emacs.d=
 4. =make bootstrap-borg & make bootstrap= ;; download and build packages
 5. (optional) =make native= ;; if you build emacs with native-comp, use this command to build all packages ahead-of-time.
 6. =emacs= ;; Launch emacs, the download, installation and configuration of packages will be done automatically.
+7. M-x
 7. If you upgrade packages or install new packages, just run =make= in the =.emacs.d= dir.
 *** Add packages
 1. Inside emacs, run =M-x borg-assimilate=, and then input your package name and git url sequentially.
@@ -77,6 +83,9 @@ generate =.el= configuration files before the first startup
 1. =make update= ;; get all packages update latest
 2. =make bootstrap= ;; build packages
 3. (optional) =make native= ;; if you build emacs with native-comp, use this command to build all packages ahead-of-time.
+*** display icons correctly
+[nerd-icons](https://github.com/rainstormstudio/nerd-icons.el) are necessary.  Run `M-x nerd-icons-install-fonts` to
+install the resource fonts. On Windows, the fonts should be installed manually. `nerd-icons` supports bot GUI and TUI.
 ** How to customize
 *** Change configurations
 Nowisemacs use =setup.el= to config all the configuration but you can also use built-in methods, =setup= is just a simple wrapper of these methods. You can get a clear understand in anywhere by typing =M-x emacs-lisp-macroexpand=, and the =setup= code will be expanded to normal built-in methods.

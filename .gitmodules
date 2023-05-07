@@ -4,12 +4,6 @@
 [submodule "alert"]
 	path = lib/alert
 	url = https://github.com/jwiegley/alert.git
-[submodule "all-the-icons"]
-	path = lib/all-the-icons
-	url = https://github.com/domtronn/all-the-icons.el.git
-[submodule "all-the-icons-completion"]
-	path = lib/all-the-icons-completion
-	url = https://github.com/iyefrat/all-the-icons-completion.git
 [submodule "app-launcher"]
 	path = lib/app-launcher
 	url = https://github.com/SebastienWae/app-launcher.git
@@ -28,9 +22,6 @@
 [submodule "borg"]
 	path = lib/borg
 	url = https://github.com/emacscollective/borg.git
-[submodule "cape"]
-	path = lib/cape
-	url = https://github.com/minad/cape.git
 [submodule "cdlatex"]
 	path = lib/cdlatex
 	url = https://github.com/cdominik/cdlatex.git
@@ -59,11 +50,6 @@
 [submodule "consult-eglot"]
 	path = lib/consult-eglot
 	url = https://github.com/mohkale/consult-eglot.git
-[submodule "corfu"]
-	path = lib/corfu
-	url = https://github.com/minad/corfu.git
-    load-path = .
-    load-path = extensions
 [submodule "darkroom"]
 	path = lib/darkroom
 	url = https://github.com/joaotavora/darkroom.git
@@ -235,6 +221,12 @@
 [submodule "nasm-mode"]
 	path = lib/nasm-mode
 	url = https://github.com/skeeto/nasm-mode.git
+[submodule "nerd-icons"]
+	path = lib/nerd-icons
+	url = https://github.com/rainstormstudio/nerd-icons.el.git
+[submodule "nerd-icons-completion"]
+	path = lib/nerd-icons-completion
+	url = https://github.com/rainstormstudio/nerd-icons-completion.git
 [submodule "no-littering"]
 	path = lib/no-littering
 	url = https://github.com/emacscollective/no-littering.git
