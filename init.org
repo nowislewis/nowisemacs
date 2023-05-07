@@ -66,6 +66,7 @@ I failed in love with denote, so previous *org-roam* configs were refiled into [
 - [[#input][Input]]
   - [[#posframe][posframe]]
   - [[#pyim][pyim]]
+  - [[#rime][rime]]
 - [[#file-and-browsing][File and Browsing]]
   - [[#file-browsing][file browsing]]
   - [[#structure-browsing][structure browsing]]
@@ -96,6 +97,7 @@ I failed in love with denote, so previous *org-roam* configs were refiled into [
   - [[#bibtex-related][bibtex related]]
   - [[#toc-org][toc-org]]
   - [[#denote][denote]]
+  - [[#denote-lumn][denote-lumn]]
   - [[#denote-menu][denote-menu]]
   - [[#find-orgmode-dir-files][find orgmode dir files]]
   - [[#org-imagine-excalidraw][org-imagine, excalidraw]]
@@ -126,10 +128,8 @@ I failed in love with denote, so previous *org-roam* configs were refiled into [
   - [[#eaf][eaf]]
   - [[#app-launcher][app-launcher]]
   - [[#gif-screencast][gif-screencast]]
-  - [[#emacs-guix][emacs-guix]]
-  - [[#mind-wave][mind-wave]]
-  - [[#gptel][gptel]]
-  - [[#whisperel][whisper.el]]
+  - [[#ai][ai]]
+  - [[#engine-mode][engine-mode]]
   - [[#scripts][scripts]]
 - [[#use-single-file-to-load-configs][use single file to load configs]]
   - [[#provide][provide]]
@@ -1370,8 +1370,8 @@ Jump anywhere in the world
     (:global "M-j" avy-goto-word-1))
 #+end_src
 *** jump-back
-borrowed from citre, now you can always jump-back use "M-,"
-#+begin_src elisp :tangle no
+borrowed from citre, now you can always jump-back use "M-," after any jump in the list.
+#+begin_src elisp
   (defun my--push-point-to-xref-marker-stack (&rest r)
     (xref-push-marker-stack (point-marker))) ;; must autoload this command in xref
   (dolist (func '(find-function
@@ -1380,9 +1380,11 @@ borrowed from citre, now you can always jump-back use "M-,"
                   consult-line
                   consult-find
                   find-file
-                  meow-goto-line
+                  blink-search
+                  consult-goto-line
                   isearch-forward))
-    (advice-add func :before 'my--push-point-to-xref-marker-stack))
+    (if (fboundp func)
+        (advice-add func :before 'my--push-point-to-xref-marker-stack)))
 #+end_src
 *** bookmark
 #+begin_src elisp
@@ -1475,9 +1477,10 @@ borrowed from citre, now you can always jump-back use "M-,"
     ;; (setq default-input-method "pyim")
     )
 #+end_src
-** COMMENT rime
+** rime
 #+begin_src elisp
   (setup rime
+    (setq default-input-method "rime")
     (:option rime-disable-predicates '(meow-normal-mode-p
                                        meow-motion-mode-p
                                        meow-keypad-mode-p
@@ -1489,7 +1492,6 @@ borrowed from citre, now you can always jump-back use "M-,"
                                        rime-predicate-current-uppercase-letter-p ;; 将要输入的为大写字母时
                                        rime-predicate-space-after-cc-p ;;在中文字符且有空格之后
                                        )
-             default-input-method "rime"
              rime-show-candidate 'posframe
              rime-posframe-properties (list :internal-border-width 1
                                             :font lewis-fixed-font)
@@ -2290,6 +2292,23 @@ Disassemble C, C++ or Fortran code under cursor
                 (if (denote--edit-front-matter-p new-name file-type)
                     (denote--rewrite-front-matter new-name title keywords file-type)
                   (denote--add-front-matter new-name title keywords id file-type))))))))
+
+
+#+end_src
+** denote-lumn
+Borrowed from https://github.com/protesilaos/denote/issues/115
+#+begin_src elisp
+  (setq find-dired-refine-function nil)  ;; This needs to be set globally, find-dired works asynchronously.
+
+  (defun my/zettel-signature-buffer ()
+   (interactive)
+     (let ((find-ls-option '(" -exec ls -ld {} \\+| awk /==/ | sed  's/--/=@/3' | sort -t '=' -Vk 3,3 | sed 's/=@/--/'" . "-ld")))
+       (find-dired denote-directory "")))
+
+  (defun my/zettel-main-topics ()
+   (interactive)
+   (let ((find-ls-option '("-regex '.*==[0-9]+-.*'  -exec ls -ld {} \\+| awk /==/ | sed  's/--/=@/3' | sort -t '=' -Vk 3,3 | sed 's/=@/--/'" . "-ld")))
+     (find-dired denote-directory "")))
 #+end_src
 ** denote-menu
 #+begin_src elisp
@@ -2301,6 +2320,7 @@ Disassemble C, C++ or Fortran code under cursor
     (interactive)
     (dired (concat nowis-doc-emacs-dir "01-orgmode")
     (project-find-file t)))
+
   (defun project-find-xnotes-dir-files ()
     (interactive)
     (dired (concat nowis-doc-emacs-dir "01-orgmode/xnotes"))
@@ -2360,7 +2380,6 @@ Disassemble C, C++ or Fortran code under cursor
       (setq nov-shr-rendering-functions '((img . nov-render-img) (title . nov-render-title)))
       (setq nov-shr-rendering-functions (append nov-shr-rendering-functions shr-external-rendering-functions))))
 #+end_src
-
 ** org-remark
 Highlight and annotate any text file with using Org mode.
 #+begin_src elisp
@@ -2493,7 +2512,6 @@ https://dindi.garjola.net/org-agenda-weekly.html
 #+begin_src elisp
   (setup ts)
   (setup peg)
-  ;; (setup org-super-agenda)
   (setup ov)
   (setup org-ql)
 #+end_src
@@ -2513,6 +2531,7 @@ Integrate Org with Video
   (setup mpvi)
 #+end_src
 ** orgtbl-aggregate
+Aggregating a table is creating a new table by computing sums, averages, and so on, out of material from the first table.
 #+begin_src elisp
   (setup orgtbl-qggregate)
 #+end_src
@@ -2726,26 +2745,20 @@ Simple distraction-free editing. I use darkroom instead of writeroom because it'
     (keymap-global-set "M-o" #'my/siri-ocr)
     )
 #+end_src
-** emacs-guix
-#+begin_src elisp
-  (setup bui)
-  (setup magit-popup)
-  (setup emacs-guix)
-#+end_src
-
-** mind-wave
+** ai
+*** mind-wave
 #+begin_src elisp
   (setup mind-wave
     (:option mind-wave-api-key-path "~/Documents/emacs/08-keys/chatgpt_api_key.txt")
     (:autoload mind-wave-chat-mode))
 #+end_src
-** gptel
+*** gptel
 #+begin_src elisp
   (setup gptel
     (:option gptel-default-mode 'org-mode)
     (:global "M-p" gptel-menu))
 #+end_src
-** whisper.el
+*** whisper.el
 #+begin_src elisp
   (setup whisper
     (:option whisper-install-directory (concat no-littering-var-directory "whisper")
@@ -2753,6 +2766,24 @@ Simple distraction-free editing. I use darkroom instead of writeroom because it'
              whisper-model "small"
              whisper-use-threads 8))
 #+end_src
+** engine-mode
+Minor mode for defining and querying search engines through Emacs.
+#+begin_src elisp
+  (setup engine-mode
+    (engine-mode t)
+    (:when-loaded
+      (defengine github
+        "https://github.com/search?ref=simplesearch&q=%s"
+        :keybinding "g")
+      (defengine google
+        "https://www.google.com/search?ie=utf-8&oe=utf-8&q=%s"
+        :keybinding "s")
+      (defengine doubandushu
+        "https://search.douban.com/book/subject_search?search_text=%s"
+        :keybinding "d")
+      ))
+#+end_src
+
 ** scripts
 *** backup scripts
 #+begin_src elisp

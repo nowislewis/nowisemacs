@@ -28,9 +28,6 @@
 [submodule "borg"]
 	path = lib/borg
 	url = https://github.com/emacscollective/borg.git
-[submodule "bui"]
-	path = lib/bui
-	url = https://github.com/alezost/bui.el.git
 [submodule "cape"]
 	path = lib/cape
 	url = https://github.com/minad/cape.git
@@ -135,15 +132,15 @@
 [submodule "elisp-refs"]
 	path = lib/elisp-refs
 	url = https://github.com/Wilfred/elisp-refs.git
-[submodule "emacs-guix"]
-	path = lib/emacs-guix
-	url = https://git.savannah.gnu.org/git/guix/emacs-guix.git/
 [submodule "embark"]
 	path = lib/embark
 	url = https://github.com/oantolin/embark.git
 [submodule "emms"]
 	path = lib/emms
 	url = https://github.com/emacsmirror/emms.git
+[submodule "engine-mode"]
+	path = lib/engine-mode
+	url = https://github.com/hrs/engine-mode.git
 [submodule "esxml"]
 	path = lib/esxml
 	url = https://github.com/tali713/esxml.git
@@ -220,9 +217,6 @@
 [submodule "magit"]
 	path = lib/magit
 	url = https://github.com/magit/magit
-[submodule "magit-popup"]
-	path = lib/magit-popup
-	url = https://github.com/magit/magit-popup.git
 [submodule "marginalia"]
 	path = lib/marginalia
 	url = https://github.com/minad/marginalia.git
