@@ -1727,7 +1727,8 @@ Highlight symbols with keymap-enabled overlays
 ***** lsp-bridge
 #+begin_src elisp
   (setup lsp-bridge
-    (:option acm-enable-citre t
+    (:option acm-enable-citre nil
+             lsp-bridge-enable-org-babel t
              ;; acm-candidate-match-function 'orderless-literal
              ;; acm-backend-search-sdcv-words-dictionary (file-truename "~/Downloads/stardicts/stardict-langdao-ec-gb-2.4.2/langdao-ec-gb")
              )
@@ -1828,112 +1829,113 @@ Disassemble C, C++ or Fortran code under cursor
 * Org Mode
 ** org-mode
 #+begin_src elisp
-  (setup org
-    (setq org-directory (concat nowis-doc-emacs-dir "01-orgmode/"))
-    (:option org-adapt-indentation nil
-             org-startup-indented t
-             org-hide-emphasis-markers t
-             org-imenu-depth 5
-             org-return-follows-link t
-             org-link-frame-setup '((vm . vm-visit-folder-other-frame)
-                                    (vm-imap . vm-visit-imap-folder-other-frame)
-                                    (gnus . org-gnus-no-new-news)
-                                    (file . find-file)
-                                    (wl . wl-other-frame))
-             org-log-done 'time ;; 记录完成时间
-             org-blank-before-new-entry '((heading . nil)
-                                          (plain-list-item . nil))
+(setup org
+  (setq org-directory (concat nowis-doc-emacs-dir "01-orgmode/"))
+  (:option org-adapt-indentation nil
+           org-startup-indented t
+           org-edit-src-content-indentation 0
+           org-hide-emphasis-markers t
+           org-imenu-depth 5
+           org-return-follows-link t
+           org-link-frame-setup '((vm . vm-visit-folder-other-frame)
+                                  (vm-imap . vm-visit-imap-folder-other-frame)
+                                  (gnus . org-gnus-no-new-news)
+                                  (file . find-file)
+                                  (wl . wl-other-frame))
+           org-log-done 'time ;; 记录完成时间
+           org-blank-before-new-entry '((heading . nil)
+                                        (plain-list-item . nil))
 
-             org-image-actual-width 600 ;; this will use 600 for width for all the images.
-             org-preview-latex-image-directory (concat no-littering-var-directory "ltximg/")
-             org-confirm-babel-evaluate nil
-             org-src-window-setup 'split-window-below
-             org-ellipsis "⤵"
-             org-plantuml-jar-path plantuml-jar-path
-             org-special-ctrl-a/e t
-             org-attach-id-dir (concat nowis-doc-emacs-dir "02-binary-files/01-pictures/01-org-attach")
+           org-image-actual-width 600 ;; this will use 600 for width for all the images.
+           org-preview-latex-image-directory (concat no-littering-var-directory "ltximg/")
+           org-confirm-babel-evaluate nil
+           org-src-window-setup 'split-window-below
+           org-ellipsis "⤵"
+           org-plantuml-jar-path plantuml-jar-path
+           org-special-ctrl-a/e t
+           org-attach-id-dir (concat nowis-doc-emacs-dir "02-binary-files/01-pictures/01-org-attach")
 
-             fill-column 120
-             )
-    ;; (:hook org-num-mode)
-    (:when-loaded
-      (require 'org-tempo) ;; so that <s is useful
-      ;; 导出相关的设置
-      (setq org-latex-pdf-process '("tectonic %f"))
-      (setq org-format-latex-options (plist-put org-format-latex-options :scale 2.0)) ;; use a large preview for latex
+           fill-column 120
+           )
+  ;; (:hook org-num-mode)
+  (:when-loaded
+    (require 'org-tempo) ;; so that <s is useful
+    ;; 导出相关的设置
+    (setq org-latex-pdf-process '("tectonic %f"))
+    (setq org-format-latex-options (plist-put org-format-latex-options :scale 2.0)) ;; use a large preview for latex
 
-      ;; emphasis
-      (defface my-org-emphasis-bold
-        '((default :inherit bold)
-          (((class color) (min-colors 88) (background light))
-           :foreground "pale violet red")
-          (((class color) (min-colors 88) (background dark))
-           :foreground "pale violet red"))
-        "My bold emphasis for Org.")
+    ;; emphasis
+    (defface my-org-emphasis-bold
+      '((default :inherit bold)
+        (((class color) (min-colors 88) (background light))
+         :foreground "pale violet red")
+        (((class color) (min-colors 88) (background dark))
+         :foreground "pale violet red"))
+      "My bold emphasis for Org.")
 
-      (defface my-org-emphasis-italic
-        '((default :inherit italic)
-          (((class color) (min-colors 88) (background light))
-           :foreground "green3")
-          (((class color) (min-colors 88) (background dark))
-           :foreground "green3"))
-        "My italic emphasis for Org.")
+    (defface my-org-emphasis-italic
+      '((default :inherit italic)
+        (((class color) (min-colors 88) (background light))
+         :foreground "green3")
+        (((class color) (min-colors 88) (background dark))
+         :foreground "green3"))
+      "My italic emphasis for Org.")
 
-      (defface my-org-emphasis-underline
-        '((default :inherit underline)
-          (((class color) (min-colors 88) (background light))
-           :foreground "#813e00")
-          (((class color) (min-colors 88) (background dark))
-           :foreground "#d0bc00"))
-        "My underline emphasis for Org.")
+    (defface my-org-emphasis-underline
+      '((default :inherit underline)
+        (((class color) (min-colors 88) (background light))
+         :foreground "#813e00")
+        (((class color) (min-colors 88) (background dark))
+         :foreground "#d0bc00"))
+      "My underline emphasis for Org.")
 
-      (setq org-emphasis-alist
-            '(("*" my-org-emphasis-bold)
-              ("/" my-org-emphasis-italic)
-              ("_" underline)
-              ("=" org-verbatim verbatim)
-              ("~" org-code verbatim)
-              ("+" (:strike-through t))
-              ))
+    (setq org-emphasis-alist
+          '(("*" my-org-emphasis-bold)
+            ("/" my-org-emphasis-italic)
+            ("_" underline)
+            ("=" org-verbatim verbatim)
+            ("~" org-code verbatim)
+            ("+" (:strike-through t))
+            ))
 
-      ;; dynamic load org-src modules to accelerate speed
-      (defun my/org-babel-execute-src-block (&optional _arg info _params)
-        "Load language if needed"
-        (let* ((lang (nth 0 info))
-               (sym (cond ((member (downcase lang) '("c" "cpp" "c++")) 'C)
-                          ((member (downcase lang) '("jupyter-python")) 'jupyter)
-                          (t (intern lang))))
-               (backup-languages org-babel-load-languages))
-        (unless (assoc sym backup-languages)
-            (condition-case err
-                (progn
-                  (org-babel-do-load-languages 'org-babel-load-languages (list (cons sym t)))
-                  (setq-default org-babel-load-languages (append (list (cons sym t)) backup-languages)))
-              (file-missing
-               (setq-default org-babel-load-languages backup-languages)
-               err)))))
-      (advice-add 'org-babel-execute-src-block :before #'my/org-babel-execute-src-block )
+    ;; dynamic load org-src modules to accelerate speed
+    (defun my/org-babel-execute-src-block (&optional _arg info _params)
+      "Load language if needed"
+      (let* ((lang (nth 0 info))
+             (sym (cond ((member (downcase lang) '("c" "cpp" "c++")) 'C)
+                        ((member (downcase lang) '("jupyter-python")) 'jupyter)
+                        (t (intern lang))))
+             (backup-languages org-babel-load-languages))
+      (unless (assoc sym backup-languages)
+          (condition-case err
+              (progn
+                (org-babel-do-load-languages 'org-babel-load-languages (list (cons sym t)))
+                (setq-default org-babel-load-languages (append (list (cons sym t)) backup-languages)))
+            (file-missing
+             (setq-default org-babel-load-languages backup-languages)
+             err)))))
+    (advice-add 'org-babel-execute-src-block :before #'my/org-babel-execute-src-block )
 
 
-      ;; didn't redisplay for now
-      ;; (add-hook 'org-babel-after-execute-hook 'org-redisplay-inline-images)
+    ;; didn't redisplay for now
+    ;; (add-hook 'org-babel-after-execute-hook 'org-redisplay-inline-images)
 
-      ;; export and open word
-      (add-to-list 'org-file-apps '("\\.docx\\'" . default))
-      (add-to-list 'org-structure-template-alist
-                   '("jp" . "src jupyter-python :async yes :kernel python3 :session py"))
-      (defun lewis/org-export-docx ()
-        (interactive)
-        (let ((docx-file (concat (file-name-sans-extension (buffer-file-name)) ".docx"))
-              (template-file (concat nowis-doc-emacs-dir
-                                     "02-binary-files/template.docx")))
-          (shell-command (format "pandoc %s -o %s --reference-doc=%s"
-                                 (buffer-file-name)
-                                 docx-file
-                                 template-file
-                                 ))
-          (message "Convert finish: %s" docx-file)))
-      ))
+    ;; export and open word
+    (add-to-list 'org-file-apps '("\\.docx\\'" . default))
+    (add-to-list 'org-structure-template-alist
+                 '("jp" . "src jupyter-python :async yes :kernel python3 :session py"))
+    (defun lewis/org-export-docx ()
+      (interactive)
+      (let ((docx-file (concat (file-name-sans-extension (buffer-file-name)) ".docx"))
+            (template-file (concat nowis-doc-emacs-dir
+                                   "02-binary-files/template.docx")))
+        (shell-command (format "pandoc %s -o %s --reference-doc=%s"
+                               (buffer-file-name)
+                               docx-file
+                               template-file
+                               ))
+        (message "Convert finish: %s" docx-file)))
+    ))
 #+end_src
 ** org-modern
 #+begin_src elisp
@@ -2444,7 +2446,7 @@ Aggregating a table is creating a new table by computing sums, averages, and so 
       (gts-translate my-translator-posframe)))
 #+end_src
 ** dictionary-overlay
-#+begin_src elisp
+#+begin_src elisp :tangle no
   (setup websocket)
   (setup websocket-bridge)
   (setup dictionary-overlay
