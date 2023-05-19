@@ -1268,27 +1268,22 @@ borrowed from citre, now you can always jump-back use "M-," after any jump in th
 #+begin_src elisp
   (setq bookmark-default-file (concat nowis-doc-emacs-dir "bookmarks"))
 #+end_src
-*** ace-window
-#+begin_src elisp
-  (setup ace-window
-      (:global [remap other-window] #'ace-window))
-#+end_src
 *** windmove
 #+begin_src elisp
-  (setup windmove
-    (transient-define-prefix windmove-transient-keybindings()
-      "Define windmove maps"
-      [[("h" "left" windmove-left :transient t)
-        ("H" "swap-left" windmove-swap-states-left :transient t)]
-       [("j" "down" windmove-down :transient t)
-        ("J" "swap-down" windmove-swap-states-down :transient t)]
-       [("k" "up" windmove-up :transient t)
-        ("K" "swap-up" windmove-swap-states-up :transient t)]
-       [("l" "right" windmove-right :transient t)
-        ("L" "swap-right" windmove-swap-states-right :transient t)]
-       ])
-    (:global "C-x O" windmove-transient-keybindings)
-    )
+(setup windmove
+  (transient-define-prefix windmove-transient-keybindings()
+    "Define windmove maps"
+    [[("h" "left" windmove-left :transient t)
+      ("H" "swap-left" windmove-swap-states-left :transient t)]
+     [("j" "down" windmove-down :transient t)
+      ("J" "swap-down" windmove-swap-states-down :transient t)]
+     [("k" "up" windmove-up :transient t)
+      ("K" "swap-up" windmove-swap-states-up :transient t)]
+     [("l" "right" windmove-right :transient t)
+      ("L" "swap-right" windmove-swap-states-right :transient t)]
+     ])
+    (:global [remap other-window] #'windmove-transient-keybindings)
+  )
 
 #+end_src
 * ibuffer
@@ -1819,12 +1814,13 @@ Disassemble C, C++ or Fortran code under cursor
              disaster-objdump "objdump -d -M att -Sl --no-show-raw-insn"))
 #+end_src
 *** jupyter
-#+begin_src elisp
-  (setup zmq)
-  (setup simple-httpd)
-  (setup jupyter
-    (setenv "PYDEVD_DISABLE_FILE_VALIDATION" "1") ;; to solve (json-number-format 5) problems because it fails to separate from stdout,
-    )
+#+begin_src elisp :tangle no
+(setup websocket)
+(setup zmq)
+(setup simple-httpd)
+(setup jupyter
+  (setenv "PYDEVD_DISABLE_FILE_VALIDATION" "1") ;; to solve (json-number-format 5) problems because it fails to separate from stdout,
+  )
 #+end_src
 * Org Mode
 ** org-mode
@@ -2121,11 +2117,13 @@ Disassemble C, C++ or Fortran code under cursor
       )
     )
 #+end_src
-*** zotro
+*** zotra
 TODO use a global installation of zotra or set path differently on mac/linux
 #+begin_src elisp
-  (setup zotra
-    (:option zotra-cli-command '("node" "/Users/liuyi/Downloads/zotra-cli/bin/index.js")))
+(setup zotra
+  (:autoload zotra-add-entry-from-url)
+  (if (eq system-type 'darwin)
+      (setq zotra-cli-command '("node" "/Users/liuyi/Downloads/zotra-cli/bin/index.js"))))
 #+end_src
 ** toc-org
 #+begin_src elisp
@@ -2564,50 +2562,57 @@ Simple distraction-free editing. I use darkroom instead of writeroom because it'
 #+end_src
 ** eaf
 #+begin_src elisp
-  (setup eaf
-    (add-to-list 'load-path "~/.emacs.d/lib/eaf")
-    (:option eaf-browser-enable-autofill t
-             eaf-webengine-font-family lewis-variable-font
-             eaf-webengine-serif-font-family lewis-variable-font
-             eaf-webengine-fixed-font-family lewis-fixed-font
-             eaf-config-location (concat no-littering-var-directory "eaf/")
-             )
-    (if (eq system-type 'darwin)
-        (setq eaf-python-command "~/.pyenv/shims/python3"))
-    (if (eq system-type 'gnu/linux)
-        (require 'eaf)
-      ))
+(setup eaf
+  (add-to-list 'load-path "~/.emacs.d/lib/eaf")
+  (:option eaf-browser-enable-autofill t
+           eaf-webengine-font-family lewis-variable-font
+           eaf-webengine-serif-font-family lewis-variable-font
+           eaf-webengine-fixed-font-family lewis-fixed-font
+           eaf-config-location (concat no-littering-var-directory "eaf/")
+           ;; proxy
+           eaf-proxy-type "http"
+           eaf-proxy-host "127.0.0.1"
+           eaf-proxy-port "7890"
+           )
+  (if (eq system-type 'darwin)
+      (setq eaf-python-command "~/.pyenv/shims/python3"))
+  (if (eq system-type 'gnu/linux)
+      (require 'eaf)
+    ))
 
-  (setup eaf-browser
-    (:autoload eaf-open-browser)
-    )
-  (setup eaf-pdf-viewer
-    (:autoload eaf-open-pdf-from-history))
-  (setup eaf-rss-reader
-    (:autoload eaf-open-rss-reader))
-  (setup eaf-map
-    (:autoload eaf-open-map))
-  (setup eaf-markdown-previewer)
-  (setup eaf-markmap)
+(setup eaf-browser
+  (:autoload eaf-open-browser)
+  )
+(setup eaf-pdf-viewer
+  (:autoload eaf-open-pdf-from-history))
+(setup eaf-rss-reader
+  (:autoload eaf-open-rss-reader))
+(setup eaf-map
+  (:autoload eaf-open-map))
+(setup eaf-markdown-previewer)
+(setup eaf-markmap)
 
-  (setup eaf-interleave
-    (:option eaf-interleave-org-notes-dir-list (list (concat nowis-doc-emacs-dir "01-orgmode/") ".")
-             eaf-interleave-disable-narrowing t
-             eaf-interleave-split-lines 20
-             eaf-find-alternate-file-in-dired t
-             )
-    (:bind "M-."  'eaf-interleave-sync-current-note
-           "M-p"  'eaf-interleave-sync-previous-note
-           "M-n"  'eaf-interleave-sync-next-note)
-    (:with-map eaf-interleave-app-mode-map
-      (:bind
-       "C-c M-i"  'eaf-interleave-add-note
-       "C-c M-o"  'eaf-interleave-open-notes-file
-       "C-c M-q"  'eaf-interleave-quit))
-    (add-hook 'eaf-pdf-viewer-hook 'eaf-interleave-app-mode)
-    (add-hook 'eaf-browser-hook 'eaf-interleave-app-mode)
-    ;; (add-hook 'org-mode-hook 'eaf-interleave-mode)
-    )
+(require 'eaf-image-viewer)
+(require 'eaf-music-player)
+
+(setup eaf-interleave
+  (:option eaf-interleave-org-notes-dir-list (list (concat nowis-doc-emacs-dir "01-orgmode/") ".")
+           eaf-interleave-disable-narrowing t
+           eaf-interleave-split-lines 20
+           eaf-find-alternate-file-in-dired t
+           )
+  (:bind "M-."  'eaf-interleave-sync-current-note
+         "M-p"  'eaf-interleave-sync-previous-note
+         "M-n"  'eaf-interleave-sync-next-note)
+  (:with-map eaf-interleave-app-mode-map
+    (:bind
+     "C-c M-i"  'eaf-interleave-add-note
+     "C-c M-o"  'eaf-interleave-open-notes-file
+     "C-c M-q"  'eaf-interleave-quit))
+  (add-hook 'eaf-pdf-viewer-hook 'eaf-interleave-app-mode)
+  (add-hook 'eaf-browser-hook 'eaf-interleave-app-mode)
+  ;; (add-hook 'org-mode-hook 'eaf-interleave-mode)
+  )
 #+end_src
 ** app-launcher
 #+begin_src elisp
@@ -2650,44 +2655,58 @@ Simple distraction-free editing. I use darkroom instead of writeroom because it'
   (setup whisper
     (:option whisper-install-directory (concat no-littering-var-directory "whisper")
              whisper-language "zh"
-             whisper-model "small"
+             whisper-model "medium"
              whisper-use-threads 8))
 #+end_src
 ** engine-mode
 Minor mode for defining and querying search engines through Emacs.
 #+begin_src elisp
-  (setup engine-mode
-    (engine-mode t)
-    (:when-loaded
-      (defengine github
-        "https://github.com/search?ref=simplesearch&q=%s"
-        :keybinding "g")
-      (defengine google
-        "https://www.google.com/search?ie=utf-8&oe=utf-8&q=%s"
-        :keybinding "s")
-      (defengine doubandushu
-        "https://search.douban.com/book/subject_search?search_text=%s"
-        :keybinding "d")
-      ))
+(setup engine-mode
+  (engine-mode t)
+  (:when-loaded
+    (defengine github
+      "https://github.com/search?ref=simplesearch&q=%s"
+      :keybinding "g")
+    (defengine google
+      "https://www.google.com/search?ie=utf-8&oe=utf-8&q=%s"
+      :keybinding "s")
+    (defengine doubandushu
+      "https://search.douban.com/book/subject_search?search_text=%s"
+      :keybinding "d")
+    (defengine aur
+    "https://aur.archlinux.org/packages?O=0&K=%s"
+      :keybinding "a")
+    ))
 #+end_src
 
 ** scripts
 *** backup scripts
 #+begin_src elisp
-  (defun lewis-backup-to-nas-rsync()
-    (interactive)
-    (async-shell-command "rsync -avbizh --delete --backup-dir=../back_restore/ ~/Documents/emacs/02-binary-files/02-searchable/ lewis-nas@192.168.31.108:/share/my_webdav/rsync/02-searchable/")
-    )
-  (defun lewis-backup-to-pc-rsync()
-    (interactive)
-    (async-shell-command "rsync -avbizh --delete --backup-dir=../back_restore/ lewis-nas@192.168.31.108:/share/my_webdav/rsync/02-searchable/  ~/Documents/emacs/02-binary-files/02-searchable/")
-    )
+(defun lewis-backup-to-nas-rsync()
+  (interactive)
+  (async-shell-command "rsync -avbizh --delete --backup-dir=../back_restore/ ~/Documents/emacs/02-binary-files/02-searchable/ lewis-nas@192.168.31.108:/share/my_webdav/rsync/02-searchable/")
+  )
+(defun lewis-backup-to-pc-rsync()
+  (interactive)
+  (async-shell-command "rsync -avbizh --delete --backup-dir=../back_restore/ lewis-nas@192.168.31.108:/share/my_webdav/rsync/02-searchable/  ~/Documents/emacs/02-binary-files/02-searchable/")
+  )
 
-  (defun lewis-backup-to-nas-restic()
-    (interactive)
-    (async-shell-command "restic -r sftp:lewis-nas@192.168.31.108:/share/my_webdav/restic backup ~/Documents/emacs/02-binary-files/")
-    )
+(defun lewis-backup-to-nas-restic()
+  (interactive)
+  (async-shell-command "restic -r sftp:lewis-nas@192.168.31.108:/share/my_webdav/restic backup ~/Documents/emacs/02-binary-files/")
+  )
+(defun lewis-backup-to-nas-tmp-file()
+  (interactive)
+  (async-shell-command "rsync -avi --delete ~/Downloads/tmp/ lewis-nas@192.168.31.108:/share/my_webdav/rsync/tmp/")
+  )
+
+(defun lewis-backup-from-nas-tmp-file()
+  (interactive)
+  (async-shell-command "rsync -avi --delete lewis-nas@192.168.31.108:/share/my_webdav/rsync/tmp/ ~/Documents/emacs/02-binary-files/02-searchable/ ")
+  )
+
 #+end_src
+
 *** startup scripts
 #+begin_src elisp
   (defun lewis-start-zotero-server()

@@ -19,6 +19,8 @@
   - [[#how-to-customize][How to customize]]
   - [[#ideas-behind-nowisemacs][Ideas behind nowisemacs]]
 - [[#useful-keybindings][Useful Keybindings]]
+  - [[#leader-keybinds][leader keybinds]]
+  - [[#vim-users-should-care][vim users should care]]
 - [[#things-you-must-know-before-going-deeper][Things you must know before going deeper]]
   - [[#radical][Radical]]
   - [[#sacrifice-for-simplicity][Sacrifice for simplicity]]
@@ -129,10 +131,12 @@ will increase the complexity of configurations. Nowisemacs looks for a balance b
 "concise" choices.
 * Useful Keybindings
 Nowisemacs uses space bars as leader key, you can find most keybindings in the Meow-Leader-Keys section [[file:init.org][here]]. Some common usages are as following:
+** leader keybinds
 | Button    | Function                                         |
 |-----------+--------------------------------------------------|
 | Space b   | Buffer-Menu                                      |
 | Space s s | Search the current buffer page                   |
+| Space s b | Search buffer/file/pdfs using blink-search       |
 | Space s d | GREP operation on the current path               |
 | Space s f | Find operation of the current path               |
 | Space s i | Open imenu                                       |
@@ -141,9 +145,9 @@ Nowisemacs uses space bars as leader key, you can find most keybindings in the M
 | M-L       | Translation The current area or user input       |
 | M-L       | Translation Current Words (need to install SDCV) |
 | M-`       | Open/fold Vterm                                  |
-Nowisemacs choose meow instead of EVIL as modal editing, so you may need to read the meow configuration in the
-configuration or the website of Meow to get a better understanding.
-
+| C-x /     | Search on website: google, aur, etc.             |
+| Space n   | Keybinds about notes                             |
+** vim users should care
 Some useful keybindings for vim user:
 | Button | Function                                                                       |
 |--------+--------------------------------------------------------------------------------|

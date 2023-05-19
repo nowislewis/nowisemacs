@@ -1,6 +1,3 @@
-[submodule "ace-window"]
-	path = lib/ace-window
-	url = https://github.com/abo-abo/ace-window.git
 [submodule "alert"]
 	path = lib/alert
 	url = https://github.com/jwiegley/alert.git
@@ -179,9 +176,6 @@
 [submodule "iscroll"]
 	path = lib/iscroll
 	url = https://github.com/casouri/iscroll.git
-[submodule "jupyter"]
-	path = lib/jupyter
-	url = https://github.com/nnicandro/emacs-jupyter.git
 [submodule "kv"]
 	path = lib/kv
 	url = https://github.com/nicferrier/emacs-kv.git
@@ -345,9 +339,6 @@
 [submodule "shrink-path"]
 	path = lib/shrink-path
     url = https://github.com/emacsmirror/shrink-path
-[submodule "simple-httpd"]
-	path = lib/simple-httpd
-	url = https://github.com/skeeto/emacs-web-server.git
 [submodule "slime"]
 	path = lib/slime
 	url = https://github.com/slime/slime.git
@@ -412,9 +403,6 @@
 [submodule "yasnippet"]
 	path = lib/yasnippet
 	url = https://github.com/joaotavora/yasnippet.git
-[submodule "zmq"]
-	path = lib/zmq
-	url = https://github.com/nnicandro/emacs-zmq.git
 [submodule "zotra"]
 	path = lib/zotra
 	url = https://github.com/mpedramfar/zotra.git
