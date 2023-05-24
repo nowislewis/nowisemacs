@@ -46,16 +46,18 @@ I failed in love with denote, so previous *org-roam* configs were refiled into [
   - [[#automatically-clean-whitespace][Automatically clean whitespace]]
   - [[#exec-path-from-shell][exec-path-from-shell]]
   - [[#undo][Undo]]
+- [[#search][Search]]
+  - [[#isearch][isearch]]
+  - [[#consult-commands][Consult Commands]]
+  - [[#rgel][rg.el]]
+  - [[#blink-search][blink-search]]
 - [[#补全][补全]]
   - [[#completions-with-vertico][Completions with Vertico]]
   - [[#orderless-and-pinyinlib][Orderless and pinyinlib]]
-  - [[#consult-commands][Consult Commands]]
   - [[#marginalia][Marginalia]]
   - [[#embark][embark]]
   - [[#yasnippet][yasnippet]]
   - [[#tempel][tempel]]
-  - [[#rgel][rg.el]]
-  - [[#blink-search][blink-search]]
 - [[#window-management][Window Management]]
   - [[#winner-mode][winner-mode]]
   - [[#popper][popper]]
@@ -1096,30 +1098,11 @@ diff-hl-mode highlights uncommitted changes on the left side of the window (area
            "j" vundo-next
            "k" vundo-previous))
 #+end_src
-* 补全
-** Completions with Vertico
-#+name: vertico
+* Search
+** isearch
 #+begin_src elisp
-  (setup vertico
-    (:option vertico-cycle t)
-    (:with-map vertico-map
-      (:bind [backspace] vertico-directory-delete-char))
-     (vertico-mode)
-    )
-#+end_src
-** Orderless and pinyinlib
-#+name: orderless
-#+begin_src elisp
-  (setup orderless
-    (:option completion-styles '(orderless)
-             completion-category-defaults nil
-             completion-category-overrides '((file (styles . (partial-completion)))))
-    (:when-loaded
-      (require 'pinyinlib)
-      (defun completion--regex-pinyin (str)
-        (orderless-regexp (pinyinlib-build-regexp-string str)))
-      (add-to-list 'orderless-matching-styles 'completion--regex-pinyin)
-      ))
+(setup isearch
+  (:option isearch-lazy-count t))
 #+end_src
 ** Consult Commands
 *** consult
@@ -1182,6 +1165,40 @@ diff-hl-mode highlights uncommitted changes on the left side of the window (area
              dash-docs-common-docsets '("C++")))
   (setup consult-dash)
     #+end_src
+** rg.el
+#+begin_src elisp
+  (setup rg)
+#+end_src
+** blink-search
+#+begin_src elisp
+  (setup blink-search
+    (add-to-list 'meow-mode-state-list '(blink-search-mode . insert)))
+#+end_src
+* 补全
+** Completions with Vertico
+#+name: vertico
+#+begin_src elisp
+  (setup vertico
+    (:option vertico-cycle t)
+    (:with-map vertico-map
+      (:bind [backspace] vertico-directory-delete-char))
+     (vertico-mode)
+    )
+#+end_src
+** Orderless and pinyinlib
+#+name: orderless
+#+begin_src elisp
+  (setup orderless
+    (:option completion-styles '(orderless)
+             completion-category-defaults nil
+             completion-category-overrides '((file (styles . (partial-completion)))))
+    (:when-loaded
+      (require 'pinyinlib)
+      (defun completion--regex-pinyin (str)
+        (orderless-regexp (pinyinlib-build-regexp-string str)))
+      (add-to-list 'orderless-matching-styles 'completion--regex-pinyin)
+      ))
+#+end_src
 ** Marginalia
 #+begin_src elisp
   (setup marginalia
@@ -1230,15 +1247,6 @@ should be check after reading the embark.el manual
                       completion-at-point-functions)))
   (add-hook 'prog-mode-hook 'tempel-setup-capf)
   (add-hook 'text-mode-hook 'tempel-setup-capf)
-#+end_src
-** rg.el
-#+begin_src elisp
-  (setup rg)
-#+end_src
-** blink-search
-#+begin_src elisp
-  (setup blink-search
-    (add-to-list 'meow-mode-state-list '(blink-search-mode . insert)))
 #+end_src
 * Window Management
 ** winner-mode
@@ -1426,15 +1434,15 @@ borrowed from citre, now you can always jump-back use "M-," after any jump in th
 *** dirvish
 Dirvish is a minimalistic file manager based on Dired. It's fast
 #+begin_src elisp
-  (setup dirvish
-    ;; wait for dirvish merge nerd-icons
-    (:option dirvish-attributes '(subtree-state)
-             dirvish-side-width 40)
-    (:bind "TAB" dirvish-toggle-subtree)
-    (:defer
-    (dirvish-override-dired-mode))
-    (:when-loaded
-      (dirvish-side-follow-mode)))
+(setup dirvish
+  ;; wait for dirvish merge nerd-icons
+  (:option dirvish-attributes '(subtree-state nerd-icons)
+           dirvish-side-width 40)
+  (:bind "TAB" dirvish-toggle-subtree)
+  (:defer
+  (dirvish-override-dired-mode))
+  (:when-loaded
+    (dirvish-side-follow-mode)))
 #+end_src
 ** structure browsing
 *** imenu-list
@@ -2181,17 +2189,17 @@ TODO use a global installation of zotra or set path differently on mac/linux
 ** denote-lumn
 Borrowed from https://github.com/protesilaos/denote/issues/115
 #+begin_src elisp
-  (setq find-dired-refine-function nil)  ;; This needs to be set globally, find-dired works asynchronously.
+(setq find-dired-refine-function nil)  ;; This needs to be set globally, find-dired works asynchronously.
 
-  (defun my/zettel-signature-buffer ()
-   (interactive)
-     (let ((find-ls-option '(" -exec ls -ld {} \\+| awk /==/ | sed  's/--/=@/3' | sort -t '=' -Vk 3,3 | sed 's/=@/--/'" . "-ld")))
-       (find-dired denote-directory "")))
-
-  (defun my/zettel-main-topics ()
-   (interactive)
-   (let ((find-ls-option '("-regex '.*==[0-9]+-.*'  -exec ls -ld {} \\+| awk /==/ | sed  's/--/=@/3' | sort -t '=' -Vk 3,3 | sed 's/=@/--/'" . "-ld")))
+(defun my/zettel-signature-buffer ()
+ (interactive)
+   (let ((find-ls-option '(" -exec ls -ld {} \\+| awk /==/ | sed  's/--/=@/3' | sort -t '=' -Vk 3,3 | sed 's/=@/--/'" . "-ld")))
      (find-dired denote-directory "")))
+
+(defun my/zettel-main-topics ()
+ (interactive)
+ (let ((find-ls-option '("-regex '.*==[0-9]+-.*'  -exec ls -ld {} \\+| awk /==/ | sed  's/--/=@/3' | sort -t '=' -Vk 3,3 | sed 's/=@/--/'" . "-ld")))
+   (find-dired denote-directory "")))
 #+end_src
 ** find orgmode dir files
 #+begin_src elisp
@@ -2452,9 +2460,9 @@ Aggregating a table is creating a new table by computing sums, averages, and so 
 ** sdcv
 #+begin_src elisp
 (setup sdcv
-  (:option sdcv-dictionary-data-dir (file-truename (concat nowis-doc-emacs-dir "02-binary-files/03-stardicts/"))
-           sdcv-dictionary-simple-list (list "简明英汉字典增强版")
-           sdcv-dictionary-complete-list (list "简明英汉字典增强版")
+  (:option sdcv-dictionary-data-dir (expand-file-name (concat nowis-doc-emacs-dir "02-binary-files/03-stardicts"))
+           ;; sdcv-dictionary-simple-list (list "简明英汉字典增强版")
+           ;; sdcv-dictionary-complete-list (list "简明英汉字典增强版")
            )
   (:global "M-l" lewis-eaf-sdcv-search-pointer+)
   (if (eq system-type 'darwin)
@@ -2586,9 +2594,6 @@ Simple distraction-free editing. I use darkroom instead of writeroom because it'
 (setup eaf-markdown-previewer)
 (setup eaf-markmap)
 
-(require 'eaf-image-viewer)
-(require 'eaf-music-player)
-
 (setup eaf-interleave
   (:option eaf-interleave-org-notes-dir-list (list (concat nowis-doc-emacs-dir "01-orgmode/") ".")
            eaf-interleave-disable-narrowing t
@@ -2635,7 +2640,7 @@ Simple distraction-free editing. I use darkroom instead of writeroom because it'
 *** mind-wave
 #+begin_src elisp
 (setup mind-wave
-  (:option mind-wave-api-key-path "~/Documents/emacs/08-keys/chatgpt_api_key.txt")
+  ;; (:option mind-wave-api-key-path (concat nowis-doc-emacs-dir "08-keys/chatgpt_api_key.txt"))
   (:autoload mind-wave-chat-mode))
 #+end_src
 *** gptel
