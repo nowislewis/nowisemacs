@@ -1320,7 +1320,7 @@ borrowed from citre, now you can always jump-back use "M-," after any jump in th
      [("l" "right" windmove-right :transient t)
       ("L" "swap-right" windmove-swap-states-right :transient t)]
      ])
-    (:global [remap other-window] #'windmove-transient-keybindings)
+    (:global "C-x O" #'windmove-transient-keybindings)
   )
 
 #+end_src
@@ -1726,6 +1726,11 @@ Highlight symbols with keymap-enabled overlays
     (setup elec-pair
        (electric-pair-mode))
 #+end_src
+**** breadcrumb
+#+begin_src elisp
+(setup breadcrumb
+  (:defer (breadcrumb-mode)))
+#+end_src
 *** Complete
 **** lsp mode
 ***** eglot
@@ -1759,13 +1764,14 @@ Highlight symbols with keymap-enabled overlays
 #+end_src
 ***** lsp-bridge
 #+begin_src elisp
-  (setup lsp-bridge
-    (:option acm-enable-citre nil
-             lsp-bridge-enable-org-babel t
-             ;; acm-candidate-match-function 'orderless-literal
-             ;; acm-backend-search-sdcv-words-dictionary (file-truename "~/Downloads/stardicts/stardict-langdao-ec-gb-2.4.2/langdao-ec-gb")
-             )
-    (global-lsp-bridge-mode))
+(setup lsp-bridge
+  (:option acm-enable-citre nil
+           lsp-bridge-enable-org-babel t
+           ;; acm-candidate-match-function 'orderless-literal
+           ;; acm-backend-search-sdcv-words-dictionary (file-truename "~/Downloads/stardicts/stardict-langdao-ec-gb-2.4.2/langdao-ec-gb")
+           lsp-bridge-python-command "pypy3"
+           )
+  (global-lsp-bridge-mode))
 #+end_src
 **** citre
 Citre is an advanced Ctags (or actually, readtags) frontend for Emacs.
@@ -2103,26 +2109,27 @@ Disassemble C, C++ or Fortran code under cursor
 #+end_src
 *** ebib
 #+begin_src elisp
-  (setup ebib
-    (:option ebib-preload-bib-files org-cite-global-bibliography
-             ebib-file-search-dirs (list nowis-bib-pdf-dir)
-             ebib-bib-search-dirs (list nowis-bib-dir)
-             ebib-default-directory 'first-bib-dir
-             ebib-file-associations '(("pdf")
-                                      ("ps" . "gv")
-                                      ("epub"))
-             ebib-index-window-size 25
-             ebib-index-columns '(("Score" 2 t)
-                                  ("Year" 6 t)
-                                  ("Title" 50 t)
-                                  ("Author/Editor" 40 t)
-                                  ("Entry Key" 40 t)
-                                  )
-             ebib-reading-list-file (concat nowis-doc-emacs-dir "01-orgmode/xnotes/20230403T125743--ebib-reading-lists.org")
-             ebib-use-timestamp t
-             ebib-bibtex-dialect 'biblatex
-             )
-    )
+(setup ebib
+  (:option ebib-preload-bib-files org-cite-global-bibliography
+           ebib-file-search-dirs (list nowis-bib-pdf-dir)
+           ebib-bib-search-dirs (list nowis-bib-dir)
+           ebib-default-directory 'first-bib-dir
+           ebib-file-associations '(("pdf")
+                                    ("ps" . "gv")
+                                    ("epub"))
+           ebib-index-window-size 25
+           ebib-index-columns '(("Score" 2 t)
+                                ("Year" 6 t)
+                                ("Title" 50 t)
+                                ("Author/Editor" 40 t)
+                                ("Entry Key" 40 t)
+                                )
+           ebib-reading-list-file (concat nowis-doc-emacs-dir "01-orgmode/xnotes/20230403T125743--ebib-reading-lists.org")
+           ebib-use-timestamp t
+           ebib-bibtex-dialect 'biblatex
+           ebib-create-backups nil
+           )
+  )
 #+end_src
 *** zotra
 TODO use a global installation of zotra or set path differently on mac/linux
@@ -2130,7 +2137,9 @@ TODO use a global installation of zotra or set path differently on mac/linux
 (setup zotra
   (:autoload zotra-add-entry-from-url)
   (if (eq system-type 'darwin)
-      (setq zotra-cli-command '("node" "/Users/liuyi/Downloads/zotra-cli/bin/index.js"))))
+      (setq zotra-cli-command '("node" "/Users/liuyi/Downloads/zotra-cli/bin/index.js")))
+  (if (eq system-type 'gnu/linux)
+      (setq zotra-cli-command '("node" "/home/lewisliu/Downloads/zotra-cli/bin/index.js"))))
 #+end_src
 ** toc-org
 #+begin_src elisp
@@ -2184,8 +2193,6 @@ TODO use a global installation of zotra or set path differently on mac/linux
                 (if (denote--edit-front-matter-p new-name file-type)
                     (denote--rewrite-front-matter new-name title keywords file-type)
                   (denote--add-front-matter new-name title keywords id file-type))))))))
-
-
 #+end_src
 ** denote-lumn
 Borrowed from https://github.com/protesilaos/denote/issues/115
@@ -2433,7 +2440,8 @@ Aggregating a table is creating a new table by computing sums, averages, and so 
   (:when-loaded
     (setq gts-default-translator (gts-translator
                                   :picker (gts-prompt-picker)
-                                  :engines (list (gts-google-rpc-engine))
+                                  ;; :engines (list (gts-google-rpc-engine))
+                                  :engines (list (gts-bing-engine))
                                   :render (gts-buffer-render))))
   (defun my-gts-translate-posframe ()
     (interactive)
@@ -2683,31 +2691,32 @@ Minor mode for defining and querying search engines through Emacs.
 ** scripts
 *** backup scripts
 #+begin_src elisp
-(defun lewis-backup-to-nas-rsync()
+(defun lewis-backup-sync-rsync()
   (interactive)
-  (async-shell-command "rsync -avbizh --delete --backup-dir=../back_restore/ ~/Documents/emacs/02-binary-files/02-searchable/ lewis-nas@192.168.31.108:/share/my_webdav/rsync/02-searchable/")
+  (async-shell-command "
+rsync -avihbu --backup-dir=../back_restore/ --exclude '.git' \
+      lewis-nas@192.168.31.108:/share/my_webdav/rsync/emacs/ \
+      ~/Documents/emacs/ \
+    && rsync -avbih --delete --backup-dir=../back_restore/ --exclude '.git'\
+             ~/Documents/emacs/ \
+             lewis-nas@192.168.31.108:/share/my_webdav/rsync/emacs/ ")
   )
-(defun lewis-backup-to-pc-rsync()
+
+(defun lewis-sync-tmp-rsync()
   (interactive)
-  (async-shell-command "rsync -avbizh --delete --backup-dir=../back_restore/ lewis-nas@192.168.31.108:/share/my_webdav/rsync/02-searchable/  ~/Documents/emacs/02-binary-files/02-searchable/")
+  (async-shell-command "
+rsync -avihu lewis-nas@192.168.31.108:/share/my_webdav/rsync/tmp/ \
+      ~/Downloads/tmp/ \
+    && rsync -avih --delete \
+             ~/Downloads/tmp/ \
+             lewis-nas@192.168.31.108:/share/my_webdav/rsync/tmp/ ")
   )
 
 (defun lewis-backup-to-nas-restic()
   (interactive)
-  (async-shell-command "restic -r sftp:lewis-nas@192.168.31.108:/share/my_webdav/restic backup ~/Documents/emacs/02-binary-files/")
+  (async-shell-command "restic -r sftp:lewis-nas@192.168.31.108:/share/my_webdav/restic/emacs backup --exclude='.git' ~/Documents/emacs/")
   )
-(defun lewis-backup-to-nas-tmp-file()
-  (interactive)
-  (async-shell-command "rsync -avi --delete ~/Downloads/tmp/ lewis-nas@192.168.31.108:/share/my_webdav/rsync/tmp/")
-  )
-
-(defun lewis-backup-from-nas-tmp-file()
-  (interactive)
-  (async-shell-command "rsync -avi --delete lewis-nas@192.168.31.108:/share/my_webdav/rsync/tmp/ ~/Documents/emacs/02-binary-files/02-searchable/ ")
-  )
-
 #+end_src
-
 *** startup scripts
 #+begin_src elisp
 (defun lewis-start-zotero-server()
