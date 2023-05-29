@@ -403,9 +403,6 @@
 [submodule "yasnippet"]
 	path = lib/yasnippet
 	url = https://github.com/joaotavora/yasnippet.git
-[submodule "yequake"]
-	path = lib/yequake
-	url = https://github.com/alphapapa/yequake.git
 [submodule "zotra"]
 	path = lib/zotra
 	url = https://github.com/mpedramfar/zotra.git

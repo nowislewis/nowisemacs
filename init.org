@@ -131,7 +131,6 @@ I failed in love with denote, so previous *org-roam* configs were refiled into [
   - [[#ai-related][ai related]]
   - [[#engine-mode][engine-mode]]
   - [[#scripts][scripts]]
-  - [[#yequake][yequake]]
 - [[#use-single-file-to-load-configs][use single file to load configs]]
   - [[#provide][provide]]
   - [[#load-init-configel][load init-config.el]]
@@ -2687,11 +2686,10 @@ Minor mode for defining and querying search engines through Emacs.
       :keybinding "a")
     ))
 #+end_src
-
 ** scripts
 *** backup scripts
 #+begin_src elisp
-(defun lewis-backup-sync-rsync()
+(defun lewis-sync-emacs-rsync()
   (interactive)
   (async-shell-command "
 rsync -avihbu --backup-dir=../back_restore/ --exclude '.git' \
@@ -2712,37 +2710,11 @@ rsync -avihu lewis-nas@192.168.31.108:/share/my_webdav/rsync/tmp/ \
              lewis-nas@192.168.31.108:/share/my_webdav/rsync/tmp/ ")
   )
 
-(defun lewis-backup-to-nas-restic()
+(defun lewis-backup-restic()
   (interactive)
-  (async-shell-command "restic -r sftp:lewis-nas@192.168.31.108:/share/my_webdav/restic/emacs backup --exclude='.git' ~/Documents/emacs/")
+  ;; (async-shell-command "restic -r sftp:lewis-nas@192.168.31.108:/share/my_webdav/restic/emacs backup --exclude='.git' ~/Documents/emacs/")
+  (async-shell-command "restic -r sftp:lewis-nas@192.168.31.108:/share/my_webdav/restic/emacs backup ~/Documents/emacs/")
   )
-#+end_src
-*** startup scripts
-#+begin_src elisp
-(defun lewis-start-zotero-server()
-  "Starts the Zotero server by opening a new eshell, changing to the translation-server directory, and running 'npm start'."
-  (interactive)
-  (let ((default-directory "~/Downloads/translation-server"))
-    (eshell)
-    (rename-buffer "zotero-server")
-    (eshell-return-to-prompt)
-    (insert "npm start")
-    (eshell-send-input)))
-#+end_src
-** yequake
-Drop-down Emacs frames, like Yakuake
-#+begin_src elisp
-(setup server
-  (:defer (server-start)))
-(setup yequake
-(:option yequake-frames
-      '(("scratch" .
-         ((width . 0.75)
-          (height . 0.5)
-          (alpha . 0.95)
-          (buffer-fns . ("*scratch*"
-                         vterm-toggle))
-          (frame-parameters . ((undecorated . t))))))))
 #+end_src
 * use single file to load configs
 this can avoid errors of native compilation of init.el
