@@ -1752,7 +1752,6 @@ Highlight symbols with keymap-enabled overlays
     (:option eldoc-echo-area-use-multiline-p t
              eldoc-echo-area-display-truncation-message t))
   ;; (setq eldoc-echo-area-prefer-doc-buffer nil)
-
 #+end_src
 ***** consult-eglot
 #+begin_src elisp
@@ -1763,13 +1762,13 @@ Highlight symbols with keymap-enabled overlays
 #+end_src
 ***** lsp-bridge
 #+begin_src elisp
+(defvar use-pypy3 nil)
 (setup lsp-bridge
   (:option acm-enable-citre nil
            lsp-bridge-enable-org-babel t
-           ;; acm-candidate-match-function 'orderless-literal
-           ;; acm-backend-search-sdcv-words-dictionary (file-truename "~/Downloads/stardicts/stardict-langdao-ec-gb-2.4.2/langdao-ec-gb")
-           lsp-bridge-python-command "pypy3"
            )
+  (if use-pypy3
+      (setq lsp-bridge-python-command "pypy3"))
   (global-lsp-bridge-mode))
 #+end_src
 **** citre
@@ -1783,11 +1782,6 @@ Citre is an advanced Ctags (or actually, readtags) frontend for Emacs.
              ;; citre-auto-enable-citre-mode-modes '(prog-mode)
              )
     )
-#+end_src
-**** eacl
-#+begin_src elisp
-  (setup eacl
-    (:option eacl-grep-program "ripgrep"))
 #+end_src
 *** quickrun
 #+begin_src elisp
@@ -1978,15 +1972,16 @@ Disassemble C, C++ or Fortran code under cursor
 #+end_src
 ** org-modern
 #+begin_src elisp
-  (setup org-modern
-    (:option org-modern-list '((?+ . "➤")
-                               (?- . "–")
-                               (?* . "•"))
-             org-modern-star '("Ⓐ" "Ⓑ" "Ⓒ" "Ⓓ" "Ⓔ" "Ⓕ" "Ⓖ" "Ⓗ" "Ⓘ" "Ⓙ" "Ⓚ" "Ⓛ" "Ⓜ")
-             org-modern-table nil)
-    (:hook-into org-mode)
-    ;; (add-hook 'org-agenda-finalize-hook #'org-modern-agenda)
-    )
+(setup org-modern
+  (:option
+   ;; org-modern-list '((?+ . "➤")
+   ;;                   (?- . "–")
+   ;;                   (?* . "•"))
+   org-modern-star '("Ⓐ" "Ⓑ" "Ⓒ" "Ⓓ" "Ⓔ" "Ⓕ" "Ⓖ" "Ⓗ" "Ⓘ" "Ⓙ" "Ⓚ" "Ⓛ" "Ⓜ")
+   org-modern-table nil)
+  (:hook-into org-mode)
+  ;; (add-hook 'org-agenda-finalize-hook #'org-modern-agenda)
+  )
 #+end_src
 ** org-modern-indent
 #+begin_src elisp

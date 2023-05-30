@@ -79,9 +79,6 @@
 [submodule "doom-modeline"]
 	path = lib/doom-modeline
 	url = https://github.com/seagle0128/doom-modeline.git
-[submodule "eacl"]
-	path = lib/eacl
-	url = https://github.com/redguardtoo/eacl.git
 [submodule "eaf"]
 	path = lib/eaf
 	url = https://github.com/emacs-eaf/emacs-application-framework.git
