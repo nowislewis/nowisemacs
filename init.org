@@ -1171,8 +1171,9 @@ diff-hl-mode highlights uncommitted changes on the left side of the window (area
 #+end_src
 ** blink-search
 #+begin_src elisp
-  (setup blink-search
-    (add-to-list 'meow-mode-state-list '(blink-search-mode . insert)))
+(setup blink-search
+  (:option blink-search-enable-posframe t)
+  (add-to-list 'meow-mode-state-list '(blink-search-mode . insert)))
 #+end_src
 * 补全
 ** Completions with Vertico
@@ -1218,7 +1219,7 @@ should be check after reading the embark.el manual
 
   (setup embark
     (:also-load embark-consult)
-    (setq prefix-help-command 'embark-prefix-help-command)
+    (setq prefix-help-command #'embark-prefix-help-command)
     (:global "C-S-a" embark-act))
 
   (setup wgrep)
@@ -2590,6 +2591,7 @@ Simple distraction-free editing. I use darkroom instead of writeroom because it'
   (:autoload eaf-open-browser)
   )
 (setup eaf-pdf-viewer
+  (:option eaf-pdf-scroll-ratio 0.1)
   (:autoload eaf-open-pdf-from-history))
 (setup eaf-rss-reader
   (:autoload eaf-open-rss-reader))
