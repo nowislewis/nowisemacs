@@ -2026,18 +2026,18 @@ Disassemble C, C++ or Fortran code under cursor
 #+end_src
 ** org-noter
 #+begin_src elisp
-  (setup org-noter
-    (:option org-noter-notes-search-path (list org-directory)
-             org-noter-auto-save-last-location t
-             org-noter-separate-notes-from-heading nil
-             org-noter-hide-other nil
-             org-noter-doc-split-percentage '(0.6 . 0.4))
-    (:when-loaded
-      (require 'org-noter-pdf)
-      (require 'org-noter-nov)
-      (require 'org-noter-nov-overlay)
-      (require 'org-noter-dynamic-block))
-      )
+(setup org-noter
+  (:option org-noter-notes-search-path (list org-directory)
+           org-noter-auto-save-last-location t
+           org-noter-separate-notes-from-heading nil
+           org-noter-hide-other nil
+           org-noter-doc-split-percentage '(0.6 . 0.4))
+  ;; (:when-loaded
+  ;;   (require 'org-noter-pdf)
+  ;;   (require 'org-noter-nov)
+  ;;   (require 'org-noter-nov-overlay)
+  ;;   (require 'org-noter-dynamic-block))
+    )
 #+end_src
 ** org-present
 #+begin_src elisp
@@ -2046,42 +2046,42 @@ Disassemble C, C++ or Fortran code under cursor
 ** bibtex related
 *** bibtex
 #+begin_src elisp
-  (setup bibtex
-    (:option bibtex-autokey-year-length 4
-             bibtex-autokey-titleword-separator "_"
-             bibtex-autokey-name-year-separator "_"
-             bibtex-autokey-year-title-separator "_"
-             bibtex-autokey-titleword-length 15
-             bibtex-autokey-titlewords 10
-             bibtex-autokey-titleword-ignore ;; I took "On" out of this
-             '("A" "An" "The" "Eine?" "Der" "Die" "Das")))
+(setup bibtex
+  (:option bibtex-autokey-year-length 4
+           bibtex-autokey-titleword-separator "_"
+           bibtex-autokey-name-year-separator "_"
+           bibtex-autokey-year-title-separator "_"
+           bibtex-autokey-titleword-length 15
+           bibtex-autokey-titlewords 10
+           bibtex-autokey-titleword-ignore ;; I took "On" out of this
+           '("A" "An" "The" "Eine?" "Der" "Die" "Das")))
 
-  (defvar do.refs/pdf-dir nil
-    "The path to the directory containing the PDF files. The file
-    for the entry with key <key> is stored as <key>.pdf.")
+(defvar do.refs/pdf-dir nil
+  "The path to the directory containing the PDF files. The file
+  for the entry with key <key> is stored as <key>.pdf.")
 
-  (defvar do.refs/notes-dir nil
-    "The path to the directory containing my notes for the
-    references. The note for the item with key <key> is stored in
-    this folder as <key>.org")
+(defvar do.refs/notes-dir nil
+  "The path to the directory containing my notes for the
+  references. The note for the item with key <key> is stored in
+  this folder as <key>.org")
 
-  (defvar do.refs/pdf-download-dir nil
-    "The path to the temporary directory to which we download PDF
-    files.")
+(defvar do.refs/pdf-download-dir nil
+  "The path to the temporary directory to which we download PDF
+  files.")
 
-  (defun do.refs/get-db-file-list ()
-    "Get the list of all the bib files containing my bib database."
-    (if (file-exists-p nowis-bib-dir)
-        (directory-files nowis-bib-dir t "\\.bib\\'")
-      nil))
+(defun do.refs/get-db-file-list ()
+  "Get the list of all the bib files containing my bib database."
+  (if (file-exists-p nowis-bib-dir)
+      (directory-files nowis-bib-dir t "\\.bib\\'")
+    nil))
 
-  (defun do.refs/update-db-file-list ()
-    "Update the list of bib files."
-    (interactive)
-    (let ((db-list (do.refs/get-db-file-list)))
-      (setq reftex-default-bibliography db-list)
-      (setq bibtex-completion-bibliography db-list)
-      (setq ebib-preload-bib-files db-list)))
+(defun do.refs/update-db-file-list ()
+  "Update the list of bib files."
+  (interactive)
+  (let ((db-list (do.refs/get-db-file-list)))
+    (setq reftex-default-bibliography db-list)
+    (setq bibtex-completion-bibliography db-list)
+    (setq ebib-preload-bib-files db-list)))
 
 #+end_src
 *** citar
