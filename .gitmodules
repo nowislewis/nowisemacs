@@ -7,6 +7,9 @@
 [submodule "async"]
 	path = lib/async
 	url = https://github.com/jwiegley/emacs-async.git
+[submodule "auto-sudoedit"]
+	path = lib/auto-sudoedit
+	url = https://github.com/ncaq/auto-sudoedit.git
 [submodule "avy"]
 	path = lib/avy
 	url = https://github.com/abo-abo/avy.git
@@ -88,9 +91,6 @@
 [submodule "ebib"]
 	path = lib/ebib
 	url = https://github.com/joostkremers/ebib.git
-[submodule "edit-indirect"]
-	path = lib/edit-indirect
-	url = https://github.com/Fanael/edit-indirect.git
 [submodule "eglot-ltex"]
 	path = lib/eglot-ltex
 	url = https://github.com/emacs-languagetool/eglot-ltex.git
@@ -115,9 +115,6 @@
 [submodule "emms"]
 	path = lib/emms
 	url = https://github.com/emacsmirror/emms.git
-[submodule "engine-mode"]
-	path = lib/engine-mode
-	url = https://github.com/hrs/engine-mode.git
 [submodule "esxml"]
 	path = lib/esxml
 	url = https://github.com/tali713/esxml.git
@@ -286,6 +283,9 @@
 [submodule "pdf-tools"]
 	path = lib/pdf-tools
 	url = https://github.com/vedang/pdf-tools.git
+[submodule "pdf-view-pagemark"]
+	path = lib/pdf-view-pagemark
+	url = https://github.com/kimim/pdf-view-pagemark.git
 [submodule "peg"]
 	path = lib/peg
 	url = https://github.com/emacsmirror/peg.git
@@ -325,9 +325,6 @@
 [submodule "sdcv"]
 	path = lib/sdcv
 	url = https://github.com/manateelazycat/sdcv.git
-[submodule "separedit"]
-	path = lib/separedit
-	url = https://github.com/twlz0ne/separedit.el.git
 [submodule "setup"]
 	path = lib/setup
     url = https://github.com/emacsmirror/setup

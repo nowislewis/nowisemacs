@@ -117,6 +117,7 @@ I failed in love with denote, so previous *org-roam* configs were refiled into [
   - [[#sdcv][sdcv]]
 - [[#阅读][阅读]]
   - [[#pdf-tools][pdf-tools]]
+  - [[#pdf-view-pagemark][pdf-view-pagemark]]
   - [[#elfeed][elfeed]]
   - [[#efleed-org][efleed-org]]
   - [[#nov][nov]]
@@ -129,7 +130,8 @@ I failed in love with denote, so previous *org-roam* configs were refiled into [
   - [[#app-launcher][app-launcher]]
   - [[#gif-screencast][gif-screencast]]
   - [[#ai-related][ai related]]
-  - [[#engine-mode][engine-mode]]
+  - [[#webjump][webjump]]
+  - [[#auto-sudoedit][auto-sudoedit]]
   - [[#scripts][scripts]]
 - [[#use-single-file-to-load-configs][use single file to load configs]]
   - [[#provide][provide]]
@@ -617,11 +619,13 @@ Maybe I should add a new state.
    ["find"
     ("f" "find-in-current" consult-find)
     ("F" "find-other-dir" lewis/find-file-other-dir)]
-   ["built-in"
+   ["built-in enhance"
     ("h" "history" consult-history)
     ("i" "imenu" consult-imenu)
     ("l" "keep-lines" consult-keep-lines)
     ("s" "line" consult-line)]
+   ["web search"
+    ("w" "webjump" webjump)]
    ])
 #+end_src
 *** apps
@@ -945,20 +949,19 @@ diff-hl-mode highlights uncommitted changes on the left side of the window (area
 #+end_src
 ** doom-modeline
 #+begin_src elisp
-  (setup nerd-icons)
-  (setup dash)
-  (setup s)
-  (setup f)
-  (setup shrink-path) ;; <-(setup s)(setup f)
+(setup nerd-icons)
+(setup dash)
+(setup s)
+(setup f)
+(setup shrink-path) ;; <-(setup s)(setup f)
 
-  (setup doom-modeline
-    (:option doom-modeline-window-width-limit fill-column
-             doom-modeline-height 5
-             doom-modeline-hud t
-             ;; doom-modeline-icon nil
-             doom-modeline-unicode-fallback t)
-    (:hook-into after-init))
-  (set-face-attribute 'mode-line nil :family lewis-fixed-font :height 100)
+(setup doom-modeline
+  (:option doom-modeline-window-width-limit fill-column
+           doom-modeline-height 5
+           doom-modeline-hud t
+           ;; doom-modeline-icon nil
+           doom-modeline-unicode-fallback t)
+  (:hook-into after-init))
 #+end_src
 ** hl-todo
 #+begin_src elisp
@@ -1102,7 +1105,9 @@ diff-hl-mode highlights uncommitted changes on the left side of the window (area
 ** isearch
 #+begin_src elisp
 (setup isearch
-  (:option isearch-lazy-count t))
+  (:option isearch-lazy-count t
+           lazy-highlight-cleanup nil)
+  (:bind [remap isearch-delete-char] isearch-del-char))
 #+end_src
 ** Consult Commands
 *** consult
@@ -1338,55 +1343,55 @@ borrowed from citre, now you can always jump-back use "M-," after any jump in th
 #+end_src
 ** pyim
 #+begin_src elisp :tangle no
-  ;; (setup pyim-tsinghua-dict
-  ;;   (:load-after pyim-dict)
-  ;;   (:when-loaded
-  ;;     (pyim-tsinghua-dict-enable)))
-  ;; (setup pyim-sogou-scel-dict
-  ;;   (:load-after pyim-dict)
-  ;;   (:when-loaded
-  ;;     (pyim-sogou-scel-dict-enable)))
-  (setup xr)
-  (setup pyim
-    (:option pyim-cloudim 'baidu
-             pyim-punctuation-translate-p '(no yes auto)
-             pyim-page-tooltip 'posframe
-             pyim-page-length 5
-             pyim-dcache-backend 'pyim-dregcache
-             pyim-dcache-directory (concat nowis-doc-emacs-dir "01-binary-files/pyim/dcache/")
-             )
-    (:when-loaded
-      (require 'popup nil t)
-      (require 'pyim-dregcache)
-      (require 'pyim-cregexp-utils)
-      (require 'pyim-cstring-utils)
-      (set-default 'pyim-punctuation-half-width-functions
-                   '(pyim-probe-punctuation-line-beginning pyim-probe-punctuation-after-punctuation))
-      ;; (pyim-default-scheme 'xiaohe-shuangpin)
-      (pyim-default-scheme 'quanpin)
-      (pyim-isearch-mode 1)
+;; (setup pyim-tsinghua-dict
+;;   (:load-after pyim-dict)
+;;   (:when-loaded
+;;     (pyim-tsinghua-dict-enable)))
+;; (setup pyim-sogou-scel-dict
+;;   (:load-after pyim-dict)
+;;   (:when-loaded
+;;     (pyim-sogou-scel-dict-enable)))
+(setup xr)
+(setup pyim
+  (:option pyim-cloudim 'baidu
+           pyim-punctuation-translate-p '(no yes auto)
+           pyim-page-tooltip 'posframe
+           pyim-page-length 5
+           pyim-dcache-backend 'pyim-dregcache
+           pyim-dcache-directory (concat nowis-doc-emacs-dir "01-binary-files/pyim/dcache/")
+           )
+  (:when-loaded
+    (require 'popup nil t)
+    (require 'pyim-dregcache)
+    (require 'pyim-cregexp-utils)
+    (require 'pyim-cstring-utils)
+    (set-default 'pyim-punctuation-half-width-functions
+                 '(pyim-probe-punctuation-line-beginning pyim-probe-punctuation-after-punctuation))
+    ;; (pyim-default-scheme 'xiaohe-shuangpin)
+    (pyim-default-scheme 'quanpin)
+    (pyim-isearch-mode 1)
 
-      (defalias 'pyim-probe-meow-normal-mode #'(lambda nil
-                                                 (meow-normal-mode-p)))
-      (set-default 'pyim-english-input-switch-functions '(pyim-probe-auto-english
-                                                          pyim-probe-isearch-mode
-                                                          pyim-probe-program-mode
-                                                          pyim-probe-org-structure-template
-                                                          pyim-probe-org-latex-mode
-                                                          pyim-probe-meow-normal-mode))
-      (defalias 'my-orderless-regexp
-        #'(lambda
-            (orig_func component)
-            (let
-                ((result
-                  (funcall orig_func component)))
-              (pyim-cregexp-build result))))
-      (advice-add 'orderless-regexp :around #'my-orderless-regexp)
-      )
-    (:defer
-     (require 'pyim))
-    ;; (setq default-input-method "pyim")
+    (defalias 'pyim-probe-meow-normal-mode #'(lambda nil
+                                               (meow-normal-mode-p)))
+    (set-default 'pyim-english-input-switch-functions '(pyim-probe-auto-english
+                                                        pyim-probe-isearch-mode
+                                                        pyim-probe-program-mode
+                                                        pyim-probe-org-structure-template
+                                                        pyim-probe-org-latex-mode
+                                                        pyim-probe-meow-normal-mode))
+    (defalias 'my-orderless-regexp
+      #'(lambda
+          (orig_func component)
+          (let
+              ((result
+                (funcall orig_func component)))
+            (pyim-cregexp-build result))))
+    (advice-add 'orderless-regexp :around #'my-orderless-regexp)
     )
+  (:defer
+   (require 'pyim))
+  ;; (setq default-input-method "pyim")
+  )
 #+end_src
 ** rime
 #+begin_src elisp
@@ -1421,16 +1426,16 @@ borrowed from citre, now you can always jump-back use "M-," after any jump in th
 ** file browsing
 *** dired
 #+begin_src elisp
-  (setup dired
-    (:option dired-dwim-target t)
-    (:hook dired-hide-details-mode
-           ;; dired-omit-mode
-           ))
+(setup dired
+  (:option dired-dwim-target t)
+  (:hook dired-hide-details-mode
+         ;; dired-omit-mode
+         ))
     #+end_src
 *** diredfl
 #+begin_src elisp
-  ;; (setup diredfl
-  ;;   (:hook-into dired-mode))
+;; (setup diredfl
+;;   (:hook-into dired-mode))
 #+end_src
 *** dirvish
 Dirvish is a minimalistic file manager based on Dired. It's fast
@@ -1440,21 +1445,21 @@ Dirvish is a minimalistic file manager based on Dired. It's fast
   (:option dirvish-attributes '(subtree-state nerd-icons)
            dirvish-side-width 40)
   (:bind "TAB" dirvish-toggle-subtree)
-  (:defer
-  (dirvish-override-dired-mode))
+  ;; (:defer
+  ;; (dirvish-override-dired-mode))
   (:when-loaded
     (dirvish-side-follow-mode)))
 #+end_src
 ** structure browsing
 *** imenu-list
 #+begin_src elisp
-  (setup imenu-list
-    (:autoload himenu-list-smart-toggle)
-    (:option imenu-list-focus-after-activate t
-             imenu-list-auto-resize t
-             imenu-list-position 'left
-             imenu-list-auto-update nil
-             ))
+(setup imenu-list
+  (:autoload himenu-list-smart-toggle)
+  (:option imenu-list-focus-after-activation t
+           imenu-list-auto-resize t
+           imenu-list-position 'left
+           imenu-list-auto-update nil
+           ))
 #+end_src
 ** tab-line and tab-bar
 #+name: tab-bar
@@ -1550,36 +1555,36 @@ Dirvish is a minimalistic file manager based on Dired. It's fast
 ** vterm
 #+name: vterm
 #+begin_src elisp
-  (setup vterm
-    (:bind [(control return)] vterm-toggle-insert-cd))
-  (defun new-vterm(name)
-    "create a new vterm with a given name"
-    (interactive "sInput a name:")
-    (let ((vterm-buffer-name name))
-      (vterm)))
+(setup vterm
+  (:bind [(control return)] vterm-toggle-insert-cd))
+(defun new-vterm(name)
+  "create a new vterm with a given name"
+  (interactive "sInput a name:")
+  (let ((vterm-buffer-name name))
+    (vterm)))
 #+end_src
 ** vterm-toggle
 #+begin_src elisp
-  (setup vterm-toggle
-    (:option vterm-toggle-hide-method 'reset-window-configration)
-    (:global "C-`" vterm-toggle)
-    (:when-loaded
-      (setq vterm-toggle-fullscreen-p nil)
-      (add-to-list 'display-buffer-alist
-                   '((lambda (buffer-or-name _)
-                       (let ((buffer (get-buffer buffer-or-name)))
-                         (with-current-buffer buffer
-                           (or (equal major-mode 'vterm-mode)
-                               (string-prefix-p vterm-buffer-name (buffer-name buffer))))))
-                     (display-buffer-reuse-window display-buffer-at-bottom)
-                     (reusable-frames . visible)
-                     (window-height . 0.3)))
-      (defun double-vterm-toggle-insert-cd()
-        (interactive)
-        (vterm-toggle-insert-cd)
-        (vterm-toggle-insert-cd))
-      )
+(setup vterm-toggle
+  (:option vterm-toggle-hide-method 'reset-window-configration)
+  (:global "C-`" vterm-toggle)
+  (:when-loaded
+    (setq vterm-toggle-fullscreen-p nil)
+    (add-to-list 'display-buffer-alist
+                 '((lambda (buffer-or-name _)
+                     (let ((buffer (get-buffer buffer-or-name)))
+                       (with-current-buffer buffer
+                         (or (equal major-mode 'vterm-mode)
+                             (string-prefix-p vterm-buffer-name (buffer-name buffer))))))
+                   (display-buffer-reuse-window display-buffer-at-bottom)
+                   (reusable-frames . visible)
+                   (window-height . 0.3)))
+    (defun double-vterm-toggle-insert-cd()
+      (interactive)
+      (vterm-toggle-insert-cd)
+      (vterm-toggle-insert-cd))
     )
+  )
 #+end_src
 ** eshell
 #+name: eshell
@@ -1593,29 +1598,29 @@ Dirvish is a minimalistic file manager based on Dired. It's fast
 * git
 ** magit
 #+begin_src elisp
-  (setup with-editor)
-  (setup magit)
-    ;; (:defer
-    ;;  (require 'libgit)))
+(setup with-editor)
+(setup magit)
+  ;; (:defer
+  ;;  (require 'libgit)))
 #+end_src
 ** ediff
 #+begin_src elisp
-  (setup ediff
-    (:option ediff-split-window-function 'split-window-horizontally
-             ediff-window-setup-function 'ediff-setup-windows-plain)
-    ;; restore windows Configuration after ediff
-    (add-hook 'ediff-before-setup-hook #'ediff-save-window-conf)
-    (add-hook 'ediff-quit-hook #'ediff-restore-window-conf)
-    (:when-loaded
-      (defvar local-ediff-saved-window-conf nil)
+(setup ediff
+  (:option ediff-split-window-function 'split-window-horizontally
+           ediff-window-setup-function 'ediff-setup-windows-plain)
+  ;; restore windows Configuration after ediff
+  (add-hook 'ediff-before-setup-hook #'ediff-save-window-conf)
+  (add-hook 'ediff-quit-hook #'ediff-restore-window-conf)
+  (:when-loaded
+    (defvar local-ediff-saved-window-conf nil)
 
-      (defun ediff-save-window-conf ()
-        (setq local-ediff-saved-window-conf (current-window-configuration)))
+    (defun ediff-save-window-conf ()
+      (setq local-ediff-saved-window-conf (current-window-configuration)))
 
-      (defun ediff-restore-window-conf ()
-        (when (window-configuration-p local-ediff-saved-window-conf)
-          (set-window-configuration local-ediff-saved-window-conf)))
-      ))
+    (defun ediff-restore-window-conf ()
+      (when (window-configuration-p local-ediff-saved-window-conf)
+        (set-window-configuration local-ediff-saved-window-conf)))
+    ))
 
 #+end_src
 * Program
@@ -1623,14 +1628,14 @@ Dirvish is a minimalistic file manager based on Dired. It's fast
 *** elisp
 **** helpful
 #+begin_src elisp
-  (setup elisp-refs)
-  (setup helpful
-    (:global "C-h f" #'helpful-callable
-             "C-h v" #'helpful-variable
-             "C-h k" #'helpful-key
-             "C-c C-d" #'helpful-at-point
-             "C-h F" #'helpful-function
-             "C-h C" #'helpful-command))
+(setup elisp-refs)
+(setup helpful
+  (:global "C-h f" #'helpful-callable
+           "C-h v" #'helpful-variable
+           "C-h k" #'helpful-key
+           "C-c C-d" #'helpful-at-point
+           "C-h F" #'helpful-function
+           "C-h C" #'helpful-command))
 #+end_src
 **** elisp-demos
 #+begin_src elisp
@@ -1691,8 +1696,8 @@ Emacs major-mode to work with Beancount ledger files
 #+end_src
 *** common lisp slime
 #+begin_src elisp
-  (setup slime
-    (:option inferior-lisp-program "sbcl"))
+(setup slime
+  (:option inferior-lisp-program "sbcl"))
 #+end_src
 *** cc-mode
 #+begin_src emacs-lisp
@@ -1733,26 +1738,26 @@ Highlight symbols with keymap-enabled overlays
 #+end_src
 *** Complete
 **** lsp mode
-***** eglot
+***** COMMENT eglot
 #+begin_src elisp
-  (setup project)
-  (setup xref
-    (:option xref-search-program #'ripgrep)
-    (:autoload xref-push-marker-stack)) ;; autoload this command for jump-back
+(setup project)
+(setup xref
+  (:option xref-search-program #'ripgrep)
+  (:autoload xref-push-marker-stack)) ;; autoload this command for jump-back
 
 
-  (setq read-process-output-max (* 1024 1024))
-  (setup eglot
-    (:option eglot-events-buffer-size 0
-             eglot-workspace-configuration '((:python.analysis :useLibraryCodeForTypes t)))
-    (:autoload eglot-find-implementation)
-    (:when-loaded
-      (set-face-attribute 'eglot-highlight-symbol-face nil :background "#227700")
-    ))
-  (setup eldoc
-    (:option eldoc-echo-area-use-multiline-p t
-             eldoc-echo-area-display-truncation-message t))
-  ;; (setq eldoc-echo-area-prefer-doc-buffer nil)
+(setq read-process-output-max (* 1024 1024))
+(setup eglot
+  (:option eglot-events-buffer-size 0
+           eglot-workspace-configuration '((:python.analysis :useLibraryCodeForTypes t)))
+  (:autoload eglot-find-implementation)
+  (:when-loaded
+    (set-face-attribute 'eglot-highlight-symbol-face nil :background "#227700")
+  ))
+(setup eldoc
+  (:option eldoc-echo-area-use-multiline-p t
+           eldoc-echo-area-display-truncation-message t))
+;; (setq eldoc-echo-area-prefer-doc-buffer nil)
 #+end_src
 ***** consult-eglot
 #+begin_src elisp
@@ -1808,7 +1813,7 @@ eglot client leveraging LTEX Language Server.
     )
 #+end_src
 *** separedit
-#+begin_src elisp
+#+begin_src elisp :tangle no
   (setup edit-indirect)
   (setup separedit
     (:option separedit-default-mode 'org-mode
@@ -1826,30 +1831,30 @@ eglot client leveraging LTEX Language Server.
 #+end_src
 *** gdb
 #+begin_src elisp
-    (setup gdb-mi
-      (:global "<f5>" gdb-transient-keybindings)
-      (:when-loaded
-        (transient-define-prefix gdb-transient-keybindings()
-          "Define map for gdb functions"
-          [[("b" "gud-break" gud-break)
-            ("c" "gud-cont" gud-cont)]
-           [("f" "gud-finish" gud-finish)
-            ("j" "gud-jump" gud-jump)]
-           [("n" "gud-next" gud-next)
-            ("p" "gud-print" gud-print)]
-           [("r" "gud-run" gud-run)
-            ("R" "gud-remove" gud-remove)]
-           [("s" "gud-step" gud-step)
-            ("u" "gud-until" gud-until)]
-           [("w" "gud-watch" gud-watch)]
-           ])))
+(setup gdb-mi
+  (:global "<f5>" gdb-transient-keybindings)
+  (:when-loaded
+    (transient-define-prefix gdb-transient-keybindings()
+      "Define map for gdb functions"
+      [[("b" "gud-break" gud-break)
+        ("c" "gud-cont" gud-cont)]
+       [("f" "gud-finish" gud-finish)
+        ("j" "gud-jump" gud-jump)]
+       [("n" "gud-next" gud-next)
+        ("p" "gud-print" gud-print)]
+       [("r" "gud-run" gud-run)
+        ("R" "gud-remove" gud-remove)]
+       [("s" "gud-step" gud-step)
+        ("u" "gud-until" gud-until)]
+       [("w" "gud-watch" gud-watch)]
+       ])))
 #+end_src
 *** disaster
 Disassemble C, C++ or Fortran code under cursor
 #+begin_src elisp
-  (setup disaster
-    (:option disaster-assembly-mode 'nasm-mode
-             disaster-objdump "objdump -d -M att -Sl --no-show-raw-insn"))
+(setup disaster
+  (:option disaster-assembly-mode 'nasm-mode
+           disaster-objdump "objdump -d -M att -Sl --no-show-raw-insn"))
 #+end_src
 *** jupyter
 #+begin_src elisp :tangle no
@@ -1975,9 +1980,6 @@ Disassemble C, C++ or Fortran code under cursor
 #+begin_src elisp
 (setup org-modern
   (:option
-   ;; org-modern-list '((?+ . "➤")
-   ;;                   (?- . "–")
-   ;;                   (?* . "•"))
    org-modern-star '("Ⓐ" "Ⓑ" "Ⓒ" "Ⓓ" "Ⓔ" "Ⓕ" "Ⓖ" "Ⓗ" "Ⓘ" "Ⓙ" "Ⓚ" "Ⓛ" "Ⓜ")
    org-modern-table nil)
   (:hook-into org-mode)
@@ -1986,8 +1988,8 @@ Disassemble C, C++ or Fortran code under cursor
 #+end_src
 ** org-modern-indent
 #+begin_src elisp
-  (setup org-modern-indent
-    (add-hook 'org-mode-hook #'org-modern-indent-mode 90))
+(setup org-modern-indent
+  (add-hook 'org-mode-hook #'org-modern-indent-mode 90))
 #+end_src
 ** org-appear
 #+begin_src elisp
@@ -1996,26 +1998,26 @@ Disassemble C, C++ or Fortran code under cursor
 #+end_src
 ** org-download
 #+begin_src elisp
-  (setup async)
-  (setup org-download
-    (:option org-download-method 'directory
-             org-download-screenshot-basename "screenshot.jpg"
-             org-download-image-dir (concat nowis-doc-emacs-dir "02-binary-files/01-pictures/org_download_images")
-             org-download-abbreviate-filename-function 'expand-file-name)
-    (:when-loaded
-      (when (eq system-type 'gnu/linux)
-        (setq-default org-download-screenshot-method "scrot -s %s"))
+(setup async)
+(setup org-download
+  (:option org-download-method 'directory
+           org-download-screenshot-basename "screenshot.jpg"
+           org-download-image-dir (concat nowis-doc-emacs-dir "02-binary-files/01-pictures/org_download_images")
+           org-download-abbreviate-filename-function 'expand-file-name)
+  (:when-loaded
+    (when (eq system-type 'gnu/linux)
+      (setq-default org-download-screenshot-method "scrot -s %s"))
 
-      (when (eq system-type 'darwin)
-        (setq org-download-screenshot-method "screencapture -i %s")))
-    (:autoload org-download-screenshot
-               org-download-yank))
+    (when (eq system-type 'darwin)
+      (setq org-download-screenshot-method "screencapture -i %s")))
+  (:autoload org-download-screenshot
+             org-download-yank))
 #+end_src
 ** ox-hugo
 #+begin_src elisp
-  (setup tomelr)
-  (setup ox-hugo
-    (:load-after ox))
+(setup tomelr)
+(setup ox-hugo
+  (:load-after ox))
 #+end_src
 ** org-clock
 *** org-pomodoro
@@ -2257,18 +2259,18 @@ Borrowed from https://github.com/protesilaos/denote/issues/115
 #+end_src
 ** shrface
 #+begin_src elisp
-  (setup shrface
-    (:load-after nov)
-    (:load-after eww)
-    (:hook-into nov-mode
-                eww-after-render)
-    (:when-loaded
-      (shrface-basic)
-      (shrface-trial)
-      (shrface-default-keybindings) ; setup default keybindings
-      (setq shrface-href-versatile t)
-      (setq nov-shr-rendering-functions '((img . nov-render-img) (title . nov-render-title)))
-      (setq nov-shr-rendering-functions (append nov-shr-rendering-functions shr-external-rendering-functions))))
+(setup shrface
+  (:load-after nov)
+  (:load-after eww)
+  (:hook-into nov-mode
+              eww-after-render)
+  (:when-loaded
+    (shrface-basic)
+    (shrface-trial)
+    (shrface-default-keybindings) ; setup default keybindings
+    (setq shrface-href-versatile t)
+    (setq nov-shr-rendering-functions '((img . nov-render-img) (title . nov-render-title)))
+    (setq nov-shr-rendering-functions (append nov-shr-rendering-functions shr-external-rendering-functions))))
 #+end_src
 ** org-remark
 Highlight and annotate any text file with using Org mode.
@@ -2400,10 +2402,10 @@ https://dindi.garjola.net/org-agenda-weekly.html
 #+end_src
 ** org-ql
 #+begin_src elisp
-  (setup ts)
-  (setup peg)
-  (setup ov)
-  (setup org-ql)
+(setup ts)
+(setup peg)
+(setup ov)
+(setup org-ql)
 #+end_src
 ** xeft
 #+begin_src elisp
@@ -2507,6 +2509,12 @@ Aggregating a table is creating a new table by computing sums, averages, and so 
 (add-hook 'TeX-after-compilation-finished-functions
           #'TeX-revert-document-buffer)
 #+end_src
+** pdf-view-pagemark
+#+begin_src elisp
+(setup pdf-view-pagemark
+  (:hook-into pdf-view-mode-hook)
+)
+#+end_src
 ** elfeed
 #+begin_src elisp
   (setup elfeed
@@ -2514,19 +2522,19 @@ Aggregating a table is creating a new table by computing sums, averages, and so 
   #+end_src
 ** efleed-org
 #+begin_src elisp
-  (setup elfeed-org
-    (:option rmh-elfeed-org-files (list (concat nowis-config-useful-tools "elfeed.org"))))
-  (defun my-elfeed()
-    (interactive)
-    (unless (featurep 'elfeed-org)
-      (elfeed-org))
-    (elfeed))
+(setup elfeed-org
+  (:option rmh-elfeed-org-files (list (concat nowis-config-useful-tools "elfeed.org"))))
+(defun my-elfeed()
+  (interactive)
+  (unless (featurep 'elfeed-org)
+    (elfeed-org))
+  (elfeed))
 #+end_src
 ** nov
 #+begin_src elisp
-  (setup esxml) ;; <- (setup kv)
-  (setup nov
-    (:file-match "\\.epub\\'"))
+(setup esxml) ;; <- (setup kv)
+(setup nov
+  (:file-match "\\.epub\\'"))
 #+end_src
 ** nov-xwidget
 #+begin_src elisp
@@ -2663,25 +2671,32 @@ Simple distraction-free editing. I use darkroom instead of writeroom because it'
            whisper-model "medium"
            whisper-use-threads 8))
 #+end_src
-** engine-mode
-Minor mode for defining and querying search engines through Emacs.
+** webjump
 #+begin_src elisp
-(setup engine-mode
-  (engine-mode t)
-  (:when-loaded
-    (defengine github
-      "https://github.com/search?ref=simplesearch&q=%s"
-      :keybinding "g")
-    (defengine google
-      "https://www.google.com/search?ie=utf-8&oe=utf-8&q=%s"
-      :keybinding "s")
-    (defengine doubandushu
-      "https://search.douban.com/book/subject_search?search_text=%s"
-      :keybinding "d")
-    (defengine aur
-    "https://aur.archlinux.org/packages?O=0&K=%s"
-      :keybinding "a")
-    ))
+(setup webjump
+  (:option webjump-sites '(
+                   ;; Emacs.
+                   ("Emacs Home Page" .
+                    "www.gnu.org/software/emacs/emacs.html")
+                   ;; Internet search engines.
+                   ("Google" .
+                    [simple-query "www.google.com"
+                                  "www.google.com/search?q=" ""])
+                   ("DouBan DuShu" .
+                    [simple-query "book.douban.com"
+                                  "search.douban.com/book/subject_search?search_text=" ""])
+                   ("Github" .
+                    [simple-query "github.com"
+                                  "github.com/search?ref=simplesearch&q=" ""])
+                   ("Aur" .
+                    [simple-query "aur.archlinux.org"
+                                  "aur.archlinux.org/packages?O=0&K=" ""])
+                   )))
+#+end_src
+** auto-sudoedit
+#+begin_src elisp
+(setup auto-sudoedit
+  (auto-sudoedit-mode 1))
 #+end_src
 ** scripts
 *** backup scripts
