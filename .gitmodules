@@ -68,6 +68,9 @@
 [submodule "diff-hl"]
 	path = lib/diff-hl
 	url = https://github.com/dgutov/diff-hl.git
+[submodule "dired-rsync"]
+	path = lib/dired-rsync
+	url = https://github.com/stsquad/dired-rsync.git
 [submodule "diredfl"]
 	path = lib/diredfl
 	url = https://github.com/purcell/diredfl.git
@@ -358,6 +361,9 @@
 [submodule "tomelr"]
 	path = lib/tomelr
 	url = https://github.com/kaushalmodi/tomelr.git
+[submodule "treesit-auto"]
+	path = lib/treesit-auto
+	url = https://github.com/renzmann/treesit-auto.git
 [submodule "ts"]
 	path = lib/ts
 	url = https://github.com/alphapapa/ts.el.git

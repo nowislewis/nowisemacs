@@ -133,6 +133,7 @@ I failed in love with denote, so previous *org-roam* configs were refiled into [
   - [[#webjump][webjump]]
   - [[#auto-sudoedit][auto-sudoedit]]
   - [[#scripts][scripts]]
+  - [[#video-and-music][video and music]]
 - [[#use-single-file-to-load-configs][use single file to load configs]]
   - [[#provide][provide]]
   - [[#load-init-configel][load init-config.el]]
@@ -603,6 +604,8 @@ Maybe I should add a new state.
     ]
    ["org-remark"
    ("m m" "org-remark-mark" org-remark-mark)]
+   ["org-noter"
+   ("n" "org-noter" org-noter)]
    ])
 #+end_src
 *** search
@@ -1450,6 +1453,10 @@ Dirvish is a minimalistic file manager based on Dired. It's fast
   (:when-loaded
     (dirvish-side-follow-mode)))
 #+end_src
+*** dired-rsync
+#+begin_src elisp
+(setup dired-rsync)
+#+end_src
 ** structure browsing
 *** imenu-list
 #+begin_src elisp
@@ -1734,7 +1741,18 @@ Highlight symbols with keymap-enabled overlays
 **** breadcrumb
 #+begin_src elisp
 (setup breadcrumb
-  (:defer (breadcrumb-mode)))
+  (:with-feature breadcrumb-local-mode
+              (:hook-into text-mode-hook prop-mode-hook)))
+#+end_src
+**** treesit
+#+begin_src elisp
+(setup treesit
+  (:option treesit-font-lock-level 4))
+#+end_src
+**** treesit-auto
+#+begin_src elisp
+(setup treesit-auto
+  (:option treesit-auto-install 'prompt))
 #+end_src
 *** Complete
 **** lsp mode
@@ -1894,7 +1912,7 @@ Disassemble C, C++ or Fortran code under cursor
            org-special-ctrl-a/e t
            org-attach-id-dir (concat nowis-doc-emacs-dir "02-binary-files/01-pictures/01-org-attach")
 
-           fill-column 120
+           fill-column 100
            )
   ;; (:hook org-num-mode)
   (:when-loaded
@@ -2029,11 +2047,13 @@ Disassemble C, C++ or Fortran code under cursor
 ** org-noter
 #+begin_src elisp
 (setup org-noter
-  (:option org-noter-notes-search-path (list org-directory)
+  (:option org-noter-notes-search-path (concat nowis-doc-emacs-dir "02-binary-files/02-searchable/01-papers-markable/")
            org-noter-auto-save-last-location t
            org-noter-separate-notes-from-heading nil
            org-noter-hide-other nil
-           org-noter-doc-split-percentage '(0.6 . 0.4))
+           org-noter-doc-split-percentage '(0.6 . 0.4)
+           org-noter-highlight-selected-text t
+           )
   ;; (:when-loaded
   ;;   (require 'org-noter-pdf)
   ;;   (require 'org-noter-nov)
@@ -2419,7 +2439,6 @@ https://dindi.garjola.net/org-agenda-weekly.html
 ** mpvi
 Integrate Org with Video
 #+begin_src elisp
-(setup emms)
 (setup mpvi)
 #+end_src
 ** orgtbl-aggregate
@@ -2727,6 +2746,15 @@ rsync -avihu lewis-nas@192.168.31.108:/share/my_webdav/rsync/tmp/ \
   ;; (async-shell-command "restic -r sftp:lewis-nas@192.168.31.108:/share/my_webdav/restic/emacs backup --exclude='.git' ~/Documents/emacs/")
   (async-shell-command "restic -r sftp:lewis-nas@192.168.31.108:/share/my_webdav/restic/emacs backup ~/Documents/emacs/")
   )
+#+end_src
+** video and music
+*** emms
+#+begin_src elisp
+(setup emms)
+;; (require 'emms-setup)
+;;   (emms-all)
+;;   (emms-default-players)
+;;   (setq emms-source-file-default-directory "~/Documents/video_and_music/cadence shanghai vision Q7")
 #+end_src
 * use single file to load configs
 this can avoid errors of native compilation of init.el
