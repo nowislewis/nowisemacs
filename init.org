@@ -1790,6 +1790,8 @@ Highlight symbols with keymap-enabled overlays
 (setup lsp-bridge
   (:option acm-enable-citre nil
            lsp-bridge-enable-org-babel t
+           acm-enable-codeium t
+           acm-backend-codeium-api-key-path (concat nowis-doc-emacs-dir "08-keys/codeium_api_key.txt")
            )
   (if use-pypy3
       (setq lsp-bridge-python-command "pypy3"))
@@ -1911,8 +1913,10 @@ Disassemble C, C++ or Fortran code under cursor
            org-plantuml-jar-path plantuml-jar-path
            org-special-ctrl-a/e t
            org-attach-id-dir (concat nowis-doc-emacs-dir "02-binary-files/01-pictures/01-org-attach")
-
            fill-column 100
+
+           ;; habit
+           org-habit-following-days 2
            )
   ;; (:hook org-num-mode)
   (:when-loaded
@@ -2751,10 +2755,10 @@ rsync -avihu lewis-nas@192.168.31.108:/share/my_webdav/rsync/tmp/ \
 *** emms
 #+begin_src elisp
 (setup emms)
-;; (require 'emms-setup)
-;;   (emms-all)
-;;   (emms-default-players)
-;;   (setq emms-source-file-default-directory "~/Documents/video_and_music/cadence shanghai vision Q7")
+(require 'emms-setup)
+  (emms-standard)
+  (emms-default-players)
+  (setq emms-source-file-default-directory "~/Documents/video_and_music/cadence shanghai vision Q7")
 #+end_src
 * use single file to load configs
 this can avoid errors of native compilation of init.el
