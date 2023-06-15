@@ -517,21 +517,31 @@ Maybe I should add a new state.
 (transient-define-prefix g-extra-commands()
   "Define notes leader-key maps"
   [["Code find"
-    ("d" "find-definitions" xref-find-definitions)
-    ("D" "find-references" xref-find-references)
+    ;; ("d" "find-definitions" xref-find-definitions)
+    ;; ("D" "find-references" xref-find-references)
+    ;; ("j" "find-apropos" xref-find-apropos)
+    ;; ("i" "find-impl" eglot-find-implementation)
+    ;; ("o" "find-def-other-window" xref-find-definitions-other-window)
+    ("d" "find-definitions" lsp-bridge-find-def)
+    ("D" "find-references" lsp-bridge-find-references)
     ("j" "find-apropos" xref-find-apropos)
-    ("i" "find-impl" eglot-find-implementation)
+    ("i" "find-impl" lsp-bridge-find-impl)
     ("o" "find-def-other-window" xref-find-definitions-other-window)
     ]
    ["Code action"
-    ("a" "code-actions" eglot-code-actions)
-    ("r" "rename" eglot-rename)
+    ;; ("a" "code-actions" eglot-code-actions)
+    ;; ("r" "rename" eglot-rename)
+    ("a" "code-actions" lsp-bridge-code-action)
+    ("r" "rename" lsp-bridge-rename)
     ("f" "format-all-region" format-all-region)
     ("F" "format-all-buffer" format-all-buffer)]
    ["diagnostic"
-    ("n" "jump-to-next-diagnostic" flymake-goto-next-error)
+    ;; ("n" "jump-to-next-diagnostic" flymake-goto-next-error)
     ;; ("p" "jump-to-prev-diagnostic" flymake-goto-prev-error)
-    ("l" "list-diagnostics" consult-flymake)
+    ;; ("l" "list-diagnostics" consult-flymake)
+    ("n" "jump-to-next-diagnostic" lsp-bridge-diagnostic-jump-next)
+    ("p" "jump-to-prev-diagnostic" lsp-bridge-diagnostic-jump-prev)
+    ("l" "list-diagnostics" lsp-bridge-diagnostic-list)
     ]
    ["Navigate"
     ("m" "consult-mark" consult-mark)
@@ -541,10 +551,28 @@ Maybe I should add a new state.
     ("y" "clue-yank" clue-paste)
     ]
    ["citre"
-    ("p" "citre-peek" citre-peek)
+    ;; ("p" "citre-peek" citre-peek)
     ("c" "citre-ace-peek" citre-ace-peek)
     ]
    ])
+#+end_src
+*** find-file
+#+begin_src elisp
+(transient-define-prefix file-leader-map()
+  "Define leader-key map for file-related functions"
+  [["config"
+    ("p" "personal emacs config" (lambda()
+                                   (interactive)
+                                   (find-file nowis-config-file)))
+    ("e" "emacs documents" (lambda()
+                             (interactive)
+                             (find-file nowis-doc-emacs-dir)))
+    ("d" "dot files" (lambda()
+                       (interactive)
+                       (find-file "~/dotfiles")))
+    ]
+   ["history"
+    ("r" "recent file" consult-recent-file)]])
 #+end_src
 *** lewis
 #+begin_src elisp
@@ -657,61 +685,60 @@ Maybe I should add a new state.
 ** meow leader keybindings
 #+name: meow-leader-keys
 #+begin_src elisp
- ;; default
- (meow-leader-define-key
-  ;; SPC j/k will run the original command in MOTION state.
-  '("j" . "H-j")
-  '("k" . "H-k")
-  ;; '("h" . "H-h")
-  ;; '("l" . "H-l")
-  '("." . "H-.")
-  ;; Use SPC (0-9) for digit arguments.
-  '("1" . meow-digit-argument)
-  '("2" . meow-digit-argument)
-  '("3" . meow-digit-argument)
-  '("4" . meow-digit-argument)
-  '("5" . meow-digit-argument)
-  '("6" . meow-digit-argument)
-  '("7" . meow-digit-argument)
-  '("8" . meow-digit-argument)
-  '("9" . meow-digit-argument)
-  '("0" . meow-digit-argument)
-  '("/" . meow-keypad-describe-key)
-  '("?" . meow-cheatsheet))
+;; default
+(meow-leader-define-key
+ ;; SPC j/k will run the original command in MOTION state.
+ '("j" . "H-j")
+ '("k" . "H-k")
+ ;; '("h" . "H-h")
+ ;; '("l" . "H-l")
+ '("." . "H-.")
+ ;; Use SPC (0-9) for digit arguments.
+ '("1" . meow-digit-argument)
+ '("2" . meow-digit-argument)
+ '("3" . meow-digit-argument)
+ '("4" . meow-digit-argument)
+ '("5" . meow-digit-argument)
+ '("6" . meow-digit-argument)
+ '("7" . meow-digit-argument)
+ '("8" . meow-digit-argument)
+ '("9" . meow-digit-argument)
+ '("0" . meow-digit-argument)
+ '("/" . meow-keypad-describe-key)
+ '("?" . meow-cheatsheet))
 
- ;; buffer
- (meow-leader-define-key
-  '("b" . buffer-leader-map))
+;; buffer
+(meow-leader-define-key
+ '("b" . buffer-leader-map))
 
- ;; lewisliu
- (meow-leader-define-key
-  '("e" . lewis-leader-map))
+;; lewisliu
+(meow-leader-define-key
+ '("e" . lewis-leader-map))
 
- ;; search
- (meow-leader-define-key
-   '("s" . search-leader-map)
-  )
- ;; apps
- (meow-leader-define-key
-  '("a" . apps-leader-map))
+;; search
+(meow-leader-define-key
+  '("s" . search-leader-map)
+ )
+;; apps
+(meow-leader-define-key
+ '("a" . apps-leader-map))
 
 
- (defun find-config-file()
-   (interactive)
-   (find-file nowis-config-file))
+(defun find-config-file()
+  (interactive)
+  (find-file nowis-config-file))
 
- ;; file
- (meow-leader-define-key
-  '("f r" . consult-recent-file)
-  '("f p" . find-config-file))
+;; file
+(meow-leader-define-key
+ '("f" . file-leader-map))
 
- ;; notes
- (meow-leader-define-key
-  '("n" . notes-leader-map))
+;; notes
+(meow-leader-define-key
+ '("n" . notes-leader-map))
 
- (meow-leader-define-key
-  ;;w workspace
-  '("TAB". tabspaces-leader-map))
+(meow-leader-define-key
+ ;;w workspace
+ '("TAB". tabspaces-leader-map))
 #+END_SRC
 ** which-key
 #+name: which-key
@@ -1180,7 +1207,7 @@ diff-hl-mode highlights uncommitted changes on the left side of the window (area
 ** blink-search
 #+begin_src elisp
 (setup blink-search
-  (:option blink-search-enable-posframe t)
+  ;; (:option blink-search-enable-posframe t)
   (add-to-list 'meow-mode-state-list '(blink-search-mode . insert)))
 #+end_src
 * 补全
@@ -1294,6 +1321,7 @@ Jump anywhere in the world
     (:global "M-j" avy-goto-word-1))
 #+end_src
 *** jump-back
+**** xref jump back(may should be disabled)
 borrowed from citre, now you can always jump-back use "M-," after any jump in the list.
 #+begin_src elisp
   (defun my--push-point-to-xref-marker-stack (&rest r)
@@ -1421,7 +1449,7 @@ borrowed from citre, now you can always jump-back use "M-," after any jump in th
     (setq
      ;; rime-emacs-module-header-root "/Applications/Emacs.app/Contents/Resources/include/" ;; use build-emacs
      rime-emacs-module-header-root "/opt/homebrew/opt/emacs-plus@29/include" ;;use emacs-plus
-     rime-librime-root "~/Downloads/rime-1/dist"
+     rime-librime-root "~/Downloads/librime/dist"
      ))
   )
 #+end_src
@@ -1788,8 +1816,12 @@ Highlight symbols with keymap-enabled overlays
 #+begin_src elisp
 (defvar use-pypy3 nil)
 (setup lsp-bridge
-  (:option acm-enable-citre nil
-           lsp-bridge-enable-org-babel t
+  (:option lsp-bridge-enable-org-babel t
+           lsp-bridge-python-lsp-server "pylsp"
+           lsp-bridge-enable-completion-in-minibuffer t
+           lsp-bridge-enable-hover-diagnostic t
+           ;; acm
+           acm-enable-citre nil
            acm-enable-codeium t
            acm-backend-codeium-api-key-path (concat nowis-doc-emacs-dir "08-keys/codeium_api_key.txt")
            )
@@ -2153,7 +2185,18 @@ Disassemble C, C++ or Fortran code under cursor
   )
 #+end_src
 *** zotra
-TODO use a global installation of zotra or set path differently on mac/linux
+**** a installation script
+#+begin_src bash
+cd ~/Downloads
+git clone --recurse-submodules https://github.com/mpedramfar/zotra-cli.git
+cd zotra-cli
+npm install .
+cd ~/Downloads
+git clone https://github.com/l0o0/translators_CN.git --depth=1
+rm -rf ~/Downloads/zotra-cli/module/translation-server/modules/translators
+ln -s ~/Downloads/translators_CN/translators ~/Downloads/zotra-cli/module/translation-server/modules/
+#+end_src
+**** config
 #+begin_src elisp
 (setup zotra
   (:autoload zotra-add-entry-from-url)
