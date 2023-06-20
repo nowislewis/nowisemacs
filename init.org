@@ -749,193 +749,193 @@ Maybe I should add a new state.
 #+end_src
 ** insert-pair
 #+begin_src elisp
-  ;; insert pairs
-  (defun insert-quotations (&optional arg)
-    "Enclose following ARG sexps in quotation marks.
-      Leave point after open-paren."
-    (interactive "*P")
-    (insert-pair arg ?\' ?\'))
+;; insert pairs
+(defun insert-quotations (&optional arg)
+  "Enclose following ARG sexps in quotation marks.
+    Leave point after open-paren."
+  (interactive "*P")
+  (insert-pair arg ?\' ?\'))
 
-  (defun insert-quotes (&optional arg)
-    "Enclose following ARG sexps in quotes.
-      Leave point after open-quote."
-    (interactive "*P")
-    (insert-pair arg ?\" ?\"))
+(defun insert-quotes (&optional arg)
+  "Enclose following ARG sexps in quotes.
+    Leave point after open-quote."
+  (interactive "*P")
+  (insert-pair arg ?\" ?\"))
 
-  (defun insert-backquote (&optional arg)
-    "Enclose following ARG sexps in quotations with backquote.
-      Leave point after open-quotation."
-    (interactive "*P")
-    (insert-pair arg ?\` ?\'))
-
-  (defun insert-star (&optional arg)
-    "Enclose following ARG sexps in stars.
+(defun insert-backquote (&optional arg)
+  "Enclose following ARG sexps in quotations with backquote.
     Leave point after open-quotation."
-    (interactive "*P")
-    (insert-pair arg ?\* ?\*))
+  (interactive "*P")
+  (insert-pair arg ?\` ?\'))
 
-  (defun insert-bracket (&optional arg)
-    "Enclose following ARG sexps in brackets.
-    Leave point after open-quotation."
-    (interactive "*P")
-    (insert-pair arg ?\[ ?\]))
+(defun insert-star (&optional arg)
+  "Enclose following ARG sexps in stars.
+  Leave point after open-quotation."
+  (interactive "*P")
+  (insert-pair arg ?\* ?\*))
 
-  (defun insert-curly (&optional arg)
-    "Enclose following ARG sexps in curly braces.
-    Leave point after open-quotation."
-    (interactive "*P")
-    (insert-pair arg ?\{ ?\}))
+(defun insert-bracket (&optional arg)
+  "Enclose following ARG sexps in brackets.
+  Leave point after open-quotation."
+  (interactive "*P")
+  (insert-pair arg ?\[ ?\]))
 
-  (defun insert-equate (&optional arg)
-    "Enclose following ARG sexps in equations.
-    Leave point after open-quotation."
-    (interactive "*P")
-    (insert-pair arg ?\= ?\=))
+(defun insert-curly (&optional arg)
+  "Enclose following ARG sexps in curly braces.
+  Leave point after open-quotation."
+  (interactive "*P")
+  (insert-pair arg ?\{ ?\}))
+
+(defun insert-equate (&optional arg)
+  "Enclose following ARG sexps in equations.
+  Leave point after open-quotation."
+  (interactive "*P")
+  (insert-pair arg ?\= ?\=))
 #+end_src
 ** electric
 #+begin_src elisp
-  (setup elec-pair
-     (electric-pair-mode))
+(setup elec-pair
+   (electric-pair-mode))
 #+end_src
 * UI
 ** font
 #+name: font
 #+begin_src elisp
-  (defun font-installed-p (font-name)
-    "Check if font with FONT-NAME is available."
-    (find-font (font-spec :name font-name)))
+(defun font-installed-p (font-name)
+  "Check if font with FONT-NAME is available."
+  (find-font (font-spec :name font-name)))
 
-  ;; font size
-  (if (eq system-type 'darwin)
-      (defvar lewis-font-size 140)
-    (defvar lewis-font-size 120))
+;; font size
+(if (eq system-type 'darwin)
+    (defvar lewis-font-size 140)
+  (defvar lewis-font-size 120))
 
-  ;; fixed font
-  (setq lewis-fixed-font (cl-loop for font in '(
-                                                "Maple Mono SC NF"
-                                                ;; "InconsolataGo QiHei NF"
-                                                ;; "yaheiInconsolata"
-                                                "JetBrainsMono Nerd Font"
-                                                "JetBrains Mono"
-                                                "Sarasa Mono SC Nerd"
-                                                "Monaco"
-                                                "Consolas"
-                                                )
-                                  when (font-installed-p font)
-                                  return font))
-  ;; variable font
-  (setq lewis-variable-font (cl-loop for font in '(
-                                                   "Noto Sans CJK SC"
-                                                   "Arial"
-                                                   "Helvetica"
-                                                   "Times New Roman")
-                                     when (font-installed-p font)
-                                     return font))
-
-  ;; chinese font
-  (setq lewis-chinese-font (cl-loop for font in '("Maple Mono SC NF"
-                                                  "Sarasa Mono SC Nerd"
-                                                  "Microsoft Yahei")
-                                    when (font-installed-p font)
-                                    return font))
-
-  ;; symbol font
-  (setq lewis-symbol-font (cl-loop for font in '("Symbola"
-                                                 "Symbol")
+;; fixed font
+(setq lewis-fixed-font (cl-loop for font in '(
+                                              "Maple Mono SC NF"
+                                              ;; "InconsolataGo QiHei NF"
+                                              ;; "yaheiInconsolata"
+                                              "JetBrainsMono Nerd Font"
+                                              "JetBrains Mono"
+                                              "Sarasa Mono SC Nerd"
+                                              "Monaco"
+                                              "Consolas"
+                                              )
+                                when (font-installed-p font)
+                                return font))
+;; variable font
+(setq lewis-variable-font (cl-loop for font in '(
+                                                 "Noto Sans CJK SC"
+                                                 "Arial"
+                                                 "Helvetica"
+                                                 "Times New Roman")
                                    when (font-installed-p font)
                                    return font))
 
-  (when (display-graphic-p)
-    ;; Set default font
-    (if lewis-fixed-font
-        (progn
-          (set-face-attribute 'default nil :family lewis-fixed-font :height lewis-font-size)
-          (set-face-attribute 'fixed-pitch nil :family lewis-fixed-font :height 1.0)))
+;; chinese font
+(setq lewis-chinese-font (cl-loop for font in '("Maple Mono SC NF"
+                                                "Sarasa Mono SC Nerd"
+                                                "Microsoft Yahei")
+                                  when (font-installed-p font)
+                                  return font))
 
-    ;; variable-pitch
-    (if lewis-variable-font
-        (set-face-attribute 'variable-pitch nil :family lewis-variable-font :height 1.0))
+;; symbol font
+(setq lewis-symbol-font (cl-loop for font in '("Symbola"
+                                               "Symbol")
+                                 when (font-installed-p font)
+                                 return font))
 
-    ;; Specify font for all unicode characters
-    ;; (if lewis-symbol-font
-    ;;     return(set-fontset-font t 'unicode lewis-symbol-font nil 'prepend))
+(when (display-graphic-p)
+  ;; Set default font
+  (if lewis-fixed-font
+      (progn
+        (set-face-attribute 'default nil :family lewis-fixed-font :height lewis-font-size)
+        (set-face-attribute 'fixed-pitch nil :family lewis-fixed-font :height 1.0)))
 
-    ;; ;; Specify font for Chinese characters
-    (if lewis-chinese-font
-        (set-fontset-font t '(#x4e00 . #x9fff) lewis-chinese-font))
-    )
+  ;; variable-pitch
+  (if lewis-variable-font
+      (set-face-attribute 'variable-pitch nil :family lewis-variable-font :height 1.0))
+
+  ;; Specify font for all unicode characters
+  ;; (if lewis-symbol-font
+  ;;     return(set-fontset-font t 'unicode lewis-symbol-font nil 'prepend))
+
+  ;; ;; Specify font for Chinese characters
+  (if lewis-chinese-font
+      (set-fontset-font t '(#x4e00 . #x9fff) lewis-chinese-font))
+  )
 #+end_src
 ** variable-pitch and cn-en-fixed-pitch faces
 #+begin_src elisp :tangle no
-  (setup mixed-pitch
-    (:when-loaded
-      (delete 'org-table mixed-pitch-fixed-pitch-faces)))
-  ;; 中英文严格等宽字体设置
-  (with-eval-after-load 'org
-    (dolist (fixed-chinese-english-face '(org-table))
-      (set-face-attribute fixed-chinese-english-face nil :family "Sarasa Mono SC Nerd" :height 1.0)))
+(setup mixed-pitch
+  (:when-loaded
+    (delete 'org-table mixed-pitch-fixed-pitch-faces)))
+;; 中英文严格等宽字体设置
+(with-eval-after-load 'org
+  (dolist (fixed-chinese-english-face '(org-table))
+    (set-face-attribute fixed-chinese-english-face nil :family "Sarasa Mono SC Nerd" :height 1.0)))
 #+end_src
 ** Theme
 *** ef-themes
 #+name: themes
 #+begin_src elisp
-  (setup ef-themes)
-  (load-theme 'ef-winter t)
+(setup ef-themes)
+(load-theme 'ef-winter t)
 #+end_src
 ** line number
 #+name: line-number
 #+begin_src elisp
-  ;; line number
-  ;; only enable line number in some modes, borrowed from lazycat-emacs
-  (setq display-line-numbers-width-start t)
-  (setq line-number-display-limit large-file-warning-threshold)
-  (setq line-number-display-limit-width 1000)
+;; line number
+;; only enable line number in some modes, borrowed from lazycat-emacs
+(setq display-line-numbers-width-start t)
+(setq line-number-display-limit large-file-warning-threshold)
+(setq line-number-display-limit-width 1000)
 
-  (dolist (hook (list
-                 'c-mode-common-hook
-                 'c-mode-hook
-                 'emacs-lisp-mode-hook
-                 'lisp-interaction-mode-hook
-                 'lisp-mode-hook
-                 'java-mode-hook
-                 'asm-mode-hook
+(dolist (hook (list
+               'c-mode-common-hook
+               'c-mode-hook
+               'emacs-lisp-mode-hook
+               'lisp-interaction-mode-hook
+               'lisp-mode-hook
+               'java-mode-hook
+               'asm-mode-hook
 
-                 'haskell-mode-hook
-                 'rcirc-mode-hook
-                 'erc-mode-hook
-                 'sh-mode-hook
-                 'makefile-gmake-mode-hook
-                 'python-mode-hook
-                 'js-mode-hook
-                 'html-mode-hook
-                 'css-mode-hook
-                 'tuareg-mode-hook
-                 'go-mode-hook
-                 'coffee-mode-hook
-                 'qml-mode-hook
-                 'markdown-mode-hook
-                 'slime-repl-mode-hook
-                 'package-menu-mode-hook
-                 'cmake-mode-hook
-                 'php-mode-hook
-                 'web-mode-hook
-                 'coffee-mode-hook
-                 'sws-mode-hook
-                 'jade-mode-hook
-                 'vala-mode-hook
-                 'rust-mode-hook
-                 'ruby-mode-hook
-                 'qmake-mode-hook
-                 'lua-mode-hook
-                 'swift-mode-hook
-                 'llvm-mode-hook
-                 'conf-toml-mode-hook
-                 'nxml-mode-hook
-                 'nim-mode-hook
-                 ;;'org-mode-hook
-                 'verilog-mode-hook
-                 ))
-    (add-hook hook (lambda () (display-line-numbers-mode))))
+               'haskell-mode-hook
+               'rcirc-mode-hook
+               'erc-mode-hook
+               'sh-mode-hook
+               'makefile-gmake-mode-hook
+               'python-mode-hook
+               'js-mode-hook
+               'html-mode-hook
+               'css-mode-hook
+               'tuareg-mode-hook
+               'go-mode-hook
+               'coffee-mode-hook
+               'qml-mode-hook
+               'markdown-mode-hook
+               'slime-repl-mode-hook
+               'package-menu-mode-hook
+               'cmake-mode-hook
+               'php-mode-hook
+               'web-mode-hook
+               'coffee-mode-hook
+               'sws-mode-hook
+               'jade-mode-hook
+               'vala-mode-hook
+               'rust-mode-hook
+               'ruby-mode-hook
+               'qmake-mode-hook
+               'lua-mode-hook
+               'swift-mode-hook
+               'llvm-mode-hook
+               'conf-toml-mode-hook
+               'nxml-mode-hook
+               'nim-mode-hook
+               ;;'org-mode-hook
+               'verilog-mode-hook
+               ))
+  (add-hook hook (lambda () (display-line-numbers-mode))))
 #+end_src
 ** nerd-icons
 #+begin_src elisp
@@ -943,16 +943,16 @@ Maybe I should add a new state.
 #+end_src
 ** nerd-icons-completion
 #+begin_src elisp
-  (setup nerd-icons-completion
-    ;; should be loaded after vertico and marginalia
-    (:defer
-    (nerd-icons-completion-mode)))
+(setup nerd-icons-completion
+  ;; should be loaded after vertico and marginalia
+  (:defer
+  (nerd-icons-completion-mode)))
 #+end_src
 ** rainbow-delimiters
 rainbow-delimiters is a "rainbow parentheses"-like mode which highlights delimiters such as parentheses, brackets or braces according to their depth.
 #+begin_src elisp
-  (setup rainbow-delimiters
-    (:hook-into prog-mode))
+(setup rainbow-delimiters
+  (:hook-into prog-mode))
 #+end_src
 ** diff-hl
 diff-hl-mode highlights uncommitted changes on the left side of the window (area also known as the "gutter"), allows you to jump between and revert them selectively.
@@ -964,18 +964,18 @@ diff-hl-mode highlights uncommitted changes on the left side of the window (area
 #+end_src
 ** emacs-dashboard
 #+begin_src elisp
-  (setup dashboard
-    (:option dashboard-items '((recents . 5)
-                               ;; (agenda . 5)
-                               (bookmarks . 5)
-                               ;; (projects . 5)
-                               )
-             dashboard-set-heading-icons t
-             dashboard-set-file-icons t
-             dashboard-center-content t
-             dashboard-startup-banner (concat nowis-config-useful-tools "banner.txt")
-             dashboard-set-init-info t)
-    (dashboard-setup-startup-hook))
+(setup dashboard
+  (:option dashboard-items '((recents . 5)
+                             ;; (agenda . 5)
+                             (bookmarks . 5)
+                             ;; (projects . 5)
+                             )
+           dashboard-set-heading-icons t
+           dashboard-set-file-icons t
+           dashboard-center-content t
+           dashboard-startup-banner (concat nowis-config-useful-tools "banner.txt")
+           dashboard-set-init-info t)
+  (dashboard-setup-startup-hook))
 #+end_src
 ** doom-modeline
 #+begin_src elisp
@@ -1018,17 +1018,17 @@ diff-hl-mode highlights uncommitted changes on the left side of the window (area
 ** simple
 #+name: simple
 #+begin_src elisp
-  (setup simple
-    ;; show line/column/filesize in modeline
-    (:option line-number-mode t
-             column-number-mode t
-             size-indication-mode t
-             kill-do-not-save-duplicates t
-             shell-command-prompt-show-cwd t
-             what-cursor-show-names t)
-  ;; for now, I need a clear line mode
-     ;; (global-visual-line-mode)
-     )
+(setup simple
+  ;; show line/column/filesize in modeline
+  (:option line-number-mode t
+           column-number-mode t
+           size-indication-mode t
+           kill-do-not-save-duplicates t
+           shell-command-prompt-show-cwd t
+           what-cursor-show-names t)
+;; for now, I need a clear line mode
+   ;; (global-visual-line-mode)
+   )
 #+end_src
 ** general builtin modes
 #+name: general-builtin-modes
@@ -1055,14 +1055,14 @@ diff-hl-mode highlights uncommitted changes on the left side of the window (area
 ** backup
 *** super-save
 #+begin_src elisp
-  (setq make-backup-files nil)
-  (setq auto-save-default nil)
+(setq make-backup-files nil)
+(setq auto-save-default nil)
 
-  (setup super-save
-    (:option super-save-auto-save-when-idle t)
-    (:defer
-     (super-save-mode 1))
-    )
+(setup super-save
+  (:option super-save-auto-save-when-idle t)
+  (:defer
+   (super-save-mode 1))
+  )
 #+end_src
 *** savehist
 #+begin_src elisp
@@ -2530,11 +2530,16 @@ Aggregating a table is creating a new table by computing sums, averages, and so 
     ))
 #+end_src
 ** sdcv
+If you encounter the following issue: =g_mkdir failed: No such file or directory=, please consider:
+#+begin_src bash
+mkdir ~/.stardict
+#+end_src
+
 #+begin_src elisp
 (setup sdcv
   (:option sdcv-dictionary-data-dir (expand-file-name (concat nowis-doc-emacs-dir "02-binary-files/03-stardicts"))
-           ;; sdcv-dictionary-simple-list (list "简明英汉字典增强版")
-           ;; sdcv-dictionary-complete-list (list "简明英汉字典增强版")
+           sdcv-dictionary-simple-list (list "简明英汉字典增强版")
+           sdcv-dictionary-complete-list (list "简明英汉字典增强版")
            )
   (:global "M-l" lewis-eaf-sdcv-search-pointer+)
   (if (eq system-type 'darwin)
@@ -2578,8 +2583,7 @@ Aggregating a table is creating a new table by computing sums, averages, and so 
 ** pdf-view-pagemark
 #+begin_src elisp
 (setup pdf-view-pagemark
-  (:hook-into pdf-view-mode-hook)
-)
+  (:hook-into pdf-view-mode-hook))
 #+end_src
 ** elfeed
 #+begin_src elisp
@@ -2776,7 +2780,7 @@ rsync -avihbu --backup-dir=../back_restore/ --exclude '.git' \
     && rsync -avbih --delete --backup-dir=../back_restore/ --exclude '.git'\
              ~/Documents/emacs/ \
              lewis-nas@192.168.31.108:/share/my_webdav/rsync/emacs/ ")
-  )
+)
 
 (defun lewis-sync-tmp-rsync()
   (interactive)
@@ -2786,22 +2790,22 @@ rsync -avihu lewis-nas@192.168.31.108:/share/my_webdav/rsync/tmp/ \
     && rsync -avih --delete \
              ~/Downloads/tmp/ \
              lewis-nas@192.168.31.108:/share/my_webdav/rsync/tmp/ ")
-  )
+)
 
 (defun lewis-backup-restic()
   (interactive)
   ;; (async-shell-command "restic -r sftp:lewis-nas@192.168.31.108:/share/my_webdav/restic/emacs backup --exclude='.git' ~/Documents/emacs/")
   (async-shell-command "restic -r sftp:lewis-nas@192.168.31.108:/share/my_webdav/restic/emacs backup ~/Documents/emacs/")
-  )
+)
 #+end_src
 ** video and music
 *** emms
 #+begin_src elisp
 (setup emms)
-(require 'emms-setup)
-  (emms-standard)
-  (emms-default-players)
-  (setq emms-source-file-default-directory "~/Documents/video_and_music/cadence shanghai vision Q7")
+;; (require 'emms-setup)
+;; (emms-standard)
+;; (emms-default-players)
+(setq emms-source-file-default-directory "~/Documents/video_music/")
 #+end_src
 * use single file to load configs
 this can avoid errors of native compilation of init.el
