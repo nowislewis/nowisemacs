@@ -631,9 +631,13 @@ Maybe I should add a new state.
     ("x" "xeft" xeft)
     ]
    ["org-remark"
-   ("m m" "org-remark-mark" org-remark-mark)]
+    ("mm" "org-remark-mark" org-remark-mark)
+    ("mo" "open" org-remark-open)
+    ("m]" "next" org-remark-view-next)
+    ("m[" "prev" org-remark-view-prev)
+    ("md" "remove" org-remark-remove)]
    ["org-noter"
-   ("n" "org-noter" org-noter)]
+    ("n" "org-noter" org-noter)]
    ])
 #+end_src
 *** search
@@ -674,13 +678,15 @@ Maybe I should add a new state.
     ("b" "toggle-backward" vterm-toggle-backward)
     ("i" "toggle-insert-cd" double-vterm-toggle-insert-cd)
     ]
+   ["mpvi"
+    ("mo" "open" mpvi-open)
+    ("ms" "seek" mpvi-seek)
+    ("mi" "insert" mpvi-insert)
+    ("ma" "emms-add" mpvi-emms-add)]
    ["others"
     ("t" "org-pomodoro" org-pomodoro)
     ("l" "app-launcher-run-app" app-launcher-run-app)]
-   ["mpvi"
-    ("m o" "open" mpvi-open)
-    ("m s" "seek" mpvi-seek)
-    ("m a" "emms-add" mpvi-emms-add)]])
+   ])
 #+end_src
 ** meow leader keybindings
 #+name: meow-leader-keys
@@ -2343,10 +2349,6 @@ Borrowed from https://github.com/protesilaos/denote/issues/115
 Highlight and annotate any text file with using Org mode.
 #+begin_src elisp
   (setup org-remark
-    (:bind "C-c n m o" #'org-remark-open
-           "C-c n m ]" #'org-remark-view-next
-           "C-c n m [" #'org-remark-view-prev
-           "C-c n m d" #'org-remark-remove)
     (:defer
      (require 'org-remark-global-tracking)
      (org-remark-global-tracking-mode +1)
