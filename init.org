@@ -263,83 +263,83 @@ emacs
    modified latter, and they should have nice naming specifications for convenience search.
 
 #+begin_src elisp
-  (defvar nowis-config-file (expand-file-name "init.org" user-emacs-directory))
-  (defvar nowis-config-useful-tools (expand-file-name "useful-tools/" user-emacs-directory))
-  (defvar nowis-doc-emacs-dir (file-truename "~/Documents/emacs/"))
-  (defvar nowis-gtd-dir (concat nowis-doc-emacs-dir "01-orgmode/xnotes/gtd"))
-  (defvar nowis-bib-dir (concat nowis-doc-emacs-dir "03-bibliography/"))
-  (defvar nowis-bib-pdf-dir (concat nowis-doc-emacs-dir "02-binary-files/02-searchable/01-papers-markable/"))
+(defvar nowis-config-file (expand-file-name "init.org" user-emacs-directory))
+(defvar nowis-config-useful-tools (expand-file-name "useful-tools/" user-emacs-directory))
+(defvar nowis-doc-emacs-dir (file-truename "~/Documents/emacs/"))
+(defvar nowis-gtd-dir (concat nowis-doc-emacs-dir "01-orgmode/xnotes/gtd"))
+(defvar nowis-bib-dir (concat nowis-doc-emacs-dir "03-bibliography/"))
+(defvar nowis-bib-pdf-dir (concat nowis-doc-emacs-dir "02-binary-files/02-searchable/01-papers-markable/"))
 #+end_src
 * Package Management
 ** setup
 #+NAME: setup
 #+begin_src elisp
-  (require 'setup)
+(require 'setup)
 
-  (setup-define :delay
-    (lambda (&optional time)
-      `(run-with-idle-timer ,(or time 1) nil
-                            (lambda () (require ',(setup-get 'feature)))))
-    :documentation "Delay loading the feature until a certain amount of idle time has passed.")
+(setup-define :delay
+  (lambda (&optional time)
+    `(run-with-idle-timer ,(or time 1) nil
+                          (lambda () (require ',(setup-get 'feature)))))
+  :documentation "Delay loading the feature until a certain amount of idle time has passed.")
 
-  (setup-define :defer
-    (lambda (features)
-      `(run-with-idle-timer 1 nil
-                            (lambda ()
-                              ,features)))
-      :documentation "Delay loading the feature until a certain amount of idle time has passed."
-      :repeatable t)
+(setup-define :defer
+  (lambda (features)
+    `(run-with-idle-timer 1 nil
+                          (lambda ()
+                            ,features)))
+    :documentation "Delay loading the feature until a certain amount of idle time has passed."
+    :repeatable t)
 
-  (setup-define :load-after
-      (lambda (features &rest body)
-        (let ((body `(progn
-                       (require ',(setup-get 'feature))
-                       ,@body)))
-          (dolist (feature (if (listp features)
-                               (nreverse features)
-                             (list features)))
-            (setq body `(with-eval-after-load ',feature ,body)))
-          body))
-    :documentation "Load the current feature after FEATURES."
-    :indent 1)
+(setup-define :load-after
+    (lambda (features &rest body)
+      (let ((body `(progn
+                     (require ',(setup-get 'feature))
+                     ,@body)))
+        (dolist (feature (if (listp features)
+                             (nreverse features)
+                           (list features)))
+          (setq body `(with-eval-after-load ',feature ,body)))
+        body))
+  :documentation "Load the current feature after FEATURES."
+  :indent 1)
 
-  (setup-define :if-system
-    (lambda (systemtype)
-      `(unless (eq system-type ,systemtype)
-         ,(setup-quit)))
-    :documentation "If SYSTEMTYPE is not the current systemtype, stop evaluating form.")
+(setup-define :if-system
+  (lambda (systemtype)
+    `(unless (eq system-type ,systemtype)
+       ,(setup-quit)))
+  :documentation "If SYSTEMTYPE is not the current systemtype, stop evaluating form.")
 
-  (setup-define :autoload
-    (lambda (func)
-      (let ((fn (if (memq (car-safe func) '(quote function))
-                    (cadr func)
-                  func)))
-        `(unless (fboundp (quote ,fn))
-           (autoload (function ,fn) ,(symbol-name (setup-get 'feature)) nil t))))
-    :documentation "Autoload COMMAND if not already bound."
-    :repeatable t
-    :signature '(FUNC ...))
+(setup-define :autoload
+  (lambda (func)
+    (let ((fn (if (memq (car-safe func) '(quote function))
+                  (cadr func)
+                func)))
+      `(unless (fboundp (quote ,fn))
+         (autoload (function ,fn) ,(symbol-name (setup-get 'feature)) nil t))))
+  :documentation "Autoload COMMAND if not already bound."
+  :repeatable t
+  :signature '(FUNC ...))
 
-  (setup-define :messure-time
-    (lambda ()
-      (let ((feature-string (symbol-name (setup-get 'feature)))
-            (load-time `(time-subtract-millis (current-time) start-time)))
-        `(progn
-           (message (format (concat ,feature-string ":%d") ,load-time))
-           (setq start-time (current-time))
-           )))
-    :documentation "Messure the current feature after FEATURES.")
+(setup-define :messure-time
+  (lambda ()
+    (let ((feature-string (symbol-name (setup-get 'feature)))
+          (load-time `(time-subtract-millis (current-time) start-time)))
+      `(progn
+         (message (format (concat ,feature-string ":%d") ,load-time))
+         (setq start-time (current-time))
+         )))
+  :documentation "Messure the current feature after FEATURES.")
 #+end_src
 ** epkg
 I use borg to manage packages, so setup.el is only used to config packages quickly, I write several macros in [[https://github.com/nowislewis/nowisemacs-base.git][nowisemacs-base]]. It should be noticed that if you use only a =init.el= file, all the funcs or macros defined in =init.el= can't pass native comp, so move these things that you defined yourself to a seperate repo(nowisemacs-base) will resolve this problem.
 #+begin_src elisp
-    (setup compat)
-    ;; (setup emacsql)
-    ;; (setup closql)
+(setup compat)
+;; (setup emacsql)
+;; (setup closql)
 
-    ;; (when (>= emacs-major-version 29)
-    ;;   (setq epkg-database-connector 'sqlite-builtin))
-    ;; (setup epkg)
+;; (when (>= emacs-major-version 29)
+;;   (setq epkg-database-connector 'sqlite-builtin))
+;; (setup epkg)
 #+end_src
 * gcmh
 Enforce a sneaky Garbage Collection strategy to minimize GC interference with user activity.
@@ -484,13 +484,12 @@ Maybe I should add a new state.
                             '("," . meow-reverse)
                             '("." . repeat)
 
-
                             '("<escape>" . ignore)
                             '("!" . meow-start-kmacro-or-insert-counter)
                             '("@" . meow-end-or-call-kmacro)
-                            '("#" . symbol-overlay-put)
+                            '("#" . embark-toggle-highlight)
                             '("^" . meow-join)
-                            '("*" . symbol-overlay-put)
+                            '("*" . embark-next-symbol)
                             '("/" . consult-line))
     (meow-global-mode 1))
 
@@ -1072,27 +1071,27 @@ diff-hl-mode highlights uncommitted changes on the left side of the window (area
 #+end_src
 *** savehist
 #+begin_src elisp
-  (setup savehist
-    (:option history-length 10000
-             history-delete-duplicates t
-             savehist-save-minibuffer-history t)
-    (:defer
-     (savehist-mode)))
+(setup savehist
+  (:option history-length 10000
+           history-delete-duplicates t
+           savehist-save-minibuffer-history t)
+  (:defer
+   (savehist-mode)))
 #+end_src
 ** no-littering
 #+begin_src lisp
-  (setup no-littering)
+(setup no-littering)
 #+end_src
 ** recentf
 #+begin_src elisp
-  (setup recentf
-    (:also-load no-littering)
-    (:option recentf-max-saved-items 1000
-             recentf-exclude `("/tmp/" "/ssh:" ,(concat user-emacs-directory "lib/.*-autoloads\\.el\\'")))
-    (add-to-list 'recentf-exclude no-littering-var-directory)
-    (add-to-list 'recentf-exclude no-littering-etc-directory)
-    (:defer
-     (recentf-mode)))
+(setup recentf
+  (:also-load no-littering)
+  (:option recentf-max-saved-items 1000
+           recentf-exclude `("/tmp/" "/ssh:" ,(concat user-emacs-directory "lib/.*-autoloads\\.el\\'")))
+  (add-to-list 'recentf-exclude no-littering-var-directory)
+  (add-to-list 'recentf-exclude no-littering-etc-directory)
+  (:defer
+   (recentf-mode)))
 #+end_src
 ** 自动换行
 #+begin_src elisp
@@ -1104,10 +1103,10 @@ diff-hl-mode highlights uncommitted changes on the left side of the window (area
 ** so-long
 解决长行卡死问题
 #+begin_src elisp
-  (setup so-long
-    (:defer
-     (global-so-long-mode 1)
-     ))
+(setup so-long
+  (:defer
+   (global-so-long-mode 1)
+   ))
 #+end_src
 ** TRAMP
 #+begin_src elisp
@@ -1115,34 +1114,35 @@ diff-hl-mode highlights uncommitted changes on the left side of the window (area
 #+end_src
 ** Automatically clean whitespace
 #+begin_src elisp
-  (setup ws-butler
-    (:hook-into text-mode prog-mode))
+(setup ws-butler
+  (:hook-into text-mode prog-mode))
 #+end_src
 ** exec-path-from-shell
 可以优化速度, 建议看一下官网的一篇文章
 #+name: exec-path-from-shell
 #+begin_src elisp
-  (setup exec-path-from-shell
-    (:defer
-     (when (memq window-system '(mac ns x))
-       (exec-path-from-shell-initialize))))
+(setup exec-path-from-shell
+  (:defer
+   (when (memq window-system '(mac ns x))
+     (exec-path-from-shell-initialize))))
 #+end_src
 ** Undo
 *** vundo for undo history
 #+name: vundo
 #+begin_src elisp
-  (setup vundo
-    (:bind "l" vundo-forward
-           "h" vundo-backward
-           "j" vundo-next
-           "k" vundo-previous))
+(setup vundo
+  (:bind "l" vundo-forward
+         "h" vundo-backward
+         "j" vundo-next
+         "k" vundo-previous))
 #+end_src
 * Search
 ** isearch
 #+begin_src elisp
 (setup isearch
   (:option isearch-lazy-count t
-           lazy-highlight-cleanup nil)
+           ;; lazy-highlight-cleanup nil
+           )
   (:bind [remap isearch-delete-char] isearch-del-char))
 #+end_src
 ** Consult Commands
@@ -1482,8 +1482,8 @@ Dirvish is a minimalistic file manager based on Dired. It's fast
   (:option dirvish-attributes '(subtree-state nerd-icons)
            dirvish-side-width 40)
   (:bind "TAB" dirvish-toggle-subtree)
-  ;; (:defer
-  ;; (dirvish-override-dired-mode))
+  (:defer
+   (dirvish-override-dired-mode))
   (:when-loaded
     (dirvish-side-follow-mode)))
 #+end_src
@@ -1541,42 +1541,42 @@ Dirvish is a minimalistic file manager based on Dired. It's fast
 ** tabspaces
 #+name: tabspaces
 #+begin_src elisp
-  (setup tabspaces
-    (:option tabspaces-use-filtered-buffers-as-default t
-             tabspaces-keymap-prefix nil)
-  (tabspaces-mode)
-    (:when-loaded
-      (transient-define-prefix tabspaces-leader-map()
-        "Define tabspaces leader-key maps"
-        [["Create or close"
-          ("s" "tabspaces-switch-or-create-workspace" tabspaces-switch-or-create-workspace)
-          ("b" "tabspaces-switch-to-buffer" tabspaces-switch-to-buffer)
-          ("d" "tabspaces-close-workspace" tabspaces-close-workspace)
-          ("k" "tabspaces-remove-selected-buffer" tabspaces-remove-selected-buffer)
-          ("K" "tabspaces-kill-buffers-close-workspace" tabspaces-kill-buffers-close-workspace)
-          ("o" "tabspaces-open-or-create-project-and-workspace" tabspaces-open-or-create-project-and-workspace)
-          ("R" "tabspaces-remove-selected-buffer" tabspaces-remove-selected-buffer)
-          ("r" "tab-bar-rename-tab-by-name" tab-bar-rename-tab-by-name)
-          ("t" "tabspaces-switch-buffer-and-tab" tabspaces-switch-buffer-and-tab)
-          ]
-         ["Switch tab bar"
-          ("n" "tab-bar-switch-to-next-tab" tab-bar-switch-to-next-tab)
-          ("p" "tab-bar-switch-to-prev-tab" tab-bar-switch-to-prev-tab)
-          ("l" "tab-bar-switch-to-last-tab" tab-bar-switch-to-last-tab)
-          ]
-         ["Switch tab bar by index"
-          ("1" "tab-bar-select-tab-1st" tab-bar-select-tab-1st)
-          ("2" "tab-bar-select-tab-2nd" tab-bar-select-tab-2nd)
-          ("3" "tab-bar-select-tab-3rd" tab-bar-select-tab-3rd)
-          ("4" "tab-bar-select-tab-4th" tab-bar-select-tab-4th)
-          ("5" "tab-bar-select-tab-5th" tab-bar-select-tab-5th)
-          ("6" "tab-bar-select-tab-6th" tab-bar-select-tab-6th)
-          ("7" "tab-bar-select-tab-7th" tab-bar-select-tab-7th)
-          ]
-         ]
-        )
+(setup tabspaces
+  (:option tabspaces-use-filtered-buffers-as-default t
+           tabspaces-keymap-prefix nil)
+(tabspaces-mode)
+  (:when-loaded
+    (transient-define-prefix tabspaces-leader-map()
+      "Define tabspaces leader-key maps"
+      [["Create or close"
+        ("s" "tabspaces-switch-or-create-workspace" tabspaces-switch-or-create-workspace)
+        ("b" "tabspaces-switch-to-buffer" tabspaces-switch-to-buffer)
+        ("d" "tabspaces-close-workspace" tabspaces-close-workspace)
+        ("k" "tabspaces-remove-selected-buffer" tabspaces-remove-selected-buffer)
+        ("K" "tabspaces-kill-buffers-close-workspace" tabspaces-kill-buffers-close-workspace)
+        ("o" "tabspaces-open-or-create-project-and-workspace" tabspaces-open-or-create-project-and-workspace)
+        ("R" "tabspaces-remove-selected-buffer" tabspaces-remove-selected-buffer)
+        ("r" "tab-bar-rename-tab-by-name" tab-bar-rename-tab-by-name)
+        ("t" "tabspaces-switch-buffer-and-tab" tabspaces-switch-buffer-and-tab)
+        ]
+       ["Switch tab bar"
+        ("n" "tab-bar-switch-to-next-tab" tab-bar-switch-to-next-tab)
+        ("p" "tab-bar-switch-to-prev-tab" tab-bar-switch-to-prev-tab)
+        ("l" "tab-bar-switch-to-last-tab" tab-bar-switch-to-last-tab)
+        ]
+       ["Switch tab bar by index"
+        ("1" "tab-bar-select-tab-1st" tab-bar-select-tab-1st)
+        ("2" "tab-bar-select-tab-2nd" tab-bar-select-tab-2nd)
+        ("3" "tab-bar-select-tab-3rd" tab-bar-select-tab-3rd)
+        ("4" "tab-bar-select-tab-4th" tab-bar-select-tab-4th)
+        ("5" "tab-bar-select-tab-5th" tab-bar-select-tab-5th)
+        ("6" "tab-bar-select-tab-6th" tab-bar-select-tab-6th)
+        ("7" "tab-bar-select-tab-7th" tab-bar-select-tab-7th)
+        ]
+       ]
       )
     )
+  )
     #+end_src
 ** project
 #+begin_src elisp
@@ -1761,16 +1761,10 @@ Emacs major-mode to work with Beancount ledger files
 #+end_src
 ** Useful programing tools
 *** UI
-**** symbol-overlay
-Highlight symbols with keymap-enabled overlays
-#+begin_src elisp
-  (setup symbol-overlay
-    (:autoload symbol-overlay-put))
-#+end_src
 **** electric-pair
 #+begin_src elisp
-    (setup elec-pair
-       (electric-pair-mode))
+(setup elec-pair
+   (electric-pair-mode))
 #+end_src
 **** breadcrumb
 #+begin_src elisp
@@ -1790,7 +1784,7 @@ Highlight symbols with keymap-enabled overlays
 #+end_src
 *** Complete
 **** lsp mode
-***** COMMENT eglot
+***** eglot
 #+begin_src elisp
 (setup project)
 (setup xref
@@ -1828,7 +1822,7 @@ Highlight symbols with keymap-enabled overlays
            lsp-bridge-enable-hover-diagnostic t
            ;; acm
            acm-enable-citre nil
-           acm-enable-codeium t
+           acm-enable-codeium nil
            acm-backend-codeium-api-key-path (concat nowis-doc-emacs-dir "08-keys/codeium_api_key.txt")
            )
   (if use-pypy3
@@ -1838,14 +1832,14 @@ Highlight symbols with keymap-enabled overlays
 **** citre
 Citre is an advanced Ctags (or actually, readtags) frontend for Emacs.
 #+begin_src elisp
-  (setup citre
-    (:defer
-     (require 'citre-config))
-    (:option citre-use-project-root-when-creating-tags t
-             citre-prompt-language-for-ctags-command t
-             ;; citre-auto-enable-citre-mode-modes '(prog-mode)
-             )
-    )
+(setup citre
+  (:defer
+   (require 'citre-config))
+  (:option citre-use-project-root-when-creating-tags t
+           citre-prompt-language-for-ctags-command t
+           ;; citre-auto-enable-citre-mode-modes '(prog-mode)
+           )
+  )
 #+end_src
 *** quickrun
 #+begin_src elisp
@@ -1870,22 +1864,11 @@ eglot client leveraging LTEX Language Server.
                                                         "\\(\\<end\\>\\|\\<endcase\\>\\|\\<endmodule\\>\\|\\<endclass\\>\\|\\<endfunction\\>\\|\\<endtask\\>\\)" nil verilog-forward-sexp-function))
     )
 #+end_src
-*** separedit
-#+begin_src elisp :tangle no
-  (setup edit-indirect)
-  (setup separedit
-    (:option separedit-default-mode 'org-mode
-             separedit-continue-fill-column t
-             separedit-remove-trailing-spaces-in-comment t)
-    (:autoload separedit))
-
-  (define-key prog-mode-map (kbd "C-c '") #'separedit)
-#+end_src
 *** format-all
 #+begin_src elisp
-  (setup inheritenv)
-  (setup language-id)
-  (setup format-all)
+(setup inheritenv)
+(setup language-id)
+(setup format-all)
 #+end_src
 *** gdb
 #+begin_src elisp

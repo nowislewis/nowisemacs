@@ -343,9 +343,6 @@
 [submodule "super-save"]
 	path = lib/super-save
 	url = https://github.com/bbatsov/super-save.git
-[submodule "symbol-overlay"]
-	path = lib/symbol-overlay
-	url = https://github.com/wolray/symbol-overlay.git
 [submodule "tablist"]
 	path = lib/tablist
 	url = https://github.com/politza/tablist.git
