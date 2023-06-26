@@ -200,9 +200,6 @@
 [submodule "meow"]
 	path = lib/meow
 	url = https://github.com/meow-edit/meow.git
-[submodule "mind-wave"]
-	path = lib/mind-wave
-	url = https://github.com/manateelazycat/mind-wave.git
 [submodule "mpvi"]
 	path = lib/mpvi
 	url = https://github.com/lorniu/mpvi.git
