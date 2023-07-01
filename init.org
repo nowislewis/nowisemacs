@@ -319,15 +319,17 @@ emacs
   :repeatable t
   :signature '(FUNC ...))
 
-(setup-define :messure-time
+(setup-define :mtime
   (lambda ()
+    (defvar start-time (current-time))
     (let ((feature-string (symbol-name (setup-get 'feature)))
-          (load-time `(time-subtract-millis (current-time) start-time)))
+          (load-time `(float-time (time-subtract (current-time) start-time))))
       `(progn
-         (message (format (concat ,feature-string ":%d") ,load-time))
+         (message (format (concat ,feature-string ":%f") ,load-time))
          (setq start-time (current-time))
          )))
-  :documentation "Messure the current feature after FEATURES.")
+  :documentation "Measures the time from the end of the previous feature to the end of the current feature")
+
 #+end_src
 ** epkg
 I use borg to manage packages, so setup.el is only used to config packages quickly, I write several macros in [[https://github.com/nowislewis/nowisemacs-base.git][nowisemacs-base]]. It should be noticed that if you use only a =init.el= file, all the funcs or macros defined in =init.el= can't pass native comp, so move these things that you defined yourself to a seperate repo(nowisemacs-base) will resolve this problem.
@@ -886,48 +888,8 @@ Maybe I should add a new state.
 (setq line-number-display-limit-width 1000)
 
 (dolist (hook (list
-               'c-mode-common-hook
-               'c-mode-hook
-               'emacs-lisp-mode-hook
-               'lisp-interaction-mode-hook
-               'lisp-mode-hook
-               'java-mode-hook
-               'asm-mode-hook
-
-               'haskell-mode-hook
-               'rcirc-mode-hook
-               'erc-mode-hook
-               'sh-mode-hook
-               'makefile-gmake-mode-hook
-               'python-mode-hook
-               'js-mode-hook
-               'html-mode-hook
-               'css-mode-hook
-               'tuareg-mode-hook
-               'go-mode-hook
-               'coffee-mode-hook
-               'qml-mode-hook
-               'markdown-mode-hook
-               'slime-repl-mode-hook
-               'package-menu-mode-hook
-               'cmake-mode-hook
-               'php-mode-hook
-               'web-mode-hook
-               'coffee-mode-hook
-               'sws-mode-hook
-               'jade-mode-hook
-               'vala-mode-hook
-               'rust-mode-hook
-               'ruby-mode-hook
-               'qmake-mode-hook
-               'lua-mode-hook
-               'swift-mode-hook
-               'llvm-mode-hook
-               'conf-toml-mode-hook
-               'nxml-mode-hook
-               'nim-mode-hook
+               'prog-mode-hook
                ;;'org-mode-hook
-               'verilog-mode-hook
                ))
   (add-hook hook (lambda () (display-line-numbers-mode))))
 #+end_src
@@ -939,8 +901,7 @@ Maybe I should add a new state.
 #+begin_src elisp
 (setup nerd-icons-completion
   ;; should be loaded after vertico and marginalia
-  (:defer
-   (nerd-icons-completion-mode)))
+   (nerd-icons-completion-mode))
 #+end_src
 ** rainbow-delimiters
 rainbow-delimiters is a "rainbow parentheses"-like mode which highlights delimiters such as parentheses, brackets or braces according to their depth.
@@ -1053,9 +1014,7 @@ diff-hl-mode highlights uncommitted changes on the left side of the window (area
 
 (setup super-save
   (:option super-save-auto-save-when-idle t)
-  (:defer
    (super-save-mode 1))
-  )
 #+end_src
 *** savehist
 #+begin_src elisp
@@ -1063,8 +1022,7 @@ diff-hl-mode highlights uncommitted changes on the left side of the window (area
   (:option history-length 10000
            history-delete-duplicates t
            savehist-save-minibuffer-history t)
-  (:defer
-   (savehist-mode)))
+   (savehist-mode))
 #+end_src
 ** no-littering
 #+begin_src lisp
@@ -1078,8 +1036,7 @@ diff-hl-mode highlights uncommitted changes on the left side of the window (area
            recentf-exclude `("/tmp/" "/ssh:" ,(concat user-emacs-directory "lib/.*-autoloads\\.el\\'")))
   (add-to-list 'recentf-exclude no-littering-var-directory)
   (add-to-list 'recentf-exclude no-littering-etc-directory)
-  (:defer
-   (recentf-mode)))
+   (recentf-mode))
 #+end_src
 ** 自动换行
 #+begin_src elisp
@@ -1092,9 +1049,8 @@ diff-hl-mode highlights uncommitted changes on the left side of the window (area
 解决长行卡死问题
 #+begin_src elisp
 (setup so-long
-  (:defer
    (global-so-long-mode 1)
-   ))
+   )
 #+end_src
 ** TRAMP
 #+begin_src elisp
@@ -1110,9 +1066,8 @@ diff-hl-mode highlights uncommitted changes on the left side of the window (area
 #+name: exec-path-from-shell
 #+begin_src elisp
 (setup exec-path-from-shell
-  (:defer
    (when (memq window-system '(mac ns x))
-     (exec-path-from-shell-initialize))))
+     (exec-path-from-shell-initialize)))
 #+end_src
 ** Undo
 *** vundo for undo history
@@ -1258,7 +1213,7 @@ should be check after reading the embark.el manual
 #+begin_src elisp
 (setup yasnippet
   (:option yas-snippet-dirs (list (concat nowis-config-useful-tools "snippets")))
-  (:defer (yas-global-mode))
+  (yas-global-mode)
   )
 #+end_src
 ** tempel
@@ -1414,8 +1369,7 @@ borrowed from citre, now you can always jump-back use "M-," after any jump in th
             (pyim-cregexp-build result))))
     (advice-add 'orderless-regexp :around #'my-orderless-regexp)
     )
-  (:defer
-   (require 'pyim))
+   (require 'pyim)
   ;; (setq default-input-method "pyim")
   )
 #+end_src
@@ -1471,8 +1425,7 @@ Dirvish is a minimalistic file manager based on Dired. It's fast
   (:option dirvish-attributes '(subtree-state nerd-icons)
            dirvish-side-width 40)
   (:bind "TAB" dirvish-toggle-subtree)
-  (:defer
-   (dirvish-override-dired-mode))
+   (dirvish-override-dired-mode)
   (:when-loaded
     (dirvish-side-follow-mode)))
 #+end_src
@@ -1619,6 +1572,7 @@ Dirvish is a minimalistic file manager based on Dired. It's fast
 ** eshell
 #+name: eshell
 #+begin_src elisp
+(setup eshell)
 (defun new-eshell(name)
   "create a new eshell with a given name"
   (interactive "sInput a name:")
@@ -1820,8 +1774,7 @@ Emacs major-mode to work with Beancount ledger files
 Citre is an advanced Ctags (or actually, readtags) frontend for Emacs.
 #+begin_src elisp
 (setup citre
-  (:defer
-   (require 'citre-config))
+  (require 'citre-config)
   (:option citre-use-project-root-when-creating-tags t
            citre-prompt-language-for-ctags-command t
            ;; citre-auto-enable-citre-mode-modes '(prog-mode)
@@ -2134,7 +2087,7 @@ Disassemble C, C++ or Fortran code under cursor
 #+begin_src elisp
 (setup citar-denote
   (:option citar-denote-title-format "title")
-  (:defer (citar-denote-mode)))
+  (citar-denote-mode))
 #+end_src
 *** ebib
 #+begin_src elisp
@@ -2319,16 +2272,13 @@ Borrowed from https://github.com/protesilaos/denote/issues/115
 Highlight and annotate any text file with using Org mode.
 #+begin_src elisp
 (setup org-remark
-  (:defer
-   (require 'org-remark-global-tracking)
-   (org-remark-global-tracking-mode +1)
-   )
+  (defun my/function ()
+    (concat (concat nowis-doc-emacs-dir "01-orgmode/org-remark/")
+            (file-name-base (org-remark-notes-file-name-function))
+            ".org"))
+  (:option org-remark-notes-file-name #'my/function)
   (:when-loaded
-    (defun my/function ()
-      (concat (concat nowis-doc-emacs-dir "01-orgmode/org-remark/")
-              (file-name-base (org-remark-notes-file-name-function))
-              ".org"))
-    (setq org-remark-notes-file-name #'my/function)
+    (org-remark-global-tracking-mode +1)
     ))
 #+end_src
 ** clue
@@ -2390,7 +2340,7 @@ https://dindi.garjola.net/org-agenda-weekly.html
 ** org-super-agenda
 #+begin_src elisp
 (setup org-super-agenda
-  (org-super-agenda-mode))
+  (:hook-into org-agenda-mode))
 
 (setq org-agenda-custom-commands
       '(("z" "Super view"
@@ -2542,7 +2492,8 @@ mkdir ~/.stardict
     (:bind "h h" pdf-annot-add-highlight-markup-annotation
            "[" pdf-view-scroll-down-or-previous-page
            "]" pdf-view-scroll-up-or-next-page))
-  (pdf-loader-install))
+  (pdf-loader-install)
+  )
 ;; (add-hook 'pdf-view-mode-hook (lambda() (linum-mode -1))))
 
 (setq TeX-view-program-selection '((output-pdf "PDF Tools"))
