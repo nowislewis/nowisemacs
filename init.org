@@ -104,6 +104,7 @@ I failed in love with denote, so previous *org-roam* configs were refiled into [
   - [[#org-remark][org-remark]]
   - [[#clue][clue]]
   - [[#org-transclusion][org-transclusion]]
+  - [[#org-gtd][org-gtd]]
   - [[#agendagtd][agenda/gtd]]
   - [[#org-super-agenda][org-super-agenda]]
   - [[#org-ql][org-ql]]
@@ -1855,7 +1856,7 @@ Disassemble C, C++ or Fortran code under cursor
            org-startup-indented t
            org-edit-src-content-indentation 0
            org-hide-emphasis-markers t
-           org-imenu-depth 5
+           org-imenu-depth 8
            org-return-follows-link t
            org-link-frame-setup '((vm . vm-visit-folder-other-frame)
                                   (vm-imap . vm-visit-imap-folder-other-frame)
@@ -2290,6 +2291,26 @@ Connecting clues while reading code.
 #+begin_src elisp
 (setup org-transclusion)
 #+end_src
+** org-gtd
+#+begin_src elisp :tangle no
+(setup org-agenda-property
+  (require 'org-agenda-property)
+  )
+  (setq org-gtd-update-ack "3.0.0")
+  (require 'org-gtd)
+(setup org-gtd
+  (:option
+           org-edna-use-inheritance t)
+    org-gtd-organize-hooks '(org-gtd-set-area-of-focus org-set-tags-command)
+
+  (org-gtd-mode)
+  (:global "C-c c" #'org-gtd-organize))
+(setup org-edna
+  (require 'org-edna)
+  (org-edna-mode)
+  )
+
+#+end_src
 ** agenda/gtd
 https://emacs.cafe/emacs/orgmode/gtd/2017/06/30/orgmode-gtd.html
 https://dindi.garjola.net/org-agenda-weekly.html
@@ -2337,6 +2358,7 @@ https://dindi.garjola.net/org-agenda-weekly.html
            )
   )
 #+end_src
+
 ** org-super-agenda
 #+begin_src elisp
 (setup org-super-agenda

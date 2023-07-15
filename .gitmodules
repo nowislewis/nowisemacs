@@ -224,15 +224,24 @@
 [submodule "orderless"]
 	path = lib/orderless
 	url = https://github.com/oantolin/orderless.git
+[submodule "org-agenda-property"]
+	path = lib/org-agenda-property
+	url = https://github.com/Malabarba/org-agenda-property.git
 [submodule "org-appear"]
 	path = lib/org-appear
 	url = https://github.com/awth13/org-appear.git
 [submodule "org-download"]
 	path = lib/org-download
 	url = https://github.com/abo-abo/org-download.git
+[submodule "org-edna"]
+	path = lib/org-edna
+	url = https://github.com/emacs-straight/org-edna.git
 [submodule "org-elp"]
 	path = lib/org-elp
 	url = https://github.com/guanyilun/org-elp.git
+[submodule "org-gtd"]
+	path = lib/org-gtd
+	url = https://github.com/Trevoke/org-gtd.el.git
 [submodule "org-imagine"]
 	path = lib/org-imagine
 	url = https://github.com/metaescape/org-imagine.git
