@@ -1,15 +1,15 @@
 [submodule "alert"]
 	path = lib/alert
 	url = https://github.com/jwiegley/alert.git
+[submodule "annotate"]
+	path = lib/annotate
+	url = https://github.com/bastibe/annotate.el.git
 [submodule "app-launcher"]
 	path = lib/app-launcher
 	url = https://github.com/SebastienWae/app-launcher.git
 [submodule "async"]
 	path = lib/async
 	url = https://github.com/jwiegley/emacs-async.git
-[submodule "auto-sudoedit"]
-	path = lib/auto-sudoedit
-	url = https://github.com/ncaq/auto-sudoedit.git
 [submodule "avy"]
 	path = lib/avy
 	url = https://github.com/abo-abo/avy.git
@@ -118,6 +118,9 @@
 [submodule "emms"]
 	path = lib/emms
 	url = https://github.com/emacsmirror/emms.git
+[submodule "esup"]
+	path = lib/esup
+	url = https://github.com/jschaf/esup.git
 [submodule "esxml"]
 	path = lib/esxml
 	url = https://github.com/tali713/esxml.git
@@ -336,7 +339,7 @@
 	url = https://github.com/manateelazycat/sdcv.git
 [submodule "setup"]
 	path = lib/setup
-    url = https://github.com/emacsmirror/setup
+	url = https://github.com/emacsmirror/setup
 [submodule "shrface"]
 	path = lib/shrface
 	url = https://github.com/chenyanming/shrface.git

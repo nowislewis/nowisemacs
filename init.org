@@ -17,7 +17,6 @@ I failed in love with denote, so previous *org-roam* configs were refiled into [
   - [[#transient-and-related-leader-map][transient and related leader-map]]
   - [[#meow-leader-keybindings][meow leader keybindings]]
   - [[#which-key][which-key]]
-  - [[#insert-pair][insert-pair]]
   - [[#electric][electric]]
 - [[#ui][UI]]
   - [[#font][font]]
@@ -102,6 +101,7 @@ I failed in love with denote, so previous *org-roam* configs were refiled into [
   - [[#org-imagine-excalidraw][org-imagine, excalidraw]]
   - [[#shrface][shrface]]
   - [[#org-remark][org-remark]]
+  - [[#annotate][annotate]]
   - [[#clue][clue]]
   - [[#org-transclusion][org-transclusion]]
   - [[#org-gtd][org-gtd]]
@@ -131,9 +131,9 @@ I failed in love with denote, so previous *org-roam* configs were refiled into [
   - [[#gif-screencast][gif-screencast]]
   - [[#ai-related][ai related]]
   - [[#webjump][webjump]]
-  - [[#auto-sudoedit][auto-sudoedit]]
   - [[#scripts][scripts]]
   - [[#video-and-music][video and music]]
+  - [[#esup][esup]]
 - [[#use-single-file-to-load-configs][use single file to load configs]]
   - [[#provide][provide]]
   - [[#load-init-configel][load init-config.el]]
@@ -276,15 +276,9 @@ emacs
 #+begin_src elisp
 (require 'setup)
 
-(setup-define :delay
-  (lambda (&optional time)
-    `(run-with-idle-timer ,(or time 1) nil
-                          (lambda () (require ',(setup-get 'feature)))))
-  :documentation "Delay loading the feature until a certain amount of idle time has passed.")
-
 (setup-define :defer
   (lambda (features)
-    `(run-with-idle-timer 1 nil
+    `(run-with-idle-timer 2 nil
                           (lambda ()
                             ,features)))
   :documentation "Delay loading the feature until a certain amount of idle time has passed."
@@ -348,7 +342,7 @@ Enforce a sneaky Garbage Collection strategy to minimize GC interference with us
 #+name: gcmh
 #+begin_src elisp
 (setup gcmh
-  (:option gcmh-auto-idle-delay-factor 10
+  (setq gcmh-auto-idle-delay-factor 10
            gcmh-high-cons-threshold (* 16 1024 1024))
   (gcmh-mode 1))
 #+end_src
@@ -360,7 +354,7 @@ Maybe I should add a new state.
 #+begin_src elisp
 (setup meow
   (require 'meow)
-  (:option meow-use-keypad-when-execute-kbd nil
+  (setq meow-use-keypad-when-execute-kbd nil
            meow-expand-exclude-mode-list nil
            meow-use-clipboard t
            meow-cursor-type-normal '(bar . 5)
@@ -409,7 +403,7 @@ Maybe I should add a new state.
                           '("1" . meow-expand-1)
 
                           '("a" . meow-append)
-                          '("A" . meow-append-vim)
+                          ;; '("A" . meow-append-vim)
                           '("b" . meow-back-word)
                           '("B" . meow-back-symbol)
                           '("c c" . meow-change)
@@ -422,7 +416,7 @@ Maybe I should add a new state.
                           '("h" . meow-left)
                           '("H" . meow-left-expand)
                           '("i" . meow-insert)
-                          '("I" . meow-insert-vim)
+                          ;; '("I" . meow-insert-vim)
                           '("j" . meow-next)
                           '("J" . meow-next-expand)
                           '("k" . meow-prev)
@@ -465,13 +459,13 @@ Maybe I should add a new state.
 
                           '("v i" . meow-inner-of-thing)
                           '("v a" . meow-bounds-of-thing)
-                          '("v \'" . insert-quotations)
-                          '("v \"" . insert-quotes)
-                          '("v \`" . insert-backquote)
-                          '("v *" . insert-star)
-                          '("v (" . insert-parentheses)
-                          '("v [" . insert-bracket)
-                          '("v {" . insert-curly)
+                          ;; '("v \'" . insert-quotations)
+                          ;; '("v \"" . insert-quotes)
+                          ;; '("v \`" . insert-backquote)
+                          ;; '("v *" . insert-star)
+                          ;; '("v (" . insert-parentheses)
+                          ;; '("v [" . insert-bracket)
+                          ;; '("v {" . insert-curly)
                           '("v =" . insert-equation)
 
                           '("-" . negative-argument)
@@ -495,14 +489,6 @@ Maybe I should add a new state.
                           '("/" . consult-line))
   (meow-global-mode 1))
 
-(defun meow-append-vim()
-  (interactive)
-  (progn (meow-line 1)
-         (meow-append)))
-(defun meow-insert-vim()
-  (interactive)
-  (progn (meow-join 1)
-         (meow-append)))
 #+end_src
 ** transient and related leader-map
 *** transient
@@ -650,7 +636,6 @@ Maybe I should add a new state.
    ["grep"
     ("d" "grep-in-current" consult-ripgrep)
     ("D" "grep-other-dir" lewis/ripgrep-search-other-dir)
-    ("S" "grep-one-file" consult-ripgrep-one-file)
     ("g" "rg" rg)]
    ["find"
     ("f" "find-in-current" consult-find)
@@ -716,34 +701,17 @@ Maybe I should add a new state.
 
 ;; buffer
 (meow-leader-define-key
- '("b" . buffer-leader-map))
-
+ '("b" . buffer-leader-map)
 ;; lewisliu
-(meow-leader-define-key
- '("e" . lewis-leader-map))
-
+ '("e" . lewis-leader-map)
 ;; search
-(meow-leader-define-key
  '("s" . search-leader-map)
- )
 ;; apps
-(meow-leader-define-key
- '("a" . apps-leader-map))
-
-
-(defun find-config-file()
-  (interactive)
-  (find-file nowis-config-file))
-
+ '("a" . apps-leader-map)
 ;; file
-(meow-leader-define-key
- '("f" . file-leader-map))
-
+ '("f" . file-leader-map)
 ;; notes
-(meow-leader-define-key
- '("n" . notes-leader-map))
-
-(meow-leader-define-key
+ '("n" . notes-leader-map)
  ;;w workspace
  '("TAB". tabspaces-leader-map))
 #+END_SRC
@@ -751,53 +719,10 @@ Maybe I should add a new state.
 #+name: which-key
 #+begin_src elisp
 (setup which-key
-  (:option which-key-idle-delay 0.1)
+  (setq which-key-idle-delay 0.1)
+  (:defer
   (which-key-mode))
-#+end_src
-** insert-pair
-#+begin_src elisp
-;; insert pairs
-(defun insert-quotations (&optional arg)
-  "Enclose following ARG sexps in quotation marks.
-    Leave point after open-paren."
-  (interactive "*P")
-  (insert-pair arg ?\' ?\'))
-
-(defun insert-quotes (&optional arg)
-  "Enclose following ARG sexps in quotes.
-    Leave point after open-quote."
-  (interactive "*P")
-  (insert-pair arg ?\" ?\"))
-
-(defun insert-backquote (&optional arg)
-  "Enclose following ARG sexps in quotations with backquote.
-    Leave point after open-quotation."
-  (interactive "*P")
-  (insert-pair arg ?\` ?\'))
-
-(defun insert-star (&optional arg)
-  "Enclose following ARG sexps in stars.
-  Leave point after open-quotation."
-  (interactive "*P")
-  (insert-pair arg ?\* ?\*))
-
-(defun insert-bracket (&optional arg)
-  "Enclose following ARG sexps in brackets.
-  Leave point after open-quotation."
-  (interactive "*P")
-  (insert-pair arg ?\[ ?\]))
-
-(defun insert-curly (&optional arg)
-  "Enclose following ARG sexps in curly braces.
-  Leave point after open-quotation."
-  (interactive "*P")
-  (insert-pair arg ?\{ ?\}))
-
-(defun insert-equate (&optional arg)
-  "Enclose following ARG sexps in equations.
-  Leave point after open-quotation."
-  (interactive "*P")
-  (insert-pair arg ?\= ?\=))
+  )
 #+end_src
 ** electric
 #+begin_src elisp
@@ -901,8 +826,7 @@ Maybe I should add a new state.
 ** nerd-icons-completion
 #+begin_src elisp
 (setup nerd-icons-completion
-  ;; should be loaded after vertico and marginalia
-   (nerd-icons-completion-mode))
+  (:hook-into vertico-mode marginalia-mode))
 #+end_src
 ** rainbow-delimiters
 rainbow-delimiters is a "rainbow parentheses"-like mode which highlights delimiters such as parentheses, brackets or braces according to their depth.
@@ -921,16 +845,13 @@ diff-hl-mode highlights uncommitted changes on the left side of the window (area
 ** emacs-dashboard
 #+begin_src elisp
 (setup dashboard
-  (:option dashboard-items '((recents . 5)
-                             ;; (agenda . 5)
-                             (bookmarks . 5)
-                             ;; (projects . 5)
-                             )
-           dashboard-set-heading-icons t
-           dashboard-set-file-icons t
-           dashboard-center-content t
-           dashboard-startup-banner (concat nowis-config-useful-tools "banner.txt")
-           dashboard-set-init-info t)
+  (setq dashboard-items '((recents . 5)
+                          (bookmarks . 5))
+        dashboard-set-heading-icons t
+        dashboard-set-file-icons t
+        dashboard-center-content t
+        dashboard-startup-banner (concat nowis-config-useful-tools "banner.txt")
+        dashboard-set-init-info t)
   (dashboard-setup-startup-hook))
 #+end_src
 ** doom-modeline
@@ -941,7 +862,7 @@ diff-hl-mode highlights uncommitted changes on the left side of the window (area
 (setup shrink-path) ;; <-(setup s)(setup f)
 
 (setup doom-modeline
-  (:option doom-modeline-window-width-limit fill-column
+  (setq doom-modeline-window-width-limit fill-column
            doom-modeline-height 5
            doom-modeline-hud t
            ;; doom-modeline-icon nil
@@ -950,7 +871,6 @@ diff-hl-mode highlights uncommitted changes on the left side of the window (area
 #+end_src
 ** hl-todo
 #+begin_src elisp
-;; 0.48
 (setup hl-todo
   (global-hl-todo-mode))
 #+end_src
@@ -962,7 +882,7 @@ diff-hl-mode highlights uncommitted changes on the left side of the window (area
 ** show-paren-mode
 #+begin_src elisp
 (setup paren
-  (:option show-paren-context-when-offscreen 'overlay))
+  (setq show-paren-context-when-offscreen 'overlay))
 #+end_src
 ** iscroll
 #+begin_src elisp
@@ -975,12 +895,12 @@ diff-hl-mode highlights uncommitted changes on the left side of the window (area
 #+begin_src elisp
 (setup simple
   ;; show line/column/filesize in modeline
-  (:option line-number-mode t
-           column-number-mode t
-           size-indication-mode t
-           kill-do-not-save-duplicates t
-           shell-command-prompt-show-cwd t
-           what-cursor-show-names t)
+  (setq line-number-mode t
+        column-number-mode t
+        size-indication-mode t
+        kill-do-not-save-duplicates t
+        shell-command-prompt-show-cwd t
+        what-cursor-show-names t)
   ;; for now, I need a clear line mode
   ;; (global-visual-line-mode)
   )
@@ -992,8 +912,9 @@ diff-hl-mode highlights uncommitted changes on the left side of the window (area
   (save-place-mode))
 
 (setup autorevert
-  (:option global-auto-revert-non-file-buffers t)
-  (global-auto-revert-mode t))                  ; 当另一程序修改了文件时，让 Emacs 及时刷新 Buffer
+  (setq global-auto-revert-non-file-buffers t)
+  (:defer
+  (global-auto-revert-mode t)))                  ; 当另一程序修改了文件时，让 Emacs 及时刷新 Buffer
 (setup hl-line
   (global-hl-line-mode))
 (setup frame
@@ -1014,16 +935,16 @@ diff-hl-mode highlights uncommitted changes on the left side of the window (area
 (setq auto-save-default nil)
 
 (setup super-save
-  (:option super-save-auto-save-when-idle t)
+  (setq super-save-auto-save-when-idle t)
    (super-save-mode 1))
 #+end_src
 *** savehist
 #+begin_src elisp
 (setup savehist
-  (:option history-length 10000
-           history-delete-duplicates t
-           savehist-save-minibuffer-history t)
-   (savehist-mode))
+  (setq history-length 10000
+        history-delete-duplicates t
+        savehist-save-minibuffer-history t)
+  (savehist-mode))
 #+end_src
 ** no-littering
 #+begin_src lisp
@@ -1033,7 +954,7 @@ diff-hl-mode highlights uncommitted changes on the left side of the window (area
 #+begin_src elisp
 (setup recentf
   (:also-load no-littering)
-  (:option recentf-max-saved-items 1000
+  (setq recentf-max-saved-items 1000
            recentf-exclude `("/tmp/" "/ssh:" ,(concat user-emacs-directory "lib/.*-autoloads\\.el\\'")))
   (add-to-list 'recentf-exclude no-littering-var-directory)
   (add-to-list 'recentf-exclude no-littering-etc-directory)
@@ -1050,8 +971,9 @@ diff-hl-mode highlights uncommitted changes on the left side of the window (area
 解决长行卡死问题
 #+begin_src elisp
 (setup so-long
+  (:defer
    (global-so-long-mode 1)
-   )
+   ))
 #+end_src
 ** TRAMP
 #+begin_src elisp
@@ -1067,8 +989,10 @@ diff-hl-mode highlights uncommitted changes on the left side of the window (area
 #+name: exec-path-from-shell
 #+begin_src elisp
 (setup exec-path-from-shell
+  (:defer
    (when (memq window-system '(mac ns x))
      (exec-path-from-shell-initialize)))
+  )
 #+end_src
 ** Undo
 *** vundo for undo history
@@ -1084,7 +1008,7 @@ diff-hl-mode highlights uncommitted changes on the left side of the window (area
 ** isearch
 #+begin_src elisp
 (setup isearch
-  (:option isearch-lazy-count t
+  (setq isearch-lazy-count t
            ;; lazy-highlight-cleanup nil
            )
   (:bind [remap isearch-delete-char] isearch-del-char))
@@ -1094,7 +1018,7 @@ diff-hl-mode highlights uncommitted changes on the left side of the window (area
 #+name: consult
 #+begin_src elisp
 (setup consult
-  (:option register-preview-delay 0.1
+  (setq register-preview-delay 0.1
            register-preview-function #'consult-register-format
            xref-show-xrefs-function #'consult-xref
            xref-show-definitions-function #'consult-xref
@@ -1103,33 +1027,6 @@ diff-hl-mode highlights uncommitted changes on the left side of the window (area
                                              (car (project-roots project)))))
   (:with-map minibuffer-local-map
     (:bind "C-r" consult-history)))
-#+end_src
-*** consult-ripgrep-one-file
-#+begin_src elisp
-(defcustom my-consult-ripgrep-or-line-limit 1000
-  "Buffer size threshold for `my-consult-ripgrep-or-line'.
-When the number of characters in a buffer exceeds this threshold,
-`consult-ripgrep' will be used instead of `consult-line'."
-  :type 'integer)
-
-(defun consult-ripgrep-one-file ()
-  "Call `consult-ripgrep' for the current buffer (a single file)."
-  (interactive)
-  (let ((consult-project-root-function (lambda nil nil))
-        (consult-ripgrep-args
-         (concat "rg "
-                 "--null "
-                 "--line-buffered "
-                 "--color=never "
-                 "--line-number "
-                 "--smart-case "
-                 "--no-heading "
-                 "--max-columns=1000 "
-                 "--max-columns-preview "
-                 "--search-zip "
-                 "--with-filename "
-                 (shell-quote-argument buffer-file-name))))
-    (consult-ripgrep)))
 #+end_src
 *** search other cwd
 #+begin_src elisp
@@ -1146,7 +1043,7 @@ When the number of characters in a buffer exceeds this threshold,
 *** consult-dash
 #+begin_src elisp :tangle no
 (setup dash-docs
-  (:option dash-docs-docsets-path (concat no-littering-var-directory "dash-docsets")
+  (setq dash-docs-docsets-path (concat no-littering-var-directory "dash-docsets")
            dash-docs-common-docsets '("C++")))
 (setup consult-dash)
 #+end_src
@@ -1157,15 +1054,15 @@ When the number of characters in a buffer exceeds this threshold,
 ** blink-search
 #+begin_src elisp
 (setup blink-search
-  ;; (:option blink-search-enable-posframe t)
+  ;; (setq blink-search-enable-posframe t)
   (add-to-list 'meow-mode-state-list '(blink-search-mode . insert)))
 #+end_src
 * 补全
 ** Completions with Vertico
 #+name: vertico
 #+begin_src elisp
+(setq vertico-cycle t)
 (setup vertico
-  (:option vertico-cycle t)
   (:with-map vertico-map
     (:bind [backspace] vertico-directory-delete-char))
   (vertico-mode)
@@ -1175,7 +1072,7 @@ When the number of characters in a buffer exceeds this threshold,
 #+name: orderless
 #+begin_src elisp
 (setup orderless
-  (:option completion-styles '(orderless)
+  (setq completion-styles '(orderless)
            completion-category-defaults nil
            completion-category-overrides '((file (styles . (partial-completion)))))
   (:when-loaded
@@ -1188,12 +1085,12 @@ When the number of characters in a buffer exceeds this threshold,
 ** Marginalia
 #+begin_src elisp
 (setup marginalia
-  (:option marginalia-annotators '(marginalia-annotators-heavy
+  (setq marginalia-annotators '(marginalia-annotators-heavy
                                    marginalia-annotators-light
                                    nil))
-  (:when-loaded
-    (cl-pushnew 'epkg-marginalia-annotate-package
-                (alist-get 'package marginalia-annotator-registry)))
+  ;; (:when-loaded
+  ;;   (cl-pushnew 'epkg-marginalia-annotate-package
+  ;;               (alist-get 'package marginalia-annotator-registry)))
   (:hook-into after-init))
 #+end_src
 ** embark
@@ -1213,14 +1110,14 @@ should be check after reading the embark.el manual
 ** yasnippet
 #+begin_src elisp
 (setup yasnippet
-  (:option yas-snippet-dirs (list (concat nowis-config-useful-tools "snippets")))
+  (setq yas-snippet-dirs (list (concat nowis-config-useful-tools "snippets")))
   (yas-global-mode)
   )
 #+end_src
 ** tempel
 #+begin_src elisp
 (setup tempel
-  (:option tempel-path "~/.emacs.d/useful-tools/tempel-snippets"
+  (setq tempel-path "~/.emacs.d/useful-tools/tempel-snippets"
            tempel-trigger-prefix "<")
   (:global "M-*" tempel-insert
            "M-+"  tempel-complete)
@@ -1240,13 +1137,15 @@ should be check after reading the embark.el manual
 #+name: winner-mode
 #+begin_src elisp
 (setup winner
+  (:defer
   (winner-mode t))
+  )
 #+end_src
 ** popper
 Popper is a minor-mode to tame the flood of ephemeral windows Emacs produces, while still keeping them within arm’s reach.
 #+begin_src elisp
 (setup popper
-  (:option popper-reference-buffers '("\\*Messages\\*"
+  (setq popper-reference-buffers '("\\*Messages\\*"
                                       "Output\\*$"
                                       "\\*Async Shell Command\\*"
                                       "Go-Translate"
@@ -1335,7 +1234,7 @@ borrowed from citre, now you can always jump-back use "M-," after any jump in th
 ;;     (pyim-sogou-scel-dict-enable)))
 (setup xr)
 (setup pyim
-  (:option pyim-cloudim 'baidu
+  (setq pyim-cloudim 'baidu
            pyim-punctuation-translate-p '(no yes auto)
            pyim-page-tooltip 'posframe
            pyim-page-length 5
@@ -1378,7 +1277,7 @@ borrowed from citre, now you can always jump-back use "M-," after any jump in th
 #+begin_src elisp
 (setup rime
   (setq default-input-method "rime")
-  (:option rime-disable-predicates '(meow-normal-mode-p
+  (setq rime-disable-predicates '(meow-normal-mode-p
                                      meow-motion-mode-p
                                      meow-keypad-mode-p
                                      rime-predicate-prog-in-code-p
@@ -1408,7 +1307,7 @@ borrowed from citre, now you can always jump-back use "M-," after any jump in th
 *** dired
 #+begin_src elisp
 (setup dired
-  (:option dired-dwim-target t)
+  (setq dired-dwim-target t)
   (:hook dired-hide-details-mode
          ;; dired-omit-mode
          ))
@@ -1423,7 +1322,7 @@ Dirvish is a minimalistic file manager based on Dired. It's fast
 #+begin_src elisp
 (setup dirvish
   ;; wait for dirvish merge nerd-icons
-  (:option dirvish-attributes '(subtree-state nerd-icons)
+  (setq dirvish-attributes '(subtree-state nerd-icons)
            dirvish-side-width 40)
   (:bind "TAB" dirvish-toggle-subtree)
    (dirvish-override-dired-mode)
@@ -1439,7 +1338,7 @@ Dirvish is a minimalistic file manager based on Dired. It's fast
 #+begin_src elisp
 (setup imenu-list
   (:autoload himenu-list-smart-toggle)
-  (:option imenu-list-focus-after-activation t
+  (setq imenu-list-focus-after-activation t
            imenu-list-auto-resize t
            imenu-list-position 'left
            imenu-list-auto-update nil
@@ -1449,7 +1348,7 @@ Dirvish is a minimalistic file manager based on Dired. It's fast
 #+name: tab-bar
 #+begin_src elisp
 (setup tab-bar
-  (:option tab-bar-new-button-show nil
+  (setq tab-bar-new-button-show nil
            tab-bar-close-button-show nil)
   (:when-loaded
     (defun tab-bar-select-tab-1st()
@@ -1476,7 +1375,7 @@ Dirvish is a minimalistic file manager based on Dired. It's fast
     )
   )
 (setup tab-line
-  (:option tab-line-new-button-show nil
+  (setq tab-line-new-button-show nil
            tab-line-close-button-show nil)
   ;; (:defer (global-tab-line-mode))
   )
@@ -1485,7 +1384,7 @@ Dirvish is a minimalistic file manager based on Dired. It's fast
 #+name: tabspaces
 #+begin_src elisp
 (setup tabspaces
-  (:option tabspaces-use-filtered-buffers-as-default t
+  (setq tabspaces-use-filtered-buffers-as-default t
            tabspaces-keymap-prefix nil)
   (tabspaces-mode)
   (:when-loaded
@@ -1532,7 +1431,7 @@ Dirvish is a minimalistic file manager based on Dired. It's fast
 ** project-rootfile
 #+begin_src elisp
 (setup project-rootfile
-  (:option project-rootfile-list '(".project"))
+  (setq project-rootfile-list '(".project"))
   )
 #+end_src
 * shell
@@ -1550,7 +1449,7 @@ Dirvish is a minimalistic file manager based on Dired. It's fast
 ** vterm-toggle
 #+begin_src elisp
 (setup vterm-toggle
-  (:option vterm-toggle-hide-method 'reset-window-configration)
+  (setq vterm-toggle-hide-method 'reset-window-configration)
   (:global "C-`" vterm-toggle)
   (:when-loaded
     (setq vterm-toggle-fullscreen-p nil)
@@ -1589,7 +1488,7 @@ Dirvish is a minimalistic file manager based on Dired. It's fast
 ** ediff
 #+begin_src elisp
 (setup ediff
-  (:option ediff-split-window-function 'split-window-horizontally
+  (setq ediff-split-window-function 'split-window-horizontally
            ediff-window-setup-function 'ediff-setup-windows-plain)
   ;; restore windows Configuration after ediff
   (add-hook 'ediff-before-setup-hook #'ediff-save-window-conf)
@@ -1629,13 +1528,13 @@ Dirvish is a minimalistic file manager based on Dired. It's fast
 #+begin_src elisp
 (setup graphviz-dot-mode
   (:file-match "\\.dot\\'")
-  (:option graphviz-dot-indent-width 4)
+  (setq graphviz-dot-indent-width 4)
   )
 #+end_src
 *** plantuml-mode
 #+begin_src elisp
 (setup plantuml-mode
-  (:option plantuml-jar-path (concat no-littering-var-directory "plantuml.jar")))
+  (setq plantuml-jar-path (concat no-littering-var-directory "plantuml.jar")))
 #+end_src
 *** beancount
 Emacs major-mode to work with Beancount ledger files
@@ -1654,7 +1553,7 @@ Emacs major-mode to work with Beancount ledger files
 **** org-elp
 #+begin_src elisp
 (setup org-elp
-  (:option org-elp-idle-time 1))
+  (setq org-elp-idle-time 1))
 #+end_src
 *** python
 **** python
@@ -1680,15 +1579,15 @@ Emacs major-mode to work with Beancount ledger files
 *** common lisp slime
 #+begin_src elisp
 (setup slime
-  (:option inferior-lisp-program "sbcl"))
+  (setq inferior-lisp-program "sbcl"))
 #+end_src
 *** cc-mode
 #+begin_src emacs-lisp
 (setup cc-mode
-  (:option c-basic-offset 4))
+  (setq c-basic-offset 4))
 
 (setup hideif
-  (:option hide-ifdef-shadow t
+  (setq hide-ifdef-shadow t
            hide-ifdef-initially t)
   (:with-feature hide-ifdef-mode
     (:hook-into c-mode c++-mode)))
@@ -1717,12 +1616,12 @@ Emacs major-mode to work with Beancount ledger files
 **** treesit
 #+begin_src elisp
 (setup treesit
-  (:option treesit-font-lock-level 4))
+  (setq treesit-font-lock-level 4))
 #+end_src
 **** treesit-auto
 #+begin_src elisp
 (setup treesit-auto
-  (:option treesit-auto-install 'prompt))
+  (setq treesit-auto-install 'prompt))
 #+end_src
 *** Complete
 **** lsp mode
@@ -1730,20 +1629,20 @@ Emacs major-mode to work with Beancount ledger files
 #+begin_src elisp
 (setup project)
 (setup xref
-  (:option xref-search-program #'ripgrep)
+  (setq xref-search-program #'ripgrep)
   (:autoload xref-push-marker-stack)) ;; autoload this command for jump-back
 
 
 (setq read-process-output-max (* 1024 1024))
 (setup eglot
-  (:option eglot-events-buffer-size 0
+  (setq eglot-events-buffer-size 0
            eglot-workspace-configuration '((:python.analysis :useLibraryCodeForTypes t)))
   (:autoload eglot-find-implementation)
   (:when-loaded
     (set-face-attribute 'eglot-highlight-symbol-face nil :background "#227700")
     ))
 (setup eldoc
-  (:option eldoc-echo-area-use-multiline-p t
+  (setq eldoc-echo-area-use-multiline-p t
            eldoc-echo-area-display-truncation-message t))
 ;; (setq eldoc-echo-area-prefer-doc-buffer nil)
 #+end_src
@@ -1758,7 +1657,7 @@ Emacs major-mode to work with Beancount ledger files
 #+begin_src elisp
 (defvar use-pypy3 nil)
 (setup lsp-bridge
-  (:option lsp-bridge-enable-org-babel t
+  (setq lsp-bridge-enable-org-babel t
            lsp-bridge-python-lsp-server "pylsp"
            lsp-bridge-enable-completion-in-minibuffer t
            lsp-bridge-enable-hover-diagnostic t
@@ -1769,17 +1668,20 @@ Emacs major-mode to work with Beancount ledger files
            )
   (if use-pypy3
       (setq lsp-bridge-python-command "pypy3"))
-  (global-lsp-bridge-mode))
+  (:defer
+  (global-lsp-bridge-mode)))
 #+end_src
 **** citre
 Citre is an advanced Ctags (or actually, readtags) frontend for Emacs.
 #+begin_src elisp
 (setup citre
-  (require 'citre-config)
-  (:option citre-use-project-root-when-creating-tags t
-           citre-prompt-language-for-ctags-command t
-           ;; citre-auto-enable-citre-mode-modes '(prog-mode)
-           )
+  (add-hook 'prog-mode (lambda()
+                         (require 'citre-config)
+                         ))
+  (setq citre-use-project-root-when-creating-tags t
+        citre-prompt-language-for-ctags-command t
+        ;; citre-auto-enable-citre-mode-modes '(prog-mode)
+        )
   )
 #+end_src
 *** quickrun
@@ -1791,7 +1693,7 @@ Citre is an advanced Ctags (or actually, readtags) frontend for Emacs.
 eglot client leveraging LTEX Language Server.
 #+begin_src elisp
 (setup eglot-ltex
-  (:option eglot-languagetool-server-path "~/Downloads/ltex-ls/")
+  (setq eglot-languagetool-server-path "~/Downloads/ltex-ls/")
   (:with-hook org-mode-hook
     (:hook (lambda ()
              (require 'eglot-ltex)))))
@@ -1835,7 +1737,7 @@ eglot client leveraging LTEX Language Server.
 Disassemble C, C++ or Fortran code under cursor
 #+begin_src elisp
 (setup disaster
-  (:option disaster-assembly-mode 'nasm-mode
+  (setq disaster-assembly-mode 'nasm-mode
            disaster-objdump "objdump -d -M att -Sl --no-show-raw-insn"))
 #+end_src
 *** jupyter
@@ -1852,7 +1754,7 @@ Disassemble C, C++ or Fortran code under cursor
 #+begin_src elisp
 (setup org
   (setq org-directory (concat nowis-doc-emacs-dir "01-orgmode/"))
-  (:option org-adapt-indentation nil
+  (setq org-adapt-indentation nil
            org-startup-indented t
            org-edit-src-content-indentation 0
            org-hide-emphasis-markers t
@@ -1963,7 +1865,7 @@ Disassemble C, C++ or Fortran code under cursor
 ** org-modern
 #+begin_src elisp
 (setup org-modern
-  (:option
+  (setq
    org-modern-star '("Ⓐ" "Ⓑ" "Ⓒ" "Ⓓ" "Ⓔ" "Ⓕ" "Ⓖ" "Ⓗ" "Ⓘ" "Ⓙ" "Ⓚ" "Ⓛ" "Ⓜ")
    org-modern-table nil)
   (:hook-into org-mode)
@@ -1984,7 +1886,7 @@ Disassemble C, C++ or Fortran code under cursor
 #+begin_src elisp
 (setup async)
 (setup org-download
-  (:option org-download-method 'directory
+  (setq org-download-method 'directory
            org-download-screenshot-basename "screenshot.jpg"
            org-download-image-dir (concat nowis-doc-emacs-dir "02-binary-files/01-pictures/org_download_images")
            org-download-abbreviate-filename-function 'expand-file-name)
@@ -2008,12 +1910,12 @@ Disassemble C, C++ or Fortran code under cursor
 #+begin_src elisp
 (setup alert)
 (setup org-pomodoro
-  (:option org-pomodoro-finished-sound (concat nowis-doc-emacs-dir "02-binary-files/applaud.wav")))
+  (setq org-pomodoro-finished-sound (concat nowis-doc-emacs-dir "02-binary-files/applaud.wav")))
 #+end_src
 ** org-noter
 #+begin_src elisp
 (setup org-noter
-  (:option org-noter-notes-search-path (concat nowis-doc-emacs-dir "02-binary-files/02-searchable/01-papers-markable/")
+  (setq org-noter-notes-search-path (concat nowis-doc-emacs-dir "02-binary-files/02-searchable/01-papers-markable/")
            org-noter-auto-save-last-location t
            org-noter-separate-notes-from-heading nil
            org-noter-hide-other nil
@@ -2035,7 +1937,7 @@ Disassemble C, C++ or Fortran code under cursor
 *** bibtex
 #+begin_src elisp
 (setup bibtex
-  (:option bibtex-autokey-year-length 4
+  (setq bibtex-autokey-year-length 4
            bibtex-autokey-titleword-separator "_"
            bibtex-autokey-name-year-separator "_"
            bibtex-autokey-year-title-separator "_"
@@ -2077,7 +1979,7 @@ Disassemble C, C++ or Fortran code under cursor
 (setup parsebib)
 ;; (setup citeproc) ;;<- (setup queue) (setup string-inflection)
 (setup citar
-  (:option org-cite-global-bibliography (do.refs/get-db-file-list)
+  (setq org-cite-global-bibliography (do.refs/get-db-file-list)
            org-cite-insert-processor 'citar
            org-cite-follow-processor 'citar
            org-cite-activate-processor 'citar
@@ -2087,13 +1989,15 @@ Disassemble C, C++ or Fortran code under cursor
 *** citar-denote
 #+begin_src elisp
 (setup citar-denote
-  (:option citar-denote-title-format "title")
+  (setq citar-denote-title-format "title")
+  (:defer
   (citar-denote-mode))
+  )
 #+end_src
 *** ebib
 #+begin_src elisp
 (setup ebib
-  (:option ebib-preload-bib-files org-cite-global-bibliography
+  (setq ebib-preload-bib-files org-cite-global-bibliography
            ebib-file-search-dirs (list nowis-bib-pdf-dir)
            ebib-bib-search-dirs (list nowis-bib-dir)
            ebib-default-directory 'first-bib-dir
@@ -2143,7 +2047,7 @@ ln -s ~/Downloads/translators_CN/translators ~/Downloads/zotra-cli/module/transl
 ** denote
 #+begin_src elisp
 (setup denote
-  (:option denote-directory (expand-file-name (concat nowis-doc-emacs-dir "01-orgmode/xnotes"))
+  (setq denote-directory (expand-file-name (concat nowis-doc-emacs-dir "01-orgmode/xnotes"))
            denote-dired-directories (ffap-all-subdirs denote-directory)
            denote-date-prompt-use-org-read-date t
            denote-modules '(project))
@@ -2277,10 +2181,14 @@ Highlight and annotate any text file with using Org mode.
     (concat (concat nowis-doc-emacs-dir "01-orgmode/org-remark/")
             (file-name-base (org-remark-notes-file-name-function))
             ".org"))
-  (:option org-remark-notes-file-name #'my/function)
+  (setq org-remark-notes-file-name #'my/function)
   (:when-loaded
     (org-remark-global-tracking-mode +1)
     ))
+#+end_src
+** annotate
+#+begin_src elisp
+(setup annotate)
 #+end_src
 ** clue
 Connecting clues while reading code.
@@ -2296,20 +2204,17 @@ Connecting clues while reading code.
 (setup org-agenda-property
   (require 'org-agenda-property)
   )
-  (setq org-gtd-update-ack "3.0.0")
-  (require 'org-gtd)
+(setq org-gtd-update-ack "3.0.0")
+(require 'org-gtd)
+  (setq org-edna-use-inheritance t
+        org-gtd-organize-hooks '(org-gtd-set-area-of-focus org-set-tags-command))
 (setup org-gtd
-  (:option
-           org-edna-use-inheritance t)
-    org-gtd-organize-hooks '(org-gtd-set-area-of-focus org-set-tags-command)
-
   (org-gtd-mode)
   (:global "C-c c" #'org-gtd-organize))
 (setup org-edna
   (require 'org-edna)
   (org-edna-mode)
   )
-
 #+end_src
 ** agenda/gtd
 https://emacs.cafe/emacs/orgmode/gtd/2017/06/30/orgmode-gtd.html
@@ -2319,7 +2224,7 @@ https://dindi.garjola.net/org-agenda-weekly.html
 (defvar nowis-gtd-org (concat nowis-gtd-dir "/20230411T002424--action.org"))
 (defvar nowis-someday-org (concat nowis-gtd-dir "/20230310T005150--someday.org"))
 (setup org
-  (:option org-agenda-files (list nowis-index-org
+  (setq org-agenda-files (list nowis-index-org
                                   nowis-gtd-org
                                   ;; (concat nowis-gtd-dir "/20230411T002918--index.org_archive")
                                   ;; (concat nowis-gtd-dir "/20230411T002424--action.org_archive")
@@ -2341,15 +2246,15 @@ https://dindi.garjola.net/org-agenda-weekly.html
                                           ))
            ))
 (setup org-refile
-  (:option org-refile-targets (list (cons nowis-gtd-org '(:maxlevel . 1))
+  (setq org-refile-targets (list (cons nowis-gtd-org '(:maxlevel . 1))
                                     (cons nowis-someday-org '(:level . 1)))))
 (setup org-capture
-  (:option org-capture-templates '(("t" "Todo [inbox]" entry
+  (setq org-capture-templates '(("t" "Todo [inbox]" entry
                                     (file+headline nowis-index-org "Tasks")
                                     "* TODO %i%?"))))
 
 (setup org-agenda
-  (:option org-agenda-span 'day
+  (setq org-agenda-span 'day
            org-agenda-skip-scheduled-if-done t
            org-agenda-skip-deadline-if-done t
            org-agenda-block-separator nil
@@ -2421,7 +2326,7 @@ https://dindi.garjola.net/org-agenda-weekly.html
 ** xeft
 #+begin_src elisp
 (setup xeft
-  (:option xeft-default-extension "org"
+  (setq xeft-default-extension "org"
            xeft-directory org-directory
            xeft-database (concat no-littering-var-directory "xeft-db")
            xeft-recursive t
@@ -2441,7 +2346,7 @@ Aggregating a table is creating a new table by computing sums, averages, and so 
 ** go-translate
 #+begin_src elisp
 (setup go-translate
-  (:option gts-translate-list '(("en" "zh")))
+  (setq gts-translate-list '(("en" "zh")))
   (:global "M-L" gts-do-translate)
 
   (:when-loaded
@@ -2449,24 +2354,14 @@ Aggregating a table is creating a new table by computing sums, averages, and so 
                                   :picker (gts-prompt-picker)
                                   ;; :engines (list (gts-google-rpc-engine))
                                   :engines (list (gts-bing-engine))
-                                  :render (gts-buffer-render))))
-  (defun my-gts-translate-posframe ()
-    (interactive)
-    (if (not (featurep 'go-translate))
-        (require 'go-translate))
-    (defvar my-translator-posframe
-      (gts-translator
-       :picker (gts-noprompt-picker)
-       :engines (gts-google-engine)
-       :render (gts-posframe-pop-render)))
-    (gts-translate my-translator-posframe)))
+                                  :render (gts-buffer-render)))))
 #+end_src
 ** dictionary-overlay
 #+begin_src elisp :tangle no
 (setup websocket)
 (setup websocket-bridge)
 (setup dictionary-overlay
-  (:option dictionary-overlay-sdcv-dictionary-path (concat nowis-doc-emacs-dir "02-binary-files/03-stardicts/"))
+  (setq dictionary-overlay-sdcv-dictionary-path (concat nowis-doc-emacs-dir "02-binary-files/03-stardicts/"))
   (:autoload dictionary-overlay-toggle)
   (:when-loaded
     (copy-face 'font-lock-keyword-face 'dictionary-overlay-unknownword)
@@ -2481,7 +2376,7 @@ mkdir ~/.stardict
 
 #+begin_src elisp
 (setup sdcv
-  (:option sdcv-dictionary-data-dir (expand-file-name (concat nowis-doc-emacs-dir "02-binary-files/03-stardicts"))
+  (setq sdcv-dictionary-data-dir (expand-file-name (concat nowis-doc-emacs-dir "02-binary-files/03-stardicts"))
            sdcv-dictionary-simple-list (list "简明英汉字典增强版")
            sdcv-dictionary-complete-list (list "简明英汉字典增强版")
            )
@@ -2505,7 +2400,7 @@ mkdir ~/.stardict
 #+begin_src elisp
 (setup tablist)
 (setup pdf-tools
-  (:option pdf-view-use-scaling t
+  (setq pdf-view-use-scaling t
            pdf-annot-list-format '((page . 3)
                                    (type . 10)
                                    (contents . 56)
@@ -2533,12 +2428,12 @@ mkdir ~/.stardict
 ** elfeed
 #+begin_src elisp
 (setup elfeed
-  (:option elfeed-show-entry-switch 'display-buffer))
+  (setq elfeed-show-entry-switch 'display-buffer))
 #+end_src
 ** efleed-org
 #+begin_src elisp
 (setup elfeed-org
-  (:option rmh-elfeed-org-files (list (concat nowis-config-useful-tools "elfeed.org"))))
+  (setq rmh-elfeed-org-files (list (concat nowis-config-useful-tools "elfeed.org"))))
 (defun my-elfeed()
   (interactive)
   (unless (featurep 'elfeed-org)
@@ -2593,7 +2488,7 @@ Simple distraction-free editing. I use darkroom instead of writeroom because it'
 #+begin_src elisp
 (setup eaf
   (add-to-list 'load-path "~/.emacs.d/lib/eaf")
-  (:option eaf-browser-enable-autofill t
+  (setq eaf-browser-enable-autofill t
            eaf-webengine-font-family lewis-variable-font
            eaf-webengine-serif-font-family lewis-variable-font
            eaf-webengine-fixed-font-family lewis-fixed-font
@@ -2614,7 +2509,7 @@ Simple distraction-free editing. I use darkroom instead of writeroom because it'
   (:autoload eaf-open-browser)
   )
 (setup eaf-pdf-viewer
-  (:option eaf-pdf-scroll-ratio 0.1)
+  (setq eaf-pdf-scroll-ratio 0.1)
   (:autoload eaf-open-pdf-from-history))
 (setup eaf-rss-reader
   (:autoload eaf-open-rss-reader))
@@ -2624,7 +2519,7 @@ Simple distraction-free editing. I use darkroom instead of writeroom because it'
 (setup eaf-markmap)
 
 (setup eaf-interleave
-  (:option eaf-interleave-org-notes-dir-list (list (concat nowis-doc-emacs-dir "01-orgmode/") ".")
+  (setq eaf-interleave-org-notes-dir-list (list (concat nowis-doc-emacs-dir "01-orgmode/") ".")
            eaf-interleave-disable-narrowing t
            eaf-interleave-split-lines 20
            eaf-find-alternate-file-in-dired t
@@ -2653,7 +2548,7 @@ Simple distraction-free editing. I use darkroom instead of writeroom because it'
              gif-screencast-toggle-pause)
   (:if-system 'darwin)
   (:when-loaded
-    (:option gif-screencast-args '("-x") ;; To shut up the shutter sound of `screencapture' (see `gif-screencast-command').
+    (setq gif-screencast-args '("-x") ;; To shut up the shutter sound of `screencapture' (see `gif-screencast-command').
              gif-screencast-cropping-program "mogrify" ;; Optional: Used to crop the capture to the Emacs frame.
              gif-screencast-capture-format "ppm" ;; Optional: Required to crop captured images.
              gif-screencast-scale-factor 2.0))
@@ -2669,13 +2564,13 @@ Simple distraction-free editing. I use darkroom instead of writeroom because it'
 *** gptel
 #+begin_src elisp
 (setup gptel
-  (:option gptel-default-mode 'org-mode)
+  (setq gptel-default-mode 'org-mode)
   (:global "M-p" gptel-menu))
 #+end_src
 *** whisper.el
 #+begin_src elisp
 (setup whisper
-  (:option whisper-install-directory (concat no-littering-var-directory "whisper")
+  (setq whisper-install-directory (concat no-littering-var-directory "whisper")
            whisper-language "zh"
            whisper-model "medium"
            whisper-use-threads 8))
@@ -2683,7 +2578,7 @@ Simple distraction-free editing. I use darkroom instead of writeroom because it'
 ** webjump
 #+begin_src elisp
 (setup webjump
-  (:option webjump-sites '(
+  (setq webjump-sites '(
                            ;; Emacs.
                            ("Emacs Home Page" .
                             "www.gnu.org/software/emacs/emacs.html")
@@ -2702,11 +2597,7 @@ Simple distraction-free editing. I use darkroom instead of writeroom because it'
                                           "aur.archlinux.org/packages?O=0&K=" ""])
                            )))
 #+end_src
-** auto-sudoedit
-#+begin_src elisp
-(setup auto-sudoedit
-  (auto-sudoedit-mode 1))
-#+end_src
+
 ** scripts
 *** backup scripts
 #+begin_src elisp
@@ -2745,6 +2636,10 @@ rsync -avihu lewis-nas@192.168.31.108:/share/my_webdav/rsync/tmp/ \
 ;; (emms-standard)
 ;; (emms-default-players)
 (setq emms-source-file-default-directory "~/Documents/video_music/")
+#+end_src
+** esup
+#+begin_src elisp
+(setup esup)
 #+end_src
 * use single file to load configs
 this can avoid errors of native compilation of init.el
