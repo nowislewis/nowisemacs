@@ -245,9 +245,6 @@
 [submodule "org-gtd"]
 	path = lib/org-gtd
 	url = https://github.com/Trevoke/org-gtd.el.git
-[submodule "org-imagine"]
-	path = lib/org-imagine
-	url = https://github.com/metaescape/org-imagine.git
 [submodule "org-modern"]
 	path = lib/org-modern
 	url = https://github.com/minad/org-modern.git
@@ -271,9 +268,6 @@
 	path = lib/org-ql
 	url = https://github.com/alphapapa/org-ql.git
     no-byte-compile = helm-org-ql.el
-[submodule "org-remark"]
-	path = lib/org-remark
-	url = https://github.com/nobiot/org-remark
 [submodule "org-super-agenda"]
 	path = lib/org-super-agenda
 	url = https://github.com/alphapapa/org-super-agenda.git

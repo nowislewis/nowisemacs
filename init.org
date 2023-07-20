@@ -113,7 +113,6 @@ I failed in love with denote, so previous *org-roam* configs were refiled into [
   - [[#orgtbl-aggregate][orgtbl-aggregate]]
 - [[#english-翻译][english 翻译]]
   - [[#go-translate][go-translate]]
-  - [[#dictionary-overlay][dictionary-overlay]]
   - [[#sdcv][sdcv]]
 - [[#阅读][阅读]]
   - [[#pdf-tools][pdf-tools]]
@@ -1613,6 +1612,7 @@ Emacs major-mode to work with Beancount ledger files
   (:with-feature breadcrumb-local-mode
     (:hook-into text-mode-hook prop-mode-hook)))
 #+end_src
+*** treesit tools
 **** treesit
 #+begin_src elisp
 (setup treesit
@@ -1621,6 +1621,8 @@ Emacs major-mode to work with Beancount ledger files
 **** treesit-auto
 #+begin_src elisp
 (setup treesit-auto
+  (:autoload treesit-auto-mode)
+  (:hook-into prog-mode)
   (setq treesit-auto-install 'prompt))
 #+end_src
 *** Complete
@@ -1698,14 +1700,18 @@ eglot client leveraging LTEX Language Server.
     (:hook (lambda ()
              (require 'eglot-ltex)))))
 #+end_src
-*** Code toggle with hideshow
+*** Code toggle with hideshow, hideif
 #+begin_src elisp
 (setup hideshow
   (:with-hook prog-mode-hook
     (:hook hs-minor-mode))
   (add-to-list 'hs-special-modes-alist '(verilog-mode "\\(\\<begin\\>\\|\\<case\\>\\|\\<module\\>\\|\\<class\\>\\|\\<function\\>\\|\\<task\\>\\)"
-                                                      "\\(\\<end\\>\\|\\<endcase\\>\\|\\<endmodule\\>\\|\\<endclass\\>\\|\\<endfunction\\>\\|\\<endtask\\>\\)" nil verilog-forward-sexp-function))
-  )
+                                                      )))
+(setup hideif
+  (add-hook 'c-mode-common-hook
+            (lambda ()
+              (hide-ifdef-mode)
+              (add-hook 'after-save-hook (lambda () (hide-ifdefs))))))
 #+end_src
 *** format-all
 #+begin_src elisp
@@ -1946,33 +1952,12 @@ Disassemble C, C++ or Fortran code under cursor
            bibtex-autokey-titleword-ignore ;; I took "On" out of this
            '("A" "An" "The" "Eine?" "Der" "Die" "Das")))
 
-(defvar do.refs/pdf-dir nil
-  "The path to the directory containing the PDF files. The file
-  for the entry with key <key> is stored as <key>.pdf.")
-
-(defvar do.refs/notes-dir nil
-  "The path to the directory containing my notes for the
-  references. The note for the item with key <key> is stored in
-  this folder as <key>.org")
-
-(defvar do.refs/pdf-download-dir nil
-  "The path to the temporary directory to which we download PDF
-  files.")
 
 (defun do.refs/get-db-file-list ()
   "Get the list of all the bib files containing my bib database."
   (if (file-exists-p nowis-bib-dir)
       (directory-files nowis-bib-dir t "\\.bib\\'")
     nil))
-
-(defun do.refs/update-db-file-list ()
-  "Update the list of bib files."
-  (interactive)
-  (let ((db-list (do.refs/get-db-file-list)))
-    (setq reftex-default-bibliography db-list)
-    (setq bibtex-completion-bibliography db-list)
-    (setq ebib-preload-bib-files db-list)))
-
 #+end_src
 *** citar
 #+begin_src elisp
@@ -2063,34 +2048,6 @@ ln -s ~/Downloads/translators_CN/translators ~/Downloads/zotra-cli/module/transl
     (let ((denote-prompts '(subdirectory title keywords)))
       (call-interactively #'denote-open-or-create)))
   )
-(defun denote-link-or-create-with-subdirectory ()
-  "Invoke `denote-link-or-create' but also prompt for subdirectory.
-This is the equivalent to calling `denote-link-or-create' when
-`denote-prompts' is set to \\='(subdirectory title keywords)."
-  (declare (interactive-only t))
-  (interactive)
-  (let ((denote-prompts '(subdirectory title keywords)))
-    (call-interactively #'denote-link-or-create)))
-
-(defun denote-rename-file-using-dired()
-  (interactive nil dired-mode)
-  (if-let ((marks (dired-get-marked-files)))
-      (progn
-        (dolist (file marks)
-          (let* ((dir (file-name-directory file))
-                 (id (denote-retrieve-or-create-file-identifier file))
-                 (file-type (denote-filetype-heuristics file))
-                 (title (denote-retrieve-filename-title file))
-                 (keywords (denote-retrieve-keywords-value file 'org))
-                 (extension (file-name-extension file t))
-                 (new-name (denote-format-file-name
-                            dir id keywords (denote-sluggify title) extension)))
-            (denote-rename-file-and-buffer file new-name)
-            (denote-update-dired-buffers)
-            (when (denote-file-is-writable-and-supported-p new-name)
-              (if (denote--edit-front-matter-p new-name file-type)
-                  (denote--rewrite-front-matter new-name title keywords file-type)
-                (denote--add-front-matter new-name title keywords id file-type))))))))
 #+end_src
 ** denote-lumn
 Borrowed from https://github.com/protesilaos/denote/issues/115
@@ -2114,10 +2071,6 @@ Borrowed from https://github.com/protesilaos/denote/issues/115
   (dired (concat nowis-doc-emacs-dir "01-orgmode")
          (project-find-file t)))
 
-(defun project-find-xnotes-dir-files ()
-  (interactive)
-  (dired (concat nowis-doc-emacs-dir "01-orgmode/xnotes"))
-  (project-find-file t))
 (defun project-find-papers-dir-files ()
   (interactive)
   (dired (concat nowis-doc-emacs-dir "02-binary-files/02-searchable/01-papers-markable"))
@@ -2156,7 +2109,8 @@ Borrowed from https://github.com/protesilaos/denote/issues/115
          (link (format "[[file:%s]]" path)))
     (insert link)
     (with-temp-file path (insert org-excalidraw--default-base))))
-(setup org-imagine)
+
+;; (setup org-imagine)
 #+end_src
 ** shrface
 #+begin_src elisp
@@ -2175,7 +2129,7 @@ Borrowed from https://github.com/protesilaos/denote/issues/115
 #+end_src
 ** org-remark
 Highlight and annotate any text file with using Org mode.
-#+begin_src elisp
+#+begin_src elisp :tangle no
 (setup org-remark
   (defun my/function ()
     (concat (concat nowis-doc-emacs-dir "01-orgmode/org-remark/")
@@ -2355,18 +2309,6 @@ Aggregating a table is creating a new table by computing sums, averages, and so 
                                   ;; :engines (list (gts-google-rpc-engine))
                                   :engines (list (gts-bing-engine))
                                   :render (gts-buffer-render)))))
-#+end_src
-** dictionary-overlay
-#+begin_src elisp :tangle no
-(setup websocket)
-(setup websocket-bridge)
-(setup dictionary-overlay
-  (setq dictionary-overlay-sdcv-dictionary-path (concat nowis-doc-emacs-dir "02-binary-files/03-stardicts/"))
-  (:autoload dictionary-overlay-toggle)
-  (:when-loaded
-    (copy-face 'font-lock-keyword-face 'dictionary-overlay-unknownword)
-    (copy-face 'font-lock-comment-face 'dictionary-overlay-translation)
-    ))
 #+end_src
 ** sdcv
 If you encounter the following issue: =g_mkdir failed: No such file or directory=, please consider:
