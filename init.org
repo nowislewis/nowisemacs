@@ -156,7 +156,6 @@ I failed in love with denote, so previous *org-roam* configs were refiled into [
 (setq frame-inhibit-implied-resize t)
 ;; disable warning
 (setq byte-compile-warnings nil)
-
 ;; no title bar
 ;; (add-to-list 'default-frame-alist '(undecorated . t))
 ;; Faster to disable these here (before they've been initialized)
@@ -169,6 +168,9 @@ I failed in love with denote, so previous *org-roam* configs were refiled into [
       package--init-file-ensured t
       inhibit-startup-message t             ; 关闭启动 Emacs 时的欢迎界面
       )
+
+;; speed font
+;; (add-to-list 'default-frame-alist '(font . "Maple Mono SC NF"))
 #+end_src
 ** basic modes
 #+NAME: basic-modes
@@ -616,12 +618,12 @@ Maybe I should add a new state.
    ["serch engine"
     ("x" "xeft" xeft)
     ]
-   ["org-remark"
-    ("mm" "org-remark-mark" org-remark-mark)
-    ("mo" "open" org-remark-open)
-    ("m]" "next" org-remark-view-next)
-    ("m[" "prev" org-remark-view-prev)
-    ("md" "remove" org-remark-remove)]
+   ;; ["org-remark"
+   ;;  ("mm" "org-remark-mark" org-remark-mark)
+   ;;  ("mo" "open" org-remark-open)
+   ;;  ("m]" "next" org-remark-view-next)
+   ;;  ("m[" "prev" org-remark-view-prev)
+   ;;  ("md" "remove" org-remark-remove)]
    ["org-noter"
     ("n" "org-noter" org-noter)]
    ])
@@ -908,12 +910,14 @@ diff-hl-mode highlights uncommitted changes on the left side of the window (area
 #+name: general-builtin-modes
 #+begin_src elisp
 (setup save-place
-  (save-place-mode))
+  (:defer
+   (save-place-mode))
+  )
 
 (setup autorevert
   (setq global-auto-revert-non-file-buffers t)
   (:defer
-  (global-auto-revert-mode t)))                  ; 当另一程序修改了文件时，让 Emacs 及时刷新 Buffer
+   (global-auto-revert-mode t)))                  ; 当另一程序修改了文件时，让 Emacs 及时刷新 Buffer
 (setup hl-line
   (global-hl-line-mode))
 (setup frame
@@ -957,7 +961,9 @@ diff-hl-mode highlights uncommitted changes on the left side of the window (area
            recentf-exclude `("/tmp/" "/ssh:" ,(concat user-emacs-directory "lib/.*-autoloads\\.el\\'")))
   (add-to-list 'recentf-exclude no-littering-var-directory)
   (add-to-list 'recentf-exclude no-littering-etc-directory)
+  (:defer
    (recentf-mode))
+  )
 #+end_src
 ** 自动换行
 #+begin_src elisp
@@ -2594,6 +2600,7 @@ this can avoid errors of native compilation of init.el
 ;; -*- lexical-binding: t; -*-
 (add-to-list 'load-path (expand-file-name "modules/" user-emacs-directory))
 (require 'init-config)
+(setq gc-cons-threshold (* 2 1000 1000))
 #+end_src
 * quick-edit and minimal-file
 These 2 files are tangled using noweb and will be used for special purpose.
