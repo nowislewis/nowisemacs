@@ -2549,32 +2549,43 @@ Simple distraction-free editing. I use darkroom instead of writeroom because it'
 ** scripts
 *** backup scripts
 #+begin_src elisp
-(defun lewis-sync-emacs-rsync()
-  (interactive)
-  (async-shell-command "
+(transient-define-prefix backup-leader-map()
+  "Define leader-key map for backup functions"
+  [["rsync"
+    ("p" "push emacs doc" (lambda()
+                            (interactive)
+                            (async-shell-command " rsync -avbih --delete --backup-dir=../back_restore/ --exclude '.git' \
+     ~/Documents/emacs/ lewis-nas@192.168.31.108:/share/my_webdav/rsync/emacs/")))
+    ("r" "restore emacs doc" (lambda()
+                               (interactive)
+                               (async-shell-command " rsync -avbih --delete --backup-dir=../back_restore/ --exclude '.git' \
+ lewis-nas@192.168.31.108:/share/my_webdav/rsync/emacs/ ~/Documents/emacs/")))
+
+    ("s" "update emacs doc first and sync" (lambda()
+                                   (interactive)
+                                   (async-shell-command "
 rsync -avihbu --backup-dir=../back_restore/ --exclude '.git' \
       lewis-nas@192.168.31.108:/share/my_webdav/rsync/emacs/ \
       ~/Documents/emacs/ \
     && rsync -avbih --delete --backup-dir=../back_restore/ --exclude '.git'\
              ~/Documents/emacs/ \
              lewis-nas@192.168.31.108:/share/my_webdav/rsync/emacs/ ")
-  )
-
-(defun lewis-sync-tmp-rsync()
-  (interactive)
-  (async-shell-command "
+                                   ))
+    ("t" "sync tmp dir" (lambda()
+                      (interactive)
+                      (async-shell-command "
 rsync -avihu lewis-nas@192.168.31.108:/share/my_webdav/rsync/tmp/ \
       ~/Downloads/tmp/ \
     && rsync -avih --delete \
              ~/Downloads/tmp/ \
-             lewis-nas@192.168.31.108:/share/my_webdav/rsync/tmp/ ")
-  )
-
-(defun lewis-backup-restic()
-  (interactive)
-  ;; (async-shell-command "restic -r sftp:lewis-nas@192.168.31.108:/share/my_webdav/restic/emacs backup --exclude='.git' ~/Documents/emacs/")
-  (async-shell-command "restic -r sftp:lewis-nas@192.168.31.108:/share/my_webdav/restic/emacs backup ~/Documents/emacs/")
-  )
+             lewis-nas@192.168.31.108:/share/my_webdav/rsync/tmp/ ")))
+    ]
+   ["restic"
+    ("b" "backup all emacs doc" (lambda()
+                                  (interactive)
+                                  ;; (async-shell-command "restic -r sftp:lewis-nas@192.168.31.108:/share/my_webdav/restic/emacs backup --exclude='.git' ~/Documents/emacs/")
+                                  (async-shell-command "restic -r sftp:lewis-nas@192.168.31.108:/share/my_webdav/restic/emacs backup ~/Documents/emacs/")
+                                  ))]])
 #+end_src
 ** video and music
 *** emms
