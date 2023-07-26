@@ -618,12 +618,6 @@ Maybe I should add a new state.
    ["serch engine"
     ("x" "xeft" xeft)
     ]
-   ;; ["org-remark"
-   ;;  ("mm" "org-remark-mark" org-remark-mark)
-   ;;  ("mo" "open" org-remark-open)
-   ;;  ("m]" "next" org-remark-view-next)
-   ;;  ("m[" "prev" org-remark-view-prev)
-   ;;  ("md" "remove" org-remark-remove)]
    ["org-noter"
     ("n" "org-noter" org-noter)]
    ])
@@ -675,6 +669,15 @@ Maybe I should add a new state.
     ("l" "app-launcher-run-app" app-launcher-run-app)]
    ])
 #+end_src
+*** gtd
+#+begin_src elisp
+(transient-define-prefix org-gtd-leader-map()
+  "Define leader-key map for file-related functions"
+  [("c" "capture" org-gtd-capture)
+    ("e" "engage" org-gtd-engage)
+    ("p" "process inbox" org-gtd-process-inbox)
+    ("o" "organize" org-gtd-organize)])
+#+end_src
 ** meow leader keybindings
 #+name: meow-leader-keys
 #+begin_src elisp
@@ -714,7 +717,9 @@ Maybe I should add a new state.
 ;; notes
  '("n" . notes-leader-map)
  ;;w workspace
- '("TAB". tabspaces-leader-map))
+ '("TAB" . tabspaces-leader-map)
+ ;; org gtd
+ '("d" . org-gtd-leader-map))
 #+END_SRC
 ** which-key
 #+name: which-key
@@ -1027,7 +1032,7 @@ diff-hl-mode highlights uncommitted changes on the left side of the window (area
            register-preview-function #'consult-register-format
            xref-show-xrefs-function #'consult-xref
            xref-show-definitions-function #'consult-xref
-           consult-project-root-function (lambda ()
+           consult-project-root-function #'(lambda ()
                                            (when-let (project (project-current))
                                              (car (project-roots project)))))
   (:with-map minibuffer-local-map
@@ -2160,26 +2165,24 @@ Connecting clues while reading code.
 (setup org-transclusion)
 #+end_src
 ** org-gtd
-#+begin_src elisp :tangle no
-(setup org-agenda-property
-  (require 'org-agenda-property)
-  )
+#+begin_src elisp
+(setup org-agenda-property)
 (setq org-gtd-update-ack "3.0.0")
-(require 'org-gtd)
-  (setq org-edna-use-inheritance t
-        org-gtd-organize-hooks '(org-gtd-set-area-of-focus org-set-tags-command))
+(setq org-edna-use-inheritance t
+      org-gtd-organize-hooks '(org-gtd-set-area-of-focus org-set-tags-command)
+      org-gtd-directory nowis-gtd-dir)
 (setup org-gtd
-  (org-gtd-mode)
-  (:global "C-c c" #'org-gtd-organize))
-(setup org-edna
-  (require 'org-edna)
-  (org-edna-mode)
-  )
+  (:load-after org)
+  (:defer (org-gtd-mode))
+    (:with-map org-gtd-clarify-map
+   (:bind "C-c c"  org-gtd-organize)))
+(setup org-edna)
+
 #+end_src
 ** agenda/gtd
 https://emacs.cafe/emacs/orgmode/gtd/2017/06/30/orgmode-gtd.html
 https://dindi.garjola.net/org-agenda-weekly.html
-#+begin_src elisp
+#+begin_src elisp :tangle no
 (defvar nowis-index-org (concat nowis-gtd-dir "/20230411T002918--index.org"))
 (defvar nowis-gtd-org (concat nowis-gtd-dir "/20230411T002424--action.org"))
 (defvar nowis-someday-org (concat nowis-gtd-dir "/20230310T005150--someday.org"))
@@ -2225,7 +2228,7 @@ https://dindi.garjola.net/org-agenda-weekly.html
 #+end_src
 
 ** org-super-agenda
-#+begin_src elisp
+#+begin_src elisp :tangle no
 (setup org-super-agenda
   (:hook-into org-agenda-mode))
 
@@ -2549,44 +2552,47 @@ Simple distraction-free editing. I use darkroom instead of writeroom because it'
 ** scripts
 *** backup scripts
 #+begin_src elisp
+(defun backup-push-emacs-doc()
+  (interactive)
+  (async-shell-command " rsync -avbih --delete --backup-dir=../back_restore/ --exclude '.git' \
+     ~/Documents/emacs/ lewis-nas@192.168.31.108:/share/my_webdav/rsync/emacs/"))
+
+(defun backup-restore-emacs-doc()
+  (interactive)
+  (async-shell-command " rsync -avbih --delete --backup-dir=../back_restore/ --exclude '.git' \
+ lewis-nas@192.168.31.108:/share/my_webdav/rsync/emacs/ ~/Documents/emacs/"))
+
+(defun backup-sync-emacs-doc()
+  (interactive)
+  (async-shell-command "
+rsync -avihbu --backup-dir=../back_restore/ --exclude '.git' \
+      lewis-nas@192.168.31.108:/share/my_webdav/rsync/emacs/ ~/Documents/emacs/ \
+    && rsync -avbih --delete --backup-dir=../back_restore/ --exclude '.git'\
+             ~/Documents/emacs/ lewis-nas@192.168.31.108:/share/my_webdav/rsync/emacs/ "))
+
+(defun backup-sync-tmp-doc()
+  (interactive)
+  (async-shell-command "
+rsync -avihu lewis-nas@192.168.31.108:/share/my_webdav/rsync/tmp/ ~/Downloads/tmp/ \
+    && rsync -avih --delete ~/Downloads/tmp/ lewis-nas@192.168.31.108:/share/my_webdav/rsync/tmp/ "))
+
+(defun backup-restic-emacs-doc()
+  (interactive)
+  (async-shell-command "restic -r sftp:lewis-nas@192.168.31.108:/share/my_webdav/restic/emacs backup ~/Documents/emacs/")
+  )
+
 (transient-define-prefix backup-leader-map()
   "Define leader-key map for backup functions"
   [["rsync"
-    ("p" "push emacs doc" (lambda()
-                            (interactive)
-                            (async-shell-command " rsync -avbih --delete --backup-dir=../back_restore/ --exclude '.git' \
-     ~/Documents/emacs/ lewis-nas@192.168.31.108:/share/my_webdav/rsync/emacs/")))
-    ("r" "restore emacs doc" (lambda()
-                               (interactive)
-                               (async-shell-command " rsync -avbih --delete --backup-dir=../back_restore/ --exclude '.git' \
- lewis-nas@192.168.31.108:/share/my_webdav/rsync/emacs/ ~/Documents/emacs/")))
-
-    ("s" "update emacs doc first and sync" (lambda()
-                                   (interactive)
-                                   (async-shell-command "
-rsync -avihbu --backup-dir=../back_restore/ --exclude '.git' \
-      lewis-nas@192.168.31.108:/share/my_webdav/rsync/emacs/ \
-      ~/Documents/emacs/ \
-    && rsync -avbih --delete --backup-dir=../back_restore/ --exclude '.git'\
-             ~/Documents/emacs/ \
-             lewis-nas@192.168.31.108:/share/my_webdav/rsync/emacs/ ")
-                                   ))
-    ("t" "sync tmp dir" (lambda()
-                      (interactive)
-                      (async-shell-command "
-rsync -avihu lewis-nas@192.168.31.108:/share/my_webdav/rsync/tmp/ \
-      ~/Downloads/tmp/ \
-    && rsync -avih --delete \
-             ~/Downloads/tmp/ \
-             lewis-nas@192.168.31.108:/share/my_webdav/rsync/tmp/ ")))
-    ]
+    ("p" "push emacs doc" backup-push-emacs-doc)
+    ("r" "restore emacs doc" backup-restore-emacs-doc)
+    ("s" "update emacs doc first and sync" backup-sync-emacs-doc)
+    ("t" "sync tmp dir" backup-sync-tmp-doc)]
    ["restic"
-    ("b" "backup all emacs doc" (lambda()
-                                  (interactive)
-                                  ;; (async-shell-command "restic -r sftp:lewis-nas@192.168.31.108:/share/my_webdav/restic/emacs backup --exclude='.git' ~/Documents/emacs/")
-                                  (async-shell-command "restic -r sftp:lewis-nas@192.168.31.108:/share/my_webdav/restic/emacs backup ~/Documents/emacs/")
-                                  ))]])
+    ("b" "backup all emacs doc" backup-restic-emacs-doc)]])
 #+end_src
+
+
 ** video and music
 *** emms
 #+begin_src elisp
