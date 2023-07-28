@@ -105,7 +105,7 @@ I failed in love with denote, so previous *org-roam* configs were refiled into [
   - [[#clue][clue]]
   - [[#org-transclusion][org-transclusion]]
   - [[#org-gtd][org-gtd]]
-  - [[#agendagtd][agenda/gtd]]
+  - [[#agendagtd-disabled][agenda/gtd (disabled)]]
   - [[#org-super-agenda][org-super-agenda]]
   - [[#org-ql][org-ql]]
   - [[#xeft][xeft]]
@@ -783,25 +783,32 @@ Maybe I should add a new state.
                                  when (font-installed-p font)
                                  return font))
 
-(when (display-graphic-p)
-  ;; Set default font
-  (if lewis-fixed-font
-      (progn
-        (set-face-attribute 'default nil :family lewis-fixed-font :height lewis-font-size)
-        (set-face-attribute 'fixed-pitch nil :family lewis-fixed-font :height 1.0)))
+;; mayby I should remove all this font-seting and use only default font
+(defun nowis-setup-fonts()
+  "Setup fonts."
+  (when (display-graphic-p)
+    ;; Set default font
+    (if lewis-fixed-font
+        (progn
+          (set-face-attribute 'default nil :family lewis-fixed-font :height lewis-font-size)
+          (set-face-attribute 'fixed-pitch nil :family lewis-fixed-font :height 1.0)
+          ))
 
-  ;; variable-pitch
-  (if lewis-variable-font
-      (set-face-attribute 'variable-pitch nil :family lewis-variable-font :height 1.0))
+    ;; variable-pitch
+    (if lewis-variable-font
+        (set-face-attribute 'variable-pitch nil :family lewis-variable-font :height 1.0))
 
-  ;; Specify font for all unicode characters
-  ;; (if lewis-symbol-font
-  ;;     return(set-fontset-font t 'unicode lewis-symbol-font nil 'prepend))
+    ;; Specify font for all unicode characters
+    (if lewis-symbol-font
+        (set-fontset-font t 'unicode lewis-symbol-font nil 'prepend))
 
-  ;; ;; Specify font for Chinese characters
-  (if lewis-chinese-font
-      (set-fontset-font t '(#x4e00 . #x9fff) lewis-chinese-font))
+    ;; Specify font for Chinese characters
+    (if lewis-chinese-font
+        (set-fontset-font t '(#x4e00 . #x9fff) lewis-chinese-font))
+    )
   )
+
+(nowis-setup-fonts)
 #+end_src
 ** Theme
 *** ef-themes
@@ -858,7 +865,8 @@ diff-hl-mode highlights uncommitted changes on the left side of the window (area
         dashboard-center-content t
         dashboard-startup-banner (concat nowis-config-useful-tools "banner.txt")
         dashboard-set-init-info t)
-  (dashboard-setup-startup-hook))
+  (dashboard-setup-startup-hook)
+  )
 #+end_src
 ** doom-modeline
 #+begin_src elisp
@@ -955,18 +963,22 @@ diff-hl-mode highlights uncommitted changes on the left side of the window (area
   (savehist-mode))
 #+end_src
 ** no-littering
-#+begin_src lisp
-(setup no-littering)
+#+begin_src elisp
+(setup no-littering
+  (:defer
+   (require 'no-littering))
+  (setq no-littering-var-directory (expand-file-name (concat user-emacs-directory "var/"))
+        no-littering-etc-directory (expand-file-name (concat user-emacs-directory "etc/")))
+  )
 #+end_src
 ** recentf
 #+begin_src elisp
 (setup recentf
-  (:also-load no-littering)
-  (setq recentf-max-saved-items 1000
-           recentf-exclude `("/tmp/" "/ssh:" ,(concat user-emacs-directory "lib/.*-autoloads\\.el\\'")))
-  (add-to-list 'recentf-exclude no-littering-var-directory)
-  (add-to-list 'recentf-exclude no-littering-etc-directory)
   (:defer
+   (setq recentf-max-saved-items 1000
+         recentf-exclude `("/tmp/" "/ssh:" ,(concat user-emacs-directory "lib/.*-autoloads\\.el\\'")))
+   (add-to-list 'recentf-exclude no-littering-var-directory)
+   (add-to-list 'recentf-exclude no-littering-etc-directory)
    (recentf-mode))
   )
 #+end_src
@@ -1050,13 +1062,6 @@ diff-hl-mode highlights uncommitted changes on the left side of the window (area
   (let ((current-prefix-arg '(-1)))
     (call-interactively 'consult-find)))
 #+end_src
-*** consult-dash
-#+begin_src elisp :tangle no
-(setup dash-docs
-  (setq dash-docs-docsets-path (concat no-littering-var-directory "dash-docsets")
-           dash-docs-common-docsets '("C++")))
-(setup consult-dash)
-#+end_src
 ** rg.el
 #+begin_src elisp
 (setup rg)
@@ -1075,8 +1080,7 @@ diff-hl-mode highlights uncommitted changes on the left side of the window (area
 (setup vertico
   (:with-map vertico-map
     (:bind [backspace] vertico-directory-delete-char))
-  (vertico-mode)
-  )
+  (vertico-mode))
 #+end_src
 ** Orderless and pinyinlib
 #+name: orderless
@@ -1098,9 +1102,6 @@ diff-hl-mode highlights uncommitted changes on the left side of the window (area
   (setq marginalia-annotators '(marginalia-annotators-heavy
                                    marginalia-annotators-light
                                    nil))
-  ;; (:when-loaded
-  ;;   (cl-pushnew 'epkg-marginalia-annotate-package
-  ;;               (alist-get 'package marginalia-annotator-registry)))
   (:hook-into after-init))
 #+end_src
 ** embark
@@ -1300,7 +1301,8 @@ borrowed from citre, now you can always jump-back use "M-," after any jump in th
                                      )
            rime-show-candidate 'posframe
            rime-posframe-properties (list :internal-border-width 1
-                                          :font lewis-fixed-font)
+                                          ;; :font lewis-fixed-font
+                                          )
            rime-user-data-dir "~/Documents/emacs/02-binary-files/05-input-rime/"
            rime-inline-ascii-trigger 'shift-r
            )
@@ -1395,8 +1397,10 @@ Dirvish is a minimalistic file manager based on Dired. It's fast
 #+begin_src elisp
 (setup tabspaces
   (setq tabspaces-use-filtered-buffers-as-default t
-           tabspaces-keymap-prefix nil)
-  (tabspaces-mode)
+        tabspaces-keymap-prefix nil)
+  (:defer
+   (tabspaces-mode)
+   )
   (:when-loaded
     (transient-define-prefix tabspaces-leader-map()
       "Define tabspaces leader-key maps"
@@ -1617,12 +1621,6 @@ Emacs major-mode to work with Beancount ledger files
 (setup elec-pair
   (electric-pair-mode))
 #+end_src
-**** breadcrumb
-#+begin_src elisp
-(setup breadcrumb
-  (:with-feature breadcrumb-local-mode
-    (:hook-into text-mode-hook prop-mode-hook)))
-#+end_src
 *** treesit tools
 **** treesit
 #+begin_src elisp
@@ -1670,19 +1668,19 @@ Emacs major-mode to work with Beancount ledger files
 #+begin_src elisp
 (defvar use-pypy3 nil)
 (setup lsp-bridge
-  (setq lsp-bridge-enable-org-babel t
-           lsp-bridge-python-lsp-server "pylsp"
-           lsp-bridge-enable-completion-in-minibuffer t
-           lsp-bridge-enable-hover-diagnostic t
-           ;; acm
-           acm-enable-citre nil
-           acm-enable-codeium nil
-           acm-backend-codeium-api-key-path (concat nowis-doc-emacs-dir "08-keys/codeium_api_key.txt")
-           )
+  (setq lsp-bridge-enable-org-babel nil
+        lsp-bridge-python-lsp-server "pylsp"
+        lsp-bridge-enable-completion-in-minibuffer t
+        lsp-bridge-enable-hover-diagnostic t
+        ;; acm
+        acm-enable-citre nil
+        acm-enable-codeium nil
+        acm-backend-codeium-api-key-path (concat nowis-doc-emacs-dir "08-keys/codeium_api_key.txt")
+        )
   (if use-pypy3
       (setq lsp-bridge-python-command "pypy3"))
   (:defer
-  (global-lsp-bridge-mode)))
+   (global-lsp-bridge-mode)))
 #+end_src
 **** citre
 Citre is an advanced Ctags (or actually, readtags) frontend for Emacs.
@@ -1718,11 +1716,12 @@ eglot client leveraging LTEX Language Server.
     (:hook hs-minor-mode))
   (add-to-list 'hs-special-modes-alist '(verilog-mode "\\(\\<begin\\>\\|\\<case\\>\\|\\<module\\>\\|\\<class\\>\\|\\<function\\>\\|\\<task\\>\\)"
                                                       )))
-(setup hideif
-  (add-hook 'c-mode-common-hook
-            (lambda ()
-              (hide-ifdef-mode)
-              (add-hook 'after-save-hook (lambda () (hide-ifdefs))))))
+
+;; (setup hideif
+;;   (add-hook 'c-mode-common-hook
+;;             (lambda ()
+;;               (hide-ifdef-mode)
+;;               (add-hook 'after-save-hook (lambda () (hide-ifdefs))))))
 #+end_src
 *** format-all
 #+begin_src elisp
@@ -1772,33 +1771,50 @@ Disassemble C, C++ or Fortran code under cursor
 (setup org
   (setq org-directory (concat nowis-doc-emacs-dir "01-orgmode/"))
   (setq org-adapt-indentation nil
-           org-startup-indented t
-           org-edit-src-content-indentation 0
-           org-hide-emphasis-markers t
-           org-imenu-depth 8
-           org-return-follows-link t
-           org-link-frame-setup '((vm . vm-visit-folder-other-frame)
-                                  (vm-imap . vm-visit-imap-folder-other-frame)
-                                  (gnus . org-gnus-no-new-news)
-                                  (file . find-file)
-                                  (wl . wl-other-frame))
-           org-log-done 'time ;; 记录完成时间
-           org-blank-before-new-entry '((heading . nil)
-                                        (plain-list-item . nil))
+        org-startup-indented t
+        org-edit-src-content-indentation 0
+        org-hide-emphasis-markers t
+        org-imenu-depth 8
+        org-return-follows-link t
+        org-link-frame-setup '((vm . vm-visit-folder-other-frame)
+                               (vm-imap . vm-visit-imap-folder-other-frame)
+                               (gnus . org-gnus-no-new-news)
+                               (file . find-file)
+                               (wl . wl-other-frame))
+        org-log-done 'time ;; 记录完成时间
+        org-blank-before-new-entry '((heading . nil)
+                                     (plain-list-item . nil))
 
-           org-image-actual-width 600 ;; this will use 600 for width for all the images.
-           org-preview-latex-image-directory (concat no-littering-var-directory "ltximg/")
-           org-confirm-babel-evaluate nil
-           org-src-window-setup 'split-window-below
-           org-ellipsis "⤵"
-           org-plantuml-jar-path plantuml-jar-path
-           org-special-ctrl-a/e t
-           org-attach-id-dir (concat nowis-doc-emacs-dir "02-binary-files/01-pictures/01-org-attach")
-           fill-column 100
+        org-image-actual-width 600 ;; this will use 600 for width for all the images.
+        org-preview-latex-image-directory (concat no-littering-var-directory "ltximg/")
+        org-confirm-babel-evaluate nil
+        org-src-window-setup 'split-window-below
+        org-ellipsis "⤵"
+        org-plantuml-jar-path plantuml-jar-path
+        org-special-ctrl-a/e t
+        org-attach-id-dir (concat nowis-doc-emacs-dir "02-binary-files/01-pictures/01-org-attach")
+        fill-column 100
 
-           ;; habit
-           org-habit-following-days 2
-           )
+        ;; habit
+        org-habit-following-days 2
+
+        ;; todo keywords
+        org-todo-keywords (quote ((sequence "TODO(t!/!)" "NEXT(n!/!)" "|" "DONE(d!/!)")
+                                  (type "PROJECT(p!/!)" "|" "DONE_PROJECT(D!/!)")
+                                  (type "SOMEDAY(S!)" "|" "NEED_COLLECTED(N!)")
+                                  (sequence "WAIT(w@/!)" "|" "CANCELLED(c@/!)")))
+        org-todo-keyword-faces (quote (("TODO" :foreground "red" :weight bold)
+                                       ("NEXT" :foreground "blue" :weight bold)
+                                       ("DONE" :foreground "forest green" :weight bold)
+                                       ("PROJECT" :foreground "red" :weight bold)
+                                       ("DONE_PROJECT" :foreground "forest green" :weight bold)
+                                       ("SOMEDAY" :foreground "orange" :weight bold)
+                                       ("NEED_COLLECTED" :foreground "orange" :weight bold)
+                                       ("WAIT" :foreground "orange" :weight bold)
+                                       ("CANCELLED" :foreground "forest green" :weight bold)
+                                       ))
+        )
+
   ;; (:hook org-num-mode)
   (:when-loaded
     (require 'org-tempo) ;; so that <s is useful
@@ -1987,8 +2003,7 @@ Disassemble C, C++ or Fortran code under cursor
 (setup citar-denote
   (setq citar-denote-title-format "title")
   (:defer
-  (citar-denote-mode))
-  )
+  (citar-denote-mode)))
 #+end_src
 *** ebib
 #+begin_src elisp
@@ -2044,9 +2059,9 @@ ln -s ~/Downloads/translators_CN/translators ~/Downloads/zotra-cli/module/transl
 #+begin_src elisp
 (setup denote
   (setq denote-directory (expand-file-name (concat nowis-doc-emacs-dir "01-orgmode/xnotes"))
-           denote-dired-directories (ffap-all-subdirs denote-directory)
-           denote-date-prompt-use-org-read-date t
-           denote-modules '(project))
+        denote-dired-directories (ffap-all-subdirs denote-directory)
+        denote-date-prompt-use-org-read-date t
+        denote-modules '(project))
   (add-hook 'dired-mode-hook #'denote-dired-mode-in-directories)
   ;; should add a hook for disable diredfl-mode
       ;;;###autoload
@@ -2161,7 +2176,7 @@ Connecting clues while reading code.
 (setup clue)
 #+end_src
 ** org-transclusion
-#+begin_src elisp
+#+begin_src elisp :tangle no
 (setup org-transclusion)
 #+end_src
 ** org-gtd
@@ -2177,37 +2192,19 @@ Connecting clues while reading code.
     (:with-map org-gtd-clarify-map
    (:bind "C-c c"  org-gtd-organize)))
 (setup org-edna)
-
 #+end_src
-** agenda/gtd
+** agenda/gtd (disabled)
 https://emacs.cafe/emacs/orgmode/gtd/2017/06/30/orgmode-gtd.html
 https://dindi.garjola.net/org-agenda-weekly.html
 #+begin_src elisp :tangle no
 (defvar nowis-index-org (concat nowis-gtd-dir "/20230411T002918--index.org"))
 (defvar nowis-gtd-org (concat nowis-gtd-dir "/20230411T002424--action.org"))
 (defvar nowis-someday-org (concat nowis-gtd-dir "/20230310T005150--someday.org"))
-(setup org
   (setq org-agenda-files (list nowis-index-org
                                   nowis-gtd-org
                                   ;; (concat nowis-gtd-dir "/20230411T002918--index.org_archive")
                                   ;; (concat nowis-gtd-dir "/20230411T002424--action.org_archive")
-                                  )
-           org-todo-keywords (quote ((sequence "TODO(t!/!)" "NEXT(n!/!)" "|" "DONE(d!/!)")
-                                     (type "PROJECT(p!/!)" "|" "DONE_PROJECT(D!/!)")
-                                     (type "SOMEDAY(S!)" "|" "NEED_COLLECTED(N!)")
-                                     (sequence "WAIT(w@/!)" "|" "CANCELLED(c@/!)")))
-
-           org-todo-keyword-faces (quote (("TODO" :foreground "red" :weight bold)
-                                          ("NEXT" :foreground "blue" :weight bold)
-                                          ("DONE" :foreground "forest green" :weight bold)
-                                          ("PROJECT" :foreground "red" :weight bold)
-                                          ("DONE_PROJECT" :foreground "forest green" :weight bold)
-                                          ("SOMEDAY" :foreground "orange" :weight bold)
-                                          ("NEED_COLLECTED" :foreground "orange" :weight bold)
-                                          ("WAIT" :foreground "orange" :weight bold)
-                                          ("CANCELLED" :foreground "forest green" :weight bold)
-                                          ))
-           ))
+                                  ))
 (setup org-refile
   (setq org-refile-targets (list (cons nowis-gtd-org '(:maxlevel . 1))
                                     (cons nowis-someday-org '(:level . 1)))))
@@ -2327,10 +2324,7 @@ mkdir ~/.stardict
 
 #+begin_src elisp
 (setup sdcv
-  (setq sdcv-dictionary-data-dir (expand-file-name (concat nowis-doc-emacs-dir "02-binary-files/03-stardicts"))
-           sdcv-dictionary-simple-list (list "简明英汉字典增强版")
-           sdcv-dictionary-complete-list (list "简明英汉字典增强版")
-           )
+  (setq sdcv-dictionary-data-dir (expand-file-name (concat nowis-doc-emacs-dir "02-binary-files/03-stardicts")))
   (:global "M-l" lewis-eaf-sdcv-search-pointer+)
   (if (eq system-type 'darwin)
       (setq sdcv-program "sdcv"))
@@ -2440,15 +2434,15 @@ Simple distraction-free editing. I use darkroom instead of writeroom because it'
 (setup eaf
   (add-to-list 'load-path "~/.emacs.d/lib/eaf")
   (setq eaf-browser-enable-autofill t
-           eaf-webengine-font-family lewis-variable-font
-           eaf-webengine-serif-font-family lewis-variable-font
-           eaf-webengine-fixed-font-family lewis-fixed-font
-           eaf-config-location (concat no-littering-var-directory "eaf/")
-           ;; proxy
-           eaf-proxy-type "http"
-           eaf-proxy-host "127.0.0.1"
-           eaf-proxy-port "7890"
-           )
+        eaf-webengine-font-family lewis-variable-font
+        eaf-webengine-serif-font-family lewis-variable-font
+        eaf-webengine-fixed-font-family lewis-fixed-font
+        eaf-config-location (concat no-littering-var-directory "eaf/")
+        ;; proxy
+        eaf-proxy-type "http"
+        eaf-proxy-host "127.0.0.1"
+        eaf-proxy-port "7890"
+        )
   (if (eq system-type 'darwin)
       (setq eaf-python-command "~/.pyenv/shims/python3"))
   ;; (if (eq system-type 'gnu/linux)
@@ -2471,10 +2465,10 @@ Simple distraction-free editing. I use darkroom instead of writeroom because it'
 
 (setup eaf-interleave
   (setq eaf-interleave-org-notes-dir-list (list (concat nowis-doc-emacs-dir "01-orgmode/") ".")
-           eaf-interleave-disable-narrowing t
-           eaf-interleave-split-lines 20
-           eaf-find-alternate-file-in-dired t
-           )
+        eaf-interleave-disable-narrowing t
+        eaf-interleave-split-lines 20
+        eaf-find-alternate-file-in-dired t
+        )
   (:bind "M-."  'eaf-interleave-sync-current-note
          "M-p"  'eaf-interleave-sync-previous-note
          "M-n"  'eaf-interleave-sync-next-note)
@@ -2515,8 +2509,10 @@ Simple distraction-free editing. I use darkroom instead of writeroom because it'
 *** gptel
 #+begin_src elisp
 (setup gptel
-  (setq gptel-default-mode 'org-mode)
-  (:global "M-p" gptel-menu))
+  (setq gptel-default-mode 'org-mode
+        gptel-host "api.chatanywhere.com.cn"
+        )
+  (:global "M-p" gptel-send))
 #+end_src
 *** whisper.el
 #+begin_src elisp
