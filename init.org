@@ -1221,6 +1221,12 @@ borrowed from citre, now you can always jump-back use "M-," after any jump in th
   )
 
 #+end_src
+*** ace-window
+#+begin_src elisp
+(setup ace-window
+  (:global "M-o" ace-window))
+(setq aw-keys '(?a ?s ?d ?f ?g ?h ?j ?k ?l))
+#+end_src
 * ibuffer
 ** ibuffer
 #+name: ibuffer
@@ -1286,33 +1292,31 @@ borrowed from citre, now you can always jump-back use "M-," after any jump in th
 #+end_src
 ** rime
 #+begin_src elisp
-(setup rime
-  (setq default-input-method "rime")
-  (setq rime-disable-predicates '(meow-normal-mode-p
-                                     meow-motion-mode-p
-                                     meow-keypad-mode-p
-                                     rime-predicate-prog-in-code-p
-                                     rime-predicate-punctuation-line-begin-p ;;在行首要输入符号时
-                                     rime-predicate-after-alphabet-char-p ;;在英文字符串之后（必须为以字母开头的英文字符串）
-                                     rime-predicate-current-input-punctuation-p ;;当要输入的是符号时
-                                     ;; rime-predicate-after-ascii-char-p ;;任意英文字符后 ,enable this to use with <s
-                                     rime-predicate-current-uppercase-letter-p ;; 将要输入的为大写字母时
-                                     rime-predicate-space-after-cc-p ;;在中文字符且有空格之后
-                                     )
-           rime-show-candidate 'posframe
-           rime-posframe-properties (list :internal-border-width 1
-                                          ;; :font lewis-fixed-font
-                                          )
-           rime-user-data-dir "~/Documents/emacs/02-binary-files/05-input-rime/"
-           rime-inline-ascii-trigger 'shift-r
-           )
-  (when (eq system-type 'darwin)
-    (setq
-     ;; rime-emacs-module-header-root "/Applications/Emacs.app/Contents/Resources/include/" ;; use build-emacs
-     rime-emacs-module-header-root "/opt/homebrew/opt/emacs-plus@29/include" ;;use emacs-plus
-     rime-librime-root "~/Downloads/librime/dist"
-     ))
-  )
+(setq default-input-method "rime")
+(setq rime-disable-predicates '(meow-normal-mode-p
+                                   meow-motion-mode-p
+                                   meow-keypad-mode-p
+                                   rime-predicate-prog-in-code-p
+                                   rime-predicate-punctuation-line-begin-p ;;在行首要输入符号时
+                                   rime-predicate-after-alphabet-char-p ;;在英文字符串之后（必须为以字母开头的英文字符串）
+                                   rime-predicate-current-input-punctuation-p ;;当要输入的是符号时
+                                   ;; rime-predicate-after-ascii-char-p ;;任意英文字符后 ,enable this to use with <s
+                                   rime-predicate-current-uppercase-letter-p ;; 将要输入的为大写字母时
+                                   rime-predicate-space-after-cc-p ;;在中文字符且有空格之后
+                                   )
+         rime-show-candidate 'posframe
+         rime-posframe-properties (list :internal-border-width 1
+                                        :font lewis-fixed-font
+                                        )
+         rime-user-data-dir "~/Documents/emacs/02-binary-files/05-input-rime/"
+         rime-inline-ascii-trigger 'shift-r
+         )
+(when (eq system-type 'darwin)
+  (setq
+   ;; rime-emacs-module-header-root "/Applications/Emacs.app/Contents/Resources/include/" ;; use build-emacs
+   rime-emacs-module-header-root "/opt/homebrew/opt/emacs-plus@29/include" ;;use emacs-plus
+   rime-librime-root "~/Downloads/librime/dist"
+   ))
 #+end_src
 * File and Browsing
 ** file browsing
@@ -2082,7 +2086,7 @@ Borrowed from https://github.com/protesilaos/denote/issues/115
 
 (defun my/zettel-signature-buffer ()
   (interactive)
-  (let ((find-ls-option '(" -exec ls -ld {} \\+| awk /==/ | sed  's/--/=@/3' | sort -t '=' -Vk 3,3 | sed 's/=@/--/'" . "-ld")))
+  (let ((find-ls-option '(" -exec ls -ld {} \\+| awk /==/ | sed  's/--/=@/3' | sort -t '=' -k 3,3 -k4,4 -k5,5 -k6,6 | sed 's/=@/--/'" . "-ld")))
     (find-dired denote-directory "")))
 
 (defun my/zettel-main-topics ()
@@ -2502,7 +2506,7 @@ Simple distraction-free editing. I use darkroom instead of writeroom because it'
     (shell-command "shortcuts run \"OCR Selected Area\"")
     (do-applescript "tell application id \"org.gnu.Emacs\" to activate")
     )
-  (keymap-global-set "M-o" #'my/siri-ocr)
+  ;; (keymap-global-set "M-o" #'my/siri-ocr)
   )
 #+end_src
 ** ai related
@@ -2512,7 +2516,8 @@ Simple distraction-free editing. I use darkroom instead of writeroom because it'
   (setq gptel-default-mode 'org-mode
         gptel-host "api.chatanywhere.com.cn"
         )
-  (:global "M-p" gptel-send))
+  (:global "M-p" gptel-send
+           "M-P" gptel-menu))
 #+end_src
 *** whisper.el
 #+begin_src elisp

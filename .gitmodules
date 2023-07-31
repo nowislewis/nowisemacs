@@ -1,3 +1,6 @@
+[submodule "ace-window"]
+	path = lib/ace-window
+	url = https://github.com/abo-abo/ace-window.git
 [submodule "alert"]
 	path = lib/alert
 	url = https://github.com/jwiegley/alert.git
