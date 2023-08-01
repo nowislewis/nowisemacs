@@ -19,9 +19,6 @@
 [submodule "beancount"]
 	path = lib/beancount
 	url = https://github.com/beancount/beancount-mode.git
-[submodule "blink-search"]
-	path = lib/blink-search
-	url = https://github.com/manateelazycat/blink-search.git
 [submodule "borg"]
 	path = lib/borg
 	url = https://github.com/emacscollective/borg.git
@@ -85,18 +82,9 @@
 [submodule "doom-modeline"]
 	path = lib/doom-modeline
 	url = https://github.com/seagle0128/doom-modeline.git
-[submodule "eaf"]
-	path = lib/eaf
-	url = https://github.com/emacs-eaf/emacs-application-framework.git
-    load-path = .
-    load-path = core
-    load-path = extension
 [submodule "ebib"]
 	path = lib/ebib
 	url = https://github.com/joostkremers/ebib.git
-[submodule "eglot-ltex"]
-	path = lib/eglot-ltex
-	url = https://github.com/emacs-languagetool/eglot-ltex.git
 [submodule "el-themes"]
 	path = lib/el-themes
 	url = https://github.com/protesilaos/ef-themes.git
@@ -358,9 +346,6 @@
 [submodule "tomelr"]
 	path = lib/tomelr
 	url = https://github.com/kaushalmodi/tomelr.git
-[submodule "treesit-auto"]
-	path = lib/treesit-auto
-	url = https://github.com/renzmann/treesit-auto.git
 [submodule "ts"]
 	path = lib/ts
 	url = https://github.com/alphapapa/ts.el.git
@@ -395,9 +380,6 @@
 [submodule "ws-butler"]
 	path = lib/ws-butler
 	url = https://github.com/lewang/ws-butler.git
-[submodule "xeft"]
-	path = lib/xeft
-	url = https://github.com/casouri/xeft.git
 [submodule "yasnippet"]
 	path = lib/yasnippet
 	url = https://github.com/joaotavora/yasnippet.git

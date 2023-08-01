@@ -103,12 +103,10 @@ I failed in love with denote, so previous *org-roam* configs were refiled into [
   - [[#org-remark][org-remark]]
   - [[#annotate][annotate]]
   - [[#clue][clue]]
-  - [[#org-transclusion][org-transclusion]]
   - [[#org-gtd][org-gtd]]
   - [[#agendagtd-disabled][agenda/gtd (disabled)]]
   - [[#org-super-agenda][org-super-agenda]]
   - [[#org-ql][org-ql]]
-  - [[#xeft][xeft]]
   - [[#mpvi][mpvi]]
   - [[#orgtbl-aggregate][orgtbl-aggregate]]
 - [[#english-翻译][english 翻译]]
@@ -626,8 +624,9 @@ Maybe I should add a new state.
 #+begin_src elisp
 (transient-define-prefix search-leader-map()
   "Define leader-key map for search functions"
-  [["blink-search"
-    ("b" "blink-search" blink-search)]
+  [
+   ;; ["blink-search"
+   ;;  ("b" "blink-search" blink-search)]
    ["grep"
     ("d" "grep-in-current" consult-ripgrep)
     ("D" "grep-other-dir" lewis/ripgrep-search-other-dir)
@@ -1067,7 +1066,7 @@ diff-hl-mode highlights uncommitted changes on the left side of the window (area
 (setup rg)
 #+end_src
 ** blink-search
-#+begin_src elisp
+#+begin_src elisp :tangle no
 (setup blink-search
   ;; (setq blink-search-enable-posframe t)
   (add-to-list 'meow-mode-state-list '(blink-search-mode . insert)))
@@ -1458,11 +1457,6 @@ Dirvish is a minimalistic file manager based on Dired. It's fast
 #+begin_src elisp
 (setup vterm
   (:bind [(control return)] vterm-toggle-insert-cd))
-(defun new-vterm(name)
-  "create a new vterm with a given name"
-  (interactive "sInput a name:")
-  (let ((vterm-buffer-name name))
-    (vterm)))
 #+end_src
 ** vterm-toggle
 #+begin_src elisp
@@ -1491,11 +1485,6 @@ Dirvish is a minimalistic file manager based on Dired. It's fast
 #+name: eshell
 #+begin_src elisp
 (setup eshell)
-(defun new-eshell(name)
-  "create a new eshell with a given name"
-  (interactive "sInput a name:")
-  (let ((eshell-buffer-name name))
-    (eshell)))
 #+end_src
 * git
 ** magit
@@ -1631,13 +1620,6 @@ Emacs major-mode to work with Beancount ledger files
 (setup treesit
   (setq treesit-font-lock-level 4))
 #+end_src
-**** treesit-auto
-#+begin_src elisp
-(setup treesit-auto
-  (:autoload treesit-auto-mode)
-  (:hook-into prog-mode)
-  (setq treesit-auto-install 'prompt))
-#+end_src
 *** Complete
 **** lsp mode
 ***** eglot
@@ -1669,6 +1651,16 @@ Emacs major-mode to work with Beancount ledger files
     (:bind [remap xref-find-apropos] #'consult-eglot-symbols)))
 #+end_src
 ***** lsp-bridge
+install dependencies.
+
+if you use pypy3:
+#+begin_src bash
+pypy3 -m pip install epc sexpdata six paramiko
+#+end_src
+else:
+#+begin_src bash
+pip3 install epc orjson sexpdata six paramiko
+#+end_src
 #+begin_src elisp
 (defvar use-pypy3 nil)
 (setup lsp-bridge
@@ -1703,15 +1695,6 @@ Citre is an advanced Ctags (or actually, readtags) frontend for Emacs.
 #+begin_src elisp
 (setup ht)
 (setup quickrun)
-#+end_src
-*** eglot-ltex
-eglot client leveraging LTEX Language Server.
-#+begin_src elisp
-(setup eglot-ltex
-  (setq eglot-languagetool-server-path "~/Downloads/ltex-ls/")
-  (:with-hook org-mode-hook
-    (:hook (lambda ()
-             (require 'eglot-ltex)))))
 #+end_src
 *** Code toggle with hideshow, hideif
 #+begin_src elisp
@@ -2179,10 +2162,6 @@ Connecting clues while reading code.
 #+begin_src elisp
 (setup clue)
 #+end_src
-** org-transclusion
-#+begin_src elisp :tangle no
-(setup org-transclusion)
-#+end_src
 ** org-gtd
 #+begin_src elisp
 (setup org-agenda-property)
@@ -2286,15 +2265,6 @@ https://dindi.garjola.net/org-agenda-weekly.html
 (setup peg)
 (setup ov)
 (setup org-ql)
-#+end_src
-** xeft
-#+begin_src elisp
-(setup xeft
-  (setq xeft-default-extension "org"
-           xeft-directory org-directory
-           xeft-database (concat no-littering-var-directory "xeft-db")
-           xeft-recursive t
-           ))
 #+end_src
 ** mpvi
 Integrate Org with Video
@@ -2434,7 +2404,7 @@ Simple distraction-free editing. I use darkroom instead of writeroom because it'
 ;; (setq browse-url-browser-function 'eww-browse-url)
 #+end_src
 ** eaf
-#+begin_src elisp
+#+begin_src elisp :tangle no
 (setup eaf
   (add-to-list 'load-path "~/.emacs.d/lib/eaf")
   (setq eaf-browser-enable-autofill t
@@ -2531,23 +2501,23 @@ Simple distraction-free editing. I use darkroom instead of writeroom because it'
 #+begin_src elisp
 (setup webjump
   (setq webjump-sites '(
-                           ;; Emacs.
-                           ("Emacs Home Page" .
-                            "www.gnu.org/software/emacs/emacs.html")
-                           ;; Internet search engines.
-                           ("Google" .
-                            [simple-query "www.google.com"
-                                          "www.google.com/search?q=" ""])
-                           ("DouBan DuShu" .
-                            [simple-query "book.douban.com"
-                                          "search.douban.com/book/subject_search?search_text=" ""])
-                           ("Github" .
-                            [simple-query "github.com"
-                                          "github.com/search?ref=simplesearch&q=" ""])
-                           ("Aur" .
-                            [simple-query "aur.archlinux.org"
-                                          "aur.archlinux.org/packages?O=0&K=" ""])
-                           )))
+                        ;; Emacs.
+                        ("Emacs Home Page" .
+                         "www.gnu.org/software/emacs/emacs.html")
+                        ;; Internet search engines.
+                        ("Google" .
+                         [simple-query "www.google.com"
+                                       "www.google.com/search?q=" ""])
+                        ("DouBan DuShu" .
+                         [simple-query "book.douban.com"
+                                       "search.douban.com/book/subject_search?search_text=" ""])
+                        ("Github" .
+                         [simple-query "github.com"
+                                       "github.com/search?ref=simplesearch&q=" ""])
+                        ("Aur" .
+                         [simple-query "aur.archlinux.org"
+                                       "aur.archlinux.org/packages?O=0&K=" ""])
+                        )))
 #+end_src
 
 ** scripts
