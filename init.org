@@ -112,6 +112,7 @@ I failed in love with denote, so previous *org-roam* configs were refiled into [
 - [[#english-翻译][english 翻译]]
   - [[#go-translate][go-translate]]
   - [[#sdcv][sdcv]]
+  - [[#immersive-translate][immersive-translate]]
 - [[#阅读][阅读]]
   - [[#pdf-tools][pdf-tools]]
   - [[#pdf-view-pagemark][pdf-view-pagemark]]
@@ -487,7 +488,6 @@ Maybe I should add a new state.
                           '("*" . embark-next-symbol)
                           '("/" . consult-line))
   (meow-global-mode 1))
-
 #+end_src
 ** transient and related leader-map
 *** transient
@@ -579,8 +579,10 @@ Maybe I should add a new state.
    ;; org-download
    ["Org download"
     ("d" "Screenshot" org-download-screenshot)]
-   ["Translator insert"
-    ("t" "toggle english helper" lsp-bridge-toggle-sdcv-helper)]])
+   ["Translate"
+    ("t" "toggle english helper" lsp-bridge-toggle-sdcv-helper)
+    ("i" "immersive translate buffer" immersive-translate-buffer)
+    ]])
 #+end_src
 *** buffer
 #+begin_src elisp
@@ -613,9 +615,9 @@ Maybe I should add a new state.
     ("e" "ebib" ebib)
     ("b" "citar-open" citar-open)
     ]
-   ["serch engine"
-    ("x" "xeft" xeft)
-    ]
+   ;; ["serch engine"
+   ;;  ("x" "xeft" xeft)
+   ;;  ]
    ["org-noter"
     ("n" "org-noter" org-noter)]
    ])
@@ -665,7 +667,9 @@ Maybe I should add a new state.
     ("ma" "emms-add" mpvi-emms-add)]
    ["others"
     ("t" "org-pomodoro" org-pomodoro)
-    ("l" "app-launcher-run-app" app-launcher-run-app)]
+    ("l" "app-launcher-run-app" app-launcher-run-app)
+    ("e" "elfeed" my-elfeed)
+    ]
    ])
 #+end_src
 *** gtd
@@ -2131,7 +2135,8 @@ Borrowed from https://github.com/protesilaos/denote/issues/115
   (:load-after nov)
   (:load-after eww)
   (:hook-into nov-mode
-              eww-after-render)
+              eww-after-render
+              )
   (:when-loaded
     (shrface-basic)
     (shrface-trial)
@@ -2314,6 +2319,15 @@ mkdir ~/.stardict
       (sdcv-search-pointer+)))
   )
 #+end_src
+** immersive-translate
+immersive-translate: Immersive Bilingual Translation
+#+begin_src elisp
+(setup immersive-translate)
+(add-hook 'elfeed-show-mode-hook #'immersive-translate-setup)
+(add-hook 'nov-pre-html-render-hook #'immersive-translate-setup)
+;; use translate-shell
+(setq immersive-translate-backend 'trans)
+#+end_src
 * 阅读
 ** pdf-tools
 #+begin_src elisp
@@ -2352,7 +2366,9 @@ mkdir ~/.stardict
 ** efleed-org
 #+begin_src elisp
 (setup elfeed-org
-  (setq rmh-elfeed-org-files (list (concat nowis-config-useful-tools "elfeed.org"))))
+  (with-eval-after-load 'no-littering
+    (setq rmh-elfeed-org-files (list (concat nowis-config-useful-tools "elfeed.org"))))
+  )
 (defun my-elfeed()
   (interactive)
   (unless (featurep 'elfeed-org)

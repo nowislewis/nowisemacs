@@ -158,6 +158,9 @@
 [submodule "imenu-list"]
 	path = lib/imenu-list
 	url = https://github.com/bmag/imenu-list.git
+[submodule "immersive-translate"]
+	path = lib/immersive-translate
+	url = https://github.com/Elilif/emacs-immersive-translate.git
 [submodule "inheritenv"]
 	path = lib/inheritenv
 	url = https://github.com/purcell/inheritenv.git
