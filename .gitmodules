@@ -68,9 +68,6 @@
 [submodule "dired-rsync"]
 	path = lib/dired-rsync
 	url = https://github.com/stsquad/dired-rsync.git
-[submodule "diredfl"]
-	path = lib/diredfl
-	url = https://github.com/purcell/diredfl.git
 [submodule "dirvish"]
 	path = lib/dirvish
 	url = https://github.com/alexluigit/dirvish.git
@@ -164,9 +161,6 @@
 [submodule "inheritenv"]
 	path = lib/inheritenv
 	url = https://github.com/purcell/inheritenv.git
-[submodule "iscroll"]
-	path = lib/iscroll
-	url = https://github.com/casouri/iscroll.git
 [submodule "kv"]
 	path = lib/kv
 	url = https://github.com/nicferrier/emacs-kv.git
@@ -349,6 +343,9 @@
 [submodule "tomelr"]
 	path = lib/tomelr
 	url = https://github.com/kaushalmodi/tomelr.git
+[submodule "treesit-auto"]
+	path = lib/treesit-auto
+	url = https://github.com/renzmann/treesit-auto.git
 [submodule "ts"]
 	path = lib/ts
 	url = https://github.com/alphapapa/ts.el.git

@@ -31,7 +31,6 @@ I failed in love with denote, so previous *org-roam* configs were refiled into [
   - [[#hl-todo][hl-todo]]
   - [[#pulsar][pulsar]]
   - [[#show-paren-mode][show-paren-mode]]
-  - [[#iscroll][iscroll]]
 - [[#general-configuration][General Configuration]]
   - [[#simple][simple]]
   - [[#general-builtin-modes][general builtin modes]]
@@ -749,7 +748,7 @@ Maybe I should add a new state.
 ;; font size
 (if (eq system-type 'darwin)
     (defvar lewis-font-size 140)
-  (defvar lewis-font-size 120))
+  (defvar lewis-font-size 150))
 
 ;; fixed font
 (setq lewis-fixed-font (cl-loop for font in '(
@@ -899,12 +898,7 @@ diff-hl-mode highlights uncommitted changes on the left side of the window (area
 ** show-paren-mode
 #+begin_src elisp
 (setup paren
-  (setq show-paren-context-when-offscreen 'overlay))
-#+end_src
-** iscroll
-#+begin_src elisp
-(setup iscroll
-  (:hook-into text-mode))
+  (setq show-paren-context-when-offscreen 'child-frame))
 #+end_src
 * General Configuration
 ** simple
@@ -1244,14 +1238,6 @@ borrowed from citre, now you can always jump-back use "M-," after any jump in th
 #+end_src
 ** pyim
 #+begin_src elisp :tangle no
-;; (setup pyim-tsinghua-dict
-;;   (:load-after pyim-dict)
-;;   (:when-loaded
-;;     (pyim-tsinghua-dict-enable)))
-;; (setup pyim-sogou-scel-dict
-;;   (:load-after pyim-dict)
-;;   (:when-loaded
-;;     (pyim-sogou-scel-dict-enable)))
 (setup xr)
 (setup pyim
   (setq pyim-cloudim 'baidu
@@ -1296,6 +1282,7 @@ borrowed from citre, now you can always jump-back use "M-," after any jump in th
 ** rime
 #+begin_src elisp
 (setq default-input-method "rime")
+(with-eval-after-load 'rime
 (setq rime-disable-predicates '(meow-normal-mode-p
                                    meow-motion-mode-p
                                    meow-keypad-mode-p
@@ -1313,7 +1300,7 @@ borrowed from citre, now you can always jump-back use "M-," after any jump in th
                                         )
          rime-user-data-dir "~/Documents/emacs/02-binary-files/05-input-rime/"
          rime-inline-ascii-trigger 'shift-r
-         )
+         ))
 (when (eq system-type 'darwin)
   (setq
    ;; rime-emacs-module-header-root "/Applications/Emacs.app/Contents/Resources/include/" ;; use build-emacs
@@ -1331,20 +1318,15 @@ borrowed from citre, now you can always jump-back use "M-," after any jump in th
          ;; dired-omit-mode
          ))
 #+end_src
-*** diredfl
-#+begin_src elisp
-;; (setup diredfl
-;;   (:hook-into dired-mode))
-#+end_src
 *** dirvish
 Dirvish is a minimalistic file manager based on Dired. It's fast
 #+begin_src elisp
 (setup dirvish
   ;; wait for dirvish merge nerd-icons
   (setq dirvish-attributes '(subtree-state nerd-icons)
-           dirvish-side-width 40)
+        dirvish-side-width 40)
   (:bind "TAB" dirvish-toggle-subtree)
-   (dirvish-override-dired-mode)
+  (add-hook 'dired-load-hook #'dirvish-override-dired-mode)
   (:when-loaded
     (dirvish-side-follow-mode)))
 #+end_src
@@ -1623,6 +1605,17 @@ Emacs major-mode to work with Beancount ledger files
 #+begin_src elisp
 (setup treesit
   (setq treesit-font-lock-level 4))
+#+end_src
+**** treesit-auto
+#+begin_src elisp
+(setup treesit-auto
+  (:defer
+   (require 'treesit-auto))
+  (:when-loaded
+    (global-treesit-auto-mode)
+    (setq treesit-auto-install t)
+    )
+  )
 #+end_src
 *** Complete
 **** lsp mode
