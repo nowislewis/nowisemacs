@@ -47,7 +47,6 @@ I failed in love with denote, so previous *org-roam* configs were refiled into [
   - [[#isearch][isearch]]
   - [[#consult-commands][Consult Commands]]
   - [[#rgel][rg.el]]
-  - [[#blink-search][blink-search]]
 - [[#补全][补全]]
   - [[#completions-with-vertico][Completions with Vertico]]
   - [[#orderless-and-pinyinlib][Orderless and pinyinlib]]
@@ -105,7 +104,6 @@ I failed in love with denote, so previous *org-roam* configs were refiled into [
   - [[#clue][clue]]
   - [[#org-gtd][org-gtd]]
   - [[#agendagtd-disabled][agenda/gtd (disabled)]]
-  - [[#org-super-agendadisabled][org-super-agenda(disabled)]]
   - [[#org-ql][org-ql]]
   - [[#mpvi][mpvi]]
   - [[#orgtbl-aggregate][orgtbl-aggregate]]
@@ -1062,12 +1060,6 @@ diff-hl-mode highlights uncommitted changes on the left side of the window (area
 #+begin_src elisp
 (setup rg)
 #+end_src
-** blink-search
-#+begin_src elisp :tangle no
-(setup blink-search
-  ;; (setq blink-search-enable-posframe t)
-  (add-to-list 'meow-mode-state-list '(blink-search-mode . insert)))
-#+end_src
 * 补全
 ** Completions with Vertico
 #+name: vertico
@@ -1321,11 +1313,10 @@ borrowed from citre, now you can always jump-back use "M-," after any jump in th
 Dirvish is a minimalistic file manager based on Dired. It's fast
 #+begin_src elisp
 (setup dirvish
-  ;; wait for dirvish merge nerd-icons
   (setq dirvish-attributes '(subtree-state nerd-icons)
         dirvish-side-width 40)
   (:bind "TAB" dirvish-toggle-subtree)
-  (add-hook 'dired-mode-hook #'dirvish-override-dired-mode)
+  (add-hook 'dired-load-hook #'dirvish-override-dired-mode)
   (:when-loaded
     (dirvish-side-follow-mode)))
 #+end_src
@@ -2124,7 +2115,7 @@ Borrowed from https://github.com/protesilaos/denote/issues/115
 ;; (setup org-imagine)
 #+end_src
 ** shrface
-#+begin_src elisp
+#+begin_src elisp :tangle no
 (setup shrface
   (:load-after nov)
   (:load-after eww)
@@ -2204,59 +2195,6 @@ https://dindi.garjola.net/org-agenda-weekly.html
            org-agenda-start-with-log-mode t
            )
   )
-#+end_src
-
-** org-super-agenda(disabled)
-#+begin_src elisp :tangle no
-(setup org-super-agenda
-  (:hook-into org-agenda-mode))
-
-(setq org-agenda-custom-commands
-      '(("z" "Super view"
-         ((agenda "" ((org-agenda-span 'day)
-                      (org-super-agenda-groups
-                       '((:name "Today"
-                                :time-grid t
-                                :date today
-                                :todo "TODAY"
-                                :scheduled today
-                                :order 1)))))
-          (alltodo "" ((org-agenda-overriding-header "")
-                       (org-super-agenda-groups
-                        '((:name "Next to do"
-                                 :todo "NEXT"
-                                 :order 1)
-                          (:name "Important"
-                                 :tag "Important"
-                                 :priority "A"
-                                 :order 6)
-                          (:name "Due Today"
-                                 :deadline today
-                                 :order 2)
-                          (:name "Due Soon"
-                                 :deadline future
-                                 :order 8)
-                          (:name "Overdue"
-                                 :deadline past
-                                 :order 7)
-                          (:name "Wait"
-                                 :todo "WAIT"
-                                 :order 10)
-                          (:name "To read"
-                                 :tag "Read"
-                                 :order 30)
-                          (:name "trivial"
-                                 :priority<= "C"
-                                 :todo ("SOMEDAY" "NEED_COLLECTED")
-                                 :order 90)
-                          (:name "Projects"
-                                 :children t)
-                          ;; can be archived in month
-                          (:discard (:tag ("Chore" "Routine" "Daily")))))))))
-        ("p" "Projected TODO"
-         ((alltodo "" ((org-super-agenda-groups
-                        '((:auto-group t)))))))))
-;; TODO use let to add all files under gtd in agenda-files for full-search, with last 7 days and 30 days DOWN
 #+end_src
 ** org-ql
 #+begin_src elisp :tangle no
