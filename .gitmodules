@@ -79,6 +79,12 @@
 [submodule "doom-modeline"]
 	path = lib/doom-modeline
 	url = https://github.com/seagle0128/doom-modeline.git
+[submodule "dumb-jump"]
+	path = lib/dumb-jump
+	url = https://github.com/jacktasia/dumb-jump.git
+[submodule "eat"]
+	path = lib/eat
+	url = https://codeberg.org/akib/emacs-eat.git
 [submodule "ebib"]
 	path = lib/ebib
 	url = https://github.com/joostkremers/ebib.git
@@ -249,19 +255,9 @@
 [submodule "org-present"]
 	path = lib/org-present
 	url = https://github.com/rlister/org-present.git
-[submodule "org-ql"]
-	path = lib/org-ql
-	url = https://github.com/alphapapa/org-ql.git
-    no-byte-compile = helm-org-ql.el
-[submodule "org-super-agenda"]
-	path = lib/org-super-agenda
-	url = https://github.com/alphapapa/org-super-agenda.git
 [submodule "orgtbl-aggregate"]
 	path = lib/orgtbl-aggregate
 	url = https://github.com/tbanel/orgaggregate.git
-[submodule "ov"]
-	path = lib/ov
-	url = https://github.com/emacsorphanage/ov.git
 [submodule "ox-hugo"]
 	path = lib/ox-hugo
 	url = https://github.com/kaushalmodi/ox-hugo.git
@@ -274,9 +270,6 @@
 [submodule "pdf-view-pagemark"]
 	path = lib/pdf-view-pagemark
 	url = https://github.com/kimim/pdf-view-pagemark.git
-[submodule "peg"]
-	path = lib/peg
-	url = https://github.com/emacsmirror/peg.git
 [submodule "pinyinlib"]
 	path = lib/pinyinlib
 	url = https://github.com/cute-jumper/pinyinlib.el.git
@@ -286,6 +279,9 @@
 [submodule "popper"]
 	path = lib/popper
 	url = https://github.com/karthink/popper.git
+[submodule "popup"]
+	path = lib/popup
+	url = https://github.com/auto-complete/popup-el.git
 [submodule "posframe"]
 	path = lib/posframe
 	url = https://github.com/tumashu/posframe.git
@@ -346,9 +342,6 @@
 [submodule "treesit-auto"]
 	path = lib/treesit-auto
 	url = https://github.com/renzmann/treesit-auto.git
-[submodule "ts"]
-	path = lib/ts
-	url = https://github.com/alphapapa/ts.el.git
 [submodule "vertico"]
 	path = lib/vertico
 	url = https://github.com/minad/vertico.git
@@ -371,9 +364,6 @@
 [submodule "which-key"]
 	path = lib/which-key
 	url = https://github.com/justbur/emacs-which-key.git
-[submodule "whisper"]
-	path = lib/whisper
-	url = https://github.com/natrys/whisper.el.git
 [submodule "with-editor"]
 	path = lib/with-editor
 	url = https://github.com/magit/with-editor.git

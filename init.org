@@ -76,6 +76,7 @@ I failed in love with denote, so previous *org-roam* configs were refiled into [
   - [[#vterm][vterm]]
   - [[#vterm-toggle][vterm-toggle]]
   - [[#eshell][eshell]]
+  - [[#eat][eat]]
 - [[#git][git]]
   - [[#magit][magit]]
   - [[#ediff][ediff]]
@@ -104,7 +105,7 @@ I failed in love with denote, so previous *org-roam* configs were refiled into [
   - [[#clue][clue]]
   - [[#org-gtd][org-gtd]]
   - [[#agendagtd-disabled][agenda/gtd (disabled)]]
-  - [[#org-super-agenda][org-super-agenda]]
+  - [[#org-super-agendadisabled][org-super-agenda(disabled)]]
   - [[#org-ql][org-ql]]
   - [[#mpvi][mpvi]]
   - [[#orgtbl-aggregate][orgtbl-aggregate]]
@@ -962,21 +963,19 @@ diff-hl-mode highlights uncommitted changes on the left side of the window (area
 ** no-littering
 #+begin_src elisp
 (setup no-littering
-  (:defer
-   (require 'no-littering))
-  (setq no-littering-var-directory (expand-file-name (concat user-emacs-directory "var/"))
-        no-littering-etc-directory (expand-file-name (concat user-emacs-directory "etc/")))
+  ;; (setq no-littering-var-directory (expand-file-name (concat user-emacs-directory "var/"))
+  ;;       no-littering-etc-directory (expand-file-name (concat user-emacs-directory "etc/")))
+   (require 'no-littering)
   )
 #+end_src
 ** recentf
 #+begin_src elisp
 (setup recentf
-  (:defer
    (setq recentf-max-saved-items 1000
          recentf-exclude `("/tmp/" "/ssh:" ,(concat user-emacs-directory "lib/.*-autoloads\\.el\\'")))
    (add-to-list 'recentf-exclude no-littering-var-directory)
    (add-to-list 'recentf-exclude no-littering-etc-directory)
-   (recentf-mode))
+   (recentf-mode)
   )
 #+end_src
 ** 自动换行
@@ -1326,7 +1325,7 @@ Dirvish is a minimalistic file manager based on Dired. It's fast
   (setq dirvish-attributes '(subtree-state nerd-icons)
         dirvish-side-width 40)
   (:bind "TAB" dirvish-toggle-subtree)
-  (add-hook 'dired-load-hook #'dirvish-override-dired-mode)
+  (add-hook 'dired-mode-hook #'dirvish-override-dired-mode)
   (:when-loaded
     (dirvish-side-follow-mode)))
 #+end_src
@@ -1472,6 +1471,10 @@ Dirvish is a minimalistic file manager based on Dired. It's fast
 #+begin_src elisp
 (setup eshell)
 #+end_src
+** eat
+#+begin_src elisp
+(setup eat)
+#+end_src
 * git
 ** magit
 #+begin_src elisp
@@ -1610,7 +1613,8 @@ Emacs major-mode to work with Beancount ledger files
 #+begin_src elisp
 (setup treesit-auto
   (:defer
-   (require 'treesit-auto))
+   (if (treesit-available-p)
+       (require 'treesit-auto)))
   (:when-loaded
     (global-treesit-auto-mode)
     (setq treesit-auto-install t)
@@ -1649,17 +1653,10 @@ Emacs major-mode to work with Beancount ledger files
 #+end_src
 ***** lsp-bridge
 install dependencies.
-
-if you use pypy3:
-#+begin_src bash
-pypy3 -m pip install epc sexpdata six paramiko
-#+end_src
-else:
 #+begin_src bash
 pip3 install epc orjson sexpdata six paramiko
 #+end_src
 #+begin_src elisp
-(defvar use-pypy3 nil)
 (setup lsp-bridge
   (setq lsp-bridge-enable-org-babel nil
         lsp-bridge-python-lsp-server "pylsp"
@@ -1670,8 +1667,6 @@ pip3 install epc orjson sexpdata six paramiko
         acm-enable-codeium nil
         acm-backend-codeium-api-key-path (concat nowis-doc-emacs-dir "08-keys/codeium_api_key.txt")
         )
-  (if use-pypy3
-      (setq lsp-bridge-python-command "pypy3"))
   (:defer
    (global-lsp-bridge-mode)))
 #+end_src
@@ -1687,6 +1682,12 @@ Citre is an advanced Ctags (or actually, readtags) frontend for Emacs.
         ;; citre-auto-enable-citre-mode-modes '(prog-mode)
         )
   )
+#+end_src
+**** dumb-jump
+#+begin_src elisp
+(setup popup)
+(setup dumb-jump)
+(add-hook 'xref-backend-functions #'dumb-jump-xref-activate)
 #+end_src
 *** quickrun
 #+begin_src elisp
@@ -2205,7 +2206,7 @@ https://dindi.garjola.net/org-agenda-weekly.html
   )
 #+end_src
 
-** org-super-agenda
+** org-super-agenda(disabled)
 #+begin_src elisp :tangle no
 (setup org-super-agenda
   (:hook-into org-agenda-mode))
@@ -2258,7 +2259,7 @@ https://dindi.garjola.net/org-agenda-weekly.html
 ;; TODO use let to add all files under gtd in agenda-files for full-search, with last 7 days and 30 days DOWN
 #+end_src
 ** org-ql
-#+begin_src elisp
+#+begin_src elisp :tangle no
 (setup ts)
 (setup peg)
 (setup ov)
@@ -2494,12 +2495,13 @@ Simple distraction-free editing. I use darkroom instead of writeroom because it'
 (setup gptel
   (setq gptel-default-mode 'org-mode
         gptel-host "api.chatanywhere.com.cn"
+        gptel-crowdsourced-prompts-file (concat nowis-doc-emacs-dir "09-scripts/chatgpt.csv")
         )
   (:global "M-p" gptel-send
            "M-P" gptel-menu))
 #+end_src
 *** whisper.el
-#+begin_src elisp
+#+begin_src elisp :tangle no
 (setup whisper
   (setq whisper-install-directory (concat no-littering-var-directory "whisper")
            whisper-language "zh"
