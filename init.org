@@ -123,6 +123,7 @@ I failed in love with denote, so previous *org-roam* configs were refiled into [
 - [[#tools][tools]]
   - [[#xwidget-and-browser][xwidget and browser]]
   - [[#eaf][eaf]]
+  - [[#holo-layer][holo-layer]]
   - [[#app-launcher][app-launcher]]
   - [[#gif-screencast][gif-screencast]]
   - [[#ai-related][ai related]]
@@ -2404,6 +2405,14 @@ Simple distraction-free editing. I use darkroom instead of writeroom because it'
   ;; (add-hook 'org-mode-hook 'eaf-interleave-mode)
   )
 #+end_src
+** holo-layer
+#+begin_src elisp :tangle no
+(setup holo-layer
+  (require 'holo-layer)
+  (setq holo-layer-enable-cursor-animation t)
+  (holo-layer-enable)
+  )
+#+end_src
 ** app-launcher
 #+begin_src elisp
 (setup app-launcher)
@@ -2474,21 +2483,21 @@ Simple distraction-free editing. I use darkroom instead of writeroom because it'
 #+begin_src elisp
 (defun backup-push-emacs-doc()
   (interactive)
-  (async-shell-command " rsync -avbih --delete --backup-dir=../back_restore/ --exclude '.git' \
-     ~/Documents/emacs/ lewis-nas@192.168.31.108:/share/my_webdav/rsync/emacs/"))
+  (async-shell-command " rsync -avbih --exclude '.git' \
+     ~/Documents/emacs/02-binary-files/ lewis-nas@192.168.31.108:/share/my_webdav/rsync/emacs/02-binary-files/"))
 
 (defun backup-restore-emacs-doc()
   (interactive)
-  (async-shell-command " rsync -avbih --delete --backup-dir=../back_restore/ --exclude '.git' \
- lewis-nas@192.168.31.108:/share/my_webdav/rsync/emacs/ ~/Documents/emacs/"))
+  (async-shell-command " rsync -avbih --exclude '.git' \
+ lewis-nas@192.168.31.108:/share/my_webdav/rsync/emacs/02-binary-files/ ~/Documents/emacs/02-binary-files/"))
 
 (defun backup-sync-emacs-doc()
   (interactive)
   (async-shell-command "
-rsync -avihbu --backup-dir=../back_restore/ --exclude '.git' \
-      lewis-nas@192.168.31.108:/share/my_webdav/rsync/emacs/ ~/Documents/emacs/ \
-    && rsync -avbih --delete --backup-dir=../back_restore/ --exclude '.git'\
-             ~/Documents/emacs/ lewis-nas@192.168.31.108:/share/my_webdav/rsync/emacs/ "))
+rsync -avihbu --exclude '.git' \
+      lewis-nas@192.168.31.108:/share/my_webdav/rsync/emacs/02-binary-files/ ~/Documents/emacs/02-binary-files/ \
+    && rsync -avbih --delete --exclude '.git'\
+             ~/Documents/emacs/02-binary-files/ lewis-nas@192.168.31.108:/share/my_webdav/rsync/emacs/02-binary-files/ "))
 
 (defun backup-sync-tmp-doc()
   (interactive)

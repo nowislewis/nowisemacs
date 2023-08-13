@@ -155,6 +155,9 @@
 [submodule "hl-todo"]
 	path = lib/hl-todo
 	url = https://github.com/tarsius/hl-todo.git
+[submodule "holo-layer"]
+	path = lib/holo-layer
+	url = https://github.com/manateelazycat/holo-layer.git
 [submodule "ht"]
 	path = lib/ht
 	url = https://github.com/Wilfred/ht.el.git
