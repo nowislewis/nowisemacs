@@ -157,7 +157,7 @@ I failed in love with denote, so previous *org-roam* configs were refiled into [
 ;; no title bar
 ;; (add-to-list 'default-frame-alist '(undecorated . t))
 ;; Faster to disable these here (before they've been initialized)
-(push '(alpha-background . 85) default-frame-alist)
+;; (push '(alpha-background . 85) default-frame-alist)
 (push '(menu-bar-lines . 0) default-frame-alist)
 (push '(tool-bar-lines . 0) default-frame-alist)
 (push '(vertical-scroll-bars) default-frame-alist)
@@ -354,34 +354,35 @@ Maybe I should add a new state.
 (setup meow
   (require 'meow)
   (setq meow-use-keypad-when-execute-kbd nil
-           meow-expand-exclude-mode-list nil
-           meow-use-clipboard t
-           meow-cursor-type-normal '(bar . 5)
-           meow-cursor-type-insert '(bar . 1)
-           meow-replace-state-name-list '((normal . "N")
-                                          (motion . "M")
-                                          (keypad . "K")
-                                          (insert . "I")
-                                          (beacon . "B"))
-           meow-use-enhanced-selection-effect t
-           meow-cheatsheet-layout meow-cheatsheet-layout-qwerty
-           meow-keypad-start-keys '((?c . ?c)
-                                    (?x . ?x))
-           meow-char-thing-table '((?\( . round)
-                                   (?\) . round)
-                                   (?\[ . square)
-                                   (?\] . square)
-                                   (?\{ . curly)
-                                   (?\} . curly)
-                                   (?\" . string)
-                                   (?w . symbol)
-                                   ;; (?w . window)
-                                   (?b . buffer)
-                                   (?p . paragraph)
-                                   (?l . line)
-                                   (?d . defun)
-                                   (?s . sentence))
-           )
+        meow-expand-exclude-mode-list nil
+        meow-use-clipboard t
+        ;; meow-cursor-type-normal '(bar . 5)
+        meow-cursor-type-normal 'box
+        meow-cursor-type-insert '(bar . 1)
+        meow-replace-state-name-list '((normal . "N")
+                                       (motion . "M")
+                                       (keypad . "K")
+                                       (insert . "I")
+                                       (beacon . "B"))
+        meow-use-enhanced-selection-effect t
+        meow-cheatsheet-layout meow-cheatsheet-layout-qwerty
+        meow-keypad-start-keys '((?c . ?c)
+                                 (?x . ?x))
+        meow-char-thing-table '((?\( . round)
+                                (?\) . round)
+                                (?\[ . square)
+                                (?\] . square)
+                                (?\{ . curly)
+                                (?\} . curly)
+                                (?\" . string)
+                                (?w . symbol)
+                                ;; (?w . window)
+                                (?b . buffer)
+                                (?p . paragraph)
+                                (?l . line)
+                                (?d . defun)
+                                (?s . sentence))
+        )
   ;; motion keys
   (meow-motion-overwrite-define-key '("j" . meow-next)
                                     '("k" . meow-prev)
@@ -401,7 +402,7 @@ Maybe I should add a new state.
                           '("2" . meow-expand-2)
                           '("1" . meow-expand-1)
 
-                          '("a" . meow-append)
+                          '("a" . meow-vim-append)
                           ;; '("A" . meow-append-vim)
                           '("b" . meow-back-word)
                           '("B" . meow-back-symbol)
@@ -432,7 +433,6 @@ Maybe I should add a new state.
                           '("p" . meow-yank)
                           '("P" . meow-yank-pop);;
                           '("q" . meow-quit)
-                          ;; '("Q" . meow-goto-line)
                           '("Q" . consult-goto-line)
                           '("r" . meow-replace)
                           '("R" . meow-swap-grab)
@@ -458,17 +458,9 @@ Maybe I should add a new state.
 
                           '("v i" . meow-inner-of-thing)
                           '("v a" . meow-bounds-of-thing)
-                          ;; '("v \'" . insert-quotations)
-                          ;; '("v \"" . insert-quotes)
-                          ;; '("v \`" . insert-backquote)
-                          ;; '("v *" . insert-star)
-                          ;; '("v (" . insert-parentheses)
-                          ;; '("v [" . insert-bracket)
-                          ;; '("v {" . insert-curly)
                           '("v =" . insert-equation)
 
                           '("-" . negative-argument)
-                          ;; '("=" . format-all-region)
                           '("=" . indent-region)
                           '("[" . meow-beginning-of-thing)
                           '("]" . meow-end-of-thing)
@@ -486,6 +478,23 @@ Maybe I should add a new state.
                           '("^" . meow-join)
                           '("*" . embark-next-symbol)
                           '("/" . consult-line))
+  (defun meow-vim-append ()
+    "Like vim, move to the end of selection, switch to INSERT state."
+    (interactive)
+    (if meow--temp-normal
+        (progn
+          (message "Quit temporary normal mode")
+          (meow--switch-state 'motion))
+      (if (not (region-active-p))
+          (progn
+            (when (and meow-use-cursor-position-hack
+                       (< (point) (point-max)))
+              (forward-char 1))
+            (forward-char 1)
+            )
+        (meow--direction-forward)
+        (meow--cancel-selection))
+      (meow--switch-state 'insert)))
   (meow-global-mode 1))
 #+end_src
 ** transient and related leader-map
@@ -2406,11 +2415,16 @@ Simple distraction-free editing. I use darkroom instead of writeroom because it'
   )
 #+end_src
 ** holo-layer
-#+begin_src elisp :tangle no
+#+begin_src elisp
 (setup holo-layer
-  (require 'holo-layer)
-  (setq holo-layer-enable-cursor-animation t)
-  (holo-layer-enable)
+  (when (eq system-type 'darwin)
+    (require 'holo-layer)
+    (setq holo-layer-enable-cursor-animation t
+          holo-layer-enable-window-border t
+          holo-layer-enable-place-info t
+          )
+    (holo-layer-enable)
+    )
   )
 #+end_src
 ** app-launcher
