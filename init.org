@@ -18,6 +18,10 @@ I failed in love with denote, so previous *org-roam* configs were refiled into [
   - [[#meow-leader-keybindings][meow leader keybindings]]
   - [[#which-key][which-key]]
   - [[#electric][electric]]
+- [[#package-library][Package Library]]
+  - [[#dash][dash]]
+  - [[#s][s]]
+  - [[#f][f]]
 - [[#ui][UI]]
   - [[#font][font]]
   - [[#theme][Theme]]
@@ -614,11 +618,12 @@ Maybe I should add a new state.
   "Define leader-key map for notes functions"
   [["Roam"
     ("r f" "denote-open-or-create" denote-open-or-create-with-subdirectory)
-    ("r p" "find-papers-dir" project-find-papers-dir-files)
-    ("r s" "find-searchable-dir" project-find-searchable-dir-files)
-    ("r o" "find-orgmode-dir" project-find-orgmode-dir-files)
+    ("r p" "find-papers" project-find-papers-dir-files)
+    ("r s" "find-all-searchable" project-find-searchable-dir-files)
     ;; ("rc" "consult-notes" consult-notes)
-    ("r g" "project-find-gtd-dir-files" project-find-gtd-dir-files)]
+    ("r g" "project-find-gtd-dir-files" project-find-gtd-dir-files)
+    ("r z" "ls zettel" my/zettel-signature-buffer)
+    ]
    ["bibtex"
     ("e" "ebib" ebib)
     ("b" "citar-open" citar-open)
@@ -745,6 +750,19 @@ Maybe I should add a new state.
 #+begin_src elisp
 (setup elec-pair
   (electric-pair-mode))
+#+end_src
+* Package Library
+** dash
+#+begin_src elisp
+(setup dash)
+#+end_src
+** s
+#+begin_src elisp
+(setup s)
+#+end_src
+** f
+#+begin_src elisp
+(setup f)
 #+end_src
 * UI
 ** font
@@ -881,17 +899,18 @@ diff-hl-mode highlights uncommitted changes on the left side of the window (area
 #+end_src
 ** doom-modeline
 #+begin_src elisp
-(setup dash)
-(setup s)
-(setup f)
-(setup shrink-path) ;; <-(setup s)(setup f)
+(setup shrink-path)
 
 (setup doom-modeline
-  (setq doom-modeline-window-width-limit fill-column
-           doom-modeline-height 5
-           doom-modeline-hud t
-           ;; doom-modeline-icon nil
-           doom-modeline-unicode-fallback t)
+  (setq doom-modeline-height 1
+        ;; doom-modeline-hud t
+        doom-modeline-unicode-fallback t)
+  (:when-loaded
+    (custom-set-faces
+     '(mode-line ((t (:height 0.9))))
+     '(mode-line-active ((t (:height 0.9)))) ; For 29+
+     '(mode-line-inactive ((t (:height 0.9))))) ; xs
+     )
   (:hook-into after-init))
 #+end_src
 ** hl-todo
@@ -902,7 +921,9 @@ diff-hl-mode highlights uncommitted changes on the left side of the window (area
 ** pulsar
 #+begin_src elisp
 (setup pulsar
-  (pulsar-global-mode 1))
+  (pulsar-global-mode 1)
+  (:when-loaded
+  (add-hook 'pulsar-pulse-functions 'ace-window)))
 #+end_src
 ** show-paren-mode
 #+begin_src elisp
@@ -921,8 +942,7 @@ diff-hl-mode highlights uncommitted changes on the left side of the window (area
         kill-do-not-save-duplicates t
         shell-command-prompt-show-cwd t
         what-cursor-show-names t)
-  ;; for now, I need a clear line mode
-  ;; (global-visual-line-mode)
+  (global-visual-line-mode)
   )
 #+end_src
 ** general builtin modes
@@ -1321,7 +1341,7 @@ borrowed from citre, now you can always jump-back use "M-," after any jump in th
 #+end_src
 *** dirvish
 Dirvish is a minimalistic file manager based on Dired. It's fast
-#+begin_src elisp
+#+begin_src elisp :tangle no
 (setup dirvish
   (setq dirvish-attributes '(subtree-state nerd-icons)
         dirvish-side-width 40)
@@ -1334,6 +1354,18 @@ Dirvish is a minimalistic file manager based on Dired. It's fast
 #+begin_src elisp
 (setup dired-rsync)
 #+end_src
+*** dired-preview
+#+begin_src elisp
+(setup dired-preview
+  (setq dired-preview-delay 0.3)
+  (add-hook 'dired-mode-hook #'dired-preview-mode)
+  )
+#+end_src
+*** nerd-icons-dired
+#+begin_src elisp
+(setup nerd-icons-dired)
+(add-hook 'dired-mode-hook #'nerd-icons-dired-mode)
+#+end_src
 ** structure browsing
 *** imenu-list
 #+begin_src elisp
@@ -1344,6 +1376,13 @@ Dirvish is a minimalistic file manager based on Dired. It's fast
            imenu-list-position 'left
            imenu-list-auto-update nil
            ))
+#+end_src
+*** maple-explorer
+#+begin_src elisp
+(setup maple-explorer
+  (:autoload maple-explorer-file maple-explorer-buffer maple-explorer-imenu maple-explorer-recentf)
+  (setq maple-explorer-file-display-alist '((side . left) (slot . -1))
+        maple-explorer-imenu-display-alist '((side . left) (slot . -1))))
 #+end_src
 ** tab-line and tab-bar
 #+name: tab-bar
@@ -2068,7 +2107,9 @@ Borrowed from https://github.com/protesilaos/denote/issues/115
 
 (defun my/zettel-signature-buffer ()
   (interactive)
-  (let ((find-ls-option '(" -exec ls -ld {} \\+| awk /==/ | sed  's/--/=@/3' | sort -t '=' -k 3,3 -k4,4 -k5,5 -k6,6 | sed 's/=@/--/'" . "-ld")))
+  (if (not (featurep 'find-dired))
+      (require 'find-dired))
+  (let ((find-ls-option '(" -exec ls -ld {} \\+| awk /==/ |sort -t '=' -k 3" . "-ld")))
     (find-dired denote-directory "")))
 
 (defun my/zettel-main-topics ()
@@ -2078,11 +2119,6 @@ Borrowed from https://github.com/protesilaos/denote/issues/115
 #+end_src
 ** find orgmode dir files
 #+begin_src elisp
-(defun project-find-orgmode-dir-files ()
-  (interactive)
-  (dired (concat nowis-doc-emacs-dir "01-orgmode")
-         (project-find-file t)))
-
 (defun project-find-papers-dir-files ()
   (interactive)
   (dired (concat nowis-doc-emacs-dir "02-binary-files/02-searchable/01-papers-markable"))
