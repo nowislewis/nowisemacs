@@ -240,6 +240,9 @@
 [submodule "org-elp"]
 	path = lib/org-elp
 	url = https://github.com/guanyilun/org-elp.git
+[submodule "org-fc"]
+	path = lib/org-fc
+	url = https://github.com/l3kn/org-fc.git
 [submodule "org-gtd"]
 	path = lib/org-gtd
 	url = https://github.com/Trevoke/org-gtd.el.git

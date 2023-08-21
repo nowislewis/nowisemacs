@@ -111,6 +111,7 @@ I failed in love with denote, so previous *org-roam* configs were refiled into [
   - [[#org-ql][org-ql]]
   - [[#mpvi][mpvi]]
   - [[#orgtbl-aggregate][orgtbl-aggregate]]
+  - [[#org-fc][org-fc]]
 - [[#english-翻译][english 翻译]]
   - [[#go-translate][go-translate]]
   - [[#sdcv][sdcv]]
@@ -499,7 +500,13 @@ Maybe I should add a new state.
         (meow--direction-forward)
         (meow--cancel-selection))
       (meow--switch-state 'insert)))
-  (meow-global-mode 1))
+  (meow-global-mode 1)
+  (when (featurep 'org-fc)
+    (progn
+     (add-to-list 'meow-mode-state-list '(org-fc-review-rate-mode . insert))
+     (add-to-list 'meow-mode-state-list '(org-fc-review-flip-mode . insert)))
+    )
+  )
 #+end_src
 ** transient and related leader-map
 *** transient
@@ -633,6 +640,14 @@ Maybe I should add a new state.
    ;;  ]
    ["org-noter"
     ("n" "org-noter" org-noter)]
+   ["org fc"
+    ("f r" "review-all" org-fc-review-all)
+    ("f u" "update card" org-fc-update)
+    ("f n" "normal init" org-fc-type-normal-init)
+    ("f d" "double init" org-fc-type-double-init)
+    ("f t" "text input" org-fc-type-text-input-init)
+    ("f c" "cloze init" org-fc-type-cloze-init)
+    ]
    ])
 #+end_src
 *** search
@@ -2258,6 +2273,18 @@ Integrate Org with Video
 Aggregating a table is creating a new table by computing sums, averages, and so on, out of material from the first table.
 #+begin_src elisp
 (setup orgtbl-qggregate)
+#+end_src
+** org-fc
+Spaced Repetition System for Emacs org-mode
+#+begin_src elisp
+(setup org-fc
+  (autoload #'org-fc-review-all "org-fc" nil t)
+  (setq org-fc-directories (list denote-directory)
+        org-fc-review-history-file (concat nowis-doc-emacs-dir "org-fc-reviews.tsv")
+        )
+  (:when-loaded
+    (require 'org-fc-keymap-hint)
+    ))
 #+end_src
 * english 翻译
 ** go-translate
