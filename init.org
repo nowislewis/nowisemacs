@@ -24,6 +24,7 @@ I failed in love with denote, so previous *org-roam* configs were refiled into [
   - [[#f][f]]
 - [[#ui][UI]]
   - [[#font][font]]
+  - [[#variable-pitch][variable-pitch]]
   - [[#theme][Theme]]
   - [[#line-number][line number]]
   - [[#nerd-icons][nerd-icons]]
@@ -522,31 +523,30 @@ Maybe I should add a new state.
 (transient-define-prefix g-extra-commands()
   "Define notes leader-key maps"
   [["Code find"
-    ;; ("d" "find-definitions" xref-find-definitions)
-    ;; ("D" "find-references" xref-find-references)
-    ;; ("j" "find-apropos" xref-find-apropos)
-    ;; ("i" "find-impl" eglot-find-implementation)
-    ;; ("o" "find-def-other-window" xref-find-definitions-other-window)
-    ("d" "find-definitions" lsp-bridge-find-def)
-    ("D" "find-references" lsp-bridge-find-references)
+    ("d" "find-definitions" xref-find-definitions)
+    ("D" "find-references" xref-find-references)
+    ("i" "find-impl" eglot-find-implementation)
+    ;; ("d" "find-definitions" lsp-bridge-find-def)
+    ;; ("D" "find-references" lsp-bridge-find-references)
+    ;; ("i" "find-impl" lsp-bridge-find-impl)
+
     ("j" "find-apropos" xref-find-apropos)
-    ("i" "find-impl" lsp-bridge-find-impl)
     ("o" "find-def-other-window" xref-find-definitions-other-window)
     ]
    ["Code action"
-    ;; ("a" "code-actions" eglot-code-actions)
-    ;; ("r" "rename" eglot-rename)
-    ("a" "code-actions" lsp-bridge-code-action)
-    ("r" "rename" lsp-bridge-rename)
+    ("a" "code-actions" eglot-code-actions)
+    ("r" "rename" eglot-rename)
+    ;; ("a" "code-actions" lsp-bridge-code-action)
+    ;; ("r" "rename" lsp-bridge-rename)
     ("f" "format-all-region" format-all-region)
     ("F" "format-all-buffer" format-all-buffer)]
    ["diagnostic"
-    ;; ("n" "jump-to-next-diagnostic" flymake-goto-next-error)
-    ;; ("p" "jump-to-prev-diagnostic" flymake-goto-prev-error)
-    ;; ("l" "list-diagnostics" consult-flymake)
-    ("n" "jump-to-next-diagnostic" lsp-bridge-diagnostic-jump-next)
-    ("p" "jump-to-prev-diagnostic" lsp-bridge-diagnostic-jump-prev)
-    ("l" "list-diagnostics" lsp-bridge-diagnostic-list)
+    ("n" "jump-to-next-diagnostic" flymake-goto-next-error)
+    ("p" "jump-to-prev-diagnostic" flymake-goto-prev-error)
+    ("l" "list-diagnostics" consult-flymake)
+    ;; ("n" "jump-to-next-diagnostic" lsp-bridge-diagnostic-jump-next)
+    ;; ("p" "jump-to-prev-diagnostic" lsp-bridge-diagnostic-jump-prev)
+    ;; ("l" "list-diagnostics" lsp-bridge-diagnostic-list)
     ]
    ["Navigate"
     ("m" "consult-mark" consult-mark)
@@ -703,11 +703,20 @@ Maybe I should add a new state.
 *** gtd
 #+begin_src elisp
 (transient-define-prefix org-gtd-leader-map()
-  "Define leader-key map for file-related functions"
+  "Define leader-key map for org-gtd functions"
   [("c" "capture" org-gtd-capture)
     ("e" "engage" org-gtd-engage)
     ("p" "process inbox" org-gtd-process-inbox)
     ("o" "organize" org-gtd-organize)])
+#+end_src
+*** ui
+#+begin_src elisp
+(transient-define-prefix ui-leader-map()
+  "Define leader-key map for ui functions"
+  [("v" "variable-pitch" variable-pitch-mode)
+   ("d" "darkroom" darkroom-mode)
+    ])
+
 #+end_src
 ** meow leader keybindings
 #+name: meow-leader-keys
@@ -750,7 +759,10 @@ Maybe I should add a new state.
  ;;w workspace
  '("TAB" . tabspaces-leader-map)
  ;; org gtd
- '("d" . org-gtd-leader-map))
+ '("d" . org-gtd-leader-map)
+ ;; ui
+ '("u" . ui-leader-map)
+ )
 #+END_SRC
 ** which-key
 #+name: which-key
@@ -807,6 +819,7 @@ Maybe I should add a new state.
                                 return font))
 ;; variable font
 (setq lewis-variable-font (cl-loop for font in '(
+                                                 "Source Han Sans SC VF"
                                                  "Noto Sans CJK SC"
                                                  "Arial"
                                                  "Helvetica"
@@ -853,6 +866,12 @@ Maybe I should add a new state.
   )
 
 (nowis-setup-fonts)
+#+end_src
+** variable-pitch
+#+begin_src elisp
+(defun dynamic-change-line-spacing( &optional ARG)
+  (if line-spacing (setq-local line-spacing nil) (setq-local line-spacing 0.3)))
+(advice-add 'variable-pitch-mode :after #'dynamic-change-line-spacing)
 #+end_src
 ** Theme
 *** ef-themes
@@ -1169,12 +1188,12 @@ should be check after reading the embark.el manual
     (:bind "M-]"  tempel-next
            "M-["  tempel-previous)))
 ;; Setup completion at point
-(defun tempel-setup-capf ()
-  (setq-local completion-at-point-functions
-              (cons #'tempel-completed
-                    completion-at-point-functions)))
-(add-hook 'prog-mode-hook 'tempel-setup-capf)
-(add-hook 'text-mode-hook 'tempel-setup-capf)
+;; (defun tempel-setup-capf ()
+;;   (setq-local completion-at-point-functions
+;;               (cons #'tempel-completed
+;;                     completion-at-point-functions)))
+;; (add-hook 'prog-mode-hook 'tempel-setup-capf)
+;; (add-hook 'text-mode-hook 'tempel-setup-capf)
 #+end_src
 * Window Management
 ** winner-mode
@@ -1677,6 +1696,94 @@ Emacs major-mode to work with Beancount ledger files
   )
 #+end_src
 *** Complete
+**** corfu related
+***** corfu
+#+begin_src elisp :tangle no
+(setup corfu
+  (setq corfu-cycle t                ;; Enable cycling for `corfu-next/previous'
+        corfu-auto t                 ;; Enable auto completion
+        corfu-quit-no-match t        ;; Automatically quit if there is no match
+        corfu-preview-current nil    ;; Disable current candidate preview
+        corfu-auto-prefix 1
+        corfu-auto-delay 0.05
+        corfu-scroll-margin 5)        ;; Use scroll margin
+  (global-corfu-mode)
+  (:with-map corfu-map
+    (:bind "<escape>" corfu-quit))
+  (global-corfu-mode)
+  (add-hook 'minibuffer-setup-hook #'corfu-enable-always-in-minibuffer 1)
+  )
+(setup corfu-popupinfo
+(:load-after corfu)
+(setq corfu-popupinfo-delay '(0.5 . 0.5))
+  (:hook corfu-popupinfo-mode))
+(defun corfu-enable-always-in-minibuffer ()
+  "Enable Corfu in the minibuffer if Vertico/Mct are not active."
+  (unless (or (bound-and-true-p mct--active)
+              (bound-and-true-p vertico--input)
+              (eq (current-local-map) read-passwd-map))
+    (setq-local corfu-echo-delay nil ;; Disable automatic echo and popup
+                corfu-popupinfo-delay nil)
+    (corfu-mode 1)))
+(setup cape
+;;   ;; (add-to-list 'completion-at-point-functions #'cape-tex)
+  (add-to-list 'completion-at-point-functions #'cape-dabbrev)
+  (add-to-list 'completion-at-point-functions #'cape-elisp-block)
+  (add-to-list 'completion-at-point-functions #'cape-file)
+;;   ;; (add-to-list 'completion-at-point-functions #'cape-keyword)
+  )
+#+end_src
+***** kind-icon
+#+begin_src elisp
+(setq kind-icon-use-icons nil)
+(setq kind-icon-mapping
+      `(
+        (array ,(nerd-icons-codicon "nf-cod-symbol_array") :face font-lock-type-face)
+        (boolean ,(nerd-icons-codicon "nf-cod-symbol_boolean") :face font-lock-builtin-face)
+        (class ,(nerd-icons-codicon "nf-cod-symbol_class") :face font-lock-type-face)
+        (color ,(nerd-icons-codicon "nf-cod-symbol_color") :face success)
+        (command ,(nerd-icons-codicon "nf-cod-terminal") :face default)
+        (constant ,(nerd-icons-codicon "nf-cod-symbol_constant") :face font-lock-constant-face)
+        (constructor ,(nerd-icons-codicon "nf-cod-triangle_right") :face font-lock-function-name-face)
+        (enummember ,(nerd-icons-codicon "nf-cod-symbol_enum_member") :face font-lock-builtin-face)
+        (enum-member ,(nerd-icons-codicon "nf-cod-symbol_enum_member") :face font-lock-builtin-face)
+        (enum ,(nerd-icons-codicon "nf-cod-symbol_enum") :face font-lock-builtin-face)
+        (event ,(nerd-icons-codicon "nf-cod-symbol_event") :face font-lock-warning-face)
+        (field ,(nerd-icons-codicon "nf-cod-symbol_field") :face font-lock-variable-name-face)
+        (file ,(nerd-icons-codicon "nf-cod-symbol_file") :face font-lock-string-face)
+        (folder ,(nerd-icons-codicon "nf-cod-folder") :face font-lock-doc-face)
+        (interface ,(nerd-icons-codicon "nf-cod-symbol_interface") :face font-lock-type-face)
+        (keyword ,(nerd-icons-codicon "nf-cod-symbol_keyword") :face font-lock-keyword-face)
+        (macro ,(nerd-icons-codicon "nf-cod-symbol_misc") :face font-lock-keyword-face)
+        (magic ,(nerd-icons-codicon "nf-cod-wand") :face font-lock-builtin-face)
+        (method ,(nerd-icons-codicon "nf-cod-symbol_method") :face font-lock-function-name-face)
+        (function ,(nerd-icons-codicon "nf-cod-symbol_method") :face font-lock-function-name-face)
+        (module ,(nerd-icons-codicon "nf-cod-file_submodule") :face font-lock-preprocessor-face)
+        (numeric ,(nerd-icons-codicon "nf-cod-symbol_numeric") :face font-lock-builtin-face)
+        (operator ,(nerd-icons-codicon "nf-cod-symbol_operator") :face font-lock-comment-delimiter-face)
+        (param ,(nerd-icons-codicon "nf-cod-symbol_parameter") :face default)
+        (property ,(nerd-icons-codicon "nf-cod-symbol_property") :face font-lock-variable-name-face)
+        (reference ,(nerd-icons-codicon "nf-cod-references") :face font-lock-variable-name-face)
+        (snippet ,(nerd-icons-codicon "nf-cod-symbol_snippet") :face font-lock-string-face)
+        (string ,(nerd-icons-codicon "nf-cod-symbol_string") :face font-lock-string-face)
+        (struct ,(nerd-icons-codicon "nf-cod-symbol_structure") :face font-lock-variable-name-face)
+        (text ,(nerd-icons-codicon "nf-cod-text_size") :face font-lock-doc-face)
+        (typeparameter ,(nerd-icons-codicon "nf-cod-list_unordered") :face font-lock-type-face)
+        (type-parameter ,(nerd-icons-codicon "nf-cod-list_unordered") :face font-lock-type-face)
+        (unit ,(nerd-icons-codicon "nf-cod-symbol_ruler") :face font-lock-constant-face)
+        (value ,(nerd-icons-codicon "nf-cod-symbol_field") :face font-lock-builtin-face)
+        (variable ,(nerd-icons-codicon "nf-cod-symbol_variable") :face font-lock-variable-name-face)
+        (t ,(nerd-icons-codicon "nf-cod-code") :face font-lock-warning-face)))
+
+(setup kind-icon
+  (:load-after corfu)
+  :custom
+  ;; (kind-icon-default-face 'corfu-default) ; to compute blended backgrounds correctly
+  (:when-loaded
+  (add-to-list 'corfu-margin-formatters #'kind-icon-margin-formatter)))
+
+
+#+end_src
 **** lsp mode
 ***** eglot
 #+begin_src elisp
@@ -1689,7 +1796,8 @@ Emacs major-mode to work with Beancount ledger files
 (setq read-process-output-max (* 1024 1024))
 (setup eglot
   (setq eglot-events-buffer-size 0
-           eglot-workspace-configuration '((:python.analysis :useLibraryCodeForTypes t)))
+           ;; eglot-workspace-configuration '((:python.analysis :useLibraryCodeForTypes t))
+           )
   (:autoload eglot-find-implementation)
   (:when-loaded
     (set-face-attribute 'eglot-highlight-symbol-face nil :background "#227700")
