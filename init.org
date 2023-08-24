@@ -594,7 +594,7 @@ Maybe I should add a new state.
    ["Org download"
     ("d" "Screenshot" org-download-screenshot)]
    ["Translate"
-    ("t" "toggle english helper" lsp-bridge-toggle-sdcv-helper)
+    ;; ("t" "toggle english helper" lsp-bridge-toggle-sdcv-helper)
     ("i" "immersive translate buffer" immersive-translate-buffer)
     ]])
 #+end_src
@@ -619,7 +619,7 @@ Maybe I should add a new state.
 (transient-define-prefix notes-leader-map()
   "Define leader-key map for notes functions"
   [["Roam"
-    ("r f" "denote-open-or-create" denote-open-or-create-with-subdirectory)
+    ("r f" "denote-open-or-create" denote-open-or-create)
     ("r p" "find-papers" project-find-papers-dir-files)
     ("r s" "find-all-searchable" project-find-searchable-dir-files)
     ;; ("rc" "consult-notes" consult-notes)
@@ -635,14 +635,8 @@ Maybe I should add a new state.
    ;;  ]
    ["org-noter"
     ("n" "org-noter" org-noter)]
-   ["org fc"
-    ("f r" "review-all" org-fc-review-all)
-    ("f u" "update card" org-fc-update)
-    ("f n" "normal init" org-fc-type-normal-init)
-    ("f d" "double init" org-fc-type-double-init)
-    ("f t" "text input" org-fc-type-text-input-init)
-    ("f c" "cloze init" org-fc-type-cloze-init)
-    ]
+   ["org-fc"
+    ("f" "org-fc" org-fc-transient-map )]
    ])
 #+end_src
 *** search
@@ -2245,15 +2239,6 @@ ln -s ~/Downloads/translators_CN/translators ~/Downloads/zotra-cli/module/transl
         denote-modules '(project))
   (add-hook 'dired-mode-hook #'denote-dired-mode-in-directories)
   ;; should add a hook for disable diredfl-mode
-      ;;;###autoload
-  (defun denote-open-or-create-with-subdirectory ()
-    "Invoke `denote-open-or-create' but also prompt for subdirectory.
-  This is the equivalent to calling `denote-open-or-create' when
-  `denote-prompts' is set to \\='(subdirectory title keywords)."
-    (declare (interactive-only t))
-    (interactive)
-    (let ((denote-prompts '(subdirectory title keywords)))
-      (call-interactively #'denote-open-or-create)))
   )
 #+end_src
 ** denote-lumn
@@ -2425,7 +2410,31 @@ Spaced Repetition System for Emacs org-mode
         )
   (:when-loaded
     (require 'org-fc-keymap-hint)
-     ))
+    ))
+(defun my-org-mode-hook ()
+  (when (bound-and-true-p org-fc-review-flip-mode)
+    (message "foo-minor-mode")))
+
+(add-hook 'org-fc-review-flip-mode-hook 'meow-motion-mode)
+
+(transient-define-prefix org-fc-transient-map()
+  "Define transient-key map for org-fc functions"
+  [["review"
+    ("r" "review" org-fc-review)
+    ("a" "review all" org-fc-review-all)
+    ("e" "edit" org-fc-review-edit)
+    ("q" "quit" org-fc-review-quit)
+    ("R" "resume" org-fc-review-resume)
+    ("s" "skip card" org-fc-review-skip-card)]
+   ["update"
+    ("u" "update" org-fc-update)
+    ("U" "update all" org-fc-update-all)
+    ("b" "dashboard" org-fc-dashboard)]
+   ["init"
+    ("c" "cloze" org-fc-type-cloze-init)
+    ("d" "double" org-fc-type-double-init)
+    ("n" "normal" org-fc-type-normal-init)
+    ("t" "text input" org-fc-type-text-input-init)]])
 #+end_src
 * english 翻译
 ** go-translate
@@ -2619,7 +2628,7 @@ Simple distraction-free editing. I use darkroom instead of writeroom because it'
   )
 #+end_src
 ** holo-layer
-#+begin_src elisp
+#+begin_src elisp :tangle no
 (setup holo-layer
   (when (eq system-type 'darwin)
     (require 'holo-layer)
