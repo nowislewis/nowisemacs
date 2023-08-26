@@ -1023,7 +1023,7 @@ diff-hl-mode highlights uncommitted changes on the left side of the window (area
 ** recentf
 #+begin_src elisp
 (setup recentf
-   (setq recentf-max-saved-items 1000
+   (setq recentf-max-saved-items 30
          recentf-exclude `("/tmp/" "/ssh:" ,(concat user-emacs-directory "lib/.*-autoloads\\.el\\'")))
    (add-to-list 'recentf-exclude no-littering-var-directory)
    (add-to-list 'recentf-exclude no-littering-etc-directory)
@@ -1717,18 +1717,27 @@ borrowed from citre, now you can always jump-back use "M-," after any jump in th
         corfu-auto-delay 0.05
         corfu-scroll-margin 5)        ;; Use scroll margin
   (:with-map corfu-map
-    (:bind "<escape>" corfu-quit))
+    (:bind "<escape>" my-corfu-quit))
+
+  (defun my-corfu-quit()
+    "when in corfu-map, quit corfu-selection and return to meow normal mode"
+    (interactive)
+    (corfu-quit)
+    (meow-insert-exit))
+
   (global-corfu-mode)
   (add-hook 'minibuffer-setup-hook #'corfu-enable-always-in-minibuffer 1)
   )
-
 (setup corfu-popupinfo
   (:load-after corfu)
   (setq corfu-popupinfo-delay '(0.5 . 0.5))
   (:hook corfu-popupinfo-mode))
 
 (setup cape
-  (add-to-list 'completion-at-point-functions #'cape-dabbrev)
+  ;; don't let dabbrev take over all things
+  (defalias 'cape-dabbrev-min-2 (cape-capf-prefix-length #'cape-dabbrev 2))
+  ;; (add-to-list 'completion-at-point-functions #'cape-dabbrev)
+  (add-to-list 'completion-at-point-functions #'cape-dabbrev-min-2)
   (add-to-list 'completion-at-point-functions #'cape-elisp-block)
   (add-to-list 'completion-at-point-functions #'cape-file)
   )
@@ -2404,24 +2413,24 @@ Aggregating a table is creating a new table by computing sums, averages, and so 
 Spaced Repetition System for Emacs org-mode
 #+begin_src elisp
 (setup org-fc
-  (autoload #'org-fc-review-all "org-fc" nil t)
+  (:autoload org-fc-review-all)
+  (:autoload org-fc-type-double-init)
+  (:autoload org-fc-type-normal-init)
   (setq org-fc-directories (list denote-directory)
         org-fc-review-history-file (concat nowis-doc-emacs-dir "org-fc-reviews.tsv")
         )
   (:when-loaded
     (require 'org-fc-keymap-hint)
     ))
-(defun my-org-mode-hook ()
-  (when (bound-and-true-p org-fc-review-flip-mode)
-    (message "foo-minor-mode")))
 
 (add-hook 'org-fc-review-flip-mode-hook 'meow-motion-mode)
+(add-hook 'org-fc-review-edit-mode-hook 'meow-normal-mode)
 
 (transient-define-prefix org-fc-transient-map()
   "Define transient-key map for org-fc functions"
   [["review"
-    ("r" "review" org-fc-review)
-    ("a" "review all" org-fc-review-all)
+    ("b" "review buffer" org-fc-review-buffer)
+    ("r" "review all" org-fc-review-all)
     ("e" "edit" org-fc-review-edit)
     ("q" "quit" org-fc-review-quit)
     ("R" "resume" org-fc-review-resume)
@@ -2435,6 +2444,8 @@ Spaced Repetition System for Emacs org-mode
     ("d" "double" org-fc-type-double-init)
     ("n" "normal" org-fc-type-normal-init)
     ("t" "text input" org-fc-type-text-input-init)]])
+
+
 #+end_src
 * english 翻译
 ** go-translate
@@ -2687,8 +2698,9 @@ Simple distraction-free editing. I use darkroom instead of writeroom because it'
 (setup webjump
   (setq webjump-sites '(
                         ;; Emacs.
-                        ("Emacs Home Page" .
-                         "www.gnu.org/software/emacs/emacs.html")
+                        ;; ("Emacs Home Page" .
+                        ;;  "www.gnu.org/software/emacs/emacs.html")
+
                         ;; Internet search engines.
                         ("Google" .
                          [simple-query "www.google.com"
@@ -2702,6 +2714,9 @@ Simple distraction-free editing. I use darkroom instead of writeroom because it'
                         ("Aur" .
                          [simple-query "aur.archlinux.org"
                                        "aur.archlinux.org/packages?O=0&K=" ""])
+                        ("leetcode-cn" .
+                         [simple-query "leetcode.cn"
+                                       "leetcode.cn/search/?q=" ""])
                         )))
 #+end_src
 
