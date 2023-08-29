@@ -502,6 +502,11 @@ Maybe I should add a new state.
         (meow--cancel-selection))
       (meow--switch-state 'insert)))
   (meow-global-mode 1)
+
+  (defun toggle-between-meow-normal-motion()
+    (interactive)
+    (if meow-motion-mode (meow-normal-mode) (meow-motion-mode)))
+  (global-set-key (kbd "M-\\") #'toggle-between-meow-normal-motion)
   )
 #+end_src
 ** transient and related leader-map
