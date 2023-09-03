@@ -94,6 +94,9 @@
 [submodule "ebib"]
 	path = lib/ebib
 	url = https://github.com/joostkremers/ebib.git
+[submodule "edwina"]
+	path = lib/edwina
+	url = https://github.com/ajgrf/edwina.git
 [submodule "el-themes"]
 	path = lib/el-themes
 	url = https://github.com/protesilaos/ef-themes.git

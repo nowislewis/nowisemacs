@@ -135,6 +135,7 @@ I failed in love with denote, so previous *org-roam* configs were refiled into [
   - [[#ai-related][ai related]]
   - [[#webjump][webjump]]
   - [[#scripts][scripts]]
+  - [[#backup-scripts][backup scripts]]
   - [[#video-and-music][video and music]]
   - [[#esup][esup]]
 - [[#use-single-file-to-load-configs][use single file to load configs]]
@@ -936,9 +937,9 @@ diff-hl-mode highlights uncommitted changes on the left side of the window (area
         doom-modeline-unicode-fallback t)
   (:when-loaded
     (custom-set-faces
-     '(mode-line ((t (:height 0.9))))
-     '(mode-line-active ((t (:height 0.9)))) ; For 29+
-     '(mode-line-inactive ((t (:height 0.9))))) ; xs
+     '(mode-line ((t (:height 0.8))))
+     '(mode-line-active ((t (:height 0.8)))) ; For 29+
+     '(mode-line-inactive ((t (:height 0.8))))) ; xs
      )
   (:hook-into after-init))
 #+end_src
@@ -1254,7 +1255,19 @@ Jump anywhere in the world
 #+begin_src elisp
 (setup ace-window
   (:global "M-o" ace-window))
-(setq aw-keys '(?a ?s ?d ?f ?g ?h ?j ?k ?l))
+(setq aw-keys '(?a ?s ?d ?f ?g ?h ?j ?k ?l)
+      aw-scope 'frame
+      )
+
+#+end_src
+*** edwina
+#+begin_src elisp :tangle no
+(setup edwina
+  (:defer
+   (require 'edwina)
+   (setq display-buffer-base-action '(display-buffer-in-direction (direction . up)))
+   (edwina-setup-dwm-keys 'super)
+   (edwina-mode 1)))
 #+end_src
 * ibuffer
 ** ibuffer
@@ -1385,7 +1398,7 @@ Dirvish is a minimalistic file manager based on Dired. It's fast
   (setq imenu-list-focus-after-activation t
            imenu-list-auto-resize t
            imenu-list-position 'left
-           imenu-list-auto-update nil
+           ;; imenu-list-auto-update nil
            ))
 #+end_src
 *** maple-explorer
@@ -2392,6 +2405,7 @@ Connecting clues while reading code.
 (setup org-agenda-property)
 (setq org-gtd-update-ack "3.0.0")
 (setq org-edna-use-inheritance t
+      org-gtd-areas-of-focus '("Growth" "Health" "Family" "Career")
       org-gtd-organize-hooks '(org-gtd-set-area-of-focus org-set-tags-command)
       org-gtd-directory nowis-gtd-dir)
 (setup org-gtd
@@ -2760,7 +2774,7 @@ Simple distraction-free editing. I use darkroom instead of writeroom because it'
 #+end_src
 
 ** scripts
-*** backup scripts
+** backup scripts
 #+begin_src elisp
 (defun backup-push-emacs-doc()
   (interactive)

@@ -17,10 +17,12 @@
   - [[#features][Features]]
   - [[#how-to-use][How to use]]
   - [[#how-to-customize][How to customize]]
-  - [[#ideas-behind-nowisemacs][Ideas behind nowisemacs]]
 - [[#useful-keybindings][Useful Keybindings]]
   - [[#leader-keybinds][leader keybinds]]
   - [[#vim-users-should-care][vim users should care]]
+- [[#ideas-behind-nowisemacs][Ideas behind nowisemacs]]
+  - [[#tl--nr][TL ; NR]]
+  - [[#description-in-detail][Description in detail]]
 - [[#things-you-must-know-before-going-deeper][Things you must know before going deeper]]
   - [[#radical][Radical]]
   - [[#sacrifice-for-simplicity][Sacrifice for simplicity]]
@@ -105,31 +107,6 @@ That't to say, after installation, there are only things you need to remember fo
 
 *It's suggested to read the [[https://emacsmirror.net/manual/borg/][borg]] for more details*.
 *** Some explanation about package configurations/setup.el
-** Ideas behind nowisemacs
-*** TL ; NR
-Concise + High maintainability
-*** Description in detail
-**** Understand Emacs from the perspective of system architecture
-1. Emacs can be regarded as a virtual machine of the lisp language. And the core function of a virtual machine is to
-   manage memory.
-2. The built-in variables and functions defined by Emacs are set together with the user-defined functions, and they are
-   all equivalent as First-class citizen.
-3. Therefore, most of the user's operation on Emacs correspond to a function, and users can modify all external or
-   built-in variables and functions. In other words, users should regard themselves as internal schedulers of the
-   system, not external users.
-**** Packages and related configurations should be simple
-Simplicity doesn't mean that the number of packages used is few, or the interface is ugly, but that the following
-concepts should be met as far as possible:
-1. Try to use built-in functions to reduce redundancy. The rational use of these APIs can greatly reduce the external
-   maintenance burden.
-2. Packages should be designed simple and flexible, which will reduce dependencies.
-3. Packages with less code or active updates will have higher priority.
-4. Try to use the default configuration or select packages with enough default configuration to avoid the update burden
-   caused by numerous hacks.
-**** Balance
-I like rich functionality, which allows me to have suitable solutions for various scenarios. Usually adding a functionality
-will increase the complexity of configurations. Nowisemacs looks for a balance between functionality and complexity by
-"concise" choices.
 * Useful Keybindings
 Nowisemacs uses space bars as leader key, you can find most keybindings in the Meow-Leader-Keys section [[file:init.org][here]]. Some common usages are as following:
 ** leader keybinds
@@ -165,6 +142,31 @@ Some useful keybindings for vim user:
 | c c    | meow-change, kill current selection and switch to INSERT state                 |
 | n      | moew-search, search and select with the car of the current regexp-search-ring  |
 
+* Ideas behind nowisemacs
+** TL ; NR
+Concise + High maintainability
+** Description in detail
+*** Understand Emacs from the perspective of system architecture
+1. Emacs can be regarded as a virtual machine of the lisp language. And the core function of a virtual machine is to
+   manage memory.
+2. The built-in variables and functions defined by Emacs are set together with the user-defined functions, and they are
+   all equivalent as First-class citizen.
+3. Therefore, most of the user's operation on Emacs correspond to a function, and users can modify all external or
+   built-in variables and functions. In other words, users should regard themselves as internal schedulers of the
+   system, not external users.
+*** Packages and related configurations should be simple
+Simplicity doesn't mean that the number of packages used is few, or the interface is ugly, but that the following
+concepts should be met as far as possible:
+1. Try to use built-in functions to reduce redundancy. The rational use of these APIs can greatly reduce the external
+   maintenance burden.
+2. Packages should be designed simple and flexible, which will reduce dependencies.
+3. Packages with less code or active updates will have higher priority.
+4. Try to use the default configuration or select packages with enough default configuration to avoid the update burden
+   caused by numerous hacks.
+*** Balance
+I like rich functionality, which allows me to have suitable solutions for various scenarios. Usually adding a functionality
+will increase the complexity of configurations. Nowisemacs looks for a balance between functionality and complexity by
+"concise" choices.
 * Things you must know before going deeper
 ** Radical
 1. Nowisemacs always uses the latest emacs version and compile it locally, so there may be some incompatible when you use an older version.
