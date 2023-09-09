@@ -134,7 +134,6 @@ I failed in love with denote, so previous *org-roam* configs were refiled into [
   - [[#gif-screencast][gif-screencast]]
   - [[#ai-related][ai related]]
   - [[#webjump][webjump]]
-  - [[#scripts][scripts]]
   - [[#backup-scripts][backup scripts]]
   - [[#video-and-music][video and music]]
   - [[#esup][esup]]
@@ -972,7 +971,15 @@ diff-hl-mode highlights uncommitted changes on the left side of the window (area
         kill-do-not-save-duplicates t
         shell-command-prompt-show-cwd t
         what-cursor-show-names t)
-  (global-visual-line-mode)
+  ;; (add-hook 'org-mode-hook 'turn-on-auto-fill)
+
+  ;; (global-visual-line-mode)
+  (dolist (hook (list
+                 'prog-mode-hook
+                 'org-mode-hook
+                 ))
+    (add-hook hook (lambda () (visual-line-mode))))
+
   )
 #+end_src
 ** general builtin modes
@@ -1343,7 +1350,7 @@ Jump anywhere in the world
          rime-posframe-properties (list :internal-border-width 1
                                         :font lewis-fixed-font
                                         )
-         rime-user-data-dir "~/Documents/emacs/02-binary-files/05-input-rime/"
+         rime-user-data-dir "~/Documents/emacs/30-input-rime/"
          rime-inline-ascii-trigger 'shift-r
          ))
 (when (eq system-type 'darwin)
@@ -1381,7 +1388,9 @@ Dirvish is a minimalistic file manager based on Dired. It's fast
 *** dired-preview
 #+begin_src elisp
 (setup dired-preview
-  (setq dired-preview-delay 0.3)
+  (setq dired-preview-delay 0.3
+        dired-preview-trigger-commands '(dired-next-line dired-previous-line)
+        )
   (add-hook 'dired-mode-hook #'dired-preview-mode)
   )
 #+end_src
@@ -1399,14 +1408,8 @@ Dirvish is a minimalistic file manager based on Dired. It's fast
            imenu-list-auto-resize t
            imenu-list-position 'left
            ;; imenu-list-auto-update nil
-           ))
-#+end_src
-*** maple-explorer
-#+begin_src elisp
-(setup maple-explorer
-  (:autoload maple-explorer-file maple-explorer-buffer maple-explorer-imenu maple-explorer-recentf)
-  (setq maple-explorer-file-display-alist '((side . left) (slot . -1))
-        maple-explorer-imenu-display-alist '((side . left) (slot . -1))))
+           )
+  )
 #+end_src
 ** tab-line and tab-bar
 #+name: tab-bar
@@ -2497,8 +2500,6 @@ Spaced Repetition System for Emacs org-mode
     ("d" "double" org-fc-type-double-init)
     ("n" "normal" org-fc-type-normal-init)
     ("t" "text input" org-fc-type-text-input-init)]])
-
-
 #+end_src
 * english 翻译
 ** go-translate
@@ -2772,27 +2773,23 @@ Simple distraction-free editing. I use darkroom instead of writeroom because it'
                                        "leetcode.cn/search/?q=" ""])
                         )))
 #+end_src
-
-** scripts
 ** backup scripts
 #+begin_src elisp
-(defun backup-push-emacs-doc()
+(defun rsync-push-binary-files()
   (interactive)
-  (async-shell-command " rsync -avbih --exclude '.git' \
-     ~/Documents/emacs/02-binary-files/ lewis-nas@192.168.31.108:/share/my_webdav/rsync/emacs/02-binary-files/"))
+  (shell-command "rsync -avbihn --exclude '.git' --delete --backup-dir \
+     ~/Documents/emacs/02-binary-files/ lewis-nas@192.168.31.108:/share/my_webdav/rsync/02-binary-files/")
+  (let ((answer (read-char-choice "Do you want to continue? [y/n] " '(?y ?n))))
+    (cond
+     ((eq answer ?y)
+      (async-shell-command " rsync -avbih --exclude '.git' --delete --backup-dir \
+     ~/Documents/emacs/02-binary-files/ lewis-nas@192.168.31.108:/share/my_webdav/rsync/02-binary-files/"))
+     ((eq answer ?n) (message "transfer exit")))))
 
-(defun backup-restore-emacs-doc()
+(defun rsync-pull-binary-files()
   (interactive)
-  (async-shell-command " rsync -avbih --exclude '.git' \
- lewis-nas@192.168.31.108:/share/my_webdav/rsync/emacs/02-binary-files/ ~/Documents/emacs/02-binary-files/"))
-
-(defun backup-sync-emacs-doc()
-  (interactive)
-  (async-shell-command "
-rsync -avihbu --exclude '.git' \
-      lewis-nas@192.168.31.108:/share/my_webdav/rsync/emacs/02-binary-files/ ~/Documents/emacs/02-binary-files/ \
-    && rsync -avbih --delete --exclude '.git'\
-             ~/Documents/emacs/02-binary-files/ lewis-nas@192.168.31.108:/share/my_webdav/rsync/emacs/02-binary-files/ "))
+  (async-shell-command " rsync -avbih --exclude '.git' --delete\
+ lewis-nas@192.168.31.108:/share/my_webdav/rsync/02-binary-files/ ~/Documents/emacs/02-binary-files/"))
 
 (defun backup-sync-tmp-doc()
   (interactive)
@@ -2800,23 +2797,13 @@ rsync -avihbu --exclude '.git' \
 rsync -avihu lewis-nas@192.168.31.108:/share/my_webdav/rsync/tmp/ ~/Downloads/tmp/ \
     && rsync -avih --delete ~/Downloads/tmp/ lewis-nas@192.168.31.108:/share/my_webdav/rsync/tmp/ "))
 
-(defun backup-restic-emacs-doc()
-  (interactive)
-  (async-shell-command "restic -r sftp:lewis-nas@192.168.31.108:/share/my_webdav/restic/emacs backup ~/Documents/emacs/")
-  )
-
 (transient-define-prefix backup-leader-map()
   "Define leader-key map for backup functions"
   [["rsync"
-    ("p" "push emacs doc" backup-push-emacs-doc)
-    ("r" "restore emacs doc" backup-restore-emacs-doc)
-    ("s" "update emacs doc first and sync" backup-sync-emacs-doc)
-    ("t" "sync tmp dir" backup-sync-tmp-doc)]
-   ["restic"
-    ("b" "backup all emacs doc" backup-restic-emacs-doc)]])
+    ("p" "push doc" rsync-push-binary-files)
+    ("F" "pull doc" rsync-pull-binary-files)
+    ("t" "sync tmp dir" backup-sync-tmp-doc)]])
 #+end_src
-
-
 ** video and music
 *** emms
 #+begin_src elisp

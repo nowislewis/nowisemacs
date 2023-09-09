@@ -200,9 +200,6 @@
 [submodule "magit"]
 	path = lib/magit
 	url = https://github.com/magit/magit
-[submodule "maple-explorer"]
-	path = lib/maple-explorer
-	url = https://github.com/honmaple/emacs-maple-explorer.git
 [submodule "marginalia"]
 	path = lib/marginalia
 	url = https://github.com/minad/marginalia.git
