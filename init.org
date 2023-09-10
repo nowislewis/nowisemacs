@@ -2546,7 +2546,9 @@ immersive-translate: Immersive Bilingual Translation
 (add-hook 'elfeed-show-mode-hook #'immersive-translate-setup)
 (add-hook 'nov-pre-html-render-hook #'immersive-translate-setup)
 ;; use translate-shell
-(setq immersive-translate-backend 'trans)
+(setq immersive-translate-backend 'trans
+     immersive-translate-trans-engine "bing"
+      )
 #+end_src
 * 阅读
 ** pdf-tools
