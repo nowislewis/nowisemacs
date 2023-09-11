@@ -67,9 +67,7 @@ generate =.el= configuration files before the first startup
 
 *** Installation
 **** Dependences
-1. =pip install epc sexpdata six paramiko=, for [[https://github.com/manateelazycat/lsp-bridge][lsp-bridge]].
-2. Install =ripgrep= and =fd=.
-3. =pip install requests=, for [[https://github.com/manateelazycat/blink-search][blink-search]].
+1. Install =ripgrep= and =fd=.
 **** Nowisemacs
 1. =mv ~/.emacs.d ~/.emacs.d.back= ;; Backup your original configuration
 2. =git clone https://github.com/nowislewis/nowisemacs ~/.emacs.d= ;; Download nowisemacs
