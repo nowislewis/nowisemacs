@@ -1817,7 +1817,7 @@ borrowed from citre, now you can always jump-back use "M-," after any jump in th
 (setq read-process-output-max (* 1024 1024))
 (setup eglot
   (setq eglot-events-buffer-size 0
-        ;; eglot-workspace-configuration '((:python.analysis :useLibraryCodeForTypes t))
+        eglot-workspace-configuration '((:python.analysis :useLibraryCodeForTypes t))
         ;; eglot-stay-out-of '("xref") ;; xref is controlled in xref-union
         )
   (:autoload eglot-find-implementation)
@@ -2779,12 +2779,12 @@ Simple distraction-free editing. I use darkroom instead of writeroom because it'
 #+begin_src elisp
 (defun rsync-push-binary-files()
   (interactive)
-  (shell-command "rsync -avbihn --exclude '.git' --delete --backup-dir \
+  (shell-command "rsync -avbihn --exclude '.git' --delete \
      ~/Documents/emacs/02-binary-files/ lewis-nas@192.168.31.108:/share/my_webdav/rsync/02-binary-files/")
   (let ((answer (read-char-choice "Do you want to continue? [y/n] " '(?y ?n))))
     (cond
      ((eq answer ?y)
-      (async-shell-command " rsync -avbih --exclude '.git' --delete --backup-dir \
+      (async-shell-command " rsync -avbih --exclude '.git' --delete \
      ~/Documents/emacs/02-binary-files/ lewis-nas@192.168.31.108:/share/my_webdav/rsync/02-binary-files/"))
      ((eq answer ?n) (message "transfer exit")))))
 
