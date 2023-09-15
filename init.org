@@ -362,9 +362,8 @@ Maybe I should add a new state.
   (setq meow-use-keypad-when-execute-kbd nil
         meow-expand-exclude-mode-list nil
         meow-use-clipboard t
-        ;; meow-cursor-type-normal '(bar . 5)
-        meow-cursor-type-normal 'box
-        meow-cursor-type-insert '(bar . 1)
+        ;; meow-cursor-type-normal 'box
+        ;; meow-cursor-type-insert '(bar . 1)
         meow-replace-state-name-list '((normal . "N")
                                        (motion . "M")
                                        (keypad . "K")
@@ -2217,7 +2216,6 @@ Disassemble C, C++ or Fortran code under cursor
            bibtex-autokey-titleword-ignore ;; I took "On" out of this
            '("A" "An" "The" "Eine?" "Der" "Die" "Das")))
 
-
 (defun do.refs/get-db-file-list ()
   "Get the list of all the bib files containing my bib database."
   (if (file-exists-p nowis-bib-dir)
@@ -2476,11 +2474,16 @@ Spaced Repetition System for Emacs org-mode
         org-fc-review-history-file (concat nowis-doc-emacs-dir "org-fc-reviews.tsv")
         )
   (:when-loaded
+    (define-key org-fc-review-rate-mode-map (kbd "RET") 'org-fc-review-rate-good)
     (require 'org-fc-keymap-hint)
+    (add-to-list 'org-fc-custom-contexts
+                 '(high-priority-cards . (:filter (tag "high"))))
+    (add-to-list 'org-fc-custom-contexts
+                 '(low-priority-cards . (:filter (not (tag "high")))))
+    (add-hook 'org-fc-review-flip-mode-hook 'meow-motion-mode)
+    (add-hook 'org-fc-review-edit-mode-hook 'meow-normal-mode)
     ))
 
-(add-hook 'org-fc-review-flip-mode-hook 'meow-motion-mode)
-(add-hook 'org-fc-review-edit-mode-hook 'meow-normal-mode)
 
 (transient-define-prefix org-fc-transient-map()
   "Define transient-key map for org-fc functions"
@@ -2779,7 +2782,7 @@ Simple distraction-free editing. I use darkroom instead of writeroom because it'
 #+begin_src elisp
 (defun rsync-push-binary-files()
   (interactive)
-  (shell-command "rsync -avbihn --exclude '.git' --delete \
+  (async-shell-command "rsync -avbihn --exclude '.git' --delete \
      ~/Documents/emacs/02-binary-files/ lewis-nas@192.168.31.108:/share/my_webdav/rsync/02-binary-files/")
   (let ((answer (read-char-choice "Do you want to continue? [y/n] " '(?y ?n))))
     (cond
