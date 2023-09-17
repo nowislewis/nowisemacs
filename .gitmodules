@@ -330,6 +330,9 @@
 [submodule "setup"]
 	path = lib/setup
 	url = https://github.com/emacsmirror/setup
+[submodule "shrface"]
+	path = lib/shrface
+	url = https://github.com/chenyanming/shrface.git
 [submodule "shrink-path"]
 	path = lib/shrink-path
     url = https://github.com/emacsmirror/shrink-path

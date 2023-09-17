@@ -103,7 +103,6 @@ I failed in love with denote, so previous *org-roam* configs were refiled into [
   - [[#denote-lumn][denote-lumn]]
   - [[#find-orgmode-dir-files][find orgmode dir files]]
   - [[#org-imagine-excalidraw][org-imagine, excalidraw]]
-  - [[#shrface][shrface]]
   - [[#org-remark][org-remark]]
   - [[#annotate][annotate]]
   - [[#clue][clue]]
@@ -113,6 +112,7 @@ I failed in love with denote, so previous *org-roam* configs were refiled into [
   - [[#mpvi][mpvi]]
   - [[#orgtbl-aggregate][orgtbl-aggregate]]
   - [[#org-fc][org-fc]]
+  - [[#shrface][shrface]]
 - [[#english-翻译][english 翻译]]
   - [[#go-translate][go-translate]]
   - [[#sdcv][sdcv]]
@@ -187,6 +187,7 @@ I failed in love with denote, so previous *org-roam* configs were refiled into [
 (set-default-coding-systems 'utf-8)
 (setq-default indent-tabs-mode nil)
 
+(setq next-screen-context-lines 0) ;; scroll up/down lines
 (setq-default tab-width 4)
 ;; 平滑地进行半屏滚动，避免滚动后recenter操作
 (setq scroll-step 1
@@ -813,6 +814,7 @@ Maybe I should add a new state.
                                 return font))
 ;; variable font
 (setq lewis-variable-font (cl-loop for font in '(
+                                                 "LXGW WenKai"
                                                  ;; "Source Han Sans SC VF"
                                                  "Noto Sans CJK SC"
                                                  "Arial"
@@ -2363,22 +2365,6 @@ Borrowed from https://github.com/protesilaos/denote/issues/115
 
 ;; (setup org-imagine)
 #+end_src
-** shrface
-#+begin_src elisp :tangle no
-(setup shrface
-  (:load-after nov)
-  (:load-after eww)
-  (:hook-into nov-mode
-              eww-after-render
-              )
-  (:when-loaded
-    (shrface-basic)
-    (shrface-trial)
-    (shrface-default-keybindings) ; setup default keybindings
-    (setq shrface-href-versatile t)
-    (setq nov-shr-rendering-functions '((img . nov-render-img) (title . nov-render-title)))
-    (setq nov-shr-rendering-functions (append nov-shr-rendering-functions shr-external-rendering-functions))))
-#+end_src
 ** org-remark
 Highlight and annotate any text file with using Org mode.
 #+begin_src elisp :tangle no
@@ -2504,6 +2490,25 @@ Spaced Repetition System for Emacs org-mode
     ("n" "normal" org-fc-type-normal-init)
     ("t" "text input" org-fc-type-text-input-init)]])
 #+end_src
+** shrface
+Extend eww/nov with org-mode features, archive web pages to org files with shr.
+#+begin_src elisp
+(setup shrface
+  (add-hook 'nov-mode-hook #'shrface-mode)
+  (:when-loaded
+    (shrface-basic)
+    (shrface-trial)
+    (shrface-default-keybindings) ; setup default keybindings
+    (setq shrface-href-versatile t)
+    (setq nov-shr-rendering-functions '((img . nov-render-img) (title . nov-render-title)))
+    (setq nov-shr-rendering-functions (append nov-shr-rendering-functions shr-external-rendering-functions))
+    (setq shrface-bullets-bullet-list org-modern-star) ;;should load after org-modern
+    )
+  (:hook (lambda()(
+                   if  (featurep 'org)
+                       (org-indent-mode -1))))
+  )
+#+end_src
 * english 翻译
 ** go-translate
 #+begin_src elisp
@@ -2604,6 +2609,8 @@ immersive-translate: Immersive Bilingual Translation
 #+begin_src elisp
 (setup esxml) ;; <- (setup kv)
 (setup nov
+  (:bind "]" nov-scroll-up
+         "[" nov-scroll-down)
   (:file-match "\\.epub\\'"))
 #+end_src
 ** nov-xwidget
