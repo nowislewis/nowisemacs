@@ -629,7 +629,8 @@ Maybe I should add a new state.
     ("r s" "find-all-searchable" project-find-searchable-dir-files)
     ;; ("rc" "consult-notes" consult-notes)
     ("r g" "project-find-gtd-dir-files" project-find-gtd-dir-files)
-    ("r z" "ls zettel" my/zettel-signature-buffer)
+    ("r z" "ls zettel" my/zettel-signature-topics)
+    ("r Z" "ls not zettel" my/zettel-not-signatured-topics)
     ]
    ["bibtex"
     ("e" "ebib" ebib)
@@ -2319,13 +2320,20 @@ Borrowed from https://github.com/protesilaos/denote/issues/115
 #+begin_src elisp
 (setq find-dired-refine-function nil)  ;; This needs to be set globally, find-dired works asynchronously.
 
-(defun my/zettel-signature-buffer ()
+(defun my/zettel-signature-topics()
   (interactive)
   (if (not (featurep 'find-dired))
       (require 'find-dired))
-  ;; (let ((find-ls-option '(" -exec ls -ld {} \\+| awk /==/ |sort -t '=' -k 3" . "-ld")))
-  (let ((find-ls-option '(" -exec ls -ld {} \\+|sort -t '=' -k 3" . "-ld")))
-    (find-dired denote-directory "")))
+  (let ((find-ls-option '(" -exec ls -ld {} \\+| awk /==/ |sort -t '=' -k 3" . "-ld")))
+    (find-dired denote-directory ""))
+  (rename-buffer "signatured")
+  )
+
+(defun my/zettel-not-signatured-topics ()
+  (interactive)
+  (let ((find-ls-option '("-exec ls -ld {} \\+ |grep -v '=='| sort -t '=' -k 3" . "-ld")))
+    (find-dired denote-directory ""))
+  (rename-buffer "not signatured"))
 
 (defun my/zettel-main-topics ()
   (interactive)
