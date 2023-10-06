@@ -31,6 +31,7 @@ I failed in love with denote, so previous *org-roam* configs were refiled into [
   - [[#nerd-icons-completion][nerd-icons-completion]]
   - [[#rainbow-delimiters][rainbow-delimiters]]
   - [[#diff-hl][diff-hl]]
+  - [[#fringe-mode][fringe-mode]]
   - [[#emacs-dashboard][emacs-dashboard]]
   - [[#doom-modeline][doom-modeline]]
   - [[#hl-todo][hl-todo]]
@@ -914,6 +915,10 @@ diff-hl-mode highlights uncommitted changes on the left side of the window (area
   (:hook-into prog-mode)
   (:when-loaded
     (diff-hl-margin-mode)))
+#+end_src
+** fringe-mode
+#+begin_src elisp
+(fringe-mode 4)
 #+end_src
 ** emacs-dashboard
 #+begin_src elisp
@@ -2310,8 +2315,22 @@ ln -s ~/Downloads/translators_CN/translators ~/Downloads/zotra-cli/module/transl
   (setq denote-directory (expand-file-name (concat nowis-doc-emacs-dir "01-orgmode/xnotes"))
         denote-dired-directories (ffap-all-subdirs denote-directory)
         denote-date-prompt-use-org-read-date t
-        denote-modules '(project))
+        denote-modules '(project)
+        denote-prompts '(title keywords signature template))
   (add-hook 'dired-mode-hook #'denote-dired-mode-in-directories)
+  (setq denote-templates
+        `((default . ,(concat "* Action\n"
+                           "** What will change\n"
+                           "** How to get this\n\n"
+                           "* Ideas\n"
+                           "** Why got this\n"
+                           "** What I think\n\n"
+                           "* Sealed"))
+        (action . ,(concat "* Destination\n\n"
+                           "* Roadmap\n\n"
+                           "* Action\n\n"
+                           "* Warnings\n\n"
+                           "* Links\n\n"))))
   ;; should add a hook for disable diredfl-mode
   )
 #+end_src
@@ -2501,7 +2520,7 @@ Spaced Repetition System for Emacs org-mode
    ["update"
     ("u" "update" org-fc-update)
     ("U" "update all" org-fc-update-all)
-    ("b" "dashboard" org-fc-dashboard)]
+    ("D" "dashboard" org-fc-dashboard)]
    ["init"
     ("c" "cloze" org-fc-type-cloze-init)
     ("d" "double" org-fc-type-double-init)
