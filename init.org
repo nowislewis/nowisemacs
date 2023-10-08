@@ -138,6 +138,7 @@ I failed in love with denote, so previous *org-roam* configs were refiled into [
   - [[#backup-scripts][backup scripts]]
   - [[#video-and-music][video and music]]
   - [[#esup][esup]]
+  - [[#literate-calc][literate-calc]]
 - [[#use-single-file-to-load-configs][use single file to load configs]]
   - [[#provide][provide]]
   - [[#load-init-configel][load init-config.el]]
@@ -2865,6 +2866,10 @@ rsync -avihu lewis-nas@192.168.31.108:/share/my_webdav/rsync/tmp/ ~/Downloads/tm
 ** esup
 #+begin_src elisp
 (setup esup)
+#+end_src
+** literate-calc
+#+begin_src elisp
+(setup literate-calc)
 #+end_src
 * use single file to load configs
 this can avoid errors of native compilation of init.el

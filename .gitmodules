@@ -185,6 +185,9 @@
 [submodule "language-id"]
 	path = lib/language-id
 	url = https://github.com/lassik/emacs-language-id.git
+[submodule "literate-calc"]
+	path = lib/literate-calc
+	url = https://github.com/sulami/literate-calc-mode.el.git
 [submodule "lsp-bridge"]
 	path = lib/lsp-bridge
 	url = https://github.com/manateelazycat/lsp-bridge.git
