@@ -176,9 +176,6 @@
 [submodule "inheritenv"]
 	path = lib/inheritenv
 	url = https://github.com/purcell/inheritenv.git
-[submodule "kind-icon"]
-	path = lib/kind-icon
-	url = https://github.com/jdtsmith/kind-icon.git
 [submodule "kv"]
 	path = lib/kv
 	url = https://github.com/nicferrier/emacs-kv.git
@@ -221,6 +218,9 @@
 [submodule "nerd-icons-completion"]
 	path = lib/nerd-icons-completion
 	url = https://github.com/rainstormstudio/nerd-icons-completion.git
+[submodule "nerd-icons-corfu"]
+	path = lib/nerd-icons-corfu
+	url = https://github.com/LuigiPiucco/nerd-icons-corfu.git
 [submodule "nerd-icons-dired"]
 	path = lib/nerd-icons-dired
 	url = https://github.com/rainstormstudio/nerd-icons-dired.git
