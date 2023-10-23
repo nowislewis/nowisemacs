@@ -940,14 +940,13 @@ diff-hl-mode highlights uncommitted changes on the left side of the window (area
 
 (setup doom-modeline
   (setq doom-modeline-height 1
-        ;; doom-modeline-hud t
-        doom-modeline-unicode-fallback t)
+        doom-modeline-unicode-fallback nil)
   (:when-loaded
-    (custom-set-faces
-     '(mode-line ((t (:height 0.8))))
-     '(mode-line-active ((t (:height 0.8)))) ; For 29+
-     '(mode-line-inactive ((t (:height 0.8))))) ; xs
-     )
+    (if (facep 'mode-line-active)
+        (set-face-attribute 'mode-line-active nil :height 120) ; For 29+
+      (set-face-attribute 'mode-line nil :height 120))
+    (set-face-attribute 'mode-line-inactive nil :height 120)
+    )
   (:hook-into after-init))
 #+end_src
 ** hl-todo
@@ -1396,7 +1395,7 @@ Dirvish is a minimalistic file manager based on Dired. It's fast
 *** dired-preview
 #+begin_src elisp
 (setup dired-preview
-  (setq dired-preview-delay 0.3
+  (setq dired-preview-delay 0.5
         dired-preview-trigger-commands '(dired-next-line dired-previous-line)
         )
   (add-hook 'dired-mode-hook #'dired-preview-mode)
@@ -1625,6 +1624,12 @@ Emacs major-mode to work with Beancount ledger files
 #+begin_src elisp
 (setup org-elp
   (setq org-elp-idle-time 1))
+#+end_src
+**** org-xlatex
+#+begin_src elisp
+(setup org-xlatex
+  (setq org-xlatex-position-indicator t)
+  )
 #+end_src
 *** python
 **** python
@@ -1953,6 +1958,24 @@ Citre is an advanced Ctags (or actually, readtags) frontend for Emacs.
         ("u" "gud-until" gud-until)]
        [("w" "gud-watch" gud-watch)]
        ])))
+#+end_src
+*** dape
+#+begin_src elisp :tangle no
+(setup dape
+  (add-to-list 'dape-configs
+             '(codelldb
+               modes (c-mode c-ts-mode
+                      c++-mode c++-ts-mode
+                      )
+               command "~/Downloads/codelldb/extension/adapter/codelldb"
+               host "localhost"
+               port 5818
+               command-args ("--port" "5818")
+               :type "lldb"
+               :request "launch"
+               :cwd dape-cwd-fn
+               :program dape-find-file))
+  )
 #+end_src
 *** disaster
 Disassemble C, C++ or Fortran code under cursor

@@ -58,6 +58,9 @@
 	url = https://github.com/minad/corfu.git
     load-path = .
     load-path = extensions
+[submodule "dape"]
+	path = lib/dape
+	url = https://github.com/svaante/dape.git
 [submodule "darkroom"]
 	path = lib/darkroom
 	url = https://github.com/joaotavora/darkroom.git
@@ -276,6 +279,9 @@
 [submodule "org-present"]
 	path = lib/org-present
 	url = https://github.com/rlister/org-present.git
+[submodule "org-xlatex"]
+	path = lib/org-xlatex
+	url = https://github.com/ksqsf/org-xlatex.git
 [submodule "orgtbl-aggregate"]
 	path = lib/orgtbl-aggregate
 	url = https://github.com/tbanel/orgaggregate.git
