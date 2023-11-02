@@ -58,9 +58,6 @@
 	url = https://github.com/minad/corfu.git
     load-path = .
     load-path = extensions
-[submodule "dape"]
-	path = lib/dape
-	url = https://github.com/svaante/dape.git
 [submodule "darkroom"]
 	path = lib/darkroom
 	url = https://github.com/joaotavora/darkroom.git
@@ -185,6 +182,9 @@
 [submodule "language-id"]
 	path = lib/language-id
 	url = https://github.com/lassik/emacs-language-id.git
+[submodule "lazycat-theme"]
+	path = lib/lazycat-theme
+	url = https://github.com/manateelazycat/lazycat-theme.git
 [submodule "literate-calc"]
 	path = lib/literate-calc
 	url = https://github.com/sulami/literate-calc-mode.el.git
@@ -209,6 +209,9 @@
 [submodule "meow"]
 	path = lib/meow
 	url = https://github.com/meow-edit/meow.git
+[submodule "mini-echo"]
+	path = lib/mini-echo
+	url = https://github.com/liuyinz/mini-echo.el.git
 [submodule "mpvi"]
 	path = lib/mpvi
 	url = https://github.com/lorniu/mpvi.git

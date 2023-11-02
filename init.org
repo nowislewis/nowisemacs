@@ -34,6 +34,7 @@ I failed in love with denote, so previous *org-roam* configs were refiled into [
   - [[#fringe-mode][fringe-mode]]
   - [[#emacs-dashboard][emacs-dashboard]]
   - [[#doom-modeline][doom-modeline]]
+  - [[#mini-echo][mini-echo]]
   - [[#hl-todo][hl-todo]]
   - [[#pulsar][pulsar]]
   - [[#show-paren-mode][show-paren-mode]]
@@ -879,6 +880,10 @@ Maybe I should add a new state.
 (setup ef-themes)
 (load-theme 'modus-operandi t)
 #+end_src
+*** lazycat-theme
+#+begin_src elisp
+(setup lazycat-theme)
+#+end_src
 ** line number
 #+name: line-number
 #+begin_src elisp
@@ -948,6 +953,10 @@ diff-hl-mode highlights uncommitted changes on the left side of the window (area
     (set-face-attribute 'mode-line-inactive nil :height 120)
     )
   (:hook-into after-init))
+#+end_src
+** mini-echo
+#+begin_src elisp
+(setup mini-echo)
 #+end_src
 ** hl-todo
 #+begin_src elisp
@@ -1942,22 +1951,8 @@ Citre is an advanced Ctags (or actually, readtags) frontend for Emacs.
 *** gdb
 #+begin_src elisp
 (setup gdb-mi
-  (:global "<f5>" gdb-transient-keybindings)
-  (:when-loaded
-    (transient-define-prefix gdb-transient-keybindings()
-      "Define map for gdb functions"
-      [[("b" "gud-break" gud-break)
-        ("c" "gud-cont" gud-cont)]
-       [("f" "gud-finish" gud-finish)
-        ("j" "gud-jump" gud-jump)]
-       [("n" "gud-next" gud-next)
-        ("p" "gud-print" gud-print)]
-       [("r" "gud-run" gud-run)
-        ("R" "gud-remove" gud-remove)]
-       [("s" "gud-step" gud-step)
-        ("u" "gud-until" gud-until)]
-       [("w" "gud-watch" gud-watch)]
-       ])))
+  (setq gdb-restore-window-configuration-after-quit t)
+  )
 #+end_src
 *** dape
 #+begin_src elisp :tangle no
