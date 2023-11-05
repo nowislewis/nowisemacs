@@ -114,6 +114,7 @@ I failed in love with denote, so previous *org-roam* configs were refiled into [
   - [[#mpvi][mpvi]]
   - [[#orgtbl-aggregate][orgtbl-aggregate]]
   - [[#org-fc][org-fc]]
+  - [[#anki-helper][anki-helper]]
   - [[#shrface][shrface]]
 - [[#english-翻译][english 翻译]]
   - [[#go-translate][go-translate]]
@@ -924,7 +925,9 @@ diff-hl-mode highlights uncommitted changes on the left side of the window (area
 #+end_src
 ** fringe-mode
 #+begin_src elisp
-(fringe-mode 4)
+(setup fringe
+  (fringe-mode 4)
+)
 #+end_src
 ** emacs-dashboard
 #+begin_src elisp
@@ -1405,9 +1408,9 @@ Dirvish is a minimalistic file manager based on Dired. It's fast
 #+begin_src elisp
 (setup dired-preview
   (setq dired-preview-delay 0.5
-        dired-preview-trigger-commands '(dired-next-line dired-previous-line)
+        dired-preview-trigger-commands '(dired-previous-line)
         )
-  (add-hook 'dired-mode-hook #'dired-preview-mode)
+  (dired-preview-global-mode 1)
   )
 #+end_src
 *** nerd-icons-dired
@@ -2504,6 +2507,10 @@ Spaced Repetition System for Emacs org-mode
     ("d" "double" org-fc-type-double-init)
     ("n" "normal" org-fc-type-normal-init)
     ("t" "text input" org-fc-type-text-input-init)]])
+#+end_src
+** anki-helper
+#+begin_src elisp
+(setup anki-helper)
 #+end_src
 ** shrface
 Extend eww/nov with org-mode features, archive web pages to org files with shr.
