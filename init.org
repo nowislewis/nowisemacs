@@ -141,6 +141,7 @@ I failed in love with denote, so previous *org-roam* configs were refiled into [
   - [[#video-and-music][video and music]]
   - [[#esup][esup]]
   - [[#literate-calc][literate-calc]]
+  - [[#server][server]]
 - [[#use-single-file-to-load-configs][use single file to load configs]]
   - [[#provide][provide]]
   - [[#load-init-configel][load init-config.el]]
@@ -1408,9 +1409,9 @@ Dirvish is a minimalistic file manager based on Dired. It's fast
 #+begin_src elisp
 (setup dired-preview
   (setq dired-preview-delay 0.5
-        dired-preview-trigger-commands '(dired-previous-line)
+        dired-preview-trigger-commands '(dired-previous-line dired-next-line)
         )
-  (dired-preview-global-mode 1)
+  ;; (dired-preview-global-mode 1)
   )
 #+end_src
 *** nerd-icons-dired
@@ -2854,6 +2855,12 @@ rsync -avihu lewis-nas@192.168.31.108:/share/my_webdav/rsync/tmp/ ~/Downloads/tm
 ** literate-calc
 #+begin_src elisp
 (setup literate-calc)
+#+end_src
+** server
+#+begin_src elisp
+(setup server
+  (:defer (server-start))
+  )
 #+end_src
 * use single file to load configs
 this can avoid errors of native compilation of init.el
