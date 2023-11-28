@@ -880,12 +880,18 @@ Maybe I should add a new state.
 #+name: themes
 #+begin_src elisp
 (setup ef-themes)
-(load-theme 'modus-operandi t)
+;; (load-theme 'modus-operandi t)
 #+end_src
 *** lazycat-theme
 #+begin_src elisp
 (setup lazycat-theme)
 #+end_src
+*** dracula
+#+begin_src elisp
+(setup dracula)
+(load-theme 'dracula t)
+#+end_src
+
 ** line number
 #+name: line-number
 #+begin_src elisp
@@ -1376,7 +1382,7 @@ Jump anywhere in the world
 (when (eq system-type 'darwin)
   (setq
    ;; rime-emacs-module-header-root "/Applications/Emacs.app/Contents/Resources/include/" ;; use build-emacs
-   rime-emacs-module-header-root "/opt/homebrew/opt/emacs-plus@29/include" ;;use emacs-plus
+   rime-emacs-module-header-root "/opt/homebrew/opt/emacs-plus@30/include" ;;use emacs-plus
    rime-librime-root "~/Downloads/librime/dist"
    ))
 #+end_src
@@ -2420,6 +2426,8 @@ Connecting clues while reading code.
     (:with-map org-gtd-clarify-map
    (:bind "C-c c"  org-gtd-organize)))
 (setup org-edna)
+
+(setq org-columns-default-format "%60ITEM(Task) %TODO %6Effort(Estim){:}  %6CLOCKSUM(Clock) %TAGS")
 #+end_src
 ** agenda/gtd (disabled)
 https://emacs.cafe/emacs/orgmode/gtd/2017/06/30/orgmode-gtd.html
@@ -2768,11 +2776,19 @@ Simple distraction-free editing. I use darkroom instead of writeroom because it'
 #+begin_src elisp
 (setup gptel
   (setq gptel-default-mode 'org-mode
-        gptel-host "api.chatanywhere.com.cn"
         gptel-crowdsourced-prompts-file (concat nowis-doc-emacs-dir "09-scripts/chatgpt.csv")
         )
   (:global "M-p" gptel-send
-           "M-P" gptel-menu))
+           "M-P" gptel-menu)
+  (:when-loaded
+    (setq-default gptel-backend
+                  (gptel-make-openai "chatanywhere"
+                                     :host "api.chatanywhere.com.cn"
+                                     :header (lambda () `(("Authorization" . ,(concat "Bearer " (gptel--get-api-key)))))
+                                     :key 'gptel-api-key
+                                     :stream t
+                                     :models '("gpt-3.5-turbo" "gpt-3.5-turbo-16k" "gpt-4" "gpt-4-32k")))
+    ))
 #+end_src
 *** whisper.el
 #+begin_src elisp :tangle no

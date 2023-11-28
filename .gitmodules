@@ -88,6 +88,9 @@
 [submodule "doom-modeline"]
 	path = lib/doom-modeline
 	url = https://github.com/seagle0128/doom-modeline.git
+[submodule "dracula"]
+	path = lib/dracula
+	url = https://github.com/dracula/emacs.git
 [submodule "dumb-jump"]
 	path = lib/dumb-jump
 	url = https://github.com/jacktasia/dumb-jump.git
