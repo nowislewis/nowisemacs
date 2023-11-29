@@ -808,6 +808,7 @@ Maybe I should add a new state.
 ;; fixed font
 (setq lewis-fixed-font (cl-loop for font in '(
                                               "Maple Mono SC NF"
+                                              "Unifont"
                                               ;; "InconsolataGo QiHei NF"
                                               ;; "yaheiInconsolata"
                                               "JetBrainsMono Nerd Font"
@@ -1292,15 +1293,6 @@ Jump anywhere in the world
       aw-scope 'frame
       )
 
-#+end_src
-*** edwina
-#+begin_src elisp :tangle no
-(setup edwina
-  (:defer
-   (require 'edwina)
-   (setq display-buffer-base-action '(display-buffer-in-direction (direction . up)))
-   (edwina-setup-dwm-keys 'super)
-   (edwina-mode 1)))
 #+end_src
 * ibuffer
 ** ibuffer
@@ -1965,22 +1957,8 @@ Citre is an advanced Ctags (or actually, readtags) frontend for Emacs.
   )
 #+end_src
 *** dape
-#+begin_src elisp :tangle no
-(setup dape
-  (add-to-list 'dape-configs
-             '(codelldb
-               modes (c-mode c-ts-mode
-                      c++-mode c++-ts-mode
-                      )
-               command "~/Downloads/codelldb/extension/adapter/codelldb"
-               host "localhost"
-               port 5818
-               command-args ("--port" "5818")
-               :type "lldb"
-               :request "launch"
-               :cwd dape-cwd-fn
-               :program dape-find-file))
-  )
+#+begin_src elisp
+(setup dape)
 #+end_src
 *** disaster
 Disassemble C, C++ or Fortran code under cursor
@@ -2053,7 +2031,8 @@ Disassemble C, C++ or Fortran code under cursor
     (require 'org-tempo) ;; so that <s is useful
     ;; 导出相关的设置
     (setq org-latex-pdf-process '("tectonic %f"))
-    (setq org-format-latex-options (plist-put org-format-latex-options :scale 2.0)) ;; use a large preview for latex
+    (plist-put org-format-latex-options :scale 2.0) ;; use a large preview for latex
+    ;; (setq org-preview-latex-default-process 'dvisvgm)
 
     ;; emphasis
     (defface my-org-emphasis-bold
@@ -2128,14 +2107,14 @@ Disassemble C, C++ or Fortran code under cursor
         (message "Convert finish: %s" docx-file)))
 
     (dolist (face '((org-level-1 . 1.8)
-                (org-level-2 . 1.7)
-                (org-level-3 . 1.6)
-                (org-level-4 . 1.5)
-                (org-level-5 . 1.4)
-                (org-level-6 . 1.3)
-                (org-level-7 . 1.2)
-                (org-level-8 . 1.1)))
-  (set-face-attribute (car face) nil :weight 'medium :height (cdr face)))
+                    (org-level-2 . 1.7)
+                    (org-level-3 . 1.6)
+                    (org-level-4 . 1.5)
+                    (org-level-5 . 1.4)
+                    (org-level-6 . 1.3)
+                    (org-level-7 . 1.2)
+                    (org-level-8 . 1.1)))
+      (set-face-attribute (car face) nil :weight 'medium :height (cdr face)))
     ))
 #+end_src
 ** org-modern

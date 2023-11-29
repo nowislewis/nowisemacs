@@ -61,6 +61,9 @@
 	url = https://github.com/minad/corfu.git
     load-path = .
     load-path = extensions
+[submodule "dape"]
+	path = lib/dape
+	url = https://github.com/svaante/dape.git
 [submodule "darkroom"]
 	path = lib/darkroom
 	url = https://github.com/joaotavora/darkroom.git
@@ -175,7 +178,7 @@
 	url = https://github.com/Wilfred/ht.el.git
 [submodule "imenu-list"]
 	path = lib/imenu-list
-	url = https://github.com/bmag/imenu-list.git
+	url = https://github.com/nowislewis/imenu-list.git
 [submodule "immersive-translate"]
 	path = lib/immersive-translate
 	url = https://github.com/Elilif/emacs-immersive-translate.git
