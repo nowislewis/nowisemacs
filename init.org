@@ -1558,7 +1558,11 @@ Dirvish is a minimalistic file manager based on Dired. It's fast
 #+end_src
 ** eat
 #+begin_src elisp
-(setup eat)
+(setup eat
+  ;; fix char error on macos
+  (when (eq system-type 'darwin)
+    (setq eat-term-name "xterm-256color"))
+  )
 #+end_src
 * git
 ** magit
@@ -1958,7 +1962,10 @@ Citre is an advanced Ctags (or actually, readtags) frontend for Emacs.
 #+end_src
 *** dape
 #+begin_src elisp
-(setup dape)
+(setup dape
+  (:when-loaded
+    (setq dape-buffer-window-arrangment 'right)
+  ))
 #+end_src
 *** disaster
 Disassemble C, C++ or Fortran code under cursor
