@@ -1963,9 +1963,40 @@ Citre is an advanced Ctags (or actually, readtags) frontend for Emacs.
 *** dape
 #+begin_src elisp
 (setup dape
+  (setq dape-buffer-window-arrangment 'gud)
+  (:global "<f5>"  dape
+           "M-<f5>"  dape-transient-map)
   (:when-loaded
-    (setq dape-buffer-window-arrangment 'right)
-  ))
+    (transient-define-prefix dape-transient-map()
+      [["Stepping"
+        ("n" "next" dape-next :transient t)
+        ("s" "step in" dape-step-in :transient t)
+        ("o" "step out" dape-step-out :transient t)
+        ("c" "continue" dape-continue :transient t)
+        ("p" "pause" dape-pause :transient t)
+        ("k" "kill" dape-kill :transient t)
+        ("r" "restart" dape-restart :transient t)
+        ("D" "disconnect" dape-disconnect-quit :transient t)
+        ]
+       ["Switch"
+        ("m" "memory" dape-read-memory :transient t)
+        ("t" "thread" dape-select-thread :transient t)
+        ("w" "watch" dape-watch-dwim :transient t)
+        ("S" "stack" dape-select-stack :transient t)
+        ("i" "info" dape-info :transient t)
+        ("R" "repl" dape-repl :transient t)
+        ]
+       ["Breakpoints"
+        ("b" "toggle" dape-breakpoint-toggle :transient t)
+        ("l" "log" dape-breakpoint-log :transient t)
+        ("e" "expression" dape-breakpoint-expression :transient t)
+        ("B" "clear" dape-breakpoint-remove-all :transient t)
+        ]
+       ["Debug"
+        ("d" "dape" dape)
+        ("Q" "quit" dape-quit)]])
+    )
+  )
 #+end_src
 *** disaster
 Disassemble C, C++ or Fortran code under cursor
