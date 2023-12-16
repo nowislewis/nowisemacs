@@ -180,6 +180,16 @@ I failed in love with denote, so previous *org-roam* configs were refiled into [
 
 ;; speed font
 ;; (add-to-list 'default-frame-alist '(font . "Maple Mono SC NF"))
+
+;; add support for android port of emacs
+(if (eq system-type 'android)
+    (setenv "PATH" (format "%s:%s" "/data/data/com.termux/files/usr/bin"
+		                   (getenv "PATH")))
+  (setenv "LD_LIBRARY_PATH" (format "%s:%s"
+				                    "/data/data/com.termux/files/usr/lib"
+				                    (getenv "LD_LIBRARY_PATH")))
+  (push "/data/data/com.termux/files/usr/bin" exec-path)
+  )
 #+end_src
 ** basic modes
 #+NAME: basic-modes
