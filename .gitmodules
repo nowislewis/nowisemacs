@@ -272,6 +272,9 @@
 [submodule "org-gtd"]
 	path = lib/org-gtd
 	url = https://github.com/Trevoke/org-gtd.el.git
+[submodule "org-mind-map"]
+	path = lib/org-mind-map
+	url = https://github.com/the-ted/org-mind-map.git
 [submodule "org-modern"]
 	path = lib/org-modern
 	url = https://github.com/minad/org-modern.git

@@ -91,9 +91,7 @@ I failed in love with denote, so previous *org-roam* configs were refiled into [
   - [[#useful-programing-tools][Useful programing tools]]
 - [[#org-mode][Org Mode]]
   - [[#org-mode-1][org-mode]]
-  - [[#org-modern][org-modern]]
-  - [[#org-modern-indent][org-modern-indent]]
-  - [[#org-appear][org-appear]]
+  - [[#ui-1][ui]]
   - [[#org-download][org-download]]
   - [[#ox-hugo][ox-hugo]]
   - [[#org-clock][org-clock]]
@@ -114,8 +112,8 @@ I failed in love with denote, so previous *org-roam* configs were refiled into [
   - [[#mpvi][mpvi]]
   - [[#orgtbl-aggregate][orgtbl-aggregate]]
   - [[#org-fc][org-fc]]
-  - [[#anki-helper][anki-helper]]
   - [[#shrface][shrface]]
+  - [[#org-mind-map][org-mind-map]]
 - [[#english-翻译][english 翻译]]
   - [[#go-translate][go-translate]]
   - [[#sdcv][sdcv]]
@@ -841,7 +839,9 @@ Maybe I should add a new state.
                                    return font))
 
 ;; chinese font
-(setq lewis-chinese-font (cl-loop for font in '("Maple Mono SC NF"
+(setq lewis-chinese-font (cl-loop for font in '(
+                                                "Maple Mono SC NF"
+                                                "Unifont"
                                                 "Sarasa Mono SC Nerd"
                                                 "Microsoft Yahei")
                                   when (font-installed-p font)
@@ -1432,10 +1432,10 @@ Dirvish is a minimalistic file manager based on Dired. It's fast
 #+begin_src elisp
 (setup imenu-list
   (:autoload himenu-list-smart-toggle)
-  (setq imenu-list-focus-after-activation t
+  (setq imenu-list-focus-after-activation nil
            imenu-list-auto-resize t
            imenu-list-position 'left
-           imenu-list-auto-update nil
+           imenu-list-auto-update t
            )
   )
 #+end_src
@@ -2165,7 +2165,8 @@ Disassemble C, C++ or Fortran code under cursor
       (set-face-attribute (car face) nil :weight 'medium :height (cdr face)))
     ))
 #+end_src
-** org-modern
+** ui
+*** org-modern
 #+begin_src elisp
 (setup org-modern
   (setq
@@ -2175,12 +2176,12 @@ Disassemble C, C++ or Fortran code under cursor
   ;; (add-hook 'org-agenda-finalize-hook #'org-modern-agenda)
   )
 #+end_src
-** org-modern-indent
+*** org-modern-indent
 #+begin_src elisp
 (setup org-modern-indent
   (add-hook 'org-mode-hook #'org-modern-indent-mode 90))
 #+end_src
-** org-appear
+*** org-appear
 #+begin_src elisp
 (setup org-appear
   (:hook-into org-mode))
@@ -2544,10 +2545,6 @@ Spaced Repetition System for Emacs org-mode
     ("n" "normal" org-fc-type-normal-init)
     ("t" "text input" org-fc-type-text-input-init)]])
 #+end_src
-** anki-helper
-#+begin_src elisp
-(setup anki-helper)
-#+end_src
 ** shrface
 Extend eww/nov with org-mode features, archive web pages to org files with shr.
 #+begin_src elisp
@@ -2566,6 +2563,22 @@ Extend eww/nov with org-mode features, archive web pages to org files with shr.
                    if  (featurep 'org)
                        (org-indent-mode -1))))
   )
+#+end_src
+** org-mind-map
+This is an Emacs package that creates graphviz directed graphs from the headings of an org file
+#+begin_src elisp
+(setup org-mind-map
+  (:when-loaded
+    (require 'ox-org)
+    (setq org-mind-map-engine "dot")       ; Default. Directed Graph
+    ;; (setq org-mind-map-engine "neato")  ; Undirected Spring Graph
+    ;; (setq org-mind-map-engine "twopi")  ; Radial Layout
+    ;; (setq org-mind-map-engine "fdp")    ; Undirected Spring Force-Directed
+    ;; (setq org-mind-map-engine "sfdp")   ; Multiscale version of fdp for the layout of large graphs
+    ;; (setq org-mind-map-engine "twopi")  ; Radial layouts
+    ;; (setq org-mind-map-engine "circo")  ; Circular Layout
+
+    ))
 #+end_src
 * english 翻译
 ** go-translate
