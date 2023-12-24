@@ -474,6 +474,7 @@ Maybe I should add a new state.
                           '("z o" . hs-show-block)
                           '("z m" . hs-hide-all)
                           '("z r" . hs-show-all)
+                          '("z z" . recenter-top-bottom)
 
                           '("v i" . meow-inner-of-thing)
                           '("v a" . meow-bounds-of-thing)
@@ -656,7 +657,10 @@ Maybe I should add a new state.
     ("n" "org-noter" org-noter)]
    ["org-fc"
     ("f" "org-fc" org-fc-transient-map )]
-   ])
+   ["org-mind-map"
+    ("m" "org-mind-map" org-mind-map-dwim)]
+   ]
+  )
 #+end_src
 *** search
 #+begin_src elisp
@@ -2569,7 +2573,7 @@ This is an Emacs package that creates graphviz directed graphs from the headings
 #+begin_src elisp
 (setup org-mind-map
   (:when-loaded
-    (require 'ox-org)
+    ;; (require 'ox-org)
     (setq org-mind-map-engine "dot")       ; Default. Directed Graph
     ;; (setq org-mind-map-engine "neato")  ; Undirected Spring Graph
     ;; (setq org-mind-map-engine "twopi")  ; Radial Layout
@@ -2579,6 +2583,12 @@ This is an Emacs package that creates graphviz directed graphs from the headings
     ;; (setq org-mind-map-engine "circo")  ; Circular Layout
 
     ))
+(defun org-mind-map-dwim()
+  "Write current tree, load ox-org if unload"
+  (interactive)
+  (unless (featurep 'ox-org) (require 'ox-org))
+  (org-mind-map-write-current-tree)
+  )
 #+end_src
 * english 翻译
 ** go-translate

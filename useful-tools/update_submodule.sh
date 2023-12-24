@@ -8,7 +8,7 @@ function pull() {
 	last_commit=$(git rev-parse HEAD)
 	echo "package:    $PN" >>$log_file
 	git reset --hard && git pull
-	git log $last_commit...HEAD --no-merges --color --graph --date=format:'%Y-%m-%d %H:%M:%S' --pretty=format:'%Cred%h%Creset -%C(yellow)%d%C(blue) %sC(green)(%cd) %C(bold blue)<%an>%Creset' --abbrev-commit >>$log_file
+	git log $last_commit...HEAD --no-merges --color --graph --date=format:'%Y-%m-%d %H:%M:%S' --pretty=format:'%C(red)%h%Creset -%C(yellow)%d%C(blue) %C(green)(%cd) %C(bold blue)<%an>%Creset' --abbrev-commit >>$log_file
 	echo "\n" >>$log_file
 }
 
