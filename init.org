@@ -2793,6 +2793,7 @@ Simple distraction-free editing. I use darkroom instead of writeroom because it'
     (setq holo-layer-enable-cursor-animation t
           holo-layer-enable-window-border t
           holo-layer-enable-place-info t
+          holo-layer-python-command "~/.pyenv/shims/python3"
           )
     (holo-layer-enable)
     )
