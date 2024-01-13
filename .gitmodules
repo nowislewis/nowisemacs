@@ -278,9 +278,6 @@
 [submodule "org-modern"]
 	path = lib/org-modern
 	url = https://github.com/minad/org-modern.git
-[submodule "org-modern-indent"]
-	path = lib/org-modern-indent
-	url = https://github.com/jdtsmith/org-modern-indent.git
 [submodule "org-noter"]
 	path = lib/org-noter
 	url = https://github.com/org-noter/org-noter.git
