@@ -2161,6 +2161,9 @@ Disassemble C, C++ or Fortran code under cursor
                     (org-level-7 . 1.2)
                     (org-level-8 . 1.1)))
       (set-face-attribute (car face) nil :weight 'medium :height (cdr face)))
+
+    ;; org-src
+    (add-to-list 'org-src-lang-modes '("dot" . graphviz-dot))
     ))
 #+end_src
 ** ui
