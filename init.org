@@ -79,8 +79,6 @@ I failed in love with denote, so previous *org-roam* configs were refiled into [
   - [[#project][project]]
   - [[#project-rootfile][project-rootfile]]
 - [[#shell][shell]]
-  - [[#vterm][vterm]]
-  - [[#vterm-toggle][vterm-toggle]]
   - [[#eshell][eshell]]
   - [[#eat][eat]]
 - [[#git][git]]
@@ -658,7 +656,8 @@ Maybe I should add a new state.
    ["org-fc"
     ("f" "org-fc" org-fc-transient-map )]
    ["org-mind-map"
-    ("m" "org-mind-map" org-mind-map-dwim)]
+    ("m" "org-mind-map-dwim" org-mind-map-dwim)
+    ("M" "org-mind-map" org-mind-map-write-current-tree)]
    ]
   )
 #+end_src
@@ -696,9 +695,12 @@ Maybe I should add a new state.
     ("g s" "start-or-stop" gif-screencast-start-or-stop)
     ("g p" "toggle-pause" gif-screencast-toggle-pause)
     ]
-   ["vterm"
-    ("b" "toggle-backward" vterm-toggle-backward)
-    ("i" "toggle-insert-cd" double-vterm-toggle-insert-cd)
+   ;; ["vterm"
+   ;;  ("b" "toggle-backward" vterm-toggle-backward)
+   ;;  ("i" "toggle-insert-cd" double-vterm-toggle-insert-cd)
+   ;;  ]
+   ["shell"
+    ;; ("i" "toggle-insert-cd" eat-toggle-insert-cd)
     ]
    ["mpvi"
     ("mo" "open" mpvi-open)
@@ -1536,35 +1538,6 @@ Dirvish is a minimalistic file manager based on Dired. It's fast
   )
 #+end_src
 * shell
-** vterm
-#+name: vterm
-#+begin_src elisp
-(setup vterm
-  (:bind [(control return)] vterm-toggle-insert-cd))
-#+end_src
-** vterm-toggle
-#+begin_src elisp
-(setup vterm-toggle
-  (setq vterm-toggle-hide-method 'reset-window-configration)
-  (:global "C-`" vterm-toggle)
-  (:when-loaded
-    (setq vterm-toggle-fullscreen-p nil)
-    (add-to-list 'display-buffer-alist
-                 '((lambda (buffer-or-name _)
-                     (let ((buffer (get-buffer buffer-or-name)))
-                       (with-current-buffer buffer
-                         (or (equal major-mode 'vterm-mode)
-                             (string-prefix-p vterm-buffer-name (buffer-name buffer))))))
-                   (display-buffer-reuse-window display-buffer-at-bottom)
-                   (reusable-frames . visible)
-                   (window-height . 0.3)))
-    (defun double-vterm-toggle-insert-cd()
-      (interactive)
-      (vterm-toggle-insert-cd)
-      (vterm-toggle-insert-cd))
-    )
-  )
-#+end_src
 ** eshell
 #+name: eshell
 #+begin_src elisp
@@ -1576,6 +1549,26 @@ Dirvish is a minimalistic file manager based on Dired. It's fast
   ;; fix char error on macos
   (when (eq system-type 'darwin)
     (setq eat-term-name "xterm-256color"))
+  (:global "C-`" eat-toggle-window)
+  (:when-loaded
+    (add-to-list 'display-buffer-alist
+                 '((lambda (buffer-or-name _)
+                     (let ((buffer (get-buffer buffer-or-name)))
+                       (with-current-buffer buffer
+                         (or (equal major-mode 'eat-mode)
+                             (string-prefix-p "*eat" (buffer-name buffer))))))
+                   (display-buffer-reuse-window display-buffer-at-bottom)
+                   (reusable-frames . visible)
+                   (window-height . 0.3)))
+
+
+    )
+  (defun eat-toggle-window()
+    "Toggle eshell buffer."
+    (interactive)
+    (if (get-buffer-window "*eat*")
+        (delete-window (get-buffer-window "*eat*"))
+      (eat)))
   )
 #+end_src
 * git
@@ -2583,12 +2576,15 @@ This is an Emacs package that creates graphviz directed graphs from the headings
     ;; (setq org-mind-map-engine "circo")  ; Circular Layout
 
     ))
-(defun org-mind-map-dwim()
+(defun org-mind-map-dwim(&optional arg)
   "Write current tree, load ox-org if unload"
-  (interactive)
+  (interactive "P")
   (unless (featurep 'ox-org) (require 'ox-org))
-  (org-mind-map-write-current-tree)
-  )
+  (if arg
+    (org-mind-map-write-current-tree)
+      (let ((org-mind-map-dot-output '("png")))
+        (org-mind-map-write-current-tree))
+    ))
 #+end_src
 * english 翻译
 ** go-translate
@@ -2830,7 +2826,7 @@ Simple distraction-free editing. I use darkroom instead of writeroom because it'
         gptel-crowdsourced-prompts-file (concat nowis-doc-emacs-dir "09-scripts/chatgpt.csv")
         )
   (:global "M-p" gptel-send
-           "M-P" gptel-menu)
+           "M-P" gptel)
   (:when-loaded
     (setq-default gptel-backend
                   (gptel-make-openai "chatanywhere"

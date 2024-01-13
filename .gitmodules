@@ -389,12 +389,6 @@
 	url = https://github.com/minad/vertico.git
     load-path = .
     load-path = extensions
-[submodule "vterm"]
-	path = lib/vterm
-	url = https://github.com/akermu/emacs-libvterm.git
-[submodule "vterm-toggle"]
-	path = lib/vterm-toggle
-	url = https://github.com/jixiuf/vterm-toggle.git
 [submodule "vundo"]
 	path = lib/vundo
 	url = https://github.com/casouri/vundo.git
