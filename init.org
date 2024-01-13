@@ -657,7 +657,8 @@ Maybe I should add a new state.
     ("f" "org-fc" org-fc-transient-map )]
    ["org-mind-map"
     ("m" "org-mind-map-dwim" org-mind-map-dwim)
-    ("M" "org-mind-map" org-mind-map-write-current-tree)]
+    ("M" "org-mind-map" org-mind-map-choose-type-dwim)
+    ]
    ]
   )
 #+end_src
@@ -2576,15 +2577,18 @@ This is an Emacs package that creates graphviz directed graphs from the headings
     ;; (setq org-mind-map-engine "circo")  ; Circular Layout
 
     ))
-(defun org-mind-map-dwim(&optional arg)
+(defun org-mind-map-dwim()
   "Write current tree, load ox-org if unload"
-  (interactive "P")
+  (interactive)
   (unless (featurep 'ox-org) (require 'ox-org))
-  (if arg
-    (org-mind-map-write-current-tree)
-      (let ((org-mind-map-dot-output '("png")))
-        (org-mind-map-write-current-tree))
-    ))
+  (let ((org-mind-map-dot-output '("png")))
+    (org-mind-map-write-current-tree))
+  )
+(defun org-mind-map-choose-type-dwim()
+  "Write current tree, load ox-org if unload"
+  (interactive)
+  (unless (featurep 'ox-org) (require 'ox-org))
+  (org-mind-map-write-current-tree))
 #+end_src
 * english 翻译
 ** go-translate
