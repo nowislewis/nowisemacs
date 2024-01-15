@@ -4,9 +4,6 @@
 [submodule "alert"]
 	path = lib/alert
 	url = https://github.com/jwiegley/alert.git
-[submodule "anki-helper"]
-	path = lib/anki-helper
-	url = https://github.com/Elilif/emacs-anki-helper.git
 [submodule "annotate"]
 	path = lib/annotate
 	url = https://github.com/bastibe/annotate.el.git

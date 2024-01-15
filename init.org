@@ -521,6 +521,7 @@ Maybe I should add a new state.
   (global-set-key (kbd "M-\\") #'toggle-between-meow-normal-motion)
   )
 #+end_src
+
 ** transient and related leader-map
 *** transient
 #+name: transient
@@ -716,6 +717,7 @@ Maybe I should add a new state.
     ]
    ])
 #+end_src
+
 *** gtd
 #+begin_src elisp
 (transient-define-prefix org-gtd-leader-map()
@@ -725,6 +727,7 @@ Maybe I should add a new state.
     ("p" "process inbox" org-gtd-process-inbox)
     ("o" "organize" org-gtd-organize)])
 #+end_src
+
 *** ui
 #+begin_src elisp
 (transient-define-prefix ui-leader-map()
@@ -898,7 +901,7 @@ Maybe I should add a new state.
 #+name: themes
 #+begin_src elisp
 (setup ef-themes)
-;; (load-theme 'modus-operandi t)
+(load-theme 'ef-light t)
 #+end_src
 *** lazycat-theme
 #+begin_src elisp
@@ -907,7 +910,7 @@ Maybe I should add a new state.
 *** dracula
 #+begin_src elisp
 (setup dracula)
-(load-theme 'dracula t)
+;; (load-theme 'dracula t)
 #+end_src
 
 ** line number
@@ -1811,9 +1814,8 @@ borrowed from citre, now you can always jump-back use "M-," after any jump in th
 
 (setq read-process-output-max (* 1024 1024))
 (setup eglot
-  (setq eglot-events-buffer-size 0
+  (setq eglot-events-buffer-config'(:size 1000 :format full)
         eglot-workspace-configuration '((:python.analysis :useLibraryCodeForTypes t))
-        ;; eglot-stay-out-of '("xref") ;; xref is controlled in xref-union
         )
   (:autoload eglot-find-implementation)
   (add-hook 'prog-mode-hook (lambda ()
@@ -2031,7 +2033,6 @@ Disassemble C, C++ or Fortran code under cursor
   (setq org-adapt-indentation nil
         org-startup-indented nil
         org-edit-src-content-indentation 0
-        org-hide-emphasis-markers nil
         org-imenu-depth 8
         org-return-follows-link t
         org-link-frame-setup '((vm . vm-visit-folder-other-frame)
@@ -2046,12 +2047,11 @@ Disassemble C, C++ or Fortran code under cursor
         org-image-actual-width 600 ;; this will use 600 for width for all the images.
         org-preview-latex-image-directory (concat no-littering-var-directory "ltximg/")
         org-confirm-babel-evaluate nil
-        org-src-window-setup 'split-window-below
-        org-ellipsis "⤵"
         org-plantuml-jar-path plantuml-jar-path
         org-special-ctrl-a/e t
         org-attach-id-dir (concat nowis-doc-emacs-dir "02-binary-files/01-pictures/01-org-attach")
         fill-column 100
+        org-src-window-setup 'split-window-below
 
         ;; habit
         org-habit-following-days 2
@@ -2163,26 +2163,33 @@ Disassemble C, C++ or Fortran code under cursor
     ;;                 (org-level-8 . 1.1)))
     ;;   (set-face-attribute (car face) nil :weight 'medium :height (cdr face)))
 
-    ;; org-src
+    ;; org-src-lang-modes
     (add-to-list 'org-src-lang-modes '("dot" . graphviz-dot))
     ))
 #+end_src
 ** ui
+*** org mode basic style
+#+begin_src elisp
+(setup org
+  (setq org-auto-align-tags nil
+        org-tags-column 0
+        org-ellipsis "⤵"
+        org-hide-emphasis-markers nil
+        org-pretty-entities t
+        org-habit-graph-column 50
+        ;; Agenda styling
+        org-agenda-tags-column 0
+        ))
+#+end_src
 *** org-modern
 #+begin_src elisp
 (setup org-modern
   (setq
-   ;; org-modern-star '("Ⓐ" "Ⓑ" "Ⓒ" "Ⓓ" "Ⓔ" "Ⓕ" "Ⓖ" "Ⓗ" "Ⓘ" "Ⓙ" "Ⓚ" "Ⓛ" "Ⓜ")
-   org-modern-star '("")
+   org-modern-star '("Ⓐ" "Ⓑ" "Ⓒ" "Ⓓ" "Ⓔ" "Ⓕ" "Ⓖ" "Ⓗ" "Ⓘ" "Ⓙ" "Ⓚ" "Ⓛ" "Ⓜ")
    org-modern-table nil)
   (:hook-into org-mode)
-  ;; (add-hook 'org-agenda-finalize-hook #'org-modern-agenda)
+  (add-hook 'org-agenda-finalize-hook #'org-modern-agenda)
   )
-#+end_src
-*** org-modern-indent
-#+begin_src elisp :tangle no
-(setup org-modern-indent
-  (add-hook 'org-mode-hook #'org-modern-indent-mode 90))
 #+end_src
 *** org-appear
 #+begin_src elisp
@@ -2455,7 +2462,7 @@ Connecting clues while reading code.
   (:load-after org)
   (:defer (org-gtd-mode))
     (:with-map org-gtd-clarify-map
-   (:bind "C-c c"  org-gtd-organize)))
+      (:bind "C-c c"  org-gtd-organize)))
 (setup org-edna)
 
 (setq org-columns-default-format "%60ITEM(Task) %TODO %6Effort(Estim){:}  %6CLOCKSUM(Clock) %TAGS")
