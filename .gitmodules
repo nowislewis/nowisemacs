@@ -76,12 +76,6 @@
 [submodule "diff-hl"]
 	path = lib/diff-hl
 	url = https://github.com/dgutov/diff-hl.git
-[submodule "dired-preview"]
-	path = lib/dired-preview
-	url = https://github.com/protesilaos/dired-preview.git
-[submodule "dired-rsync"]
-	path = lib/dired-rsync
-	url = https://github.com/stsquad/dired-rsync.git
 [submodule "disaster"]
 	path = lib/disaster
 	url = https://github.com/jart/disaster.git
@@ -121,9 +115,6 @@
 [submodule "emms"]
 	path = lib/emms
 	url = https://github.com/emacsmirror/emms.git
-[submodule "esup"]
-	path = lib/esup
-	url = https://github.com/jschaf/esup.git
 [submodule "esxml"]
 	path = lib/esxml
 	url = https://github.com/tali713/esxml.git
@@ -148,9 +139,6 @@
 [submodule "geiser-guile"]
 	path = lib/geiser-guile
 	url = https://github.com/emacsmirror/geiser-guile.git
-[submodule "gif-screencast"]
-	path = lib/gif-screencast
-	url = https://github.com/emacsmirror/gif-screencast.git
 [submodule "go-translate"]
 	path = lib/go-translate
 	url = https://github.com/lorniu/go-translate.git
@@ -170,9 +158,6 @@
 [submodule "holo-layer"]
 	path = lib/holo-layer
 	url = https://github.com/manateelazycat/holo-layer.git
-[submodule "ht"]
-	path = lib/ht
-	url = https://github.com/Wilfred/ht.el.git
 [submodule "imenu-list"]
 	path = lib/imenu-list
 	url = https://github.com/nowislewis/imenu-list.git
@@ -288,9 +273,6 @@
 [submodule "org-present"]
 	path = lib/org-present
 	url = https://github.com/rlister/org-present.git
-[submodule "org-xlatex"]
-	path = lib/org-xlatex
-	url = https://github.com/ksqsf/org-xlatex.git
 [submodule "orgtbl-aggregate"]
 	path = lib/orgtbl-aggregate
 	url = https://github.com/tbanel/orgaggregate.git
@@ -327,9 +309,6 @@
 [submodule "pulsar"]
 	path = lib/pulsar
     url = https://github.com/protesilaos/pulsar.git
-[submodule "quickrun"]
-	path = lib/quickrun
-	url = https://github.com/emacsorphanage/quickrun.git
 [submodule "rainbow-delimiters"]
 	path = lib/rainbow-delimiters
 	url = https://github.com/Fanael/rainbow-delimiters.git

@@ -41,6 +41,7 @@ I failed in love with denote, so previous *org-roam* configs were refiled into [
 - [[#general-configuration][General Configuration]]
   - [[#simple][simple]]
   - [[#general-builtin-modes][general builtin modes]]
+  - [[#repeat-mode][repeat-mode]]
   - [[#backup][backup]]
   - [[#no-littering][no-littering]]
   - [[#recentf][recentf]]
@@ -130,12 +131,10 @@ I failed in love with denote, so previous *org-roam* configs were refiled into [
   - [[#eaf][eaf]]
   - [[#holo-layer][holo-layer]]
   - [[#app-launcher][app-launcher]]
-  - [[#gif-screencast][gif-screencast]]
   - [[#ai-related][ai related]]
   - [[#webjump][webjump]]
   - [[#backup-scripts][backup scripts]]
   - [[#video-and-music][video and music]]
-  - [[#esup][esup]]
   - [[#literate-calc][literate-calc]]
   - [[#server][server]]
 - [[#use-single-file-to-load-configs][use single file to load configs]]
@@ -693,10 +692,6 @@ Maybe I should add a new state.
   [["agenda"
     ("a" "org-agenda" org-agenda)
     ("c" "org-capture" org-capture)]
-   ["gif-screencast"
-    ("g s" "start-or-stop" gif-screencast-start-or-stop)
-    ("g p" "toggle-pause" gif-screencast-toggle-pause)
-    ]
    ;; ["vterm"
    ;;  ("b" "toggle-backward" vterm-toggle-backward)
    ;;  ("i" "toggle-insert-cd" double-vterm-toggle-insert-cd)
@@ -1051,6 +1046,9 @@ diff-hl-mode highlights uncommitted changes on the left side of the window (area
   ;; 最近发现和 pdf-view-mode 工作不协调
   (when (>= emacs-major-version 29)
     (pixel-scroll-precision-mode t)))
+#+end_src
+** repeat-mode
+#+begin_src elisp
 (setup repeat
   (repeat-mode))
 #+end_src
@@ -1201,9 +1199,9 @@ diff-hl-mode highlights uncommitted changes on the left side of the window (area
 ** Marginalia
 #+begin_src elisp
 (setup marginalia
-  (setq marginalia-annotators '(marginalia-annotators-heavy
-                                   marginalia-annotators-light
-                                   nil))
+  ;; (setq marginalia-annotators '(marginalia-annotators-heavy
+  ;;                               marginalia-annotators-light
+  ;;                               nil))
   (:hook-into after-init))
 #+end_src
 ** embark
@@ -1281,7 +1279,20 @@ Popper is a minor-mode to tame the flood of ephemeral windows Emacs produces, wh
 Jump anywhere in the world
 #+begin_src elisp
 (setup avy
-  (:global "M-j" avy-goto-word-1))
+  (:global "M-j" avy-goto-char-timer)
+  (:when-loaded
+  (defun avy-action-embark (pt)
+    (unwind-protect
+        (save-excursion
+          (goto-char pt)
+          (embark-act))
+      (select-window
+       (cdr (ring-ref avy-ring 0))))
+    t)
+
+  (setf (alist-get ?. avy-dispatch-alist) 'avy-action-embark)
+  (define-key isearch-mode-map (kbd "M-j") 'avy-isearch)
+  ))
 #+end_src
 *** bookmark
 #+begin_src elisp
@@ -1418,19 +1429,6 @@ Dirvish is a minimalistic file manager based on Dired. It's fast
   (add-hook 'dired-load-hook #'dirvish-override-dired-mode)
   (:when-loaded
     (dirvish-side-follow-mode)))
-#+end_src
-*** dired-rsync
-#+begin_src elisp
-(setup dired-rsync)
-#+end_src
-*** dired-preview
-#+begin_src elisp
-(setup dired-preview
-  (setq dired-preview-delay 0.5
-        dired-preview-trigger-commands '(dired-previous-line dired-next-line)
-        )
-  ;; (dired-preview-global-mode 1)
-  )
 #+end_src
 *** nerd-icons-dired
 #+begin_src elisp
@@ -1651,12 +1649,6 @@ Emacs major-mode to work with Beancount ledger files
 (setup org-elp
   (setq org-elp-idle-time 1))
 #+end_src
-**** org-xlatex
-#+begin_src elisp
-(setup org-xlatex
-  (setq org-xlatex-position-indicator t)
-  )
-#+end_src
 *** python
 **** python
 #+begin_src elisp
@@ -1758,15 +1750,23 @@ borrowed from citre, now you can always jump-back use "M-," after any jump in th
 **** corfu related
 ***** corfu
 #+begin_src elisp
-(defun corfu-enable-always-in-minibuffer ()
-  "Enable Corfu in the minibuffer if Vertico/Mct are not active."
-  (unless (or (bound-and-true-p mct--active)
-              (bound-and-true-p vertico--input)
-              (eq (current-local-map) read-passwd-map))
+;; (defun corfu-enable-always-in-minibuffer ()
+;;   "Enable Corfu in the minibuffer if Vertico/Mct are not active."
+;;   (unless (or (bound-and-true-p mct--active)
+;;               (bound-and-true-p vertico--input)
+;;               (eq (current-local-map) read-passwd-map))
+;;     (setq-local corfu-echo-delay nil ;; Disable automatic echo and popup
+;;                 corfu-popupinfo-delay nil)
+;;     (corfu-mode 1)))
+
+(defun corfu-enable-in-minibuffer ()
+  "Enable Corfu in the minibuffer."
+  (when (local-variable-p 'completion-at-point-functions)
+    ;; (setq-local corfu-auto nil) ;; Enable/disable auto completion
     (setq-local corfu-echo-delay nil ;; Disable automatic echo and popup
                 corfu-popupinfo-delay nil)
     (corfu-mode 1)))
-
+(add-hook 'minibuffer-setup-hook #'corfu-enable-in-minibuffer)
 
 (setup corfu
   (setq corfu-cycle t                ;; Enable cycling for `corfu-next/previous'
@@ -1786,7 +1786,7 @@ borrowed from citre, now you can always jump-back use "M-," after any jump in th
     (meow-insert-exit))
 
   (global-corfu-mode)
-  (add-hook 'minibuffer-setup-hook #'corfu-enable-always-in-minibuffer 1)
+  ;; (add-hook 'minibuffer-setup-hook #'corfu-enable-always-in-minibuffer 1)
   )
 (setup corfu-popupinfo
   (:load-after corfu)
@@ -1938,11 +1938,6 @@ Citre is an advanced Ctags (or actually, readtags) frontend for Emacs.
 (setup popup)
 (setup dumb-jump)
 (add-hook 'xref-backend-functions #'dumb-jump-xref-activate)
-#+end_src
-*** quickrun
-#+begin_src elisp
-(setup ht)
-(setup quickrun)
 #+end_src
 *** Code toggle with hideshow, hideif
 #+begin_src elisp
@@ -2593,7 +2588,7 @@ This is an Emacs package that creates graphviz directed graphs from the headings
   "Write current tree, load ox-org if unload"
   (interactive)
   (unless (featurep 'ox-org) (require 'ox-org))
-  (let ((org-mind-map-dot-output '("png")))
+  (let ((org-mind-map-dot-output '("pdf")))
     (org-mind-map-write-current-tree))
   )
 (defun org-mind-map-choose-type-dwim()
@@ -2815,25 +2810,6 @@ Simple distraction-free editing. I use darkroom instead of writeroom because it'
 #+begin_src elisp
 (setup app-launcher)
 #+end_src
-** gif-screencast
-#+begin_src elisp
-(setup gif-screencast
-  (:autoload gif-screencast-start-or-stop
-             gif-screencast-toggle-pause)
-  (:if-system 'darwin)
-  (:when-loaded
-    (setq gif-screencast-args '("-x") ;; To shut up the shutter sound of `screencapture' (see `gif-screencast-command').
-             gif-screencast-cropping-program "mogrify" ;; Optional: Used to crop the capture to the Emacs frame.
-             gif-screencast-capture-format "ppm" ;; Optional: Required to crop captured images.
-             gif-screencast-scale-factor 2.0))
-  (defun my/siri-ocr ()
-    (interactive)
-    (shell-command "shortcuts run \"OCR Selected Area\"")
-    (do-applescript "tell application id \"org.gnu.Emacs\" to activate")
-    )
-  ;; (keymap-global-set "M-o" #'my/siri-ocr)
-  )
-#+end_src
 ** ai related
 *** gptel
 #+begin_src elisp
@@ -2852,14 +2828,6 @@ Simple distraction-free editing. I use darkroom instead of writeroom because it'
                                      :stream t
                                      :models '("gpt-3.5-turbo" "gpt-3.5-turbo-16k" "gpt-4" "gpt-4-32k")))
     ))
-#+end_src
-*** whisper.el
-#+begin_src elisp :tangle no
-(setup whisper
-  (setq whisper-install-directory (concat no-littering-var-directory "whisper")
-           whisper-language "zh"
-           whisper-model "medium"
-           whisper-use-threads 8))
 #+end_src
 ** webjump
 #+begin_src elisp
@@ -2926,10 +2894,6 @@ rsync -avihu lewis-nas@192.168.31.108:/share/my_webdav/rsync/tmp/ ~/Downloads/tm
 ;; (emms-standard)
 ;; (emms-default-players)
 (setq emms-source-file-default-directory "~/Documents/video_music/")
-#+end_src
-** esup
-#+begin_src elisp
-(setup esup)
 #+end_src
 ** literate-calc
 #+begin_src elisp
