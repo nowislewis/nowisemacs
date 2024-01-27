@@ -683,6 +683,8 @@ Maybe I should add a new state.
     ("s" "line" consult-line)]
    ["web search"
     ("w" "webjump" webjump)]
+   ["lsp"
+    ("e" "eglot-symbols" consult-eglot-symbols)]
    ])
 #+end_src
 *** apps
@@ -2027,6 +2029,7 @@ Disassemble C, C++ or Fortran code under cursor
   (setq org-directory (concat nowis-doc-emacs-dir "01-orgmode/"))
   (setq org-adapt-indentation nil
         org-startup-indented nil
+        org-startup-with-inline-images t
         org-edit-src-content-indentation 0
         org-imenu-depth 8
         org-return-follows-link t
@@ -2039,7 +2042,7 @@ Disassemble C, C++ or Fortran code under cursor
         org-blank-before-new-entry '((heading . nil)
                                      (plain-list-item . nil))
 
-        org-image-actual-width 600 ;; this will use 600 for width for all the images.
+        org-image-actual-width 720 ;; this will use 600 for width for all the images.
         org-preview-latex-image-directory (concat no-littering-var-directory "ltximg/")
         org-confirm-babel-evaluate nil
         org-plantuml-jar-path plantuml-jar-path
@@ -2582,13 +2585,13 @@ This is an Emacs package that creates graphviz directed graphs from the headings
     ;; (setq org-mind-map-engine "sfdp")   ; Multiscale version of fdp for the layout of large graphs
     ;; (setq org-mind-map-engine "twopi")  ; Radial layouts
     ;; (setq org-mind-map-engine "circo")  ; Circular Layout
-
+    (add-to-list 'org-mind-map-default-graph-attribs '("fontname" . "Maple Mono SC F"))
     ))
 (defun org-mind-map-dwim()
   "Write current tree, load ox-org if unload"
   (interactive)
   (unless (featurep 'ox-org) (require 'ox-org))
-  (let ((org-mind-map-dot-output '("pdf")))
+  (let ((org-mind-map-dot-output '("svg")))
     (org-mind-map-write-current-tree))
   )
 (defun org-mind-map-choose-type-dwim()

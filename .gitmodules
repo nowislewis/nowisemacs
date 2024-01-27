@@ -179,12 +179,6 @@
 [submodule "literate-calc"]
 	path = lib/literate-calc
 	url = https://github.com/sulami/literate-calc-mode.el.git
-[submodule "lsp-bridge"]
-	path = lib/lsp-bridge
-	url = https://github.com/manateelazycat/lsp-bridge.git
-    load-path = .
-    load-path = acm
-    build-step = borg-update-autoloads
 [submodule "lua-mode"]
 	path = lib/lua-mode
 	url = https://github.com/immerrr/lua-mode.git
@@ -290,7 +284,7 @@
 	url = https://github.com/kimim/pdf-view-pagemark.git
 [submodule "pinyinlib"]
 	path = lib/pinyinlib
-	url = https://github.com/cute-jumper/pinyinlib.el.git
+	url = https://github.com/nowislewis/pinyinlib.el.git
 [submodule "plantuml-mode"]
 	path = lib/plantuml-mode
 	url = https://github.com/skuro/plantuml-mode.git
