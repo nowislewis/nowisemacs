@@ -36,7 +36,7 @@ I failed in love with denote, so previous *org-roam* configs were refiled into [
   - [[#doom-modeline][doom-modeline]]
   - [[#mini-echo][mini-echo]]
   - [[#hl-todo][hl-todo]]
-  - [[#pulsar][pulsar]]
+  - [[#highlight-line][highlight line]]
   - [[#show-paren-mode][show-paren-mode]]
 - [[#general-configuration][General Configuration]]
   - [[#simple][simple]]
@@ -538,37 +538,28 @@ Maybe I should add a new state.
     ("d" "find-definitions" xref-find-definitions)
     ("D" "find-references" xref-find-references)
     ("i" "find-impl" eglot-find-implementation)
-    ;; ("d" "find-definitions" lsp-bridge-find-def)
-    ;; ("D" "find-references" lsp-bridge-find-references)
-    ;; ("i" "find-impl" lsp-bridge-find-impl)
-
-    ("j" "find-apropos" xref-find-apropos)
+    ("s" "find-symbols" xref-find-apropos)
     ("o" "find-def-other-window" xref-find-definitions-other-window)
     ]
    ["Code action"
     ("a" "code-actions" eglot-code-actions)
     ("r" "rename" eglot-rename)
-    ;; ("a" "code-actions" lsp-bridge-code-action)
-    ;; ("r" "rename" lsp-bridge-rename)
     ("f" "format-all-region" format-all-region)
     ("F" "format-all-buffer" format-all-buffer)]
    ["diagnostic"
     ("n" "jump-to-next-diagnostic" flymake-goto-next-error)
-    ("p" "jump-to-prev-diagnostic" flymake-goto-prev-error)
+    ("N" "jump-to-prev-diagnostic" flymake-goto-prev-error)
     ("l" "list-diagnostics" consult-flymake)
-    ;; ("n" "jump-to-next-diagnostic" lsp-bridge-diagnostic-jump-next)
-    ;; ("p" "jump-to-prev-diagnostic" lsp-bridge-diagnostic-jump-prev)
-    ;; ("l" "list-diagnostics" lsp-bridge-diagnostic-list)
     ]
    ["Navigate"
     ("m" "consult-mark" consult-mark)
     ]
    ["Clue"
-    ("w" "clue-copy" clue-copy)
-    ("y" "clue-yank" clue-paste)
+    ("y" "clue-copy" clue-copy)
+    ("p" "clue-yank" clue-paste)
     ]
    ["citre"
-    ;; ("p" "citre-peek" citre-peek)
+    ("j" "citre-peek" citre-jump)
     ("c" "citre-ace-peek" citre-ace-peek)
     ]
    ])
@@ -683,8 +674,6 @@ Maybe I should add a new state.
     ("s" "line" consult-line)]
    ["web search"
     ("w" "webjump" webjump)]
-   ["lsp"
-    ("e" "eglot-symbols" consult-eglot-symbols)]
    ])
 #+end_src
 *** apps
@@ -991,7 +980,21 @@ diff-hl-mode highlights uncommitted changes on the left side of the window (area
 (setup hl-todo
   (global-hl-todo-mode))
 #+end_src
-** pulsar
+** highlight line
+*** hl-line
+#+begin_src elisp
+(setup hl-line
+  (:global "C-l" #'nowis-recenter)
+  ;; Only highliht current buffer in current window
+  (setq hl-line-sticky-flag nil
+        global-hl-line-sticky-flag nil)
+  (global-hl-line-mode))
+(defun nowis-recenter ()
+  (interactive)
+  (call-interactively 'recenter)
+  (pulsar-pulse-line))
+#+end_src
+*** pulsar
 #+begin_src elisp
 (setup pulsar
   (pulsar-global-mode 1)
@@ -1038,8 +1041,7 @@ diff-hl-mode highlights uncommitted changes on the left side of the window (area
   (setq global-auto-revert-non-file-buffers t)
   (:defer
    (global-auto-revert-mode t)))                  ; 当另一程序修改了文件时，让 Emacs 及时刷新 Buffer
-(setup hl-line
-  (global-hl-line-mode))
+
 (setup frame
   (blink-cursor-mode -1)                  ;指针不闪动
   )
@@ -1821,8 +1823,8 @@ borrowed from citre, now you can always jump-back use "M-," after any jump in th
         )
   (:autoload eglot-find-implementation)
   (add-hook 'prog-mode-hook (lambda ()
-                        (unless (derived-mode-p 'emacs-lisp-mode 'lisp-mode 'makefile-mode 'snippet-mode)
-                          (eglot-ensure))))
+                              (unless (derived-mode-p 'emacs-lisp-mode 'lisp-mode 'makefile-mode 'snippet-mode)
+                                (eglot-ensure))))
   (:when-loaded
     (defface new-hi-green
       '((((min-colors 88) (background dark))
@@ -1832,29 +1834,6 @@ borrowed from citre, now you can always jump-back use "M-," after any jump in th
         (t (:background "green")))
       "Face for hi-lock mode.")
     (set-face-attribute 'eglot-highlight-symbol-face nil :inherit 'new-hi-green)
-
-    ;; the following code enable combine dumb-jump with eglot
-    (advice-add 'eglot-xref-backend :override 'xref-eglot+dumb-backend)
-
-    (defun xref-eglot+dumb-backend () 'eglot+dumb)
-
-    (cl-defmethod xref-backend-identifier-at-point ((_backend (eql eglot+dumb)))
-      (cons (xref-backend-identifier-at-point 'eglot)
-            (xref-backend-identifier-at-point 'dumb-jump)))
-
-    (cl-defmethod xref-backend-identifier-completion-table ((_backend (eql eglot+dumb)))
-      (xref-backend-identifier-completion-table 'eglot))
-
-    (cl-defmethod xref-backend-definitions ((_backend (eql eglot+dumb)) identifier)
-      (or (xref-backend-definitions 'eglot (car identifier))
-          (xref-backend-definitions 'dumb-jump (cdr identifier))))
-
-    (cl-defmethod xref-backend-references ((_backend (eql eglot+dumb)) identifier)
-      (or (xref-backend-references 'eglot (car identifier))
-          (xref-backend-references 'dumb-jump (cdr identifier))))
-
-    (cl-defmethod xref-backend-apropos ((_backend (eql eglot+dumb)) pattern)
-      (xref-backend-apropos 'eglot pattern))
     )
   )
 
@@ -1934,12 +1913,6 @@ Citre is an advanced Ctags (or actually, readtags) frontend for Emacs.
         ;; citre-auto-enable-citre-mode-modes '(prog-mode)
         )
   )
-#+end_src
-**** dumb-jump
-#+begin_src elisp
-(setup popup)
-(setup dumb-jump)
-(add-hook 'xref-backend-functions #'dumb-jump-xref-activate)
 #+end_src
 *** Code toggle with hideshow, hideif
 #+begin_src elisp
@@ -2173,7 +2146,7 @@ Disassemble C, C++ or Fortran code under cursor
         org-tags-column 0
         org-ellipsis "⤵"
         org-hide-emphasis-markers nil
-        org-pretty-entities t
+        org-pretty-entities nil ;; can perfor ui such as "a_words" into small "awords"
         org-habit-graph-column 50
         ;; Agenda styling
         org-agenda-tags-column 0
@@ -2591,8 +2564,10 @@ This is an Emacs package that creates graphviz directed graphs from the headings
   "Write current tree, load ox-org if unload"
   (interactive)
   (unless (featurep 'ox-org) (require 'ox-org))
-  (let ((org-mind-map-dot-output '("svg")))
-    (org-mind-map-write-current-tree))
+  (make-local-variable 'org-mind-map-dot-output)
+  (setq org-mind-map-dot-output '("pdf"))
+  (org-mind-map-write-current-tree)
+  (kill-local-variable 'org-mind-map-dot-output)
   )
 (defun org-mind-map-choose-type-dwim()
   "Write current tree, load ox-org if unload"
