@@ -91,9 +91,9 @@
 [submodule "ebib"]
 	path = lib/ebib
 	url = https://github.com/joostkremers/ebib.git
-[submodule "eglot-ccls"]
-	path = lib/eglot-ccls
-	url = https://git.sr.ht/~zhscn/eglot-ccls
+[submodule "eglot-hierarchy"]
+	path = lib/eglot-hierarchy
+	url = https://github.com/dolmens/eglot-hierarchy.git
 [submodule "el-themes"]
 	path = lib/el-themes
 	url = https://github.com/protesilaos/ef-themes.git

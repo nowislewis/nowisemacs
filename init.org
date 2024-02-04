@@ -18,6 +18,7 @@ I failed in love with denote, so previous *org-roam* configs were refiled into [
   - [[#meow-leader-keybindings][meow leader keybindings]]
   - [[#which-key][which-key]]
   - [[#electric][electric]]
+  - [[#dwim][dwim]]
 - [[#package-library][Package Library]]
   - [[#dash][dash]]
   - [[#s][s]]
@@ -683,12 +684,8 @@ Maybe I should add a new state.
   [["agenda"
     ("a" "org-agenda" org-agenda)
     ("c" "org-capture" org-capture)]
-   ;; ["vterm"
-   ;;  ("b" "toggle-backward" vterm-toggle-backward)
-   ;;  ("i" "toggle-insert-cd" double-vterm-toggle-insert-cd)
-   ;;  ]
    ["shell"
-    ;; ("i" "toggle-insert-cd" eat-toggle-insert-cd)
+    ("i" "toggle-insert-cd" eat-toggle-insert-dir)
     ]
    ["mpvi"
     ("mo" "open" mpvi-open)
@@ -782,6 +779,12 @@ Maybe I should add a new state.
 #+begin_src elisp
 (setup elec-pair
   (electric-pair-mode))
+#+end_src
+** dwim
+#+begin_src elisp
+(global-set-key (kbd "M-u") 'upcase-dwim)
+(global-set-key (kbd "M-l") 'downcase-dwim)
+(global-set-key (kbd "M-c") 'capitalize-dwim)
 #+end_src
 * Package Library
 ** dash
@@ -1329,6 +1332,30 @@ Jump anywhere in the world
       )
 
 #+end_src
+*** hide-cursor-mode
+#+begin_src elisp
+(defvar-local hide-cursor--original nil)
+
+(define-minor-mode hide-cursor-mode
+  "Hide or show the cursor.
+
+When the cursor is hidden `scroll-lock-mode' is enabled, so that
+the buffer works like a pager."
+  :global nil
+  :lighter "H"
+  (if hide-cursor-mode
+      (progn
+        (scroll-lock-mode 1)
+        (setq-local hide-cursor--original
+                    cursor-type)
+        (global-hl-line-mode -1)
+        (setq-local cursor-type nil))
+    (scroll-lock-mode -1)
+    (global-hl-line-mode 1)
+    (setq-local cursor-type (or hide-cursor--original
+                                t))))
+(define-key global-map (kbd "<f7>") 'hide-cursor-mode)
+#+end_src
 * ibuffer
 ** ibuffer
 #+name: ibuffer
@@ -1575,6 +1602,14 @@ Dirvish is a minimalistic file manager based on Dired. It's fast
     (if (get-buffer-window "*eat*")
         (delete-window (get-buffer-window "*eat*"))
       (eat)))
+
+  (defun eat-toggle-insert-dir()
+    "Toggle eshell buffer."
+    (interactive)
+      (eat)
+      (eat--send-string "*eat*"
+                        (concat "cd " (file-name-directory (buffer-file-name))))
+      )
   )
 #+end_src
 * git
@@ -2931,7 +2966,6 @@ emacsclient -t -r
 <<ibuffer>>
 ;; <<tab-bar>>
 ;; <<tabspaces>>
-<<vterm>>
 <<eshell>>
 #+end_src
 ** init-minimal
