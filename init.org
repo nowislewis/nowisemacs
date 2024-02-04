@@ -662,8 +662,8 @@ Maybe I should add a new state.
    ;; ["blink-search"
    ;;  ("b" "blink-search" blink-search)]
    ["grep"
-    ("d" "grep-in-current" consult-ripgrep)
-    ("D" "grep-other-dir" lewis/ripgrep-search-other-dir)
+    ("d" "grep-dir" lewis/ripgrep-search-other-dir)
+    ("D" "grep-project" consult-ripgrep)
     ("g" "rg" rg)]
    ["find"
     ("f" "find-in-current" consult-find)
@@ -1330,7 +1330,6 @@ Jump anywhere in the world
 (setq aw-keys '(?a ?s ?d ?f ?g ?h ?j ?k ?l)
       aw-scope 'frame
       )
-
 #+end_src
 *** hide-cursor-mode
 #+begin_src elisp
@@ -1348,10 +1347,8 @@ the buffer works like a pager."
         (scroll-lock-mode 1)
         (setq-local hide-cursor--original
                     cursor-type)
-        (global-hl-line-mode -1)
         (setq-local cursor-type nil))
     (scroll-lock-mode -1)
-    (global-hl-line-mode 1)
     (setq-local cursor-type (or hide-cursor--original
                                 t))))
 (define-key global-map (kbd "<f7>") 'hide-cursor-mode)
@@ -1756,6 +1753,7 @@ borrowed from citre, now you can always jump-back use "M-," after any jump in th
                 consult-find
                 find-file
                 blink-search
+                citre-jump
                 consult-goto-line
                 isearch-forward))
   (if (fboundp func)
