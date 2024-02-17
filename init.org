@@ -404,8 +404,8 @@ Maybe I should add a new state.
   ;; motion keys
   (meow-motion-overwrite-define-key '("j" . meow-next)
                                     '("k" . meow-prev)
-                                    ;; '("h" . meow-left)
-                                    ;; '("l" . meow-right)
+                                    '("h" . meow-left)
+                                    '("l" . meow-right)
                                     '("<escape>" . ignore)
                                     '("." . repeat))
   ;; normal keys
@@ -598,8 +598,8 @@ Maybe I should add a new state.
     ("c s" "peek-save-session" citre-peek-save-session)
     ("c l" "peek-load-session" citre-peek-load-session)]
    ["Imenu"
-    ("l" "Imenu list smart toggle" imenu-list-smart-toggle)]
-   ;; ("L" "Boxy imenu" boxy-imenu)]
+    ("l" "Imenu list smart toggle" imenu-list-smart-toggle)
+    ("L" "Boxy imenu" boxy-imenu)]
    ;; org-download
    ["Org download"
     ("d" "Screenshot" org-download-screenshot)]
@@ -729,8 +729,8 @@ Maybe I should add a new state.
  ;; SPC j/k will run the original command in MOTION state.
  '("j" . "H-j")
  '("k" . "H-k")
- ;; '("h" . "H-h")
- ;; '("l" . "H-l")
+ '("h" . "H-h")
+ '("l" . "H-l")
  '("." . "H-.")
  ;; Use SPC (0-9) for digit arguments.
  '("1" . meow-digit-argument)
@@ -1478,6 +1478,11 @@ Dirvish is a minimalistic file manager based on Dired. It's fast
            )
   )
 #+end_src
+*** boxy-imenu
+#+begin_src elisp
+(setup boxy)
+(setup boxy-imenu)
+#+end_src
 ** tab-line and tab-bar
 #+name: tab-bar
 #+begin_src elisp
@@ -1790,15 +1795,6 @@ borrowed from citre, now you can always jump-back use "M-," after any jump in th
 **** corfu related
 ***** corfu
 #+begin_src elisp
-;; (defun corfu-enable-always-in-minibuffer ()
-;;   "Enable Corfu in the minibuffer if Vertico/Mct are not active."
-;;   (unless (or (bound-and-true-p mct--active)
-;;               (bound-and-true-p vertico--input)
-;;               (eq (current-local-map) read-passwd-map))
-;;     (setq-local corfu-echo-delay nil ;; Disable automatic echo and popup
-;;                 corfu-popupinfo-delay nil)
-;;     (corfu-mode 1)))
-
 (defun corfu-enable-in-minibuffer ()
   "Enable Corfu in the minibuffer."
   (when (local-variable-p 'completion-at-point-functions)
@@ -1831,7 +1827,8 @@ borrowed from citre, now you can always jump-back use "M-," after any jump in th
 (setup corfu-popupinfo
   (:load-after corfu)
   (setq corfu-popupinfo-delay '(0.5 . 0.5))
-  (:hook corfu-popupinfo-mode))
+  (:when-loaded
+    (corfu-popupinfo-mode)))
 
 (setup cape
   ;; don't let dabbrev take over all things
