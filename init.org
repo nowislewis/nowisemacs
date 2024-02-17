@@ -6,7 +6,7 @@ I failed in love with denote, so previous *org-roam* configs were refiled into [
   - [[#ui-speed-up][UI speed up]]
   - [[#basic-modes][basic modes]]
   - [[#load-path][load-path]]
-  - [[#drop][drop]]
+  - [[#drop-out][drop out]]
   - [[#set-vars][set vars]]
 - [[#package-management][Package Management]]
   - [[#setup][setup]]
@@ -127,6 +127,7 @@ I failed in love with denote, so previous *org-roam* configs were refiled into [
   - [[#nov-xwidget][nov-xwidget]]
   - [[#darkroom][darkroom]]
   - [[#markdown-mode][markdown-mode]]
+  - [[#markdown-xwidget][markdown-xwidget]]
 - [[#tools][tools]]
   - [[#xwidget-and-browser][xwidget and browser]]
   - [[#eaf][eaf]]
@@ -220,7 +221,7 @@ I failed in love with denote, so previous *org-roam* configs were refiled into [
         ("git@gitlab.com:" . "https://gitlab.com/")))
 (borg-initialize)
 #+end_src
-** drop
+** drop out
 The following content is not enabled yet, because I want to minimize unnecessary settings as much as possible
 #+begin_src elisp :tangle no
 ;; Restore emacs session.
@@ -1001,8 +1002,10 @@ diff-hl-mode highlights uncommitted changes on the left side of the window (area
 #+begin_src elisp
 (setup pulsar
   (pulsar-global-mode 1)
+  (setq pulsar-delay 0.015
+        pulsar-iterations 10)
   (:when-loaded
-  (add-hook 'pulsar-pulse-functions 'ace-window)))
+    (add-hook 'pulsar-pulse-functions 'ace-window)))
 #+end_src
 ** show-paren-mode
 #+begin_src elisp
@@ -2034,8 +2037,10 @@ Disassemble C, C++ or Fortran code under cursor
 (setup org
   (setq org-directory (concat nowis-doc-emacs-dir "01-orgmode/"))
   (setq org-adapt-indentation nil
-        org-startup-indented nil
+        org-startup-indented t
         org-startup-with-inline-images t
+        org-startup-numerated nil
+        org-startup-folded 'content
         org-edit-src-content-indentation 0
         org-imenu-depth 8
         org-return-follows-link t
@@ -2076,8 +2081,6 @@ Disassemble C, C++ or Fortran code under cursor
                                        ("CANCELLED" :foreground "forest green" :weight bold)
                                        ))
         )
-
-  (:hook org-num-mode)
   (:when-loaded
     (require 'org-tempo) ;; so that <s is useful
     ;; 导出相关的设置
@@ -2188,12 +2191,15 @@ Disassemble C, C++ or Fortran code under cursor
 *** org-modern
 #+begin_src elisp
 (setup org-modern
-  (setq
-   org-modern-star '("Ⓐ" "Ⓑ" "Ⓒ" "Ⓓ" "Ⓔ" "Ⓕ" "Ⓖ" "Ⓗ" "Ⓘ" "Ⓙ" "Ⓚ" "Ⓛ" "Ⓜ")
-   org-modern-table nil)
+  (setq org-modern-table nil
+        org-modern-star '("Ⓐ" "Ⓑ" "Ⓒ" "Ⓓ" "Ⓔ" "Ⓕ" "Ⓖ" "Ⓗ" "Ⓘ" "Ⓙ" "Ⓚ" "Ⓛ" "Ⓜ")
+        )
   (:hook-into org-mode)
   (add-hook 'org-agenda-finalize-hook #'org-modern-agenda)
-  )
+  (:when-loaded
+    ;; (set-face-attribute 'org-block-begin-line nil :underline nil :overline t)
+    ;; (set-face-attribute 'org-block-end-line nil :overline nil :underline t)
+    ))
 #+end_src
 *** org-appear
 #+begin_src elisp
@@ -2607,6 +2613,27 @@ This is an Emacs package that creates graphviz directed graphs from the headings
   (interactive)
   (unless (featurep 'ox-org) (require 'ox-org))
   (org-mind-map-write-current-tree))
+
+(defvar save-mind-map-minor-mode nil
+  "A flag indicating whether the minor mode is enabled or not.")
+
+(defun org-mind-map-print()
+  "Write current tree, load ox-org if unload"
+  (unless (featurep 'ox-org) (require 'ox-org))
+  (make-local-variable 'org-mind-map-dot-output)
+  (setq org-mind-map-dot-output '("pdf"))
+  (org-mind-map-write-current-tree)
+  (kill-local-variable 'org-mind-map-dot-output)
+  )
+
+(define-minor-mode save-mind-map-minor-mode
+  "Toggle save org mind map minor mode."
+  :init-value nil
+  :lighter " MindMap"
+  :global nil
+  (if save-mind-map-minor-mode
+      (add-hook 'after-save-hook #'org-mind-map-print t t)
+    (remove-hook 'after-save-hook #'org-mind-map-print t)))
 #+end_src
 * english 翻译
 ** go-translate
@@ -2737,6 +2764,12 @@ Simple distraction-free editing. I use darkroom instead of writeroom because it'
 (setup markdown-mode
   (:file-match "\\.md\\'"))
 #+end_src
+** markdown-xwidget
+#+begin_src elisp
+(setup mustache)
+(setup ht)
+(setup markdown-xwidget)
+#+end_src
 * tools
 ** xwidget and browser
 #+begin_src elisp
@@ -2809,8 +2842,9 @@ Simple distraction-free editing. I use darkroom instead of writeroom because it'
   (when (eq system-type 'darwin)
     (require 'holo-layer)
     (setq holo-layer-enable-cursor-animation t
-          holo-layer-enable-window-border t
+          holo-layer-enable-window-border nil
           holo-layer-enable-place-info t
+          holo-layer-hide-mode-line nil
           holo-layer-python-command "~/.pyenv/shims/python3"
           )
     (holo-layer-enable)
