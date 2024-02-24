@@ -99,24 +99,20 @@ I failed in love with denote, so previous *org-roam* configs were refiled into [
   - [[#org-present][org-present]]
   - [[#bibtex-related][bibtex related]]
   - [[#toc-org][toc-org]]
-  - [[#denote][denote]]
-  - [[#denote-lumn][denote-lumn]]
+  - [[#denote-and-related][denote and related]]
   - [[#find-orgmode-dir-files][find orgmode dir files]]
   - [[#org-imagine-excalidraw][org-imagine, excalidraw]]
   - [[#org-remark][org-remark]]
-  - [[#annotate][annotate]]
   - [[#clue][clue]]
   - [[#org-gtd][org-gtd]]
   - [[#agendagtd-disabled][agenda/gtd (disabled)]]
   - [[#org-ql][org-ql]]
   - [[#mpvi][mpvi]]
-  - [[#orgtbl-aggregate][orgtbl-aggregate]]
   - [[#org-fc][org-fc]]
   - [[#shrface][shrface]]
   - [[#org-mind-map][org-mind-map]]
 - [[#english-翻译][english 翻译]]
   - [[#go-translate][go-translate]]
-  - [[#sdcv][sdcv]]
   - [[#immersive-translate][immersive-translate]]
 - [[#阅读][阅读]]
   - [[#pdf-tools][pdf-tools]]
@@ -651,6 +647,8 @@ Maybe I should add a new state.
    ["org-mind-map"
     ("m" "org-mind-map-dwim" org-mind-map-dwim)
     ("M" "org-mind-map" org-mind-map-choose-type-dwim)
+    ("w" "org-mind-wbs" plantuml-org-to-wbs-open)
+    ("p" "org-mind-plantuml" plantuml-org-to-mindmap-open)
     ]
    ]
   )
@@ -815,8 +813,8 @@ Maybe I should add a new state.
 
 ;; fixed font
 (setq lewis-fixed-font (cl-loop for font in '(
-                                              "Maple Mono SC NF"
                                               "Unifont"
+                                              "Maple Mono SC NF"
                                               ;; "InconsolataGo QiHei NF"
                                               ;; "yaheiInconsolata"
                                               "JetBrainsMono Nerd Font"
@@ -840,8 +838,8 @@ Maybe I should add a new state.
 
 ;; chinese font
 (setq lewis-chinese-font (cl-loop for font in '(
-                                                "Maple Mono SC NF"
                                                 "Unifont"
+                                                "Maple Mono SC NF"
                                                 "Sarasa Mono SC Nerd"
                                                 "Microsoft Yahei")
                                   when (font-installed-p font)
@@ -1669,10 +1667,49 @@ Dirvish is a minimalistic file manager based on Dired. It's fast
   (setq graphviz-dot-indent-width 4)
   )
 #+end_src
-*** plantuml-mode
+*** plantuml
+This Emacs tool use plantuml to generate images for org, json, yaml files.
 #+begin_src elisp
-(setup plantuml-mode
-  (setq plantuml-jar-path (concat no-littering-var-directory "plantuml.jar")))
+
+(setup plantuml
+  (setq plantuml-output-type "svg"
+        plantuml-relative-path "./tmp_images/"
+        plantuml-theme "_none_"
+        plantuml-font lewis-variable-font
+        plantuml-add-index-number t
+        plantuml-mindmap-contains-org-content nil
+        plantuml-org-headline-bold nil)
+  (:autoload plantuml-org-to-mindmap-open
+             plantuml-org-to-wbs-open)
+  )
+
+
+;; download plantuml jar
+(setq plantuml-jar-path (concat no-littering-var-directory "plantuml.jar"))
+(defun plantuml-download-jar ()
+  "Download the latest PlantUML JAR file and install it into `plantuml-jar-path'."
+  (interactive)
+  (if (y-or-n-p (format "Download the latest PlantUML JAR file into %s? " plantuml-jar-path))
+      (if (or (not (file-exists-p plantuml-jar-path))
+              (y-or-n-p (format "The PlantUML jar file already exists at %s, overwrite? " plantuml-jar-path)))
+          (with-current-buffer (url-retrieve-synchronously "https://search.maven.org/solrsearch/select?q=g:net.sourceforge.plantuml+AND+a:plantuml&core=gav&start=0&rows=1&wt=xml")
+            (mkdir (file-name-directory plantuml-jar-path) t)
+            (let* ((parse-tree (xml-parse-region))
+                   (doc        (->> parse-tree
+                                    (assq 'response)
+                                    (assq 'result)
+                                    (assq 'doc)))
+                   (strs       (xml-get-children doc 'str))
+                   (version    (->> strs
+                                    (--filter (string-equal "v" (xml-get-attribute it 'name)))
+                                    (car)
+                                    (xml-node-children)
+                                    (car))))
+              (message (concat "Downloading PlantUML v" version " into " plantuml-jar-path))
+              (url-copy-file (format "https://search.maven.org/remotecontent?filepath=net/sourceforge/plantuml/plantuml/%s/plantuml-%s.jar" version version) plantuml-jar-path t)
+              (kill-buffer)))
+        (message "Aborted."))
+    (message "Aborted.")))
 #+end_src
 *** beancount
 Emacs major-mode to work with Beancount ledger files
@@ -2050,7 +2087,7 @@ Disassemble C, C++ or Fortran code under cursor
         org-blank-before-new-entry '((heading . nil)
                                      (plain-list-item . nil))
 
-        org-image-actual-width 720 ;; this will use 600 for width for all the images.
+        org-image-actual-width 800 ;; this will use 600 for width for all the images.
         org-preview-latex-image-directory (concat no-littering-var-directory "ltximg/")
         org-confirm-babel-evaluate nil
         org-plantuml-jar-path plantuml-jar-path
@@ -2178,7 +2215,7 @@ Disassemble C, C++ or Fortran code under cursor
   (setq org-auto-align-tags nil
         org-tags-column 0
         org-ellipsis "⤵"
-        org-hide-emphasis-markers nil
+        org-hide-emphasis-markers t
         org-pretty-entities nil ;; can perfor ui such as "a_words" into small "awords"
         org-habit-graph-column 50
         ;; Agenda styling
@@ -2342,7 +2379,8 @@ ln -s ~/Downloads/translators_CN/translators ~/Downloads/zotra-cli/module/transl
 (setup toc-org
   (:hook-into org-mode))
 #+end_src
-** denote
+** denote and related
+*** denote
 #+begin_src elisp
 (setup denote
   (setq denote-directory (expand-file-name (concat nowis-doc-emacs-dir "01-orgmode/xnotes"))
@@ -2367,7 +2405,7 @@ ln -s ~/Downloads/translators_CN/translators ~/Downloads/zotra-cli/module/transl
   ;; should add a hook for disable diredfl-mode
   )
 #+end_src
-** denote-lumn
+*** denote-lumn
 Borrowed from https://github.com/protesilaos/denote/issues/115
 #+begin_src elisp
 (setq find-dired-refine-function nil)  ;; This needs to be set globally, find-dired works asynchronously.
@@ -2391,6 +2429,10 @@ Borrowed from https://github.com/protesilaos/denote/issues/115
   (interactive)
   (let ((find-ls-option '("-regex '.*==[0-9]+-.*'  -exec ls -ld {} \\+| awk /==/ | sed  's/--/=@/3' | sort -t '=' -Vk 3,3 | sed 's/=@/--/'" . "-ld")))
     (find-dired denote-directory "")))
+#+end_src
+*** denote-folgezettel
+#+begin_src elisp
+(setup denote-folgezettel)
 #+end_src
 ** find orgmode dir files
 #+begin_src elisp
@@ -2447,10 +2489,6 @@ Highlight and annotate any text file with using Org mode.
   (:when-loaded
     (org-remark-global-tracking-mode +1)
     ))
-#+end_src
-** annotate
-#+begin_src elisp
-(setup annotate)
 #+end_src
 ** clue
 Connecting clues while reading code.
@@ -2515,11 +2553,6 @@ https://dindi.garjola.net/org-agenda-weekly.html
 Integrate Org with Video
 #+begin_src elisp
 (setup mpvi)
-#+end_src
-** orgtbl-aggregate
-Aggregating a table is creating a new table by computing sums, averages, and so on, out of material from the first table.
-#+begin_src elisp
-(setup orgtbl-qggregate)
 #+end_src
 ** org-fc
 Spaced Repetition System for Emacs org-mode
@@ -2634,41 +2667,42 @@ This is an Emacs package that creates graphviz directed graphs from the headings
 #+end_src
 * english 翻译
 ** go-translate
+Powerful translator on Emacs. Supports multiple translation engines such as Google, Bing, deepL, StarDict, Youdao.
 #+begin_src elisp
 (setup go-translate
   (setq gts-translate-list '(("en" "zh")))
   (:global "M-L" gts-do-translate)
+  (:global "M-l" gts-quick-sdcv)
 
   (:when-loaded
     (setq gts-default-translator (gts-translator
                                   :picker (gts-prompt-picker)
-                                  ;; :engines (list (gts-google-rpc-engine))
-                                  :engines (list (gts-bing-engine))
-                                  :render (gts-buffer-render)))))
-#+end_src
-** sdcv
-If you encounter the following issue: =g_mkdir failed: No such file or directory=, please consider:
-#+begin_src bash
-mkdir ~/.stardict
-#+end_src
-
-#+begin_src elisp
-(setup sdcv
-  (setq sdcv-dictionary-data-dir (expand-file-name (concat nowis-doc-emacs-dir "02-binary-files/03-stardicts")))
-  (:global "M-l" lewis-eaf-sdcv-search-pointer+)
-  (if (eq system-type 'darwin)
-      (setq sdcv-program "sdcv"))
-  ;; search in eaf mode
-  (defun lewis-sdcv-search-pointer-in-kill-ring()
-    (sdcv-search-input+ (substring-no-properties (car kill-ring) 0)))
-  (defun lewis-eaf-sdcv-search-pointer+()
+                                  :engines (list (gts-bing-engine)
+                                                 (gts-google-engine)
+                                                 )
+                                  :render (gts-buffer-render)))
+    )
+  (defun gts-quick-sdcv ()
     (interactive)
-    (if (derived-mode-p 'eaf-mode)
-        (progn
-          (eaf-py-proxy-copy_select)
-          (run-with-timer 0.2 nil 'lewis-sdcv-search-pointer-in-kill-ring))
-      (sdcv-search-pointer+)))
-  )
+    (if (not (featurep 'go-translate))
+        (require 'go-translate)
+      (gts-translate (gts-translator
+                      :picker (gts-noprompt-picker :texter (gts-current-or-selection-texter))
+                      :engines (gts-stardict-engine)
+                      :render (gts-buffer-render))))
+
+    ))
+#+end_src
+If you want to use *sdcv* for offline translate, then download dictionary data to ~/.stardict/dic or /usr/share/stardict/dic:
+#+begin_src sh
+# For example from http://download.huzheng.org:
+mkdir -p ~/.stardict/dic
+cd ~/.stardict/dic
+wget http://download.huzheng.org/zh_CN/stardict-langdao-ce-gb-2.4.2.tar.bz2
+wget http://download.huzheng.org/zh_CN/stardict-langdao-ce-gb-2.4.2.tar.bz2
+tar xvf stardict-langdao-ec-gb-2.4.2.tar.bz2
+tar xvf stardict-langdao-ce-gb-2.4.2.tar.bz2
+sdcv -l
 #+end_src
 ** immersive-translate
 immersive-translate: Immersive Bilingual Translation
@@ -2942,7 +2976,7 @@ rsync -avihu lewis-nas@192.168.31.108:/share/my_webdav/rsync/tmp/ ~/Downloads/tm
 (setup literate-calc)
 #+end_src
 ** server
-#+begin_src elisp
+#+begin_src elisp :tangle no
 (setup server
   (:defer (server-start))
   )

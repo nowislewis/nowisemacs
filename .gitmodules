@@ -79,6 +79,9 @@
 [submodule "denote"]
 	path = lib/denote
 	url = https://github.com/protesilaos/denote.git
+[submodule "denote-folgezettel"]
+	path = lib/denote-folgezettel
+	url = https://github.com/MirkoHernandez/denote-folgezettel.git
 [submodule "diff-hl"]
 	path = lib/diff-hl
 	url = https://github.com/dgutov/diff-hl.git
@@ -282,9 +285,9 @@
 [submodule "org-present"]
 	path = lib/org-present
 	url = https://github.com/rlister/org-present.git
-[submodule "orgtbl-aggregate"]
-	path = lib/orgtbl-aggregate
-	url = https://github.com/tbanel/orgaggregate.git
+[submodule "org-remark"]
+	path = lib/org-remark
+	url = https://github.com/nobiot/org-remark.git
 [submodule "ox-hugo"]
 	path = lib/ox-hugo
 	url = https://github.com/kaushalmodi/ox-hugo.git
@@ -300,9 +303,9 @@
 [submodule "pinyinlib"]
 	path = lib/pinyinlib
 	url = https://github.com/nowislewis/pinyinlib.el.git
-[submodule "plantuml-mode"]
-	path = lib/plantuml-mode
-	url = https://github.com/skuro/plantuml-mode.git
+[submodule "plantuml"]
+	path = lib/plantuml
+	url = https://github.com/ginqi7/plantuml-emacs.git
 [submodule "popper"]
 	path = lib/popper
 	url = https://github.com/karthink/popper.git
@@ -327,9 +330,6 @@
 [submodule "s"]
 	path = lib/s
 	url = https://github.com/magnars/s.el.git
-[submodule "sdcv"]
-	path = lib/sdcv
-	url = https://github.com/manateelazycat/sdcv.git
 [submodule "setup"]
 	path = lib/setup
 	url = https://github.com/emacsmirror/setup
