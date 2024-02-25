@@ -341,7 +341,7 @@ emacs
 
 #+end_src
 ** epkg
-I use borg to manage packages, so setup.el is only used to config packages quickly, I write several macros in [[https://github.com/nowislewis/nowisemacs-base.git][nowisemacs-base]]. It should be noticed that if you use only a =init.el= file, all the funcs or macros defined in =init.el= can't pass native comp, so move these things that you defined yourself to a seperate repo(nowisemacs-base) will resolve this problem.
+I use borg to manage packages, so setup.el is only used to config packages quickly.
 #+begin_src elisp
 (setup compat)
 ;; (setup emacsql)
@@ -492,7 +492,7 @@ Maybe I should add a new state.
                           '("#" . embark-toggle-highlight)
                           '("^" . meow-join)
                           '("*" . embark-next-symbol)
-                          '("/" . consult-line))
+                          '("/" . isearch-forward))
   (defun meow-vim-append ()
     "Like vim, move to the end of selection, switch to INSERT state."
     (interactive)
@@ -1145,9 +1145,20 @@ diff-hl-mode highlights uncommitted changes on the left side of the window (area
 #+begin_src elisp
 (setup isearch
   (setq isearch-lazy-count t
-           ;; lazy-highlight-cleanup nil
-           )
-  (:bind [remap isearch-delete-char] isearch-del-char))
+        ;; lazy-highlight-cleanup nil
+        )
+  (:bind [remap isearch-delete-char] isearch-del-char)
+  (:when-loaded
+    (defvar isearch-repeat-map
+      (let ((map (make-sparse-keymap)))
+        (define-key map (kbd "s") #'isearch-repeat-forward)
+        (define-key map (kbd "r") #'isearch-repeat-backward)
+        map))
+
+    (dolist (cmd '(isearch-repeat-forward isearch-repeat-backward))
+      (put cmd 'repeat-map 'isearch-repeat-map))
+
+    ))
 #+end_src
 ** Consult Commands
 *** consult
@@ -1673,7 +1684,7 @@ This Emacs tool use plantuml to generate images for org, json, yaml files.
 
 (setup plantuml
   (setq plantuml-output-type "svg"
-        plantuml-relative-path "./tmp_images/"
+        plantuml-relative-path "./.temp_images/"
         plantuml-theme "_none_"
         plantuml-font lewis-variable-font
         plantuml-add-index-number t
@@ -2431,8 +2442,9 @@ Borrowed from https://github.com/protesilaos/denote/issues/115
     (find-dired denote-directory "")))
 #+end_src
 *** denote-folgezettel
+Emacs package to create and navigate denote notes with folgezettel numbering in the signature.
 #+begin_src elisp
-(setup denote-folgezettel)
+(setup denote-fz)
 #+end_src
 ** find orgmode dir files
 #+begin_src elisp
@@ -2479,7 +2491,7 @@ Borrowed from https://github.com/protesilaos/denote/issues/115
 #+end_src
 ** org-remark
 Highlight and annotate any text file with using Org mode.
-#+begin_src elisp :tangle no
+#+begin_src elisp
 (setup org-remark
   (defun my/function ()
     (concat (concat nowis-doc-emacs-dir "01-orgmode/org-remark/")
@@ -2488,6 +2500,17 @@ Highlight and annotate any text file with using Org mode.
   (setq org-remark-notes-file-name #'my/function)
   (:when-loaded
     (org-remark-global-tracking-mode +1)
+    ;; Optional if you would like to highlight websites via eww-mode
+    (with-eval-after-load 'eww
+      (org-remark-eww-mode +1))
+
+    ;; Optional if you would like to highlight EPUB books via nov.el
+    (with-eval-after-load 'nov
+      (org-remark-nov-mode +1))
+
+    ;; Optional if you would like to highlight Info documentation via Info-mode
+    (with-eval-after-load 'info
+      (org-remark-info-mode +1))
     ))
 #+end_src
 ** clue

@@ -4,9 +4,6 @@
 [submodule "alert"]
 	path = lib/alert
 	url = https://github.com/jwiegley/alert.git
-[submodule "annotate"]
-	path = lib/annotate
-	url = https://github.com/bastibe/annotate.el.git
 [submodule "app-launcher"]
 	path = lib/app-launcher
 	url = https://github.com/SebastienWae/app-launcher.git
@@ -79,8 +76,8 @@
 [submodule "denote"]
 	path = lib/denote
 	url = https://github.com/protesilaos/denote.git
-[submodule "denote-folgezettel"]
-	path = lib/denote-folgezettel
+[submodule "denote-fz"]
+	path = lib/denote-fz
 	url = https://github.com/MirkoHernandez/denote-folgezettel.git
 [submodule "diff-hl"]
 	path = lib/diff-hl
