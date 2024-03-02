@@ -38,6 +38,7 @@
 [submodule "citar-denote"]
 	path = lib/citar-denote
 	url = https://github.com/pprevos/citar-denote.git
+    no-byte-compile = minimum-config.el 
 [submodule "citre"]
 	path = lib/citre
 	url = https://github.com/universal-ctags/citre.git
@@ -376,6 +377,9 @@
 [submodule "which-key"]
 	path = lib/which-key
 	url = https://github.com/justbur/emacs-which-key.git
+[submodule "whisper"]
+	path = lib/whisper
+	url = https://github.com/natrys/whisper.el.git
 [submodule "with-editor"]
 	path = lib/with-editor
 	url = https://github.com/magit/with-editor.git
