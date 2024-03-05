@@ -103,6 +103,7 @@ I failed in love with denote, so previous *org-roam* configs were refiled into [
   - [[#find-orgmode-dir-files][find orgmode dir files]]
   - [[#org-imagine-excalidraw][org-imagine, excalidraw]]
   - [[#org-remark][org-remark]]
+  - [[#annotate][annotate]]
   - [[#clue][clue]]
   - [[#org-gtd][org-gtd]]
   - [[#agendagtd-disabled][agenda/gtd (disabled)]]
@@ -135,6 +136,7 @@ I failed in love with denote, so previous *org-roam* configs were refiled into [
   - [[#video-and-music][video and music]]
   - [[#literate-calc][literate-calc]]
   - [[#server][server]]
+  - [[#macos-ocr][macos-ocr]]
 - [[#use-single-file-to-load-configs][use single file to load configs]]
   - [[#provide][provide]]
   - [[#load-init-configel][load init-config.el]]
@@ -2491,7 +2493,7 @@ Emacs package to create and navigate denote notes with folgezettel numbering in 
 #+end_src
 ** org-remark
 Highlight and annotate any text file with using Org mode.
-#+begin_src elisp
+#+begin_src elisp :tangle no
 (setup org-remark
   (defun my/function ()
     (concat (concat nowis-doc-emacs-dir "01-orgmode/org-remark/")
@@ -2512,6 +2514,15 @@ Highlight and annotate any text file with using Org mode.
     (with-eval-after-load 'info
       (org-remark-info-mode +1))
     ))
+#+end_src
+** annotate
+#+begin_src elisp
+(setup annotate
+  (setq annotate-file (concat nowis-doc-emacs-dir "annotations.el")
+        annotate-annotation-max-size-not-place-new-line 100
+        )
+  (:hook-into prog-mode)
+  )
 #+end_src
 ** clue
 Connecting clues while reading code.
@@ -3011,6 +3022,15 @@ rsync -avihu lewis-nas@192.168.31.108:/share/my_webdav/rsync/tmp/ ~/Downloads/tm
 (setup server
   (:defer (server-start))
   )
+#+end_src
+** macos-ocr
+#+begin_src elisp
+(defun my/siri-ocr ()
+    (interactive)
+    (shell-command "shortcuts run \"OCR Selected Area\"")
+    (do-applescript "tell application id \"org.gnu.Emacs\" to activate")
+  )
+(keymap-global-set "C-c M-o" #'my/siri-ocr)
 #+end_src
 * use single file to load configs
 this can avoid errors of native compilation of init.el

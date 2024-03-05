@@ -4,6 +4,9 @@
 [submodule "alert"]
 	path = lib/alert
 	url = https://github.com/jwiegley/alert.git
+[submodule "annotate"]
+	path = lib/annotate
+	url = https://github.com/bastibe/annotate.el.git
 [submodule "app-launcher"]
 	path = lib/app-launcher
 	url = https://github.com/SebastienWae/app-launcher.git
@@ -283,9 +286,6 @@
 [submodule "org-present"]
 	path = lib/org-present
 	url = https://github.com/rlister/org-present.git
-[submodule "org-remark"]
-	path = lib/org-remark
-	url = https://github.com/nobiot/org-remark.git
 [submodule "ox-hugo"]
 	path = lib/ox-hugo
 	url = https://github.com/kaushalmodi/ox-hugo.git
