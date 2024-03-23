@@ -650,7 +650,8 @@ Maybe I should add a new state.
     ("m" "org-mind-map-dwim" org-mind-map-dwim)
     ("M" "org-mind-map" org-mind-map-choose-type-dwim)
     ("w" "org-mind-wbs" plantuml-org-to-wbs-open)
-    ("p" "org-mind-plantuml" plantuml-org-to-mindmap-open)
+    ("p" "org-mind-plantuml" plantuml-org-to-mindmap)
+    ("P" "org-mind-plantuml" plantuml-org-to-mindmap-open)
     ]
    ]
   )
@@ -2106,7 +2107,6 @@ Disassemble C, C++ or Fortran code under cursor
         org-plantuml-jar-path plantuml-jar-path
         org-special-ctrl-a/e t
         org-attach-id-dir (concat nowis-doc-emacs-dir "02-binary-files/01-pictures/01-org-attach")
-        fill-column 100
         org-src-window-setup 'split-window-below
 
         ;; habit
@@ -2355,9 +2355,9 @@ Disassemble C, C++ or Fortran code under cursor
            ebib-index-window-size 25
            ebib-index-columns '(("Score" 2 t)
                                 ("Year" 6 t)
-                                ("Title" 50 t)
                                 ("Author/Editor" 40 t)
-                                ("Entry Key" 40 t)
+                                ("Title" 100 t)
+                                ;; ("Entry Key" 40 t)
                                 )
            ebib-reading-list-file (concat nowis-doc-emacs-dir "01-orgmode/xnotes/20230403T125743--ebib-reading-lists.org")
            ebib-use-timestamp t
