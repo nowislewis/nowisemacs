@@ -816,8 +816,8 @@ Maybe I should add a new state.
 
 ;; fixed font
 (setq lewis-fixed-font (cl-loop for font in '(
-                                              "Unifont"
                                               "Maple Mono SC NF"
+                                              "Unifont"
                                               ;; "InconsolataGo QiHei NF"
                                               ;; "yaheiInconsolata"
                                               "JetBrainsMono Nerd Font"
@@ -841,8 +841,8 @@ Maybe I should add a new state.
 
 ;; chinese font
 (setq lewis-chinese-font (cl-loop for font in '(
-                                                "Unifont"
                                                 "Maple Mono SC NF"
+                                                "Unifont"
                                                 "Sarasa Mono SC Nerd"
                                                 "Microsoft Yahei")
                                   when (font-installed-p font)
