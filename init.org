@@ -1442,7 +1442,7 @@ the buffer works like a pager."
          rime-posframe-properties (list :internal-border-width 1
                                         :font lewis-fixed-font
                                         )
-         rime-user-data-dir "~/Documents/emacs/30-input-rime/"
+         rime-user-data-dir "~/Documents/rime/"
          rime-inline-ascii-trigger 'shift-r
          ))
 (when (eq system-type 'darwin)
