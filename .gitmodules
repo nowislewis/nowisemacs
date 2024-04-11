@@ -89,6 +89,12 @@
 [submodule "diff-hl"]
 	path = lib/diff-hl
 	url = https://github.com/dgutov/diff-hl.git
+[submodule "dired-hacks"]
+	path = lib/dired-hacks
+	url = https://github.com/Fuco1/dired-hacks.git
+[submodule "dired-sidebar"]
+	path = lib/dired-sidebar
+	url = https://github.com/jojojames/dired-sidebar.git
 [submodule "disaster"]
 	path = lib/disaster
 	url = https://github.com/jart/disaster.git

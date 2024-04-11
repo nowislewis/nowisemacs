@@ -1459,7 +1459,7 @@ the buffer works like a pager."
 (setup dired
   (setq dired-dwim-target t)
   (:hook dired-hide-details-mode
-         ;; dired-omit-mode
+         dired-omit-mode
          ))
 #+end_src
 *** dirvish
@@ -1477,6 +1477,18 @@ Dirvish is a minimalistic file manager based on Dired. It's fast
 #+begin_src elisp
 (setup nerd-icons-dired)
 (add-hook 'dired-mode-hook #'nerd-icons-dired-mode)
+#+end_src
+*** dired-hacks
+#+begin_src elisp
+(setup dired
+  (:with-map dired-mode-map
+    (:bind "TAB" #'dired-subtree-toggle))
+  )
+;; TODO if want to use dired-images, you should install eimp
+#+end_src
+*** dired-sidebar
+#+begin_src elisp
+(setup dired-sidebar)
 #+end_src
 ** structure browsing
 *** imenu-list
@@ -2400,8 +2412,10 @@ ln -s ~/Downloads/translators_CN/translators ~/Downloads/zotra-cli/module/transl
         denote-dired-directories (ffap-all-subdirs denote-directory)
         denote-date-prompt-use-org-read-date t
         denote-modules '(project)
-        denote-prompts '(title keywords signature template))
-  (add-hook 'dired-mode-hook #'denote-dired-mode-in-directories)
+        denote-prompts '(title keywords signature template)
+        denote-dired-directories-include-subdirectories t
+        )
+  ;; (add-hook 'dired-mode-hook #'denote-dired-mode-in-directories)
   (setq denote-templates
         `((default . ,(concat "* Action\n"
                            "** What will change\n"
