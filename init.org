@@ -163,7 +163,7 @@ I failed in love with denote, so previous *org-roam* configs were refiled into [
 ;; no title bar
 ;; (add-to-list 'default-frame-alist '(undecorated . t))
 ;; Faster to disable these here (before they've been initialized)
-;; (push '(alpha-background . 85) default-frame-alist)
+(push '(alpha-background . 85) default-frame-alist)
 (push '(menu-bar-lines . 0) default-frame-alist)
 (push '(tool-bar-lines . 0) default-frame-alist)
 (push '(vertical-scroll-bars) default-frame-alist)
@@ -892,7 +892,7 @@ Maybe I should add a new state.
 #+name: themes
 #+begin_src elisp
 (setup ef-themes)
-(load-theme 'ef-light t)
+(load-theme 'ef-trio-dark t)
 #+end_src
 *** lazycat-theme
 #+begin_src elisp
@@ -978,7 +978,17 @@ diff-hl-mode highlights uncommitted changes on the left side of the window (area
 #+end_src
 ** mini-echo
 #+begin_src elisp
-(setup mini-echo)
+(setup hide-mode-line)
+(setup mini-echo
+  ;; set default segments of long/short style
+  (setq mini-echo-default-segments
+        '(:long ("major-mode" "buffer-name" "vcs" "buffer-position"
+                 "buffer-size" "flymake" "process" "selection-info"
+                 "narrow" "macro" "profiler" "meow")
+                :short ("buffer-name-short" "buffer-position" "process"
+                        "profiler" "selection-info" "narrow" "macro" "meow" )))
+  (setq mini-echo-separator " ")
+  )
 #+end_src
 ** hl-todo
 #+begin_src elisp
@@ -1459,7 +1469,7 @@ the buffer works like a pager."
 (setup dired
   (setq dired-dwim-target t)
   (:hook dired-hide-details-mode
-         dired-omit-mode
+         ;; dired-omit-mode
          ))
 #+end_src
 *** dirvish
@@ -1498,7 +1508,7 @@ Dirvish is a minimalistic file manager based on Dired. It's fast
   (setq imenu-list-focus-after-activation nil
            imenu-list-auto-resize t
            imenu-list-position 'left
-           imenu-list-auto-update t
+           imenu-list-auto-update nil
            )
   )
 #+end_src
@@ -2265,6 +2275,12 @@ Disassemble C, C++ or Fortran code under cursor
 (setup org-appear
   (:hook-into org-mode))
 #+end_src
+*** org-tidy
+#+begin_src elisp
+(setup org-tidy
+  (add-hook 'org-mode-hook #'org-tidy-mode)
+  )
+#+end_src
 ** org-download
 #+begin_src elisp
 (setup async)
@@ -2924,7 +2940,7 @@ Simple distraction-free editing. I use darkroom instead of writeroom because it'
           holo-layer-enable-window-border nil
           holo-layer-enable-place-info t
           holo-layer-hide-mode-line nil
-          holo-layer-python-command "~/.pyenv/shims/python3"
+          ;; holo-layer-python-command "~/.pyenv/shims/python3"
           )
     (holo-layer-enable)
     )
