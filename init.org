@@ -2348,7 +2348,7 @@ Disassemble C, C++ or Fortran code under cursor
 (defun do.refs/get-db-file-list ()
   "Get the list of all the bib files containing my bib database."
   (if (file-exists-p nowis-bib-dir)
-      (directory-files nowis-bib-dir t "\\.bib\\'")
+      (directory-files-recursively nowis-bib-dir "\\.bib\\'" t)
     nil))
 #+end_src
 *** citar
@@ -2475,7 +2475,7 @@ Borrowed from https://github.com/protesilaos/denote/issues/115
 #+end_src
 *** denote-folgezettel
 Emacs package to create and navigate denote notes with folgezettel numbering in the signature.
-#+begin_src elisp
+#+begin_src elisp :tangle no
 (setup denote-fz)
 #+end_src
 ** find orgmode dir files
@@ -2546,7 +2546,7 @@ Highlight and annotate any text file with using Org mode.
     ))
 #+end_src
 ** annotate
-#+begin_src elisp
+#+begin_src elisp :tangle no
 (setup annotate
   (setq annotate-file (concat nowis-doc-emacs-dir "annotations.el")
         annotate-annotation-max-size-not-place-new-line 100
@@ -3149,7 +3149,7 @@ rsync -avihu lewis-nas@192.168.31.108:/share/my_webdav/rsync/tmp/ ~/Downloads/tm
 (setup literate-calc)
 #+end_src
 ** server
-#+begin_src elisp :tangle no
+#+begin_src elisp
 (setup server
   (:defer (server-start))
   )

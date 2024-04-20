@@ -4,9 +4,6 @@
 [submodule "alert"]
 	path = lib/alert
 	url = https://github.com/jwiegley/alert.git
-[submodule "annotate"]
-	path = lib/annotate
-	url = https://github.com/bastibe/annotate.el.git
 [submodule "app-launcher"]
 	path = lib/app-launcher
 	url = https://github.com/SebastienWae/app-launcher.git
@@ -83,9 +80,6 @@
 [submodule "denote-explore"]
 	path = lib/denote-explore
 	url = https://github.com/pprevos/denote-explore.git
-[submodule "denote-fz"]
-	path = lib/denote-fz
-	url = https://github.com/MirkoHernandez/denote-folgezettel.git
 [submodule "diff-hl"]
 	path = lib/diff-hl
 	url = https://github.com/dgutov/diff-hl.git
@@ -177,9 +171,6 @@
 [submodule "hl-todo"]
 	path = lib/hl-todo
 	url = https://github.com/tarsius/hl-todo.git
-[submodule "holo-layer"]
-	path = lib/holo-layer
-	url = https://github.com/manateelazycat/holo-layer.git
 [submodule "ht"]
 	path = lib/ht
 	url = https://github.com/Wilfred/ht.el.git
