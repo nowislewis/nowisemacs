@@ -163,7 +163,7 @@ I failed in love with denote, so previous *org-roam* configs were refiled into [
 ;; no title bar
 ;; (add-to-list 'default-frame-alist '(undecorated . t))
 ;; Faster to disable these here (before they've been initialized)
-(push '(alpha-background . 85) default-frame-alist)
+(push '(alpha-background . 80) default-frame-alist)
 (push '(menu-bar-lines . 0) default-frame-alist)
 (push '(tool-bar-lines . 0) default-frame-alist)
 (push '(vertical-scroll-bars) default-frame-alist)
@@ -559,8 +559,15 @@ Maybe I should add a new state.
     ("p" "clue-yank" clue-paste)
     ]
    ["citre"
-    ("j" "citre-peek" citre-jump)
-    ("c" "citre-ace-peek" citre-ace-peek)
+    ("c d" "citre-jump" citre-jump)
+    ("c D" "citre-jump-to-reference" citre-jump-to-reference)
+    ("c p" "citre-peek" citre-peek)
+    ("c P" "citre-peek-reference" citre-peek-reference)
+    ("c r" "citre-peek-restore" citre-peek-restore)
+    ("c a" "citre-ace-peek" citre-ace-peek)
+    ("c u" "update-tags-file" citre-update-this-tags-file)
+    ("c s" "peek-save-session" citre-peek-save-session)
+    ("c l" "peek-load-session" citre-peek-load-session)
     ]
    ])
 #+end_src
@@ -586,15 +593,7 @@ Maybe I should add a new state.
 #+begin_src elisp
 (transient-define-prefix lewis-leader-map()
   "Define leader-key map for special functions"
-  [["Citre"
-    ("c a" "ace-peek" citre-ace-peek)
-    ("c j" "jump" citre-jump)
-    ("c p" "peek" citre-peek)
-    ("c J" "jump-back" citre-jump-back)
-    ("c u" "update-this-tags-file" citre-update-this-tags-file)
-    ("c r" "peek-restore" citre-peek-restore)
-    ("c s" "peek-save-session" citre-peek-save-session)
-    ("c l" "peek-load-session" citre-peek-load-session)]
+  [
    ["Imenu"
     ("l" "Imenu list smart toggle" imenu-list-smart-toggle)
     ("L" "Boxy imenu" boxy-imenu)]
@@ -2477,6 +2476,10 @@ Borrowed from https://github.com/protesilaos/denote/issues/115
 Emacs package to create and navigate denote notes with folgezettel numbering in the signature.
 #+begin_src elisp :tangle no
 (setup denote-fz)
+#+end_src
+*** denote-explorer
+#+begin_src elisp
+(setup denote-explore)
 #+end_src
 ** find orgmode dir files
 #+begin_src elisp
