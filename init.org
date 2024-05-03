@@ -1110,7 +1110,7 @@ diff-hl-mode highlights uncommitted changes on the left side of the window (area
 #+end_src
 ** 自动换行
 #+begin_src elisp
-(setq fill-column 100)          ;默认显示 100列就换行
+(setq-default fill-column 100)          ;默认显示 100列就换行
 (setq word-wrap t)
 (setq word-wrap-by-category t)
 ;; (add-hook 'org-mode-hook 'turn-on-auto-fill)
@@ -1910,6 +1910,18 @@ borrowed from citre, now you can always jump-back use "M-," after any jump in th
   (add-to-list 'completion-at-point-functions #'cape-elisp-block)
   (add-to-list 'completion-at-point-functions #'cape-file)
   )
+
+#+end_src
+***** ispell
+#+begin_src elisp
+(setup ispell
+  (:when-loaded
+    ;; if not find ispell-dict, use cape as default
+    (if (null ispell-alternate-dictionary)
+        (progn
+          ;; (add-to-list 'completion-at-point-functions #'cape-dict)
+          ;; (setq ispell-alternate-dictionary cape-dict-file)
+          (setq ispell-complete-word-dict (concat nowis-doc-emacs-dir "02-binary-files/12-spell-dict/en_US.dict"))))))
 #+end_src
 ***** nerd-icons-corfu
 #+begin_src elisp
@@ -2260,7 +2272,8 @@ Disassemble C, C++ or Fortran code under cursor
 #+begin_src elisp
 (setup org-modern
   (setq org-modern-table nil
-        org-modern-star '("Ⓐ" "Ⓑ" "Ⓒ" "Ⓓ" "Ⓔ" "Ⓕ" "Ⓖ" "Ⓗ" "Ⓘ" "Ⓙ" "Ⓚ" "Ⓛ" "Ⓜ")
+        org-modern-star 'replace
+        org-modern-replace-stars '("Ⓐ" "Ⓑ" "Ⓒ" "Ⓓ" "Ⓔ" "Ⓕ" "Ⓖ" "Ⓗ" "Ⓘ" "Ⓙ" "Ⓚ" "Ⓛ" "Ⓜ")
         )
   (:hook-into org-mode)
   (add-hook 'org-agenda-finalize-hook #'org-modern-agenda)
@@ -2275,7 +2288,7 @@ Disassemble C, C++ or Fortran code under cursor
   (:hook-into org-mode))
 #+end_src
 *** org-tidy
-#+begin_src elisp
+#+begin_src elisp :tangle no
 (setup org-tidy
   (add-hook 'org-mode-hook #'org-tidy-mode)
   )
@@ -2619,7 +2632,10 @@ https://dindi.garjola.net/org-agenda-weekly.html
 ** mpvi
 Integrate Org with Video
 #+begin_src elisp
-(setup mpvi)
+(setup mpvi
+  (setq mpvi-bilibili-enable-danmaku nil)
+  (setq mpvi-ytdlp-extra-args "--cookies-from-browser firefox")
+  )
 #+end_src
 ** org-fc
 Spaced Repetition System for Emacs org-mode
@@ -2965,11 +2981,12 @@ Simple distraction-free editing. I use darkroom instead of writeroom because it'
   (:when-loaded
     (setq-default gptel-backend
                   (gptel-make-openai "chatanywhere"
-                                     :host "api.chatanywhere.com.cn"
-                                     :header (lambda () `(("Authorization" . ,(concat "Bearer " (gptel--get-api-key)))))
-                                     :key 'gptel-api-key
-                                     :stream t
-                                     :models '("gpt-3.5-turbo" "gpt-3.5-turbo-16k" "gpt-4" "gpt-4-32k")))
+                    :host "api.chatanywhere.com.cn"
+                    :header (lambda () `(("Authorization" . ,(concat "Bearer " (gptel--get-api-key)))))
+                    :key 'gptel-api-key
+                    :stream t
+                    :models '("gpt-3.5-turbo" "gpt-3.5-turbo-16k" "gpt-4-turbo" "gpt-4-turbo-preview")))
+    (gptel-make-gemini "Gemini" :key 'gptel-api-key :stream t)
     ))
 #+end_src
 *** whisper
