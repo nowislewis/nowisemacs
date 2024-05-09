@@ -94,6 +94,7 @@ I failed in love with denote, so previous *org-roam* configs were refiled into [
   - [[#ui-1][ui]]
   - [[#org-download][org-download]]
   - [[#ox-hugo][ox-hugo]]
+  - [[#weblorg][weblorg]]
   - [[#org-clock][org-clock]]
   - [[#org-noter][org-noter]]
   - [[#org-present][org-present]]
@@ -2316,6 +2317,11 @@ Disassemble C, C++ or Fortran code under cursor
 (setup ox-hugo
   (:load-after ox))
 #+end_src
+** weblorg
+#+begin_src elisp
+(setup templatel)
+(setup weblorg)
+#+end_src
 ** org-clock
 *** org-pomodoro
 #+begin_src elisp
@@ -2992,8 +2998,8 @@ Simple distraction-free editing. I use darkroom instead of writeroom because it'
 *** whisper
 #+begin_src elisp
 (setup whisper
-  (setq whisper-model "small"
-        whisper-language "auto"
+  (setq whisper-language "auto"
+        whisper-model "small"
         whisper-translate nil
         whisper-use-threads (num-processors))
 
@@ -3031,8 +3037,6 @@ function to produce the command for the inference engine of your choice."
           "--no-timestamps"
           "--prompt" ,prompt_ch
           "--file" ,input-file)))
-
-
 
     (defun rk/get-ffmpeg-device ()
       "Gets the list of devices available to ffmpeg.
@@ -3094,8 +3098,6 @@ If `DEVICE-NAME' is provided, it will be used instead of prompting the user."
         (setq rk/default-audio-device (rk/find-device-matching name :audio))
         (when (boundp 'whisper--ffmpeg-input-device)
           (setq whisper--ffmpeg-input-device (format ":%s" rk/default-audio-device))))))
-
-
   )
 #+end_src
 ** webjump

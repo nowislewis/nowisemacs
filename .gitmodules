@@ -355,6 +355,9 @@
 [submodule "tempel"]
 	path = lib/tempel
 	url = https://github.com/minad/tempel.git
+[submodule "templatel"]
+	path = lib/templatel
+	url = https://github.com/clarete/templatel.git
 [submodule "toc-org"]
 	path = lib/toc-org
 	url = https://github.com/snosov1/toc-org.git
@@ -372,6 +375,9 @@
 [submodule "vundo"]
 	path = lib/vundo
 	url = https://github.com/casouri/vundo.git
+[submodule "weblorg"]
+	path = lib/weblorg
+	url = https://github.com/emacs-love/weblorg.git
 [submodule "wgrep"]
 	path = lib/wgrep
 	url = https://github.com/mhayashi1120/Emacs-wgrep.git
