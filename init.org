@@ -3124,7 +3124,11 @@ If `DEVICE-NAME' is provided, it will be used instead of prompting the user."
                         ("leetcode-cn" .
                          [simple-query "leetcode.cn"
                                        "leetcode.cn/search/?q=" ""])
+                        ("superlib" .
+                         [simple-query "book.ucdrs.superlib.net"
+                                       "http://book.ucdrs.superlib.net/search?sw=" "&allsw=%23%2Call&bCon=&ecode=utf-8&channel=search&Field=all"])
                         )))
+
 #+end_src
 ** backup scripts
 #+begin_src elisp
