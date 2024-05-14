@@ -2759,26 +2759,26 @@ This is an Emacs package that creates graphviz directed graphs from the headings
 Powerful translator on Emacs. Supports multiple translation engines such as Google, Bing, deepL, StarDict, Youdao.
 #+begin_src elisp
 (setup go-translate
-  (setq gts-translate-list '(("en" "zh")))
-  (:global "M-L" gts-do-translate)
-  (:global "M-l" gts-quick-sdcv)
+  (setq gt-translate-list '(("en" "zh")))
+  (:global "M-L" gt-do-translate)
+  (:global "M-l" gt-quick-sdcv)
 
   (:when-loaded
-    (setq gts-default-translator (gts-translator
-                                  :picker (gts-prompt-picker)
-                                  :engines (list (gts-bing-engine)
-                                                 (gts-google-engine)
+    (setq gt-default-translator (gt-translator
+                                  :taker (gt-taker :langs '(en zh) :text 'sentence :prompt 'buffer)
+                                  :engines (list (gt-bing-engine)
+                                                 (gt-google-engine)
                                                  )
-                                  :render (gts-buffer-render)))
+                                  :render (gt-buffer-render)))
     )
-  (defun gts-quick-sdcv ()
+  (defun gt-quick-sdcv ()
     (interactive)
     (if (not (featurep 'go-translate))
         (require 'go-translate)
-      (gts-translate (gts-translator
-                      :picker (gts-noprompt-picker :texter (gts-current-or-selection-texter))
-                      :engines (gts-stardict-engine)
-                      :render (gts-buffer-render))))
+      (gt-start (gt-translator
+                      :taker (gt-taker :langs '(en zh) :text 'word)
+                      :engines (gt-stardict-engine)
+                      :render (gt-posframe-pop-render))))
 
     ))
 #+end_src
