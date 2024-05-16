@@ -874,8 +874,8 @@ Maybe I should add a new state.
         (set-fontset-font t 'unicode lewis-symbol-font nil 'prepend))
 
     ;; Specify font for Chinese characters
-    (if lewis-chinese-font
-        (set-fontset-font t '(#x4e00 . #x9fff) lewis-chinese-font))
+    ;; (if lewis-chinese-font
+    ;;     (set-fontset-font t '(#x4e00 . #x9fff) lewis-chinese-font))
     )
   )
 
@@ -2696,7 +2696,7 @@ Extend eww/nov with org-mode features, archive web pages to org files with shr.
     (setq shrface-href-versatile t)
     (setq nov-shr-rendering-functions '((img . nov-render-img) (title . nov-render-title)))
     (setq nov-shr-rendering-functions (append nov-shr-rendering-functions shr-external-rendering-functions))
-    (setq shrface-bullets-bullet-list org-modern-star) ;;should load after org-modern
+    (setq shrface-bullets-bullet-list org-modern-replace-stars) ;;should load after org-modern
     )
   (:hook (lambda()(
                    if  (featurep 'org)
@@ -2885,7 +2885,7 @@ Simple distraction-free editing. I use darkroom instead of writeroom because it'
   (:file-match "\\.md\\'"))
 #+end_src
 ** markdown-xwidget
-#+begin_src elisp
+#+begin_src elisp :tangle no
 (setup mustache)
 (setup ht)
 (setup markdown-xwidget)

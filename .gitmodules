@@ -171,9 +171,6 @@
 [submodule "hl-todo"]
 	path = lib/hl-todo
 	url = https://github.com/tarsius/hl-todo.git
-[submodule "ht"]
-	path = lib/ht
-	url = https://github.com/Wilfred/ht.el.git
 [submodule "imenu-list"]
 	path = lib/imenu-list
 	url = https://github.com/nowislewis/imenu-list.git
@@ -207,9 +204,6 @@
 [submodule "markdown-mode"]
 	path = lib/markdown-mode
 	url = https://github.com/jrblevin/markdown-mode.git
-[submodule "markdown-xwidget"]
-	path = lib/markdown-xwidget
-	url = https://github.com/cfclrk/markdown-xwidget.git
 [submodule "meow"]
 	path = lib/meow
 	url = https://github.com/meow-edit/meow.git
@@ -219,9 +213,6 @@
 [submodule "mpvi"]
 	path = lib/mpvi
 	url = https://github.com/lorniu/mpvi.git
-[submodule "mustache"]
-	path = lib/mustache
-	url = https://github.com/Wilfred/mustache.el.git
 [submodule "nasm-mode"]
 	path = lib/nasm-mode
 	url = https://github.com/skeeto/nasm-mode.git
@@ -242,7 +233,7 @@
 	url = https://github.com/emacscollective/no-littering.git
 [submodule "nov"]
 	path = lib/nov
-    url = https://github.com/emacsmirror/nov.git
+	url = https://depp.brause.cc/nov.el.git
 [submodule "nov-xwidget"]
 	path = lib/nov-xwidget
 	url = https://github.com/chenyanming/nov-xwidget.git
