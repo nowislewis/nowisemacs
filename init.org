@@ -66,6 +66,7 @@ I failed in love with denote, so previous *org-roam* configs were refiled into [
 - [[#window-management][Window Management]]
   - [[#winner-mode][winner-mode]]
   - [[#popper][popper]]
+  - [[#burly][burly]]
   - [[#move][Move]]
 - [[#ibuffer][ibuffer]]
   - [[#ibuffer-1][ibuffer]]
@@ -344,7 +345,7 @@ emacs
 
 #+end_src
 ** epkg
-I use borg to manage packages, so setup.el is only used to config packages quickly.
+I use borg to manage packages, so setup.el is only used to config packages quickly. There is no  need for epkg anymore.
 #+begin_src elisp
 (setup compat)
 ;; (setup emacsql)
@@ -620,7 +621,12 @@ Maybe I should add a new state.
    ["Bookmark"
     ("j" "bookmark-jump" bookmark-jump)
     ("m" "bookmark-set" bookmark-set)
-    ("M" "bookmark-delete" bookmark-delete)]])
+    ("M" "bookmark-delete" bookmark-delete)]
+   ["Burly"
+    ("w" "burly-bookmark-windows" burly-bookmark-windows)
+    ("o" "burly-open-bookmark" burly-open-bookmark)
+    ]]
+  )
 #+end_src
 *** notes
 #+begin_src elisp
@@ -715,10 +721,10 @@ Maybe I should add a new state.
 
 *** ui
 #+begin_src elisp
-(transient-define-prefix ui-leader-map()
+(transient-define-prefix toggle-leader-map()
   "Define leader-key map for ui functions"
-  [("v" "variable-pitch" variable-pitch-mode)
-   ("d" "darkroom" darkroom-mode)
+  [("v" "toggle-variable-pitch" variable-pitch-mode)
+   ("d" "toggle-darkroom" darkroom-mode)
     ])
 
 #+end_src
@@ -765,7 +771,7 @@ Maybe I should add a new state.
  ;; org gtd
  '("d" . org-gtd-leader-map)
  ;; ui
- '("u" . ui-leader-map)
+ '("t" . toggle-leader-map)
  )
 #+END_SRC
 ** which-key
@@ -1289,22 +1295,32 @@ Popper is a minor-mode to tame the flood of ephemeral windows Emacs produces, wh
 #+begin_src elisp
 (setup popper
   (setq popper-reference-buffers '("\\*Messages\\*"
-                                      "Output\\*$"
-                                      "\\*Async Shell Command\\*"
-                                      "Go-Translate"
-                                      help-mode
-                                      helpful-mode
-                                      compilation-mode
-                                      youdao-dictionary-mode)
-           popper-window-height  (lambda (win)
-                                   (fit-window-to-buffer
-                                    win
-                                    (floor (frame-height) 2)))
+                                   "Output\\*$"
+                                   "\\*Async Shell Command\\*"
+                                   "Go-Translate"
+                                   help-mode
+                                   helpful-mode
+                                   compilation-mode
+                                   youdao-dictionary-mode)
+        popper-window-height 0.33
+        ;; popper-window-height  (lambda (win)
+        ;;                         (fit-window-to-buffer
+        ;;                          win
+        ;;                          (floor (frame-height) 2)))
+        )
+  (:global "M-`" popper-toggle ;; shadown tmm-menubar
+           "M-~" popper-cycle
+           "C-M-`" popper-toggle-type
            )
-  (:global "M-`" popper-toggle-latest ;; shadown tmm-menubar
-           "C-M-`" popper-toggle-type)
   (popper-mode +1)
   (popper-echo-mode +1))
+#+end_src
+** burly
+#+begin_src elisp
+(setup burly
+  (:defer
+   (burly-tabs-mode)
+   ))
 #+end_src
 ** Move
 *** avy
@@ -1846,6 +1862,13 @@ borrowed from citre, now you can always jump-back use "M-," after any jump in th
 (setup elec-pair
   (electric-pair-mode))
 #+end_src
+**** outli
+#+begin_src elisp
+(setup outli
+  (:hook-into prog-mode)
+  (setq outli-allow-indented-headlines t)
+  )
+#+end_src
 *** treesit tools
 **** treesit
 #+begin_src elisp
@@ -2113,6 +2136,11 @@ Disassemble C, C++ or Fortran code under cursor
   (setenv "PYDEVD_DISABLE_FILE_VALIDATION" "1") ;; to solve (json-number-format 5) problems because it fails to separate from stdout,
   )
 #+end_src
+*** compile
+#+begin_src elisp
+(setup compile
+  (setq compile-command "cd build && make && ./test"))
+#+end_src
 * Org Mode
 ** org-mode
 #+begin_src elisp
@@ -2324,7 +2352,7 @@ Disassemble C, C++ or Fortran code under cursor
 #+end_src
 ** org-clock
 *** org-pomodoro
-#+begin_src elisp
+#+begin_src elisp :tangle no
 (setup alert)
 (setup org-pomodoro
   (setq org-pomodoro-finished-sound (concat nowis-doc-emacs-dir "02-binary-files/applaud.wav")))
@@ -2425,7 +2453,7 @@ rm -rf ~/Downloads/zotra-cli/module/translation-server/modules/translators
 ln -s ~/Downloads/translators_CN/translators ~/Downloads/zotra-cli/module/translation-server/modules/
 #+end_src
 **** config
-#+begin_src elisp
+#+begin_src elisp :tangle no
 (setup zotra
   (:autoload zotra-add-entry-from-url)
   (if (eq system-type 'darwin)
@@ -2991,7 +3019,7 @@ Simple distraction-free editing. I use darkroom instead of writeroom because it'
                     :header (lambda () `(("Authorization" . ,(concat "Bearer " (gptel--get-api-key)))))
                     :key 'gptel-api-key
                     :stream t
-                    :models '("gpt-3.5-turbo" "gpt-3.5-turbo-16k" "gpt-4-turbo" "gpt-4-turbo-preview")))
+                    :models '("gpt-3.5-turbo" "gpt-3.5-turbo-ca" "gpt-4o" "gpt-4o-ca")))
     (gptel-make-gemini "Gemini" :key 'gptel-api-key :stream t)
     ))
 #+end_src
