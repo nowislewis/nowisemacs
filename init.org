@@ -107,8 +107,8 @@ I failed in love with denote, so previous *org-roam* configs were refiled into [
   - [[#org-remark][org-remark]]
   - [[#annotate][annotate]]
   - [[#clue][clue]]
-  - [[#org-gtd][org-gtd]]
-  - [[#agendagtd-disabled][agenda/gtd (disabled)]]
+  - [[#org-transclusion][org-transclusion]]
+  - [[#agendagtd][agenda/gtd]]
   - [[#org-ql][org-ql]]
   - [[#mpvi][mpvi]]
   - [[#org-fc][org-fc]]
@@ -701,7 +701,7 @@ Maybe I should add a new state.
     ("mi" "insert" mpvi-insert)
     ("ma" "emms-add" mpvi-emms-add)]
    ["others"
-    ("t" "org-pomodoro" org-pomodoro)
+    ;; ("t" "org-pomodoro" org-pomodoro)
     ("l" "app-launcher-run-app" app-launcher-run-app)
     ("e" "elfeed" my-elfeed)
     ("r" "restart emacs" restart-emacs)
@@ -713,10 +713,10 @@ Maybe I should add a new state.
 #+begin_src elisp
 (transient-define-prefix org-gtd-leader-map()
   "Define leader-key map for org-gtd functions"
-  [("c" "capture" org-gtd-capture)
-    ("e" "engage" org-gtd-engage)
-    ("p" "process inbox" org-gtd-process-inbox)
-    ("o" "organize" org-gtd-organize)])
+  [("a" "agenda" org-agenda)
+   ("c" "capture" org-capture)
+   ("i" "capture inbox" org-capture-inbox)
+   ])
 #+end_src
 
 *** ui
@@ -2159,7 +2159,6 @@ Disassemble C, C++ or Fortran code under cursor
                                (gnus . org-gnus-no-new-news)
                                (file . find-file)
                                (wl . wl-other-frame))
-        org-log-done 'time ;; 记录完成时间
         org-blank-before-new-entry '((heading . nil)
                                      (plain-list-item . nil))
 
@@ -2175,10 +2174,10 @@ Disassemble C, C++ or Fortran code under cursor
         org-habit-following-days 2
         system-time-locale "C" ;; ensure time format is always english
         ;; todo keywords
-        org-todo-keywords (quote ((sequence "TODO(t!/!)" "NEXT(n!/!)" "|" "DONE(d!/!)")
-                                  (type "PROJECT(p!/!)" "|" "DONE_PROJECT(D!/!)")
-                                  (type "SOMEDAY(S!)" "|" "NEED_COLLECTED(N!)")
-                                  (sequence "WAIT(w@/!)" "|" "CANCELLED(c@/!)")))
+        ;; org-todo-keywords (quote ((sequence "TODO(t!/!)" "NEXT(n!/!)" "|" "DONE(d!/!)")
+        ;;                           (type "PROJECT(p!/!)" "|" "DONE_PROJECT(D!/!)")
+        ;;                           (type "SOMEDAY(S!)" "|" "NEED_COLLECTED(N!)")
+        ;;                           (sequence "WAIT(w@/!)" "|" "CANCELLED(c@/!)")))
         org-todo-keyword-faces (quote (("TODO" :foreground "red" :weight bold)
                                        ("NEXT" :foreground "blue" :weight bold)
                                        ("DONE" :foreground "forest green" :weight bold)
@@ -2609,52 +2608,117 @@ Connecting clues while reading code.
 #+begin_src elisp
 (setup clue)
 #+end_src
-** org-gtd
+** org-transclusion
 #+begin_src elisp
-(setup org-agenda-property)
-(setq org-gtd-update-ack "3.0.0")
-(setq org-edna-use-inheritance t
-      org-gtd-areas-of-focus '("Growth" "Health" "Family" "Career")
-      org-gtd-organize-hooks '(org-gtd-set-area-of-focus org-set-tags-command)
-      org-gtd-directory nowis-gtd-dir)
-(setup org-gtd
-  (:load-after org)
-  (:defer (org-gtd-mode))
-    (:with-map org-gtd-clarify-map
-      (:bind "C-c c"  org-gtd-organize)))
-(setup org-edna)
-
-(setq org-columns-default-format "%60ITEM(Task) %TODO %6Effort(Estim){:}  %6CLOCKSUM(Clock) %TAGS")
+(setup org-transclusion)
 #+end_src
-** agenda/gtd (disabled)
-https://emacs.cafe/emacs/orgmode/gtd/2017/06/30/orgmode-gtd.html
-https://dindi.garjola.net/org-agenda-weekly.html
-#+begin_src elisp :tangle no
-(defvar nowis-index-org (concat nowis-gtd-dir "/20230411T002918--index.org"))
-(defvar nowis-gtd-org (concat nowis-gtd-dir "/20230411T002424--action.org"))
-(defvar nowis-someday-org (concat nowis-gtd-dir "/20230310T005150--someday.org"))
-  (setq org-agenda-files (list nowis-index-org
-                                  nowis-gtd-org
-                                  ;; (concat nowis-gtd-dir "/20230411T002918--index.org_archive")
-                                  ;; (concat nowis-gtd-dir "/20230411T002424--action.org_archive")
-                                  ))
-(setup org-refile
-  (setq org-refile-targets (list (cons nowis-gtd-org '(:maxlevel . 1))
-                                    (cons nowis-someday-org '(:level . 1)))))
-(setup org-capture
-  (setq org-capture-templates '(("t" "Todo [inbox]" entry
-                                    (file+headline nowis-index-org "Tasks")
-                                    "* TODO %i%?"))))
+** agenda/gtd
+Borrowed from https://github.com/rougier/emacs-GTD
 
-(setup org-agenda
-  (setq org-agenda-span 'day
-           org-agenda-skip-scheduled-if-done t
-           org-agenda-skip-deadline-if-done t
-           org-agenda-block-separator nil
-           org-agenda-compact-blocks t
-           org-agenda-start-with-log-mode t
-           )
-  )
+In short, you will need 3 files:
+1. =index.org= for capture inbox todos
+2. =agenda.org= for recurrent events
+3. =projects.org= for all projects moving from inbox
+#+begin_src elisp
+;; Files
+(setq org-agenda-files
+      (mapcar 'file-truename
+              (file-expand-wildcards "~/Documents/emacs/01-orgmode/xnotes/gtd/*.org")))
+
+;; Capture
+(setq org-capture-templates
+      `(("i" "Inbox" entry  (file "inbox.org")
+        ,(concat "* TODO %?\n"
+                 "/Entered on/ %U"))
+        ("m" "Meeting" entry  (file+headline "agenda.org" "Future")
+        ,(concat "* %? :meeting:\n"
+                 "<%<%Y-%m-%d %a %H:00>>"))
+        ("n" "Note" entry  (file "notes.org")
+        ,(concat "* Note (%a)\n"
+                 "/Entered on/ %U\n" "\n" "%?"))
+        ("@" "Inbox [mu4e]" entry (file "inbox.org")
+        ,(concat "* TODO Reply to \"%a\" %?\n"
+                 "/Entered on/ %U"))))
+
+(defun org-capture-inbox ()
+     (interactive)
+     (call-interactively 'org-store-link)
+     (org-capture nil "i"))
+
+(defun org-capture-mail ()
+  (interactive)
+  (call-interactively 'org-store-link)
+  (org-capture nil "@"))
+
+;; Use full window for org-capture
+;; (add-hook 'org-capture-mode-hook 'delete-other-windows)
+
+;; Key bindings
+
+;; Only if you use mu4e
+;; (require 'mu4e)
+;; (define-key mu4e-headers-mode-map (kbd "C-c i") 'org-capture-mail)
+;; (define-key mu4e-view-mode-map    (kbd "C-c i") 'org-capture-mail)
+
+;; Refile
+(setq org-refile-use-outline-path 'file)
+(setq org-outline-path-complete-in-steps nil)
+;; (setq org-refile-targets
+;;       '(("projects.org" :regexp . "\\(?:\\(?:Note\\|Task\\)s\\)")))
+(setq org-refile-targets
+      '(("projects.org" :level . 1)))
+
+;; TODO
+(setq org-log-done 'time)
+(setq org-todo-keywords
+      '((sequence "TODO(t)" "NEXT(n)" "HOLD(h)" "|" "DONE(d)")))
+(defun log-todo-next-creation-date (&rest ignore)
+  "Log NEXT creation time in the property drawer under the key 'ACTIVATED'"
+  (when (and (string= (org-get-todo-state) "NEXT")
+             (not (org-entry-get nil "ACTIVATED")))
+    (org-entry-put nil "ACTIVATED" (format-time-string "[%Y-%m-%d]"))))
+(add-hook 'org-after-todo-state-change-hook #'log-todo-next-creation-date)
+
+;; Agenda
+(setq org-agenda-custom-commands
+      '(("g" "Get Things Done (GTD)"
+         ((agenda ""
+                  ((org-agenda-skip-function
+                    '(org-agenda-skip-entry-if 'deadline))
+                   (org-deadline-warning-days 0)))
+          (todo "NEXT"
+                ((org-agenda-skip-function
+                  '(org-agenda-skip-entry-if 'deadline))
+                 (org-agenda-prefix-format "  %i %-12:c [%e] ")
+                 (org-agenda-overriding-header "\nTasks\n")))
+          (agenda nil
+                  ((org-agenda-entry-types '(:deadline))
+                   (org-agenda-format-date "")
+                   (org-deadline-warning-days 7)
+                   (org-agenda-skip-function
+                    '(org-agenda-skip-entry-if 'notregexp "\\* NEXT"))
+                   (org-agenda-overriding-header "\nDeadlines")))
+          (tags-todo "inbox"
+                     ((org-agenda-prefix-format "  %?-12t% s")
+                      (org-agenda-overriding-header "\nInbox\n")))
+          (tags "CLOSED>=\"<today>\""
+                ((org-agenda-overriding-header "\nCompleted today\n")))))))
+
+;; Save the corresponding buffers
+(defun gtd-save-org-buffers ()
+  "Save `org-agenda-files' buffers without user confirmation.
+See also `org-save-all-org-buffers'"
+  (interactive)
+  (message "Saving org-agenda-files buffers...")
+  (save-some-buffers t (lambda ()
+             (when (member (buffer-file-name) org-agenda-files)
+               t)))
+  (message "Saving org-agenda-files buffers... done"))
+
+;; Add it after refile
+(advice-add 'org-refile :after
+        (lambda (&rest _)
+          (gtd-save-org-buffers)))
 #+end_src
 ** org-ql
 #+begin_src elisp :tangle no
