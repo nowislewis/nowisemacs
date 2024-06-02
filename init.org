@@ -691,32 +691,23 @@ Maybe I should add a new state.
   "Define leader-key map for apps functions"
   [["agenda"
     ("a" "org-agenda" org-agenda)
-    ("c" "org-capture" org-capture)]
-   ["shell"
-    ("i" "toggle-insert-cd" eat-toggle-insert-dir)
-    ]
-   ["mpvi"
-    ("mo" "open" mpvi-open)
-    ("ms" "seek" mpvi-seek)
-    ("mi" "insert" mpvi-insert)
-    ("ma" "emms-add" mpvi-emms-add)]
-   ["others"
-    ;; ("t" "org-pomodoro" org-pomodoro)
-    ("l" "app-launcher-run-app" app-launcher-run-app)
-    ("e" "elfeed" my-elfeed)
-    ("r" "restart emacs" restart-emacs)
-    ]
-   ])
-#+end_src
-
-*** gtd
-#+begin_src elisp
-(transient-define-prefix org-gtd-leader-map()
-  "Define leader-key map for org-gtd functions"
-  [("a" "agenda" org-agenda)
-   ("c" "capture" org-capture)
-   ("i" "capture inbox" org-capture-inbox)
-   ])
+    ("c" "capture" org-capture)
+    ("i" "capture inbox" org-capture-inbox)]
+    ["shell"
+     ("i" "toggle-insert-cd" eat-toggle-insert-dir)
+     ]
+    ["mpvi"
+     ("mo" "open" mpvi-open)
+     ("ms" "seek" mpvi-seek)
+     ("mi" "insert" mpvi-insert)
+     ("ma" "emms-add" mpvi-emms-add)]
+    ["others"
+     ;; ("t" "org-pomodoro" org-pomodoro)
+     ("l" "app-launcher-run-app" app-launcher-run-app)
+     ("e" "elfeed" my-elfeed)
+     ("r" "restart emacs" restart-emacs)
+     ]
+    ])
 #+end_src
 
 *** ui
@@ -768,8 +759,8 @@ Maybe I should add a new state.
  '("n" . notes-leader-map)
  ;;w workspace
  '("TAB" . tabspaces-leader-map)
- ;; org gtd
- '("d" . org-gtd-leader-map)
+ ;; ;; org gtd
+ ;; '("d" . org-gtd-leader-map)
  ;; ui
  '("t" . toggle-leader-map)
  )
@@ -2663,10 +2654,10 @@ In short, you will need 3 files:
 ;; Refile
 (setq org-refile-use-outline-path 'file)
 (setq org-outline-path-complete-in-steps nil)
-;; (setq org-refile-targets
-;;       '(("projects.org" :regexp . "\\(?:\\(?:Note\\|Task\\)s\\)")))
 (setq org-refile-targets
-      '(("projects.org" :level . 1)))
+      '(("projects.org" :regexp . "\\(?:\\(?:Note\\|Task\\)s\\)")))
+;; (setq org-refile-targets
+;;       '(("projects.org" :level . 2)))
 
 ;; TODO
 (setq org-log-done 'time)
@@ -2689,11 +2680,11 @@ In short, you will need 3 files:
           (todo "NEXT"
                 ((org-agenda-skip-function
                   '(org-agenda-skip-entry-if 'deadline))
-                 (org-agenda-prefix-format "  %i %-12:c [%e] ")
+                 (org-agenda-prefix-format "  %-12:c [%e] ")
                  (org-agenda-overriding-header "\nTasks\n")))
-          (tags-todo "agenda-not_todo"
-                     ((org-agenda-prefix-format "  %?-12t% s")
-                      (org-agenda-overriding-header "\nAgenda inbox\n")))
+          (tags-todo "action"
+                     ((org-agenda-prefix-format "  %-12:c [%e] ")
+                      (org-agenda-overriding-header "\nAvailiable Action\n")))
           (agenda nil
                   ((org-agenda-entry-types '(:deadline))
                    (org-agenda-format-date "")
