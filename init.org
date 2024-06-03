@@ -109,6 +109,7 @@ I failed in love with denote, so previous *org-roam* configs were refiled into [
   - [[#clue][clue]]
   - [[#org-transclusion][org-transclusion]]
   - [[#agendagtd][agenda/gtd]]
+  - [[#org-agenda-property][org-agenda-property]]
   - [[#org-ql][org-ql]]
   - [[#mpvi][mpvi]]
   - [[#org-fc][org-fc]]
@@ -1288,7 +1289,7 @@ Popper is a minor-mode to tame the flood of ephemeral windows Emacs produces, wh
   (setq popper-reference-buffers '("\\*Messages\\*"
                                    "Output\\*$"
                                    "\\*Async Shell Command\\*"
-                                   "Go-Translate"
+                                   "gt-result"
                                    help-mode
                                    helpful-mode
                                    compilation-mode
@@ -2610,6 +2611,21 @@ In short, you will need 3 files:
 1. =index.org= for capture inbox todos
 2. =agenda.org= for recurrent events
 3. =projects.org= for all projects moving from inbox
+
+My useage for projects.org:
+#+begin_example
++ a #action
+++ Single #single
++++ Tasks
+++ Project #project
++ n #not_sure
+++ someday
++++ Tasks
+++ need collect
++++ Tasks
+++ Incubate
++++ Tasks
+#+end_example
 #+begin_src elisp
 ;; Files
 (setq org-agenda-files
@@ -2682,22 +2698,24 @@ In short, you will need 3 files:
                   '(org-agenda-skip-entry-if 'deadline))
                  (org-agenda-prefix-format "  %-12:c [%e] ")
                  (org-agenda-overriding-header "\nTasks\n")))
-          (tags-todo "action"
+          (tags-todo "+action-TODO=\"NEXT\""
                      ((org-agenda-prefix-format "  %-12:c [%e] ")
                       (org-agenda-overriding-header "\nAvailiable Action\n")))
-          (agenda nil
-                  ((org-agenda-entry-types '(:deadline))
-                   (org-agenda-format-date "")
-                   (org-deadline-warning-days 7)
-                   (org-agenda-skip-function
-                    '(org-agenda-skip-entry-if 'notregexp "\\* NEXT"))
-                   (org-agenda-overriding-header "\nDeadlines")))
+          ;; (agenda nil
+          ;;         ((org-agenda-entry-types '(:deadline))
+          ;;          (org-agenda-format-date "")
+          ;;          (org-deadline-warning-days 7)
+          ;;          (org-agenda-skip-function
+          ;;           '(org-agenda-skip-entry-if 'notregexp "\\* NEXT"))
+          ;;          (org-agenda-overriding-header "\nDeadlines")))
           (tags-todo "inbox"
                      ((org-agenda-prefix-format "  %?-12t% s")
                       (org-agenda-overriding-header "\nInbox\n")))
           (tags "CLOSED>=\"<today>\""
                 ((org-agenda-overriding-header "\nCompleted today\n")))))))
 
+;; agenda style
+(setq org-agenda-hide-tags-regexp ".")
 ;; Save the corresponding buffers
 (defun gtd-save-org-buffers ()
   "Save `org-agenda-files' buffers without user confirmation.
@@ -2713,6 +2731,15 @@ See also `org-save-all-org-buffers'"
 (advice-add 'org-refile :after
         (lambda (&rest _)
           (gtd-save-org-buffers)))
+#+end_src
+** org-agenda-property
+#+begin_src elisp
+(setup org-agenda-property
+  (:load-after org)
+  (setq org-agenda-property-list '("GAIN"))
+  (setq org-agenda-property-column 0)
+  (setq org-agenda-property-position 'where-it-fits)
+  )
 #+end_src
 ** org-ql
 #+begin_src elisp :tangle no
@@ -2851,20 +2878,21 @@ Powerful translator on Emacs. Supports multiple translation engines such as Goog
 
   (:when-loaded
     (setq gt-default-translator (gt-translator
-                                  :taker (gt-taker :langs '(en zh) :text 'sentence :prompt 'buffer)
-                                  :engines (list (gt-bing-engine)
-                                                 (gt-google-engine)
-                                                 )
-                                  :render (gt-buffer-render)))
+                                 :taker (gt-taker :langs '(en zh) :text 'sentence :prompt 'buffer)
+                                 :engines (list
+                                           (gt-bing-engine)
+                                           ;; (gt-google-engine)
+                                           )
+                                 :render (gt-buffer-render)))
     )
   (defun gt-quick-sdcv ()
     (interactive)
     (if (not (featurep 'go-translate))
         (require 'go-translate)
       (gt-start (gt-translator
-                      :taker (gt-taker :langs '(en zh) :text 'word)
-                      :engines (gt-stardict-engine)
-                      :render (gt-posframe-pop-render))))
+                 :taker (gt-taker :langs '(en zh) :text 'word)
+                 :engines (gt-stardict-engine)
+                 :render (gt-buffer-render))))
 
     ))
 #+end_src

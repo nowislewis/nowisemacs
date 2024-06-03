@@ -240,6 +240,9 @@
 [submodule "orderless"]
 	path = lib/orderless
 	url = https://github.com/oantolin/orderless.git
+[submodule "org-agenda-property"]
+	path = lib/org-agenda-property
+	url = https://github.com/Malabarba/org-agenda-property.git
 [submodule "org-appear"]
 	path = lib/org-appear
 	url = https://github.com/awth13/org-appear.git
