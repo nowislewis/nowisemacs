@@ -7,6 +7,9 @@
 [submodule "async"]
 	path = lib/async
 	url = https://github.com/jwiegley/emacs-async.git
+[submodule "atomic-chrome"]
+	path = lib/atomic-chrome
+	url = https://github.com/alpha22jp/atomic-chrome.git
 [submodule "avy"]
 	path = lib/avy
 	url = https://github.com/abo-abo/avy.git
@@ -95,9 +98,6 @@
 [submodule "doom-modeline"]
 	path = lib/doom-modeline
 	url = https://github.com/seagle0128/doom-modeline.git
-[submodule "dracula"]
-	path = lib/dracula
-	url = https://github.com/dracula/emacs.git
 [submodule "eat"]
 	path = lib/eat
 	url = https://codeberg.org/akib/emacs-eat.git
@@ -213,9 +213,6 @@
 [submodule "mpvi"]
 	path = lib/mpvi
 	url = https://github.com/lorniu/mpvi.git
-[submodule "nasm-mode"]
-	path = lib/nasm-mode
-	url = https://github.com/skeeto/nasm-mode.git
 [submodule "nerd-icons"]
 	path = lib/nerd-icons
 	url = https://github.com/rainstormstudio/nerd-icons.el.git
@@ -366,6 +363,9 @@
 [submodule "weblorg"]
 	path = lib/weblorg
 	url = https://github.com/emacs-love/weblorg.git
+[submodule "websocket"]
+	path = lib/websocket
+	url = https://github.com/ahyatt/emacs-websocket.git
 [submodule "wgrep"]
 	path = lib/wgrep
 	url = https://github.com/mhayashi1120/Emacs-wgrep.git

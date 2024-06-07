@@ -139,6 +139,7 @@ I failed in love with denote, so previous *org-roam* configs were refiled into [
   - [[#video-and-music][video and music]]
   - [[#literate-calc][literate-calc]]
   - [[#server][server]]
+  - [[#atomic-chrome][atomic-chrome]]
   - [[#macos-ocr][macos-ocr]]
 - [[#use-single-file-to-load-configs][use single file to load configs]]
   - [[#provide][provide]]
@@ -707,6 +708,7 @@ Maybe I should add a new state.
      ("l" "app-launcher-run-app" app-launcher-run-app)
      ("e" "elfeed" my-elfeed)
      ("r" "restart emacs" restart-emacs)
+     ("w" "whisper" whisper-run)
      ]
     ])
 #+end_src
@@ -896,12 +898,6 @@ Maybe I should add a new state.
 #+begin_src elisp
 (setup lazycat-theme)
 #+end_src
-*** dracula
-#+begin_src elisp
-(setup dracula)
-;; (load-theme 'dracula t)
-#+end_src
-
 ** line number
 #+name: line-number
 #+begin_src elisp
@@ -2115,8 +2111,7 @@ Citre is an advanced Ctags (or actually, readtags) frontend for Emacs.
 Disassemble C, C++ or Fortran code under cursor
 #+begin_src elisp
 (setup disaster
-  (setq disaster-assembly-mode 'nasm-mode
-           disaster-objdump "objdump -d -M att -Sl --no-show-raw-insn"))
+  (setq disaster-objdump "objdump -d -M att -Sl --no-show-raw-insn"))
 #+end_src
 
 *** jupyter
@@ -2306,12 +2301,6 @@ Disassemble C, C++ or Fortran code under cursor
 #+begin_src elisp
 (setup org-appear
   (:hook-into org-mode))
-#+end_src
-*** org-tidy
-#+begin_src elisp :tangle no
-(setup org-tidy
-  (add-hook 'org-mode-hook #'org-tidy-mode)
-  )
 #+end_src
 ** org-download
 #+begin_src elisp
@@ -3292,6 +3281,18 @@ rsync -avihu lewis-nas@192.168.31.108:/share/my_webdav/rsync/tmp/ ~/Downloads/tm
 #+begin_src elisp
 (setup server
   (:defer (server-start))
+  )
+#+end_src
+** atomic-chrome
+Edit text area on Chrome with Emacs using Atomic Chrome
+#+begin_src elisp
+(setup websocket)
+(setup atomic-chrome
+  (setq atomic-chrome-url-major-mode-alist
+      '(("leetcode.cn" . c++-ts-mode)
+        ("redmine" . textile-mode)))
+  (:defer
+  (atomic-chrome-start-server))
   )
 #+end_src
 ** macos-ocr
