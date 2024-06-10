@@ -2286,9 +2286,10 @@ Disassemble C, C++ or Fortran code under cursor
 *** org-modern
 #+begin_src elisp
 (setup org-modern
-  (setq org-modern-table nil
-        org-modern-star 'replace
+  (setq org-modern-star 'replace
         org-modern-replace-stars '("Ⓐ" "Ⓑ" "Ⓒ" "Ⓓ" "Ⓔ" "Ⓕ" "Ⓖ" "Ⓗ" "Ⓘ" "Ⓙ" "Ⓚ" "Ⓛ" "Ⓜ")
+        org-modern-table t
+
         )
   (:hook-into org-mode)
   (add-hook 'org-agenda-finalize-hook #'org-modern-agenda)
@@ -2720,6 +2721,11 @@ See also `org-save-all-org-buffers'"
 (advice-add 'org-refile :after
         (lambda (&rest _)
           (gtd-save-org-buffers)))
+
+;; org-clock
+(setq org-agenda-start-with-clockreport-mode t)
+(setq org-clock-out-remove-zero-time-clocks t)
+(setq org-agenda-clockreport-parameter-plist '(:link t :maxlevel 4))
 #+end_src
 ** org-agenda-property
 #+begin_src elisp
