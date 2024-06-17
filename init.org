@@ -105,7 +105,6 @@ I failed in love with denote, so previous *org-roam* configs were refiled into [
   - [[#find-orgmode-dir-files][find orgmode dir files]]
   - [[#org-imagine-excalidraw][org-imagine, excalidraw]]
   - [[#org-remark][org-remark]]
-  - [[#annotate][annotate]]
   - [[#clue][clue]]
   - [[#org-transclusion][org-transclusion]]
   - [[#agendagtd][agenda/gtd]]
@@ -2584,15 +2583,6 @@ Highlight and annotate any text file with using Org mode.
       (org-remark-info-mode +1))
     ))
 #+end_src
-** annotate
-#+begin_src elisp :tangle no
-(setup annotate
-  (setq annotate-file (concat nowis-doc-emacs-dir "annotations.el")
-        annotate-annotation-max-size-not-place-new-line 100
-        )
-  (:hook-into prog-mode)
-  )
-#+end_src
 ** clue
 Connecting clues while reading code.
 #+begin_src elisp
@@ -2608,8 +2598,8 @@ Borrowed from https://github.com/rougier/emacs-GTD
 In short, you will need 3 files:
 1. =index.org= for capture inbox todos
 2. =agenda.org= for recurrent events
-3. taken.org= for all tasks moving from inbox
-My useage for taken.org:
+3. =action.org= for all tasks moving from inbox
+My useage for =action.org=:
 #+begin_example
 + Single #single
 ++ Notes
@@ -2663,11 +2653,11 @@ My useage for taken.org:
 (setq org-refile-use-outline-path 'file)
 (setq org-outline-path-complete-in-steps nil)
 (setq org-refile-targets
-      '(("taken.org" :regexp . "\\(?:\\(?:Note\\|Task\\)s\\)")
+      '(("action.org" :regexp . "\\(?:\\(?:Note\\|Task\\)s\\)")
         ("incubate.org" :regexp . "\\(?:\\(?:Note\\|Task\\)s\\)")
         ))
 ;; (setq org-refile-targets
-;;       '(("taken.org" :level . 2)))
+;;       '(("action.org" :level . 2)))
 
 ;; TODO
 (setq org-log-done 'time)
@@ -2707,7 +2697,10 @@ My useage for taken.org:
                      ((org-agenda-prefix-format "  %?-12t% s")
                       (org-agenda-overriding-header "\nInbox\n")))
           (tags "CLOSED>=\"<today>\""
-                ((org-agenda-overriding-header "\nCompleted today\n")))))))
+                ((org-agenda-overriding-header "\nCompleted today\n")))
+          (tags "CLOSED>=\"<-1w>\""
+                ((org-agenda-overriding-header "\nCompleted last 7 days")))
+          ))))
 
 ;; agenda clockreport
 (setq org-agenda-start-with-clockreport-mode t
@@ -2731,7 +2724,6 @@ See also `org-save-all-org-buffers'"
             (lambda (&rest _)
               (gtd-save-org-buffers)))
 #+end_src
-
 ** org-agenda-property
 #+begin_src elisp
 (setup org-agenda-property
