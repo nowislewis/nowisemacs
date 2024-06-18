@@ -234,6 +234,9 @@
 [submodule "nov-xwidget"]
 	path = lib/nov-xwidget
 	url = https://github.com/chenyanming/nov-xwidget.git
+[submodule "ob-d2"]
+	path = lib/ob-d2
+	url = https://github.com/xcapaldi/ob-d2.git
 [submodule "orderless"]
 	path = lib/orderless
 	url = https://github.com/oantolin/orderless.git

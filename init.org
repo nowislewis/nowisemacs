@@ -104,6 +104,8 @@ I failed in love with denote, so previous *org-roam* configs were refiled into [
   - [[#denote-and-related][denote and related]]
   - [[#find-orgmode-dir-files][find orgmode dir files]]
   - [[#org-imagine-excalidraw][org-imagine, excalidraw]]
+  - [[#ob-d2][ob-d2]]
+  - [[#auto-insert][auto-insert]]
   - [[#org-remark][org-remark]]
   - [[#clue][clue]]
   - [[#org-transclusion][org-transclusion]]
@@ -2558,6 +2560,36 @@ Emacs package to create and navigate denote notes with folgezettel numbering in 
     (with-temp-file path (insert org-excalidraw--default-base))))
 
 ;; (setup org-imagine)
+#+end_src
+** ob-d2
+Org-Babel support for evaluating d2 diagram scripting language.
+#+begin_src elisp
+(setup ob-d2)
+#+end_src
+** auto-insert
+#+begin_src elisp
+(setup autoinsert
+  (:defer
+   (auto-insert-mode t))
+
+   ;; Get default JSON template used for new excalidraw files.
+  (define-auto-insert "\\.excalidraw\\'"
+    (lambda ()
+      (insert
+       "{
+    \"type\": \"excalidraw\",
+    \"version\": 2,
+    \"source\": \"https://excalidraw.com\",
+    \"elements\": [],
+    \"appState\": {
+      \"gridSize\": null,
+      \"viewBackgroundColor\": \"#ffffff\"
+    },
+    \"files\": {}
+}
+"
+       )))
+  )
 #+end_src
 ** org-remark
 Highlight and annotate any text file with using Org mode.
