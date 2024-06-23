@@ -2141,7 +2141,7 @@ Disassemble C, C++ or Fortran code under cursor
 #+begin_src elisp
 (setup org
   (setq org-adapt-indentation nil
-        org-startup-indented t
+        org-startup-indented nil
         org-startup-with-inline-images t
         org-startup-numerated nil
         org-startup-folded 'content
@@ -2262,15 +2262,15 @@ Disassemble C, C++ or Fortran code under cursor
                                ))
         (message "Convert finish: %s" docx-file)))
 
-    ;; (dolist (face '((org-level-1 . 1.8)
-    ;;                 (org-level-2 . 1.7)
-    ;;                 (org-level-3 . 1.6)
-    ;;                 (org-level-4 . 1.5)
-    ;;                 (org-level-5 . 1.4)
-    ;;                 (org-level-6 . 1.3)
-    ;;                 (org-level-7 . 1.2)
-    ;;                 (org-level-8 . 1.1)))
-    ;;   (set-face-attribute (car face) nil :weight 'medium :height (cdr face)))
+    (dolist (face '((org-level-1 . 1.8)
+                    (org-level-2 . 1.7)
+                    (org-level-3 . 1.6)
+                    (org-level-4 . 1.5)
+                    (org-level-5 . 1.4)
+                    (org-level-6 . 1.3)
+                    (org-level-7 . 1.2)
+                    (org-level-8 . 1.1)))
+      (set-face-attribute (car face) nil :weight 'medium :height (cdr face)))
 
     ;; org-src-lang-modes
     (add-to-list 'org-src-lang-modes '("dot" . graphviz-dot))
