@@ -774,8 +774,8 @@ Maybe I should add a new state.
 #+begin_src elisp
 (setup which-key
   (setq which-key-idle-delay 0.1)
-  ;;(:defer
-  ;;(which-key-mode))
+  (:defer
+  (which-key-mode))
   )
 #+end_src
 ** electric
