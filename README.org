@@ -60,7 +60,9 @@ It's designed by following principles:
   front-end *citre*, users can easily use and expand almost all programming languages under emacs.
 + Rime integration, orderless completion everywhere.
 ** How to use
-*All configs can be seen [[file:init.org][here]], it is highly recommended that you read this document first.*
+----------------------------------------------------------------------------------------------------------------------------
+|*All configs can be seen [[file:init.org][here]], it is highly recommended that you read this document first.*|
+---------------------------------------------------------------------------------------------------------------------------
 
 Nowisemacs uses a single org file to manage all configurations. To reduce the startup time of emacs, users need to
 generate =.el= configuration files before the first startup
