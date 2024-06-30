@@ -831,6 +831,7 @@ Maybe I should add a new state.
                                 return font))
 ;; variable font
 (setq lewis-variable-font (cl-loop for font in '(
+                                                 "Maple UI"
                                                  "LXGW WenKai"
                                                  ;; "Source Han Sans SC VF"
                                                  "Noto Sans CJK SC"
@@ -1878,7 +1879,7 @@ borrowed from citre, now you can always jump-back use "M-," after any jump in th
    (if (treesit-available-p)
        (require 'treesit-auto)))
   (:when-loaded
-    (global-treesit-auto-mode)
+    ;; (global-treesit-auto-mode)
     (setq treesit-auto-install t)
     )
   )

@@ -86,7 +86,7 @@ generate =.el= configuration files before the first startup
 1. Inside emacs, run =M-x borg-remove=, choose the package you want to remove.
 *** Update packages
 1. =make update= ;; get all packages update latest
-2. =make bootstrap= ;; build packages
+2. =make build= ;; build packages
 3. (optional) =make native= ;; if you build emacs with native-comp, use this command to build all packages ahead-of-time.
 *** display icons correctly
 [nerd-icons](https://github.com/rainstormstudio/nerd-icons.el) are necessary.  Run `M-x nerd-icons-install-fonts` to
@@ -99,11 +99,12 @@ Every time you make some changes on =~/.emacs.d/init.org= (eg, write down =<s= a
 code), you should run =make init-build=. You can also just use =make= to config everything. This will overwrite
 =~/.emacs.d/init.el= and =early-init.el=. Nowisemacs use this method to guarantee the =init.el= will not be changed by mistake
 =custom-group= or something else.
-*** Everyday use
+*** Everyday use(a summary)
 That't to say, after installation, there are only things you need to remember for everyday use:
 1. =borg-assimilate= for install packages, and =borg-remove= for remove packages.
-2. =make update= for updates.
-3. =make= for everything else( eg, after you changed init.org, or changed packages, you can just run =make= to configure everything well) related to packages.
+2. =make update= for updates. After update, run =git add .= to add all updates, and =make build= to get them compiled.
+3. =make init-build=  if you only changed the =init.org= file.
+4. If you modify a local package under lib such as =foo=, run =make lib/foo= to recompile only that package.
 
 *It's suggested to read the [[https://emacsmirror.net/manual/borg/][borg]] for more details*.
 *** Some explanation about package configurations/setup.el
@@ -120,28 +121,37 @@ Nowisemacs uses space bars as leader key, you can find most keybindings in the M
 | Space s i | Open imenu                                       |
 | Space f p | Open Personal Config                             |
 | Space Tab | Open the tabspace management menu                |
-| M-L       | Translation The current area or user input       |
-| M-L       | Translation Current Words (need to install SDCV) |
-| M-`       | Open/fold Vterm                                  |
-| C-x /     | Search on website: google, aur, etc.             |
+| Space s w | Search on website: google, aur, etc.             |
+| M-l       | Translation Current Words (need to install SDCV) |
+| M-L       | Translation current selected area or user input  |
+| C-`       | Open/fold Vterm                                  |
 | Space n   | Keybinds about notes                             |
+| Space ?   | For a keybing help for meow                      |
 ** vim users should care
 Some useful keybindings for vim user:
-| Button | Function                                                                       |
-|--------+--------------------------------------------------------------------------------|
-| C-a    | Go to the beginning of the current visible line                                |
-| C-e    | Go to the end of the line, but before ellipsis, if any                         |
-| M->    | Move point to the end of the buffer                                            |
-| M-<    | Move point to the beginning of the buffer                                      |
-| M-v    | Scroll text of selected window down ARG lines; or near full screen if no ARG   |
-| C-v    | Scroll text of selected window upward ARG lines; or near full screen if no ARG |
-| C-w    | Kill ("cut") text between point and mark                                       |
-| e      | meow-next-word, select to the end of the next Nth word                         |
-| b      | meow-back-word, select to the beginning the previous Nth word                  |
-| f      | meow-find, find the next N char read from minibuffer                           |
-| c c    | meow-change, kill current selection and switch to INSERT state                 |
-| n      | moew-search, search and select with the car of the current regexp-search-ring  |
+| Button         | Function                                                                       |
+|----------------+--------------------------------------------------------------------------------|
+| C-a            | Go to the beginning of the current visible line                                |
+| C-e            | Go to the end of the line, but before ellipsis, if any                         |
+| M->            | Move point to the end of the buffer                                            |
+| M-<            | Move point to the beginning of the buffer                                      |
+| M-v            | Scroll text of selected window down ARG lines; or near full screen if no ARG   |
+| C-v            | Scroll text of selected window upward ARG lines; or near full screen if no ARG |
+| C-w            | Kill ("cut") text between point and mark                                       |
+| e              | meow-next-word, select to the end of the next Nth word                         |
+| b              | meow-back-word, select to the beginning the previous Nth word                  |
+| f              | meow-find, find the next N char read from minibuffer                           |
+| c c            | meow-change, kill current selection and switch to INSERT state                 |
+| n              | moew-search, search and select with the car of the current regexp-search-ring  |
+| v a            | text-object based operation (arounding objects)                                |
+| v i            | text-object based operation (inside objects)                                   |
+| m + any letter | save the current location into registers with name "letter"                    |
+| ' + any letter | load the location registers of name "letter"                                   |
+| g d            | jump to definition                                                             |
+| g D            | jump to reference                                                              |
+| g a            | code actions                                                                   |
 
+Press =Space ?= to get a view of keybings under normal status.
 * Ideas behind nowisemacs
 ** TL ; NR
 Concise + High maintainability
