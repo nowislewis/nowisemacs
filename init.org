@@ -2149,6 +2149,8 @@ Disassemble C, C++ or Fortran code under cursor
         org-edit-src-content-indentation 0
         org-imenu-depth 8
         org-return-follows-link t
+        org-id-link-to-org-use-id t ;; Create an ID if needed to make a link to the current entry.
+
         org-link-frame-setup '((vm . vm-visit-folder-other-frame)
                                (vm-imap . vm-visit-imap-folder-other-frame)
                                (gnus . org-gnus-no-new-news)
@@ -2897,7 +2899,9 @@ This is an Emacs package that creates graphviz directed graphs from the headings
 Powerful translator on Emacs. Supports multiple translation engines such as Google, Bing, deepL, StarDict, Youdao.
 #+begin_src elisp
 (setup go-translate
-  (setq gt-translate-list '(("en" "zh")))
+  (setq gt-translate-list '(("en" "zh"))
+        gts-supress-warning t
+        )
   (:global "M-L" gt-do-translate)
   (:global "M-l" gt-quick-sdcv)
 

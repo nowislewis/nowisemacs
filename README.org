@@ -127,6 +127,8 @@ Nowisemacs uses space bars as leader key, you can find most keybindings in the M
 | C-`       | Open/fold Vterm                                  |
 | Space n   | Keybinds about notes                             |
 | Space ?   | For a keybing help for meow                      |
+
+I use XiaoHeShuangPin for Pinyin search, it will affect all searching jobs with vertico
 ** vim users should care
 Some useful keybindings for vim user:
 | Button         | Function                                                                       |
