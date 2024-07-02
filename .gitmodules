@@ -389,3 +389,6 @@
 [submodule "yasnippet"]
 	path = lib/yasnippet
 	url = https://github.com/joaotavora/yasnippet.git
+[submodule "ztree"]
+	path = lib/ztree
+	url = https://codeberg.org/fourier/ztree.git
