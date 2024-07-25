@@ -1,6 +1,9 @@
 [submodule "ace-window"]
 	path = lib/ace-window
 	url = https://github.com/abo-abo/ace-window.git
+[submodule "anki-helper"]
+	path = lib/anki-helper
+	url = https://github.com/Elilif/emacs-anki-helper.git
 [submodule "app-launcher"]
 	path = lib/app-launcher
 	url = https://github.com/SebastienWae/app-launcher.git
@@ -171,6 +174,9 @@
 [submodule "hl-todo"]
 	path = lib/hl-todo
 	url = https://github.com/tarsius/hl-todo.git
+[submodule "htmlize"]
+	path = lib/htmlize
+	url = https://github.com/hniksic/emacs-htmlize.git
 [submodule "imenu-list"]
 	path = lib/imenu-list
 	url = https://github.com/nowislewis/imenu-list.git
@@ -252,9 +258,6 @@
 [submodule "org-elp"]
 	path = lib/org-elp
 	url = https://github.com/guanyilun/org-elp.git
-[submodule "org-fc"]
-	path = lib/org-fc
-	url = https://github.com/l3kn/org-fc.git
 [submodule "org-mind-map"]
 	path = lib/org-mind-map
     url = https://github.com/nowislewis/org-mind-map.git
@@ -271,6 +274,9 @@
 [submodule "org-present"]
 	path = lib/org-present
 	url = https://github.com/rlister/org-present.git
+[submodule "org-remark"]
+	path = lib/org-remark
+	url = https://github.com/nobiot/org-remark.git
 [submodule "org-transclusion"]
 	path = lib/org-transclusion
 	url = https://github.com/nobiot/org-transclusion.git

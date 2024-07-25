@@ -113,7 +113,8 @@ I failed in love with denote, so previous *org-roam* configs were refiled into [
   - [[#org-agenda-property][org-agenda-property]]
   - [[#org-ql][org-ql]]
   - [[#mpvi][mpvi]]
-  - [[#org-fc][org-fc]]
+  - [[#org-fcdisabled][org-fc(disabled)]]
+  - [[#anki-helper][anki-helper]]
   - [[#shrface][shrface]]
   - [[#org-mind-map][org-mind-map]]
 - [[#english-翻译][english 翻译]]
@@ -653,8 +654,8 @@ Maybe I should add a new state.
    ;;  ]
    ["org-noter"
     ("n" "org-noter" org-noter)]
-   ["org-fc"
-    ("f" "org-fc" org-fc-transient-map )]
+   ;; ["org-fc"
+   ;;  ("f" "org-fc" org-fc-transient-map )]
    ["org-mind-map"
     ("m" "org-mind-map-dwim" org-mind-map-dwim)
     ("M" "org-mind-map" org-mind-map-choose-type-dwim)
@@ -751,15 +752,15 @@ Maybe I should add a new state.
 ;; buffer
 (meow-leader-define-key
  '("b" . buffer-leader-map)
-;; lewisliu
+ ;; lewisliu
  '("e" . lewis-leader-map)
-;; search
+ ;; search
  '("s" . search-leader-map)
-;; apps
+ ;; apps
  '("a" . apps-leader-map)
-;; file
+ ;; file
  '("f" . file-leader-map)
-;; notes
+ ;; notes
  '("n" . notes-leader-map)
  ;;w workspace
  '("TAB" . tabspaces-leader-map)
@@ -767,6 +768,15 @@ Maybe I should add a new state.
  ;; '("d" . org-gtd-leader-map)
  ;; ui
  '("t" . toggle-leader-map)
+
+ ;; remark
+ '("r m" . org-remark-mark)
+ '("r l" . org-remark-mark-line) ; new in v1.3
+ '("r o" . org-remark-open)
+ '("r ]" . org-remark-view-next)
+ '("r [" . org-remark-view-prev)
+ '("r r" . org-remark-remove)
+ '("r d" . org-remark-delete)
  )
 #+END_SRC
 ** which-key
@@ -2142,7 +2152,7 @@ Disassemble C, C++ or Fortran code under cursor
 #+begin_src elisp
 (setup org
   (setq org-adapt-indentation nil
-        org-startup-indented nil
+        org-startup-indented t
         org-startup-with-inline-images t
         org-startup-numerated nil
         org-startup-folded 'content
@@ -2156,8 +2166,8 @@ Disassemble C, C++ or Fortran code under cursor
                                (gnus . org-gnus-no-new-news)
                                (file . find-file)
                                (wl . wl-other-frame))
-        org-blank-before-new-entry '((heading . nil)
-                                     (plain-list-item . nil))
+        ;; org-blank-before-new-entry '((heading . t)
+        ;;                              (plain-list-item . auto))
 
         org-image-actual-width 800 ;; this will use 600 for width for all the images.
         org-preview-latex-image-directory (concat no-littering-var-directory "ltximg/")
@@ -2265,13 +2275,13 @@ Disassemble C, C++ or Fortran code under cursor
                                ))
         (message "Convert finish: %s" docx-file)))
 
-    (dolist (face '((org-level-1 . 1.8)
-                    (org-level-2 . 1.7)
-                    (org-level-3 . 1.6)
-                    (org-level-4 . 1.5)
+    (dolist (face '((org-level-1 . 1.4)
+                    (org-level-2 . 1.4)
+                    (org-level-3 . 1.4)
+                    (org-level-4 . 1.4)
                     (org-level-5 . 1.4)
-                    (org-level-6 . 1.3)
-                    (org-level-7 . 1.2)
+                    (org-level-6 . 1.4)
+                    (org-level-7 . 1.4)
                     (org-level-8 . 1.1)))
       (set-face-attribute (car face) nil :weight 'medium :height (cdr face)))
 
@@ -2596,15 +2606,15 @@ Org-Babel support for evaluating d2 diagram scripting language.
 #+end_src
 ** org-remark
 Highlight and annotate any text file with using Org mode.
-#+begin_src elisp :tangle no
+#+begin_src elisp
 (setup org-remark
   (defun my/function ()
     (concat (concat nowis-doc-emacs-dir "01-orgmode/org-remark/")
             (file-name-base (org-remark-notes-file-name-function))
             ".org"))
   (setq org-remark-notes-file-name #'my/function)
+  (add-hook 'after-init-hook 'org-remark-global-tracking-mode)
   (:when-loaded
-    (org-remark-global-tracking-mode +1)
     ;; Optional if you would like to highlight websites via eww-mode
     (with-eval-after-load 'eww
       (org-remark-eww-mode +1))
@@ -2783,9 +2793,9 @@ Integrate Org with Video
   (setq mpvi-ytdlp-extra-args "--cookies-from-browser firefox")
   )
 #+end_src
-** org-fc
+** org-fc(disabled)
 Spaced Repetition System for Emacs org-mode
-#+begin_src elisp
+#+begin_src elisp :tangle no
 (setup org-fc
   (:autoload org-fc-review-all)
   (:autoload org-fc-type-double-init)
@@ -2824,11 +2834,19 @@ Spaced Repetition System for Emacs org-mode
     ("n" "normal" org-fc-type-normal-init)
     ("t" "text input" org-fc-type-text-input-init)]])
 #+end_src
+** anki-helper
+#+begin_src elisp
+(setup htmlize)
+(setup anki-helper
+  (setq anki-helper-cloze-use-emphasis 'bold)
+  )
+#+end_src
 ** shrface
 Extend eww/nov with org-mode features, archive web pages to org files with shr.
 #+begin_src elisp
 (setup shrface
   (add-hook 'nov-mode-hook #'shrface-mode)
+  (add-hook 'eww-mode-hook #'shrface-mode)
   (:when-loaded
     (shrface-basic)
     (shrface-trial)
@@ -3108,6 +3126,9 @@ Simple distraction-free editing. I use darkroom instead of writeroom because it'
           holo-layer-enable-window-border nil
           holo-layer-enable-place-info t
           holo-layer-hide-mode-line nil
+          holo-layer-enable-type-animation t
+          holo-layer-enable-indent-rainbow t
+          holo-layer-type-animation-style "flame"
           ;; holo-layer-python-command "~/.pyenv/shims/python3"
           )
     (holo-layer-enable)
