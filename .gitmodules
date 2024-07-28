@@ -258,6 +258,9 @@
 [submodule "org-elp"]
 	path = lib/org-elp
 	url = https://github.com/guanyilun/org-elp.git
+[submodule "org-fc"]
+	path = lib/org-fc
+	url = https://github.com/l3kn/org-fc.git
 [submodule "org-mind-map"]
 	path = lib/org-mind-map
     url = https://github.com/nowislewis/org-mind-map.git
