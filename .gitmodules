@@ -107,6 +107,9 @@
 [submodule "ebib"]
 	path = lib/ebib
 	url = https://github.com/joostkremers/ebib.git
+[submodule "eglot-booster"]
+	path = lib/eglot-booster
+	url = https://github.com/jdtsmith/eglot-booster.git
 [submodule "eglot-hierarchy"]
 	path = lib/eglot-hierarchy
 	url = https://github.com/dolmens/eglot-hierarchy.git

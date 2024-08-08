@@ -2030,6 +2030,16 @@ borrowed from citre, now you can always jump-back use "M-," after any jump in th
   (:with-map eglot-mode-map
     (:bind [remap xref-find-apropos] #'consult-eglot-symbols)))
 #+end_src
+***** eglot-booster
+Improve the performance of eglot using a wrapper executable, you should install =emacs-lsp-booster= first
+#+begin_src elisp
+(setup eglot-booster
+  (:load-after eglot)
+  (:when-loaded
+    (eglot-booster-mode)
+    )
+  )
+#+end_src
 ***** lsp-bridge
 install dependencies.
 #+begin_src bash
@@ -2860,6 +2870,21 @@ Spaced Repetition System for Emacs org-mode
 (setup anki-helper
   (setq anki-helper-cloze-use-emphasis 'bold)
   )
+
+;; for zotero annotations parser
+(defun parser-zotero-annotation-to-org-mode()
+  (interactive)
+  (while (re-search-forward ".\\(.*\n*.*\\)” (\\[\\(.*\\)\\](zotero://selec.*)) (.*(\\(zotero.*\\)))" nil t)
+    (let ((begin (match-beginning 1))
+          (end (match-end 3))
+          (note (match-string 1))
+          (title (match-string 2))
+          (location (match-string 3))
+          )
+      (delete-region (1- begin) (+ 2 end)) ;; full region
+      (insert (format "* %s\n%s" title note))
+      (org-set-property "zotero" location)
+      )))
 #+end_src
 ** shrface
 Extend eww/nov with org-mode features, archive web pages to org files with shr.
