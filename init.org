@@ -2034,11 +2034,9 @@ borrowed from citre, now you can always jump-back use "M-," after any jump in th
 Improve the performance of eglot using a wrapper executable, you should install =emacs-lsp-booster= first
 #+begin_src elisp
 (setup eglot-booster
-  (:load-after eglot)
-  (:when-loaded
+    (when (executable-find "emacs-lsp-booster")
     (eglot-booster-mode)
-    )
-  )
+  ))
 #+end_src
 ***** lsp-bridge
 install dependencies.
