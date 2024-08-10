@@ -2297,6 +2297,27 @@ Disassemble C, C++ or Fortran code under cursor
 
     ;; org-src-lang-modes
     (add-to-list 'org-src-lang-modes '("dot" . graphviz-dot))
+    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+    ;; for zotero annotations parser
+    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+    (defun org-zotero-open (path)
+      (browse-url (format "zotero:%s" path)))
+    (org-link-set-parameters "zotero" :follow #'org-zotero-open)
+
+    (defun parser-zotero-annotation-to-org-mode()
+      (interactive)
+      (while (re-search-forward ".\\(.*\n*.*\\)” (\\[\\(.*\\)\\](zotero://selec.*)) (.*(\\(zotero.*\\)))" nil t)
+        (let ((begin (match-beginning 1))
+              (end (match-end 3))
+              (note (match-string 1))
+              (title (match-string 2))
+              (location (match-string 3))
+              )
+          (delete-region (1- begin) (+ 2 end)) ;; full region
+          (insert (format "* %s\n%s" title note))
+          (org-set-property "zotero" location)
+          )))
+
     ))
 #+end_src
 ** ui
@@ -2871,20 +2892,6 @@ Spaced Repetition System for Emacs org-mode
   (setq anki-helper-cloze-use-emphasis 'bold)
   )
 
-;; for zotero annotations parser
-(defun parser-zotero-annotation-to-org-mode()
-  (interactive)
-  (while (re-search-forward ".\\(.*\n*.*\\)” (\\[\\(.*\\)\\](zotero://selec.*)) (.*(\\(zotero.*\\)))" nil t)
-    (let ((begin (match-beginning 1))
-          (end (match-end 3))
-          (note (match-string 1))
-          (title (match-string 2))
-          (location (match-string 3))
-          )
-      (delete-region (1- begin) (+ 2 end)) ;; full region
-      (insert (format "* %s\n%s" title note))
-      (org-set-property "zotero" location)
-      )))
 #+end_src
 ** shrface
 Extend eww/nov with org-mode features, archive web pages to org files with shr.
