@@ -2203,6 +2203,8 @@ Disassemble C, C++ or Fortran code under cursor
                                        ("WAIT" :foreground "orange" :weight bold)
                                        ("CANCELLED" :foreground "forest green" :weight bold)
                                        ))
+        ;; save state changes into logbook
+        org-log-state-notes-into-drawer t
         )
   (:when-loaded
     (require 'org-tempo) ;; so that <s is useful
@@ -2304,7 +2306,7 @@ Disassemble C, C++ or Fortran code under cursor
 
     (defun parser-zotero-annotation-to-org-mode()
       (interactive)
-      (while (re-search-forward ".\\(.*\n*.*\\)” (\\[\\(.*\\)\\](zotero://selec.*)) (.*(\\(zotero.*\\)))" nil t)
+      (while (re-search-forward "“\\([.]*\n*.*\\)” (\\[\\(.*\\)\\](zotero://selec.*)) (.*(\\(zotero.*\\)))" nil t)
         (let ((begin (match-beginning 1))
               (end (match-end 3))
               (note (match-string 1))
@@ -2312,10 +2314,10 @@ Disassemble C, C++ or Fortran code under cursor
               (location (match-string 3))
               )
           (delete-region (1- begin) (+ 2 end)) ;; full region
-          (insert (format "* %s\n%s" title note))
+          (insert (format "** %s\n%s" title note))
           (org-set-property "zotero" location)
+          (org-set-property "ref" title)
           )))
-
     ))
 #+end_src
 ** ui
@@ -2887,7 +2889,9 @@ Spaced Repetition System for Emacs org-mode
 #+begin_src elisp
 (setup htmlize)
 (setup anki-helper
-  (setq anki-helper-cloze-use-emphasis 'bold)
+  (setq anki-helper-cloze-use-emphasis 'bold
+        anki-helper-default-note-type "Cloze"
+        )
   )
 
 #+end_src
