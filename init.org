@@ -655,7 +655,7 @@ Maybe I should add a new state.
    ["org-noter"
     ("n" "org-noter" org-noter)]
    ["org-fc"
-    ("f" "org-fc" org-fc-transient-map)]
+    ("f" "org-fc" org-fc-transient-load-map)]
    ["org-mind-map"
     ("m" "org-mind-map-dwim" org-mind-map-dwim)
     ("M" "org-mind-map" org-mind-map-choose-type-dwim)
@@ -841,12 +841,13 @@ Maybe I should add a new state.
                                 return font))
 ;; variable font
 (setq lewis-variable-font (cl-loop for font in '(
-                                                 "Maple UI"
-                                                 "LXGW WenKai"
-                                                 ;; "Source Han Sans SC VF"
-                                                 "Noto Sans CJK SC"
-                                                 "Arial"
                                                  "Helvetica"
+                                                 "Times"
+                                                 "Noto Sans CJK SC"
+                                                 "LXGW WenKai"
+                                                 "Maple UI"
+                                                 ;; "Source Han Sans SC VF"
+                                                 "Arial"
                                                  "Times New Roman")
                                    when (font-installed-p font)
                                    return font))
@@ -2889,6 +2890,13 @@ Spaced Repetition System for Emacs org-mode
     ("d" "double" org-fc-type-double-init)
     ("n" "normal" org-fc-type-normal-init)
     ("t" "text input" org-fc-type-text-input-init)]])
+
+(defun org-fc-transient-load-map()
+  (interactive)
+  (if (not (featurep 'org-fc))
+      (require 'org-fc))
+  (org-fc-transient-map))
+
 #+end_src
 ** anki-helper
 #+begin_src elisp
