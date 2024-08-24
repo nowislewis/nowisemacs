@@ -2070,33 +2070,14 @@ Citre is an advanced Ctags (or actually, readtags) frontend for Emacs.
         )
   )
 #+end_src
-*** Code toggle with hideshow, hideif
-#+begin_src elisp
-(setup hideshow
-  (:with-hook prog-mode-hook
-    (:hook hs-minor-mode))
-  (add-to-list 'hs-special-modes-alist '(verilog-mode "\\(\\<begin\\>\\|\\<case\\>\\|\\<module\\>\\|\\<class\\>\\|\\<function\\>\\|\\<task\\>\\)"
-                                                      )))
-
-;; (setup hideif
-;;   (add-hook 'c-mode-common-hook
-;;             (lambda ()
-;;               (hide-ifdef-mode)
-;;               (add-hook 'after-save-hook (lambda () (hide-ifdefs))))))
-#+end_src
-*** format-all
-#+begin_src elisp
-(setup inheritenv)
-(setup language-id)
-(setup format-all)
-#+end_src
-*** gdb
+*** debug
+**** gdb
 #+begin_src elisp
 (setup gdb-mi
   (setq gdb-restore-window-configuration-after-quit t)
   )
 #+end_src
-*** dape
+**** dape
 #+begin_src elisp
 (setup dape
   (setq dape-buffer-window-arrangment 'right)
@@ -2133,6 +2114,35 @@ Citre is an advanced Ctags (or actually, readtags) frontend for Emacs.
         ("Q" "quit" dape-quit)]])
     )
   )
+#+end_src
+**** edebug
+#+begin_src lisp
+(setup edebug
+  (:with-map edebug-mode-map
+    (:bind "n" edebug-step-mode
+           "N" edebug-next-mode
+  )))
+#+end_src
+
+*** Code toggle with hideshow, hideif
+#+begin_src elisp
+(setup hideshow
+  (:with-hook prog-mode-hook
+    (:hook hs-minor-mode))
+  (add-to-list 'hs-special-modes-alist '(verilog-mode "\\(\\<begin\\>\\|\\<case\\>\\|\\<module\\>\\|\\<class\\>\\|\\<function\\>\\|\\<task\\>\\)"
+                                                      )))
+
+;; (setup hideif
+;;   (add-hook 'c-mode-common-hook
+;;             (lambda ()
+;;               (hide-ifdef-mode)
+;;               (add-hook 'after-save-hook (lambda () (hide-ifdefs))))))
+#+end_src
+*** format-all
+#+begin_src elisp
+(setup inheritenv)
+(setup language-id)
+(setup format-all)
 #+end_src
 *** disaster
 Disassemble C, C++ or Fortran code under cursor
@@ -2686,10 +2696,10 @@ My useage for =action.org=:
 #+end_example
 #+begin_src elisp
 ;; Files
-(setq org-directory "~/Documents/emacs/01-orgmode/xnotes/gtd/")
+(setq org-directory "~/Documents/emacs/01-orgmode/xnotes")
 (setq org-agenda-files
       (mapcar 'file-truename
-              (file-expand-wildcards (concat org-directory "*.org"))))
+              (file-expand-wildcards (concat org-directory "/gtd/*.org"))))
 
 ;; Capture
 (setq org-capture-templates
@@ -2812,9 +2822,17 @@ See also `org-save-all-org-buffers'"
 ** org-ql
 #+begin_src elisp :tangle no
 (setup ts)
-(setup peg)
+(setup ht)
+(setup org-super-agenda)
 (setup ov)
-(setup org-ql)
+(setup org-ql
+  (defun lewis/find-read-articles()
+          (interactive)
+          (org-ql-search (directory-files-recursively org-directory (rx ".org"))
+            '(and (property "zotero") (not (property "ANKI_NOTE_ID"))))
+
+          )
+  )
 #+end_src
 ** mpvi
 Integrate Org with Video
@@ -3178,12 +3196,13 @@ Simple distraction-free editing. I use darkroom instead of writeroom because it'
     (require 'holo-layer)
     (setq holo-layer-enable-cursor-animation t
           holo-layer-enable-window-border nil
-          holo-layer-enable-place-info t
+          holo-layer-enable-place-info nil
           holo-layer-hide-mode-line nil
-          holo-layer-enable-type-animation t
           holo-layer-enable-indent-rainbow t
+          holo-layer-enable-type-animation t
           holo-layer-type-animation-style "flame"
-          ;; holo-layer-python-command "~/.pyenv/shims/python3"
+          holo-layer-python-command "~/.pyenv/shims/python3"
+          n
           )
     (holo-layer-enable)
     )
