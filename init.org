@@ -2327,6 +2327,10 @@ Disassemble C, C++ or Fortran code under cursor
           (insert (format "** %s\n%s" title note))
           (org-set-property "zotero" location)
           (org-set-property "ref" title)
+
+          (org-set-tags "wait_for_cloze") ;; for article
+          (org-set-property "ANKI_DECK" "Default::2") ;; default with 0.9 mem rate
+          (org-set-property "ANKI_NOTE_TYPE" "Cloze")
           )))
     ))
 #+end_src
@@ -2908,8 +2912,8 @@ Spaced Repetition System for Emacs org-mode
 (setup htmlize)
 (setup anki-helper
   (setq anki-helper-cloze-use-emphasis 'bold
-        anki-helper-default-note-type "Cloze"
-        )
+        ;; anki-helper-default-note-type "Cloze" ;; use zotero scipts to set this
+  )
   )
 
 #+end_src
