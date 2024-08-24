@@ -2328,9 +2328,15 @@ Disassemble C, C++ or Fortran code under cursor
           (org-set-property "zotero" location)
           (org-set-property "ref" title)
 
+          ;; for anki
           (org-set-tags "wait_for_cloze") ;; for article
-          (org-set-property "ANKI_DECK" "Default::2") ;; default with 0.9 mem rate
-          (org-set-property "ANKI_NOTE_TYPE" "Cloze")
+          ;; (org-set-property "ANKI_DECK" "Default::2") ;; default with 0.9 mem rate
+          ;; (org-set-property "ANKI_NOTE_TYPE" "Cloze")
+
+          ;; for org-fc
+          (if (not (featurep 'org-fc))
+              (require 'org-fc))
+          (org-fc-type-normal-init)
           )))
     ))
 #+end_src
@@ -2854,47 +2860,24 @@ Spaced Repetition System for Emacs org-mode
         org-fc-review-history-file (concat nowis-doc-emacs-dir "org-fc-reviews.tsv")
         ;; org-fc-shuffle-positions nil
         )
-  ;; autoload some useful commands
-  (defun load-org-fc (orig-fun &rest args)
-    (if (not (featurep 'org-fc))
-        (require 'org-fc)))
-
-  (:autoload org-fc-dashboard
-             org-fc-dashboard
-             org-fc-type-cloze-init
-             org-fc-type-double-init
-             org-fc-type-normal-init
-             org-fc-type-text-input-init)
-
-  (dolist (func (list
-                 'org-fc-dashboard
-                 'org-fc-type-cloze-init
-                 'org-fc-type-double-init
-                 ;; 'org-fc-type-normal-init
-                 'org-fc-type-text-input-init))
-    (advice-add func :before #'load-org-fc))
-
-  (defun insert-hello-world-under-content-headings ()
-  "Insert 'hello world' under all 'Content' headings in the current buffer."
-  (interactive)
-  (save-excursion
-    (goto-char (point-min))
-    (while (re-search-forward "^\\*+ Content" nil t)
-      (org-end-of-subtree t nil)
-      (org-fc-type-normal-init))))
-
   (:when-loaded
-     (set-face-attribute 'org-fc-type-cloze-hole-face nil :box t)
+    (set-face-attribute 'org-fc-type-cloze-hole-face nil :box t)
 
     (define-key org-fc-review-rate-mode-map (kbd "RET") 'org-fc-review-rate-good)
     (require 'org-fc-keymap-hint)
-    (add-to-list 'org-fc-custom-contexts
-                 '(high-priority-cards . (:filter (tag "high"))))
-    (add-to-list 'org-fc-custom-contexts
-                 '(low-priority-cards . (:filter (not (tag "high")))))
     (add-hook 'org-fc-review-flip-mode-hook 'meow-motion-mode)
     (add-hook 'org-fc-review-edit-mode-hook 'meow-normal-mode)
+    (defun org-fc-timestamp-in (interval)
+      "Generate an `org-mode' timestamp INTERVAL days from now."
+      (let ((seconds (* interval 60 60 24))
+            (now (time-to-seconds)))
+
+        (format-time-string
+         "%FT%TZ"
+         (seconds-to-time  (time-to-seconds)  )
+         "Asia/Shanghai")))
     ))
+
 
 (transient-define-prefix org-fc-transient-map()
   "Define transient-key map for org-fc functions"
