@@ -365,7 +365,8 @@ Enforce a sneaky Garbage Collection strategy to minimize GC interference with us
 #+begin_src elisp
 (setup gcmh
   (setq gcmh-auto-idle-delay-factor 10
-           gcmh-high-cons-threshold (* 16 1024 1024))
+           gcmh-high-cons-threshold (* 16 1024 1024)
+           )
   (gcmh-mode 1))
 #+end_src
 * Keyboard Bindings
@@ -696,7 +697,7 @@ Maybe I should add a new state.
   [["agenda"
     ("a" "org-agenda" org-agenda)
     ("c" "capture" org-capture)
-    ("i" "capture inbox" org-capture-inbox)]
+    ("I" "capture inbox" org-capture-inbox)]
     ["shell"
      ("i" "toggle-insert-cd" eat-toggle-insert-dir)
      ]
@@ -2698,6 +2699,7 @@ In short, you will need 3 files:
 1. =index.org= for capture inbox todos
 2. =agenda.org= for recurrent events
 3. =action.org= for all tasks moving from inbox
+4. (Option) =incubate.org= for incubate ideas
 My useage for =action.org=:
 #+begin_example
 + Single #single
@@ -2883,8 +2885,12 @@ Spaced Repetition System for Emacs org-mode
          "%FT%TZ"
          (seconds-to-time  (time-to-seconds)  )
          "Asia/Shanghai")))
+
     )
-  ;; outside functions
+  ;; +-----------------+
+  ;; | load and keymap |
+  ;; +-----------------+
+
   (defun org-fc-review-flip-or-rate-mode-p()
     "return t if inside flip or rate mode"
     (if (or (bound-and-true-p org-fc-review-flip-mode)
@@ -2905,7 +2911,15 @@ Spaced Repetition System for Emacs org-mode
       ("d" "double" org-fc-type-double-init)
       ("n" "normal" org-fc-type-normal-init)
       ("t" "text input" org-fc-type-text-input-init)]])
+  (defun org-fc-transient-load-map()
+    (interactive)
+    (if (not (featurep 'org-fc))
+        (require 'org-fc))
+    (org-fc-transient-map))
 
+  ;; +---------------------+
+  ;; | review and fontlock |
+  ;; +---------------------+
   (defun org-fc-review-buffer-hierarchy()
     "org-fc review current buffer with hierachy"
     (interactive)
@@ -2913,11 +2927,19 @@ Spaced Repetition System for Emacs org-mode
       (setq-local org-fc-shuffle-positions nil)
       (org-fc-review-buffer)))
 
-  (defun org-fc-transient-load-map()
-    (interactive)
-    (if (not (featurep 'org-fc))
-        (require 'org-fc))
-    (org-fc-transient-map))
+  (defface my-org-fc-cloze-face
+  '((t (:weight bold :box t)))
+  "A custom face with bold weight and a box.")
+
+  ;; font lock for cloze
+  (defun org-fc-cloze-in-org-font-lock ()
+    (font-lock-add-keywords
+     nil
+     '(("{{\\([^}]+\\)}@[0-9]}"
+        (1 'my-org-fc-cloze-face t)
+        ))))
+
+  (add-hook 'org-mode-hook #'org-fc-cloze-in-org-font-lock)
   )
 #+end_src
 ** anki-helper
