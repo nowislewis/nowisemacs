@@ -149,9 +149,6 @@
 [submodule "format-all"]
 	path = lib/format-all
 	url = https://github.com/lassik/emacs-format-all-the-code.git
-[submodule "gcmh"]
-	path = lib/gcmh
-	url = https://github.com/emacsmirror/gcmh.git
 [submodule "geiser"]
 	path = lib/geiser
 	url = https://github.com/emacsmirror/geiser.git

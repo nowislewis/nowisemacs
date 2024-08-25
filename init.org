@@ -11,7 +11,6 @@ I failed in love with denote, so previous *org-roam* configs were refiled into [
 - [[#package-management][Package Management]]
   - [[#setup][setup]]
   - [[#epkg][epkg]]
-- [[#gcmh][gcmh]]
 - [[#keyboard-bindings][Keyboard Bindings]]
   - [[#meow][meow]]
   - [[#transient-and-related-leader-map][transient and related leader-map]]
@@ -155,8 +154,8 @@ I failed in love with denote, so previous *org-roam* configs were refiled into [
 #+NAME: ui-speed-up
 #+begin_src elisp :tangle ~/.emacs.d/early-init.el
 ;; -*- lexical-binding: t; -*-
-(setq gc-cons-threshold most-positive-fixnum
-      gc-cons-percentage 0.5) ;;defer gc futher back
+(setq gc-cons-threshold 80000000
+      gc-cons-percentage 0.2)
 ;; Package initialize occurs automatically, before `user-init-file' is
 ;; loaded, but after `early-init-file'. We handle package
 ;; initialization, so we must prevent Emacs from doing it early!
@@ -358,16 +357,6 @@ I use borg to manage packages, so setup.el is only used to config packages quick
 ;; (when (>= emacs-major-version 29)
 ;;   (setq epkg-database-connector 'sqlite-builtin))
 ;; (setup epkg)
-#+end_src
-* gcmh
-Enforce a sneaky Garbage Collection strategy to minimize GC interference with user activity.
-#+name: gcmh
-#+begin_src elisp
-(setup gcmh
-  (setq gcmh-auto-idle-delay-factor 10
-           gcmh-high-cons-threshold (* 16 1024 1024)
-           )
-  (gcmh-mode 1))
 #+end_src
 * Keyboard Bindings
 I used to be a vim(evil) user, but now I use meow to manage all my keys.
@@ -2038,9 +2027,9 @@ borrowed from citre, now you can always jump-back use "M-," after any jump in th
 Improve the performance of eglot using a wrapper executable, you should install =emacs-lsp-booster= first
 #+begin_src elisp
 (setup eglot-booster
-    (when (executable-find "emacs-lsp-booster")
+  (when (executable-find "emacs-lsp-booster")
     (eglot-booster-mode)
-  ))
+    ))
 #+end_src
 ***** lsp-bridge
 install dependencies.
@@ -3494,7 +3483,7 @@ this can avoid errors of native compilation of init.el
 ;; -*- lexical-binding: t; -*-
 (add-to-list 'load-path (expand-file-name "modules/" user-emacs-directory))
 (require 'init-config)
-(setq gc-cons-threshold (* 2 1000 1000))
+(setq gc-cons-threshold 800000)
 #+end_src
 * quick-edit and minimal-file
 These 2 files are tangled using noweb and will be used for special purpose.
