@@ -7,11 +7,10 @@ org-mode
 (elisp "#+begin_src elisp" n> r> n "#+end_src" :post (org-edit-src-code))
 
 (dot "#+begin_src dot :file ~/Documents/emacs/02-binary-files/01-pictures/dot_pictures/" (format-time-string "%Y%m%d%H%M%S") ".svg" n> r> n> "#+end_src")
-(uml "#+begin_src plantuml :file ~/Documents/emacs/02-binary-files/01-pictures/plantuml_pictures/" (format-time-string "%Y%m%d%H%M%S") ".jpg"
+(uml "#+begin_src plantuml :file ~/Documents/emacs/02-binary-files/01-pictures/plantuml_pictures/" (format-time-string "%Y%m%d%H%M%S") ".svg"
      " :cmdline -charset UTF-8" n> "title " p n> "#+end_src")
-(d2 "#+begin_src d2 :file ~/Documents/emacs/02-binary-files/01-pictures/d2_pictures/" (format-time-string "%Y%m%d%H%M%S") ".jpg"
+(d2 "#+begin_src d2 :file ~/Documents/emacs/02-binary-files/01-pictures/d2_pictures/" (format-time-string "%Y%m%d%H%M%S") ".svg"
      " :flags -t 101 -s" n> r> n> "#+end_src")
-(excalidraw "#+IMAGINE: wget -O %{%o.png} %f" n> "[[" (buffer-file-name) ".excalidraw]]" n> "#+ATTR_HTML: :width 800 :align center")
 
 ;; Local Variables:
 ;; mode: lisp-data
