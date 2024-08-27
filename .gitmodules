@@ -1,18 +1,15 @@
 [submodule "ace-window"]
 	path = lib/ace-window
 	url = https://github.com/abo-abo/ace-window.git
-[submodule "anki-helper"]
-	path = lib/anki-helper
-	url = https://github.com/Elilif/emacs-anki-helper.git
-[submodule "app-launcher"]
-	path = lib/app-launcher
-	url = https://github.com/SebastienWae/app-launcher.git
+[submodule "annotate"]
+	path = lib/annotate
+	url = https://github.com/bastibe/annotate.el.git
 [submodule "async"]
 	path = lib/async
 	url = https://github.com/jwiegley/emacs-async.git
 [submodule "atomic-chrome"]
 	path = lib/atomic-chrome
-	url = https://github.com/alpha22jp/atomic-chrome.git
+	url = https://github.com/KarimAziev/atomic-chrome.git
 [submodule "avy"]
 	path = lib/avy
 	url = https://github.com/abo-abo/avy.git
@@ -22,12 +19,6 @@
 [submodule "borg"]
 	path = lib/borg
 	url = https://github.com/emacscollective/borg.git
-[submodule "boxy"]
-	path = lib/boxy
-	url = https://gitlab.com/tygrdev/boxy.git
-[submodule "boxy-imenu"]
-	path = lib/boxy-imenu
-	url = https://gitlab.com/tygrdev/boxy-imenu.git
 [submodule "burly"]
 	path = lib/burly
 	url = https://github.com/alphapapa/burly.el.git
@@ -54,9 +45,6 @@
 [submodule "cmake-mode"]
 	path = lib/cmake-mode
 	url = https://github.com/emacsmirror/cmake-mode.git
-[submodule "compat"]
-	path = lib/compat
-	url = https://github.com/emacsmirror/compat.git
 [submodule "consult"]
 	path = lib/consult
 	url = https://github.com/minad/consult.git
@@ -98,9 +86,6 @@
 [submodule "disaster"]
 	path = lib/disaster
 	url = https://github.com/jart/disaster.git
-[submodule "doom-modeline"]
-	path = lib/doom-modeline
-	url = https://github.com/seagle0128/doom-modeline.git
 [submodule "eat"]
 	path = lib/eat
 	url = https://codeberg.org/akib/emacs-eat.git
@@ -192,9 +177,6 @@
 [submodule "language-id"]
 	path = lib/language-id
 	url = https://github.com/lassik/emacs-language-id.git
-[submodule "lazycat-theme"]
-	path = lib/lazycat-theme
-	url = https://github.com/manateelazycat/lazycat-theme.git
 [submodule "literate-calc"]
 	path = lib/literate-calc
 	url = https://github.com/sulami/literate-calc-mode.el.git
@@ -216,6 +198,9 @@
 [submodule "mini-echo"]
 	path = lib/mini-echo
 	url = https://github.com/liuyinz/mini-echo.el.git
+[submodule "mood-line"]
+	path = lib/mood-line
+	url = https://git.tty.dog/jessieh/mood-line.git
 [submodule "mpvi"]
 	path = lib/mpvi
 	url = https://github.com/lorniu/mpvi.git
@@ -277,18 +262,12 @@
 [submodule "org-present"]
 	path = lib/org-present
 	url = https://github.com/rlister/org-present.git
-[submodule "org-remark"]
-	path = lib/org-remark
-	url = https://github.com/nobiot/org-remark.git
 [submodule "org-transclusion"]
 	path = lib/org-transclusion
 	url = https://github.com/nobiot/org-transclusion.git
 [submodule "outli"]
 	path = lib/outli
 	url = https://github.com/jdtsmith/outli.git
-[submodule "ox-hugo"]
-	path = lib/ox-hugo
-	url = https://github.com/kaushalmodi/ox-hugo.git
 [submodule "parsebib"]
 	path = lib/parsebib
 	url = https://github.com/joostkremers/parsebib.git
@@ -334,9 +313,6 @@
 [submodule "shrface"]
 	path = lib/shrface
 	url = https://github.com/chenyanming/shrface.git
-[submodule "shrink-path"]
-	path = lib/shrink-path
-    url = https://github.com/emacsmirror/shrink-path
 [submodule "slime"]
 	path = lib/slime
 	url = https://github.com/slime/slime.git
@@ -358,9 +334,6 @@
 [submodule "toc-org"]
 	path = lib/toc-org
 	url = https://github.com/snosov1/toc-org.git
-[submodule "tomelr"]
-	path = lib/tomelr
-	url = https://github.com/kaushalmodi/tomelr.git
 [submodule "treesit-auto"]
 	path = lib/treesit-auto
 	url = https://github.com/renzmann/treesit-auto.git
@@ -383,9 +356,6 @@
 	url = https://github.com/mhayashi1120/Emacs-wgrep.git
     no-byte-compile = wgrep-subtest.el
     no-byte-compile = wgrep-ag.el
-[submodule "which-key"]
-	path = lib/which-key
-	url = https://github.com/justbur/emacs-which-key.git
 [submodule "whisper"]
 	path = lib/whisper
 	url = https://github.com/natrys/whisper.el.git

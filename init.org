@@ -17,7 +17,6 @@ I failed in love with denote, so previous *org-roam* configs were refiled into [
   - [[#meow-leader-keybindings][meow leader keybindings]]
   - [[#which-key][which-key]]
   - [[#electric][electric]]
-  - [[#dwim][dwim]]
 - [[#package-library][Package Library]]
   - [[#dash][dash]]
   - [[#s][s]]
@@ -33,7 +32,7 @@ I failed in love with denote, so previous *org-roam* configs were refiled into [
   - [[#diff-hl][diff-hl]]
   - [[#fringe-mode][fringe-mode]]
   - [[#emacs-dashboard][emacs-dashboard]]
-  - [[#doom-modeline][doom-modeline]]
+  - [[#mood-line][mood-line]]
   - [[#mini-echo][mini-echo]]
   - [[#hl-todo][hl-todo]]
   - [[#highlight-line][highlight line]]
@@ -50,7 +49,7 @@ I failed in love with denote, so previous *org-roam* configs were refiled into [
   - [[#tramp][TRAMP]]
   - [[#automatically-clean-whitespace][Automatically clean whitespace]]
   - [[#exec-path-from-shell][exec-path-from-shell]]
-  - [[#undo][Undo]]
+  - [[#vundo-for-undo-history][vundo for undo history]]
 - [[#search][Search]]
   - [[#isearch][isearch]]
   - [[#consult-commands][Consult Commands]]
@@ -93,9 +92,7 @@ I failed in love with denote, so previous *org-roam* configs were refiled into [
   - [[#org-mode-1][org-mode]]
   - [[#ui-1][ui]]
   - [[#org-download][org-download]]
-  - [[#ox-hugo][ox-hugo]]
   - [[#weblorg][weblorg]]
-  - [[#org-clock][org-clock]]
   - [[#org-noter][org-noter]]
   - [[#org-present][org-present]]
   - [[#bibtex-related][bibtex related]]
@@ -105,7 +102,6 @@ I failed in love with denote, so previous *org-roam* configs were refiled into [
   - [[#org-imagine-excalidraw][org-imagine, excalidraw]]
   - [[#ob-d2][ob-d2]]
   - [[#auto-insert][auto-insert]]
-  - [[#org-remark][org-remark]]
   - [[#clue][clue]]
   - [[#org-transclusion][org-transclusion]]
   - [[#agendagtd][agenda/gtd]]
@@ -113,7 +109,6 @@ I failed in love with denote, so previous *org-roam* configs were refiled into [
   - [[#org-ql][org-ql]]
   - [[#mpvi][mpvi]]
   - [[#org-fc][org-fc]]
-  - [[#anki-helper][anki-helper]]
   - [[#shrface][shrface]]
   - [[#org-mind-map][org-mind-map]]
 - [[#english-翻译][english 翻译]]
@@ -128,12 +123,8 @@ I failed in love with denote, so previous *org-roam* configs were refiled into [
   - [[#nov-xwidget][nov-xwidget]]
   - [[#darkroom][darkroom]]
   - [[#markdown-mode][markdown-mode]]
-  - [[#markdown-xwidget][markdown-xwidget]]
 - [[#tools][tools]]
-  - [[#xwidget-and-browser][xwidget and browser]]
-  - [[#eaf][eaf]]
   - [[#holo-layer][holo-layer]]
-  - [[#app-launcher][app-launcher]]
   - [[#ai-related][ai related]]
   - [[#webjump][webjump]]
   - [[#backup-scripts][backup scripts]]
@@ -145,9 +136,6 @@ I failed in love with denote, so previous *org-roam* configs were refiled into [
 - [[#use-single-file-to-load-configs][use single file to load configs]]
   - [[#provide][provide]]
   - [[#load-init-configel][load init-config.el]]
-- [[#quick-edit-and-minimal-file][quick-edit and minimal-file]]
-  - [[#init-quick-edit][init-quick-edit]]
-  - [[#init-minimal][init-minimal]]
 
 * Startup config
 ** UI speed up
@@ -210,9 +198,6 @@ I failed in love with denote, so previous *org-roam* configs were refiled into [
 (setq completions-detailed t) ;;useful in emacs 28
 (setq use-dialog-box nil)               ;never pop dialog
 (setq mouse-yank-at-point t)            ;粘贴于光标处,而不是鼠标指针处
-
-;; (setq frame-resize-pixelwise t) ;设置缩放的模式,避免Mac平台最大化窗口以后右边和下边有空隙
-;; (set-frame-parameter nil 'fullscreen 'maximized)
 #+end_src
 ** load-path
 #+NAME: load-path
@@ -345,7 +330,6 @@ emacs
          (setq start-time (current-time))
          )))
   :documentation "Measures the time from the end of the previous feature to the end of the current feature")
-
 #+end_src
 ** epkg
 I use borg to manage packages, so setup.el is only used to config packages quickly. There is no  need for epkg anymore.
@@ -353,7 +337,6 @@ I use borg to manage packages, so setup.el is only used to config packages quick
 (setup compat)
 ;; (setup emacsql)
 ;; (setup closql)
-
 ;; (when (>= emacs-major-version 29)
 ;;   (setq epkg-database-connector 'sqlite-builtin))
 ;; (setup epkg)
@@ -592,7 +575,8 @@ Maybe I should add a new state.
   [
    ["Imenu"
     ("l" "Imenu list smart toggle" imenu-list-smart-toggle)
-    ("L" "Boxy imenu" boxy-imenu)]
+    ;; ("L" "Boxy imenu" boxy-imenu)
+    ]
    ;; org-download
    ["Org download"
     ("d" "Screenshot" org-download-screenshot)]
@@ -697,7 +681,7 @@ Maybe I should add a new state.
      ("ma" "emms-add" mpvi-emms-add)]
     ["others"
      ;; ("t" "org-pomodoro" org-pomodoro)
-     ("l" "app-launcher-run-app" app-launcher-run-app)
+     ;; ("l" "app-launcher-run-app" app-launcher-run-app)
      ("e" "elfeed" my-elfeed)
      ("r" "restart emacs" restart-emacs)
      ("w" "whisper" whisper-run)
@@ -775,19 +759,13 @@ Maybe I should add a new state.
 (setup which-key
   (setq which-key-idle-delay 0.1)
   (:defer
-  (which-key-mode))
+   (which-key-mode))
   )
 #+end_src
 ** electric
 #+begin_src elisp
 (setup elec-pair
   (electric-pair-mode))
-#+end_src
-** dwim
-#+begin_src elisp
-(global-set-key (kbd "M-u") 'upcase-dwim)
-(global-set-key (kbd "M-l") 'downcase-dwim)
-(global-set-key (kbd "M-c") 'capitalize-dwim)
 #+end_src
 * Package Library
 ** dash
@@ -897,19 +875,11 @@ Maybe I should add a new state.
 (setup ef-themes)
 (load-theme 'ef-trio-dark t)
 #+end_src
-*** lazycat-theme
-#+begin_src elisp
-(setup lazycat-theme)
-#+end_src
 ** line number
 #+name: line-number
 #+begin_src elisp
-;; line number
-;; only enable line number in some modes, borrowed from lazycat-emacs
-(setq display-line-numbers-width-start t)
 (setq line-number-display-limit large-file-warning-threshold)
-(setq line-number-display-limit-width 1000)
-
+;; only enable line number in some modes, borrowed from lazycat-emacs
 (dolist (hook (list
                'prog-mode-hook
                ;;'org-mode-hook
@@ -958,20 +928,13 @@ diff-hl-mode highlights uncommitted changes on the left side of the window (area
   (dashboard-setup-startup-hook)
   )
 #+end_src
-** doom-modeline
+** mood-line
+Minimal mode line configuration for Emacs, inspired by doom-modeline
 #+begin_src elisp
-(setup shrink-path)
-
-(setup doom-modeline
-  (setq doom-modeline-height 1
-        doom-modeline-unicode-fallback nil)
-  (:when-loaded
-    (if (facep 'mode-line-active)
-        (set-face-attribute 'mode-line-active nil :height 120) ; For 29+
-      (set-face-attribute 'mode-line nil :height 120))
-    (set-face-attribute 'mode-line-inactive nil :height 120)
-    )
-  (:hook-into after-init))
+(setup mood-line
+  (require 'mood-line)
+  (setq mood-line-glyph-alist mood-line-glyphs-fira-code)
+  (mood-line-mode))
 #+end_src
 ** mini-echo
 #+begin_src elisp
@@ -984,7 +947,8 @@ diff-hl-mode highlights uncommitted changes on the left side of the window (area
                  "narrow" "macro" "profiler" "meow")
                 :short ("buffer-name-short" "buffer-position" "process"
                         "profiler" "selection-info" "narrow" "macro" "meow" )))
-  (setq mini-echo-separator " ")
+  (setq mini-echo-separator "  ")
+  ;; (setq window-divider-default-places t)
   )
 #+end_src
 ** hl-todo
@@ -1108,7 +1072,7 @@ diff-hl-mode highlights uncommitted changes on the left side of the window (area
 #+end_src
 ** 自动换行
 #+begin_src elisp
-(setq-default fill-column 100)          ;默认显示 100列就换行
+(setq-default fill-column 100)
 (setq word-wrap t)
 (setq word-wrap-by-category t)
 ;; (add-hook 'org-mode-hook 'turn-on-auto-fill)
@@ -1140,8 +1104,7 @@ diff-hl-mode highlights uncommitted changes on the left side of the window (area
      (exec-path-from-shell-initialize)))
   )
 #+end_src
-** Undo
-*** vundo for undo history
+** vundo for undo history
 #+name: vundo
 #+begin_src elisp
 (setup vundo
@@ -1264,13 +1227,6 @@ should be check after reading the embark.el manual
   (:with-map tempel-map
     (:bind "M-]"  tempel-next
            "M-["  tempel-previous)))
-;; Setup completion at point
-;; (defun tempel-setup-capf ()
-;;   (setq-local completion-at-point-functions
-;;               (cons #'tempel-completed
-;;                     completion-at-point-functions)))
-;; (add-hook 'prog-mode-hook 'tempel-setup-capf)
-;; (add-hook 'text-mode-hook 'tempel-setup-capf)
 #+end_src
 * Window Management
 ** winner-mode
@@ -1481,17 +1437,6 @@ the buffer works like a pager."
          ;; dired-omit-mode
          ))
 #+end_src
-*** dirvish
-Dirvish is a minimalistic file manager based on Dired. It's fast
-#+begin_src elisp :tangle no
-(setup dirvish
-  (setq dirvish-attributes '(subtree-state nerd-icons)
-        dirvish-side-width 40)
-  (:bind "TAB" dirvish-toggle-subtree)
-  (add-hook 'dired-load-hook #'dirvish-override-dired-mode)
-  (:when-loaded
-    (dirvish-side-follow-mode)))
-#+end_src
 *** nerd-icons-dired
 #+begin_src elisp
 (setup nerd-icons-dired)
@@ -1520,11 +1465,6 @@ Dirvish is a minimalistic file manager based on Dired. It's fast
            imenu-list-auto-update nil
            )
   )
-#+end_src
-*** boxy-imenu
-#+begin_src elisp
-(setup boxy)
-(setup boxy-imenu)
 #+end_src
 ** tab-line and tab-bar
 #+name: tab-bar
@@ -1734,8 +1674,6 @@ This Emacs tool use plantuml to generate images for org, json, yaml files.
   (:autoload plantuml-org-to-mindmap-open
              plantuml-org-to-wbs-open)
   )
-
-
 ;; download plantuml jar
 (setq plantuml-jar-path (concat no-littering-var-directory "plantuml.jar"))
 (defun plantuml-download-jar ()
@@ -1943,8 +1881,6 @@ borrowed from citre, now you can always jump-back use "M-," after any jump in th
     ;; if not find ispell-dict, use cape as default
     (if (null ispell-alternate-dictionary)
         (progn
-          ;; (add-to-list 'completion-at-point-functions #'cape-dict)
-          ;; (setq ispell-alternate-dictionary cape-dict-file)
           (setq ispell-complete-word-dict (concat nowis-doc-emacs-dir "02-binary-files/12-spell-dict/en_US.dict"))))))
 #+end_src
 ***** nerd-icons-corfu
@@ -2031,25 +1967,6 @@ Improve the performance of eglot using a wrapper executable, you should install 
     (eglot-booster-mode)
     ))
 #+end_src
-***** lsp-bridge
-install dependencies.
-#+begin_src bash
-pip3 install epc orjson sexpdata six paramiko
-#+end_src
-#+begin_src elisp :tangle no
-(setup lsp-bridge
-  (setq lsp-bridge-enable-org-babel nil
-        lsp-bridge-python-lsp-server "pylsp"
-        lsp-bridge-enable-completion-in-minibuffer t
-        lsp-bridge-enable-hover-diagnostic t
-        ;; acm
-        acm-enable-citre nil
-        acm-enable-codeium nil
-        acm-backend-codeium-api-key-path (concat nowis-doc-emacs-dir "08-keys/codeium_api_key.txt")
-        )
-  (:defer
-   (global-lsp-bridge-mode)))
-#+end_src
 **** citre
 Citre is an advanced Ctags (or actually, readtags) frontend for Emacs.
 #+begin_src elisp
@@ -2074,39 +1991,7 @@ Citre is an advanced Ctags (or actually, readtags) frontend for Emacs.
 #+begin_src elisp
 (setup dape
   (setq dape-buffer-window-arrangment 'right)
-  (:global "<f5>"  dape
-           "M-<f5>"  dape-transient-map)
-  (:when-loaded
-    (transient-define-prefix dape-transient-map()
-      [["Stepping"
-        ("n" "next" dape-next :transient t)
-        ("s" "step in" dape-step-in :transient t)
-        ("o" "step out" dape-step-out :transient t)
-        ("c" "continue" dape-continue :transient t)
-        ("p" "pause" dape-pause :transient t)
-        ("k" "kill" dape-kill :transient t)
-        ("r" "restart" dape-restart :transient t)
-        ("D" "disconnect" dape-disconnect-quit :transient t)
-        ]
-       ["Switch"
-        ("m" "memory" dape-read-memory :transient t)
-        ("t" "thread" dape-select-thread :transient t)
-        ("w" "watch" dape-watch-dwim :transient t)
-        ("S" "stack" dape-select-stack :transient t)
-        ("i" "info" dape-info :transient t)
-        ("R" "repl" dape-repl :transient t)
-        ]
-       ["Breakpoints"
-        ("b" "toggle" dape-breakpoint-toggle :transient t)
-        ("l" "log" dape-breakpoint-log :transient t)
-        ("e" "expression" dape-breakpoint-expression :transient t)
-        ("B" "clear" dape-breakpoint-remove-all :transient t)
-        ]
-       ["Debug"
-        ("d" "dape" dape)
-        ("Q" "quit" dape-quit)]])
-    )
-  )
+  (:global "<f5>"  dape))
 #+end_src
 **** edebug
 #+begin_src lisp
@@ -2192,19 +2077,9 @@ Disassemble C, C++ or Fortran code under cursor
         org-habit-following-days 2
         system-time-locale "C" ;; ensure time format is always english
         ;; todo keywords
-        ;; org-todo-keywords (quote ((sequence "TODO(t!/!)" "NEXT(n!/!)" "|" "DONE(d!/!)")
-        ;;                           (type "PROJECT(p!/!)" "|" "DONE_PROJECT(D!/!)")
-        ;;                           (type "SOMEDAY(S!)" "|" "NEED_COLLECTED(N!)")
-        ;;                           (sequence "WAIT(w@/!)" "|" "CANCELLED(c@/!)")))
         org-todo-keyword-faces (quote (("TODO" :foreground "red" :weight bold)
                                        ("NEXT" :foreground "blue" :weight bold)
                                        ("DONE" :foreground "forest green" :weight bold)
-                                       ("PROJECT" :foreground "red" :weight bold)
-                                       ("DONE_PROJECT" :foreground "forest green" :weight bold)
-                                       ("SOMEDAY" :foreground "orange" :weight bold)
-                                       ("NEED_COLLECTED" :foreground "orange" :weight bold)
-                                       ("WAIT" :foreground "orange" :weight bold)
-                                       ("CANCELLED" :foreground "forest green" :weight bold)
                                        ))
         ;; save state changes into logbook
         org-log-state-notes-into-drawer t
@@ -2358,8 +2233,6 @@ Disassemble C, C++ or Fortran code under cursor
   (:hook-into org-mode)
   (add-hook 'org-agenda-finalize-hook #'org-modern-agenda)
   (:when-loaded
-    ;; (set-face-attribute 'org-block-begin-line nil :underline nil :overline t)
-    ;; (set-face-attribute 'org-block-end-line nil :overline nil :underline t)
     ))
 #+end_src
 *** org-appear
@@ -2384,23 +2257,10 @@ Disassemble C, C++ or Fortran code under cursor
   (:autoload org-download-screenshot
              org-download-yank))
 #+end_src
-** ox-hugo
-#+begin_src elisp
-(setup tomelr)
-(setup ox-hugo
-  (:load-after ox))
-#+end_src
 ** weblorg
 #+begin_src elisp
 (setup templatel)
 (setup weblorg)
-#+end_src
-** org-clock
-*** org-pomodoro
-#+begin_src elisp :tangle no
-(setup alert)
-(setup org-pomodoro
-  (setq org-pomodoro-finished-sound (concat nowis-doc-emacs-dir "02-binary-files/applaud.wav")))
 #+end_src
 ** org-noter
 #+begin_src elisp
@@ -2412,11 +2272,6 @@ Disassemble C, C++ or Fortran code under cursor
            org-noter-doc-split-percentage '(0.6 . 0.4)
            org-noter-highlight-selected-text t
            )
-  ;; (:when-loaded
-  ;;   (require 'org-noter-pdf)
-  ;;   (require 'org-noter-nov)
-  ;;   (require 'org-noter-nov-overlay)
-  ;;   (require 'org-noter-dynamic-block))
   )
 #+end_src
 ** org-present
@@ -2485,27 +2340,6 @@ Disassemble C, C++ or Fortran code under cursor
            )
   )
 #+end_src
-*** zotra
-**** a installation script
-#+begin_src bash
-cd ~/Downloads
-git clone --recurse-submodules https://github.com/mpedramfar/zotra-cli.git
-cd zotra-cli
-npm install .
-cd ~/Downloads
-git clone https://github.com/l0o0/translators_CN.git --depth=1
-rm -rf ~/Downloads/zotra-cli/module/translation-server/modules/translators
-ln -s ~/Downloads/translators_CN/translators ~/Downloads/zotra-cli/module/translation-server/modules/
-#+end_src
-**** config
-#+begin_src elisp :tangle no
-(setup zotra
-  (:autoload zotra-add-entry-from-url)
-  (if (eq system-type 'darwin)
-      (setq zotra-cli-command '("node" "/Users/liuyi/Downloads/zotra-cli/bin/index.js")))
-  (if (eq system-type 'gnu/linux)
-      (setq zotra-cli-command '("node" "/home/lewisliu/Downloads/zotra-cli/bin/index.js"))))
-#+end_src
 ** toc-org
 #+begin_src elisp
 (setup toc-org
@@ -2560,16 +2394,6 @@ Borrowed from https://github.com/protesilaos/denote/issues/115
   (let ((find-ls-option '("-exec ls -ld {} \\+ |grep -v '=='| sort -t '=' -k 3" . "-ld")))
     (find-dired denote-directory ""))
   (rename-buffer "not signatured"))
-
-(defun my/zettel-main-topics ()
-  (interactive)
-  (let ((find-ls-option '("-regex '.*==[0-9]+-.*'  -exec ls -ld {} \\+| awk /==/ | sed  's/--/=@/3' | sort -t '=' -Vk 3,3 | sed 's/=@/--/'" . "-ld")))
-    (find-dired denote-directory "")))
-#+end_src
-*** denote-folgezettel
-Emacs package to create and navigate denote notes with folgezettel numbering in the signature.
-#+begin_src elisp :tangle no
-(setup denote-fz)
 #+end_src
 *** denote-explorer
 #+begin_src elisp
@@ -2615,8 +2439,6 @@ Emacs package to create and navigate denote notes with folgezettel numbering in 
          (link (format "[[file:%s]]" path)))
     (insert link)
     (with-temp-file path (insert org-excalidraw--default-base))))
-
-;; (setup org-imagine)
 #+end_src
 ** ob-d2
 Org-Babel support for evaluating d2 diagram scripting language.
@@ -2647,30 +2469,6 @@ Org-Babel support for evaluating d2 diagram scripting language.
 "
        )))
   )
-#+end_src
-** org-remark
-Highlight and annotate any text file with using Org mode.
-#+begin_src elisp
-(setup org-remark
-  (defun my/function ()
-    (concat (concat nowis-doc-emacs-dir "01-orgmode/org-remark/")
-            (file-name-base (org-remark-notes-file-name-function))
-            ".org"))
-  (setq org-remark-notes-file-name #'my/function)
-  (add-hook 'after-init-hook 'org-remark-global-tracking-mode)
-  (:when-loaded
-    ;; Optional if you would like to highlight websites via eww-mode
-    (with-eval-after-load 'eww
-      (org-remark-eww-mode +1))
-
-    ;; Optional if you would like to highlight EPUB books via nov.el
-    (with-eval-after-load 'nov
-      (org-remark-nov-mode +1))
-
-    ;; Optional if you would like to highlight Info documentation via Info-mode
-    (with-eval-after-load 'info
-      (org-remark-info-mode +1))
-    ))
 #+end_src
 ** clue
 Connecting clues while reading code.
@@ -2879,7 +2677,6 @@ Spaced Repetition System for Emacs org-mode
   ;; +-----------------+
   ;; | load and keymap |
   ;; +-----------------+
-
   (defun org-fc-review-flip-or-rate-mode-p()
     "return t if inside flip or rate mode"
     (if (or (bound-and-true-p org-fc-review-flip-mode)
@@ -2930,16 +2727,6 @@ Spaced Repetition System for Emacs org-mode
 
   (add-hook 'org-mode-hook #'org-fc-cloze-in-org-font-lock)
   )
-#+end_src
-** anki-helper
-#+begin_src elisp
-(setup htmlize)
-(setup anki-helper
-  (setq anki-helper-cloze-use-emphasis 'bold
-        ;; anki-helper-default-note-type "Cloze" ;; use zotero scipts to set this
-  )
-  )
-
 #+end_src
 ** shrface
 Extend eww/nov with org-mode features, archive web pages to org files with shr.
@@ -3043,17 +2830,7 @@ Powerful translator on Emacs. Supports multiple translation engines such as Goog
 
     ))
 #+end_src
-If you want to use *sdcv* for offline translate, then download dictionary data to ~/.stardict/dic or /usr/share/stardict/dic:
-#+begin_src sh
-# For example from http://download.huzheng.org:
-mkdir -p ~/.stardict/dic
-cd ~/.stardict/dic
-wget http://download.huzheng.org/zh_CN/stardict-langdao-ce-gb-2.4.2.tar.bz2
-wget http://download.huzheng.org/zh_CN/stardict-langdao-ce-gb-2.4.2.tar.bz2
-tar xvf stardict-langdao-ec-gb-2.4.2.tar.bz2
-tar xvf stardict-langdao-ce-gb-2.4.2.tar.bz2
-sdcv -l
-#+end_src
+If you want to use *sdcv* for offline translate, then download dictionary data to ~/.stardict/dic or /usr/share/stardict/dic
 ** immersive-translate
 immersive-translate: Immersive Bilingual Translation
 #+begin_src elisp
@@ -3082,7 +2859,6 @@ immersive-translate: Immersive Bilingual Translation
   (pdf-loader-install)
   )
 ;; (add-hook 'pdf-view-mode-hook (lambda() (linum-mode -1))))
-
 (setq TeX-view-program-selection '((output-pdf "PDF Tools"))
       TeX-view-program-list '(("PDF Tools" TeX-pdf-tools-sync-view))
       TeX-source-correlate-start-server t)
@@ -3145,78 +2921,7 @@ Simple distraction-free editing. I use darkroom instead of writeroom because it'
 (setup markdown-mode
   (:file-match "\\.md\\'"))
 #+end_src
-** markdown-xwidget
-#+begin_src elisp :tangle no
-(setup mustache)
-(setup ht)
-(setup markdown-xwidget)
-#+end_src
 * tools
-** xwidget and browser
-#+begin_src elisp
-(defun lewis/url-browser-new-buffer(url &optional new-session)
-  (interactive (progn
-                 (require 'browse-url)
-                 (browse-url-interactive-arg "xwidget-webkit URL: ")))
-  (xwidget-webkit-browse-url url t))
-
-;; now use eww
-;; (setq browse-url-browser-function 'lewis/url-browser-new-buffer)
-;; (setq browse-url-browser-function 'eww-browse-url)
-#+end_src
-** eaf
-#+begin_src elisp :tangle no
-(setup eaf
-  (add-to-list 'load-path "~/.emacs.d/lib/eaf")
-  (setq eaf-browser-enable-autofill t
-        eaf-webengine-font-family lewis-variable-font
-        eaf-webengine-serif-font-family lewis-variable-font
-        eaf-webengine-fixed-font-family lewis-fixed-font
-        eaf-config-location (concat no-littering-var-directory "eaf/")
-        ;; proxy
-        eaf-proxy-type "http"
-        eaf-proxy-host "127.0.0.1"
-        eaf-proxy-port "7890"
-        )
-  (if (eq system-type 'darwin)
-      (setq eaf-python-command "~/.pyenv/shims/python3"))
-  ;; (if (eq system-type 'gnu/linux)
-  ;; (require 'eaf)
-  ;; )
-  )
-
-(setup eaf-browser
-  (:autoload eaf-open-browser)
-  )
-(setup eaf-pdf-viewer
-  (setq eaf-pdf-scroll-ratio 0.1)
-  (:autoload eaf-open-pdf-from-history))
-(setup eaf-rss-reader
-  (:autoload eaf-open-rss-reader))
-(setup eaf-map
-  (:autoload eaf-open-map))
-(setup eaf-markdown-previewer)
-(setup eaf-markmap)
-
-(setup eaf-interleave
-  (setq eaf-interleave-org-notes-dir-list (list (concat nowis-doc-emacs-dir "01-orgmode/") ".")
-        eaf-interleave-disable-narrowing t
-        eaf-interleave-split-lines 20
-        eaf-find-alternate-file-in-dired t
-        )
-  (:bind "M-."  'eaf-interleave-sync-current-note
-         "M-p"  'eaf-interleave-sync-previous-note
-         "M-n"  'eaf-interleave-sync-next-note)
-  (:with-map eaf-interleave-app-mode-map
-    (:bind
-     "C-c M-i"  'eaf-interleave-add-note
-     "C-c M-o"  'eaf-interleave-open-notes-file
-     "C-c M-q"  'eaf-interleave-quit))
-  (add-hook 'eaf-pdf-viewer-hook 'eaf-interleave-app-mode)
-  (add-hook 'eaf-browser-hook 'eaf-interleave-app-mode)
-  ;; (add-hook 'org-mode-hook 'eaf-interleave-mode)
-  )
-#+end_src
 ** holo-layer
 #+begin_src elisp :tangle no
 (setup holo-layer
@@ -3230,15 +2935,10 @@ Simple distraction-free editing. I use darkroom instead of writeroom because it'
           holo-layer-enable-type-animation t
           holo-layer-type-animation-style "flame"
           holo-layer-python-command "~/.pyenv/shims/python3"
-          n
           )
     (holo-layer-enable)
     )
   )
-#+end_src
-** app-launcher
-#+begin_src elisp
-(setup app-launcher)
 #+end_src
 ** ai related
 *** gptel
@@ -3370,11 +3070,6 @@ If `DEVICE-NAME' is provided, it will be used instead of prompting the user."
 #+begin_src elisp
 (setup webjump
   (setq webjump-sites '(
-                        ;; Emacs.
-                        ;; ("Emacs Home Page" .
-                        ;;  "www.gnu.org/software/emacs/emacs.html")
-
-                        ;; Internet search engines.
                         ("Google" .
                          [simple-query "www.google.com"
                                        "www.google.com/search?q=" ""])
@@ -3394,7 +3089,6 @@ If `DEVICE-NAME' is provided, it will be used instead of prompting the user."
                          [simple-query "book.ucdrs.superlib.net"
                                        "http://book.ucdrs.superlib.net/search?sw=" "&allsw=%23%2Call&bCon=&ecode=utf-8&channel=search&Field=all"])
                         )))
-
 #+end_src
 ** backup scripts
 #+begin_src elisp
@@ -3459,6 +3153,9 @@ Edit text area on Chrome with Emacs using Atomic Chrome
   (setq atomic-chrome-url-major-mode-alist
         '(("leetcode.cn" . c++-ts-mode)
           ("redmine" . textile-mode)))
+  (setq atomic-chrome-create-file-strategy '((temp-file-ddirectory))
+        atomic-chrome-buffer-open-style 'frame
+        atomic-chrome-auto-remove-file t)
   (:defer
    (atomic-chrome-start-server))
   )
@@ -3485,41 +3182,3 @@ this can avoid errors of native compilation of init.el
 (require 'init-config)
 (setq gc-cons-threshold 800000)
 #+end_src
-* quick-edit and minimal-file
-These 2 files are tangled using noweb and will be used for special purpose.
-
-1. =init-quick-edit.el= will be used to open a file, edit it and close it quickly.
-2. =init-mininal.el= is a file to start from scratch in which case you don't want the full-blown configurations.
-** init-quick-edit
-use the following commands in shell:
-#+begin_src bash
-emacs -Q --daemon -l ~/.emacs.d/init-quick-edit.el
-emacsclient -t -r
-#+end_src
-
-#+begin_src elisp :noweb yes :tangle init-quick-edit.el
-<<ui-speed-up>>
-<<basic-modes>>
-<<load-path>>
-<<setup>>
-<<gcmh>>
-<<meow>>
-<<transient>>
-<<meow-leader-keys>>
-<<which-key>>
-<<font>>
-<<line-number>>
-<<simple>>
-<<general-builtin-modes>>
-<<exec-path-from-shell>>
-<<vundo>>
-<<vertico>>
-<<orderless>>
-<<consult>>
-<<winner-mode>>
-<<ibuffer>>
-;; <<tab-bar>>
-;; <<tabspaces>>
-<<eshell>>
-#+end_src
-** init-minimal
