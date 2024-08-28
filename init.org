@@ -133,6 +133,7 @@ I failed in love with denote, so previous *org-roam* configs were refiled into [
   - [[#server][server]]
   - [[#atomic-chrome][atomic-chrome]]
   - [[#macos-ocr][macos-ocr]]
+  - [[#esup][esup]]
 - [[#use-single-file-to-load-configs][use single file to load configs]]
   - [[#provide][provide]]
   - [[#load-init-configel][load init-config.el]]
@@ -142,7 +143,8 @@ I failed in love with denote, so previous *org-roam* configs were refiled into [
 #+NAME: ui-speed-up
 #+begin_src elisp :tangle ~/.emacs.d/early-init.el
 ;; -*- lexical-binding: t; -*-
-(setq gc-cons-threshold 80000000
+;; set gc according to EmacsConf 2023
+(setq gc-cons-threshold 8000000
       gc-cons-percentage 0.2)
 ;; Package initialize occurs automatically, before `user-init-file' is
 ;; loaded, but after `early-init-file'. We handle package
@@ -934,7 +936,9 @@ Minimal mode line configuration for Emacs, inspired by doom-modeline
 (setup mood-line
   (require 'mood-line)
   (setq mood-line-glyph-alist mood-line-glyphs-fira-code)
-  (mood-line-mode))
+  (setq mood-line-format mood-line-format-default-extended)
+  ;; (mood-line-mode)
+  )
 #+end_src
 ** mini-echo
 #+begin_src elisp
@@ -942,13 +946,19 @@ Minimal mode line configuration for Emacs, inspired by doom-modeline
 (setup mini-echo
   ;; set default segments of long/short style
   (setq mini-echo-default-segments
-        '(:long ("major-mode" "buffer-name" "vcs" "buffer-position"
-                 "buffer-size" "flymake" "process" "selection-info"
-                 "narrow" "macro" "profiler" "meow")
-                :short ("buffer-name-short" "buffer-position" "process"
-                        "profiler" "selection-info" "narrow" "macro" "meow" )))
+        '(:long
+          ("major-mode" "vcs" "flymake" "process"
+           "selection-info" "narrow"  "profiler" "repeat" "eglot" "buffer-size" "buffer-position" "shrink-path"  "meow" "macro" "org-clock")
+          :short
+          ("major-mode" "vcs" "buffer-size" "buffer-position" "shrink-path"  "meow" "macro")))
   (setq mini-echo-separator "  ")
   ;; (setq window-divider-default-places t)
+  (setq mini-echo-window-divider-args '(t 2 2))
+  (mini-echo-define-segment "org-clock"
+   "Return org-clock."
+   :fetch (when (featurep 'org-clock) (when (org-clocking-p) (org-clock-get-clock-string)))
+   )
+  (mini-echo-mode)
   )
 #+end_src
 ** hl-todo
@@ -1631,7 +1641,6 @@ the buffer works like a pager."
       (when (window-configuration-p local-ediff-saved-window-conf)
         (set-window-configuration local-ediff-saved-window-conf)))
     ))
-
 #+end_src
 * Program
 ** Language
@@ -1895,7 +1904,7 @@ borrowed from citre, now you can always jump-back use "M-," after any jump in th
 
 (setq read-process-output-max (* 1024 1024))
 (setup eglot
-  (setq eglot-events-buffer-config'(:size 1000 :format full)
+  (setq eglot-events-buffer-config'(:size 10000 :format full)
         eglot-workspace-configuration '((:python.analysis :useLibraryCodeForTypes t))
         )
   (:autoload eglot-find-implementation)
@@ -1964,8 +1973,10 @@ Improve the performance of eglot using a wrapper executable, you should install 
 #+begin_src elisp
 (setup eglot-booster
   (when (executable-find "emacs-lsp-booster")
-    (eglot-booster-mode)
-    ))
+    (:load-after eglot)
+    (:when-loaded
+      (eglot-booster-mode)
+      )))
 #+end_src
 **** citre
 Citre is an advanced Ctags (or actually, readtags) frontend for Emacs.
@@ -3169,6 +3180,11 @@ Edit text area on Chrome with Emacs using Atomic Chrome
   )
 (keymap-global-set "C-c M-o" #'my/siri-ocr)
 #+end_src
+** esup
+ESUP - Emacs Start Up Profiler
+#+begin_src elisp
+(setup esup)
+#+end_src
 * use single file to load configs
 this can avoid errors of native compilation of init.el
 ** provide
@@ -3180,5 +3196,4 @@ this can avoid errors of native compilation of init.el
 ;; -*- lexical-binding: t; -*-
 (add-to-list 'load-path (expand-file-name "modules/" user-emacs-directory))
 (require 'init-config)
-(setq gc-cons-threshold 800000)
 #+end_src

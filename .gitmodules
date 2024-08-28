@@ -119,6 +119,9 @@
 [submodule "emms"]
 	path = lib/emms
 	url = https://github.com/emacsmirror/emms.git
+[submodule "esup"]
+	path = lib/esup
+	url = https://github.com/jschaf/esup.git
 [submodule "esxml"]
 	path = lib/esxml
 	url = https://github.com/tali713/esxml.git
