@@ -19,9 +19,6 @@
 [submodule "borg"]
 	path = lib/borg
 	url = https://github.com/emacscollective/borg.git
-[submodule "burly"]
-	path = lib/burly
-	url = https://github.com/alphapapa/burly.el.git
 [submodule "cape"]
 	path = lib/cape
 	url = https://github.com/minad/cape.git

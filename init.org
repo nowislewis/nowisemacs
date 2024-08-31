@@ -10,7 +10,6 @@ I failed in love with denote, so previous *org-roam* configs were refiled into [
   - [[#set-vars][set vars]]
 - [[#package-management][Package Management]]
   - [[#setup][setup]]
-  - [[#epkg][epkg]]
 - [[#keyboard-bindings][Keyboard Bindings]]
   - [[#meow][meow]]
   - [[#transient-and-related-leader-map][transient and related leader-map]]
@@ -64,7 +63,6 @@ I failed in love with denote, so previous *org-roam* configs were refiled into [
 - [[#window-management][Window Management]]
   - [[#winner-mode][winner-mode]]
   - [[#popper][popper]]
-  - [[#burly][burly]]
   - [[#move][Move]]
 - [[#ibuffer][ibuffer]]
   - [[#ibuffer-1][ibuffer]]
@@ -106,7 +104,6 @@ I failed in love with denote, so previous *org-roam* configs were refiled into [
   - [[#org-transclusion][org-transclusion]]
   - [[#agendagtd][agenda/gtd]]
   - [[#org-agenda-property][org-agenda-property]]
-  - [[#org-ql][org-ql]]
   - [[#mpvi][mpvi]]
   - [[#org-fc][org-fc]]
   - [[#shrface][shrface]]
@@ -165,9 +162,8 @@ I failed in love with denote, so previous *org-roam* configs were refiled into [
 ;; (push '(undecorated . t) default-frame-alist)
 (setq initial-major-mode 'fundamental-mode ;; 默认用最简单的模式
       package--init-file-ensured t
-      inhibit-startup-message t             ; 关闭启动 Emacs 时的欢迎界面
+      inhibit-startup-message t  ; 关闭启动 Emacs 时的欢迎界面
       )
-
 ;; speed font
 ;; (add-to-list 'default-frame-alist '(font . "Maple Mono SC NF"))
 
@@ -283,7 +279,6 @@ emacs
 #+NAME: setup
 #+begin_src elisp
 (require 'setup)
-
 (setup-define :defer
   (lambda (features)
     `(run-with-idle-timer 2 nil
@@ -291,7 +286,6 @@ emacs
                             ,features)))
   :documentation "Delay loading the feature until a certain amount of idle time has passed."
   :repeatable t)
-
 (setup-define :load-after
   (lambda (features &rest body)
     (let ((body `(progn
@@ -304,13 +298,6 @@ emacs
       body))
   :documentation "Load the current feature after FEATURES."
   :indent 1)
-
-(setup-define :if-system
-  (lambda (systemtype)
-    `(unless (eq system-type ,systemtype)
-       ,(setup-quit)))
-  :documentation "If SYSTEMTYPE is not the current systemtype, stop evaluating form.")
-
 (setup-define :autoload
   (lambda (func)
     (let ((fn (if (memq (car-safe func) '(quote function))
@@ -321,27 +308,6 @@ emacs
   :documentation "Autoload COMMAND if not already bound."
   :repeatable t
   :signature '(FUNC ...))
-
-(setup-define :mtime
-  (lambda ()
-    (defvar start-time (current-time))
-    (let ((feature-string (symbol-name (setup-get 'feature)))
-          (load-time `(float-time (time-subtract (current-time) start-time))))
-      `(progn
-         (message (format (concat ,feature-string ":%f") ,load-time))
-         (setq start-time (current-time))
-         )))
-  :documentation "Measures the time from the end of the previous feature to the end of the current feature")
-#+end_src
-** epkg
-I use borg to manage packages, so setup.el is only used to config packages quickly. There is no  need for epkg anymore.
-#+begin_src elisp
-(setup compat)
-;; (setup emacsql)
-;; (setup closql)
-;; (when (>= emacs-major-version 29)
-;;   (setq epkg-database-connector 'sqlite-builtin))
-;; (setup epkg)
 #+end_src
 * Keyboard Bindings
 I used to be a vim(evil) user, but now I use meow to manage all my keys.
@@ -602,10 +568,7 @@ Maybe I should add a new state.
     ("j" "bookmark-jump" bookmark-jump)
     ("m" "bookmark-set" bookmark-set)
     ("M" "bookmark-delete" bookmark-delete)]
-   ["Burly"
-    ("w" "burly-bookmark-windows" burly-bookmark-windows)
-    ("o" "burly-open-bookmark" burly-open-bookmark)
-    ]]
+   ]
   )
 #+end_src
 *** notes
@@ -614,7 +577,6 @@ Maybe I should add a new state.
   "Define leader-key map for notes functions"
   [["Roam"
     ("r f" "denote-open-or-create" denote-open-or-create)
-    ("r p" "find-papers" project-find-papers-dir-files)
     ("r s" "find-all-searchable" project-find-searchable-dir-files)
     ;; ("rc" "consult-notes" consult-notes)
     ("r g" "project-find-gtd-dir-files" project-find-gtd-dir-files)
@@ -634,7 +596,6 @@ Maybe I should add a new state.
     ("f" "org-fc" org-fc-transient-load-map)]
    ["org-mind-map"
     ("m" "org-mind-map-dwim" org-mind-map-dwim)
-    ("M" "org-mind-map" org-mind-map-choose-type-dwim)
     ("w" "org-mind-wbs-open" plantuml-org-to-wbs-open)
     ("p" "org-mind-plantuml" plantuml-org-to-mindmap)
     ("P" "org-mind-plantuml-open" plantuml-org-to-mindmap-open)
@@ -690,7 +651,6 @@ Maybe I should add a new state.
      ]
     ])
 #+end_src
-
 *** ui
 #+begin_src elisp
 (transient-define-prefix toggle-leader-map()
@@ -698,7 +658,6 @@ Maybe I should add a new state.
   [("v" "toggle-variable-pitch" variable-pitch-mode)
    ("d" "toggle-darkroom" darkroom-mode)
     ])
-
 #+end_src
 ** meow leader keybindings
 #+name: meow-leader-keys
@@ -1201,9 +1160,6 @@ Minimal mode line configuration for Emacs, inspired by doom-modeline
 ** Marginalia
 #+begin_src elisp
 (setup marginalia
-  ;; (setq marginalia-annotators '(marginalia-annotators-heavy
-  ;;                               marginalia-annotators-light
-  ;;                               nil))
   (:hook-into after-init))
 #+end_src
 ** embark
@@ -1260,10 +1216,6 @@ Popper is a minor-mode to tame the flood of ephemeral windows Emacs produces, wh
                                    compilation-mode
                                    youdao-dictionary-mode)
         popper-window-height 0.33
-        ;; popper-window-height  (lambda (win)
-        ;;                         (fit-window-to-buffer
-        ;;                          win
-        ;;                          (floor (frame-height) 2)))
         )
   (:global "M-`" popper-toggle ;; shadown tmm-menubar
            "M-~" popper-cycle
@@ -1271,13 +1223,6 @@ Popper is a minor-mode to tame the flood of ephemeral windows Emacs produces, wh
            )
   (popper-mode +1)
   (popper-echo-mode +1))
-#+end_src
-** burly
-#+begin_src elisp
-(setup burly
-  (:defer
-   (burly-tabs-mode)
-   ))
 #+end_src
 ** Move
 *** avy
@@ -1328,28 +1273,6 @@ Jump anywhere in the world
 (setq aw-keys '(?a ?s ?d ?f ?g ?h ?j ?k ?l)
       aw-scope 'frame
       )
-#+end_src
-*** hide-cursor-mode
-#+begin_src elisp
-(defvar-local hide-cursor--original nil)
-
-(define-minor-mode hide-cursor-mode
-  "Hide or show the cursor.
-
-When the cursor is hidden `scroll-lock-mode' is enabled, so that
-the buffer works like a pager."
-  :global nil
-  :lighter "H"
-  (if hide-cursor-mode
-      (progn
-        (scroll-lock-mode 1)
-        (setq-local hide-cursor--original
-                    cursor-type)
-        (setq-local cursor-type nil))
-    (scroll-lock-mode -1)
-    (setq-local cursor-type (or hide-cursor--original
-                                t))))
-(define-key global-map (kbd "<f7>") 'hide-cursor-mode)
 #+end_src
 * ibuffer
 ** ibuffer
@@ -1598,8 +1521,6 @@ the buffer works like a pager."
                    (display-buffer-reuse-window display-buffer-at-bottom)
                    (reusable-frames . visible)
                    (window-height . 0.3)))
-
-
     )
   (defun eat-toggle-window()
     "Toggle eshell buffer."
@@ -1614,8 +1535,7 @@ the buffer works like a pager."
       (eat)
       (eat--send-string "*eat*"
                         (concat "cd " (file-name-directory (buffer-file-name))))
-      )
-  )
+      ))
 #+end_src
 * git
 ** magit
@@ -1633,10 +1553,8 @@ the buffer works like a pager."
   (add-hook 'ediff-quit-hook #'ediff-restore-window-conf)
   (:when-loaded
     (defvar local-ediff-saved-window-conf nil)
-
     (defun ediff-save-window-conf ()
       (setq local-ediff-saved-window-conf (current-window-configuration)))
-
     (defun ediff-restore-window-conf ()
       (when (window-configuration-p local-ediff-saved-window-conf)
         (set-window-configuration local-ediff-saved-window-conf)))
@@ -1671,7 +1589,6 @@ the buffer works like a pager."
 *** plantuml
 This Emacs tool use plantuml to generate images for org, json, yaml files.
 #+begin_src elisp
-
 (setup plantuml
   (setq plantuml-output-type "svg"
         plantuml-relative-path "./.temp_images/"
@@ -1901,7 +1818,6 @@ borrowed from citre, now you can always jump-back use "M-," after any jump in th
 ***** eglot
 #+begin_src elisp
 (setup project)
-
 (setq read-process-output-max (* 1024 1024))
 (setup eglot
   (setq eglot-events-buffer-config'(:size 10000 :format full)
@@ -1922,7 +1838,6 @@ borrowed from citre, now you can always jump-back use "M-," after any jump in th
     (set-face-attribute 'eglot-highlight-symbol-face nil :inherit 'new-hi-green)
     )
   )
-
 (setup eldoc
   (setq eldoc-echo-area-use-multiline-p nil
         eldoc-echo-area-display-truncation-message t))
@@ -2238,13 +2153,9 @@ Disassemble C, C++ or Fortran code under cursor
 (setup org-modern
   (setq org-modern-star 'replace
         org-modern-replace-stars '("Ⓐ" "Ⓑ" "Ⓒ" "Ⓓ" "Ⓔ" "Ⓕ" "Ⓖ" "Ⓗ" "Ⓘ" "Ⓙ" "Ⓚ" "Ⓛ" "Ⓜ")
-        org-modern-table t
-
-        )
+        org-modern-table t)
   (:hook-into org-mode)
-  (add-hook 'org-agenda-finalize-hook #'org-modern-agenda)
-  (:when-loaded
-    ))
+  (add-hook 'org-agenda-finalize-hook #'org-modern-agenda))
 #+end_src
 *** org-appear
 #+begin_src elisp
@@ -2348,8 +2259,7 @@ Disassemble C, C++ or Fortran code under cursor
            ebib-use-timestamp t
            ebib-bibtex-dialect 'biblatex
            ebib-create-backups nil
-           )
-  )
+           ))
 #+end_src
 ** toc-org
 #+begin_src elisp
@@ -2371,14 +2281,7 @@ Disassemble C, C++ or Fortran code under cursor
         )
   ;; (add-hook 'dired-mode-hook #'denote-dired-mode-in-directories)
   (setq denote-templates
-        `((default . ,(concat "* Action\n"
-                           "** What will change\n"
-                           "** How to get this\n\n"
-                           "* Ideas\n"
-                           "** Why got this\n"
-                           "** What I think\n\n"
-                           "* Sealed"))
-        (action . ,(concat "* Destination\n\n"
+        `((action . ,(concat "* Destination\n\n"
                            "* Roadmap\n\n"
                            "* Action\n\n"
                            "* Warnings\n\n"
@@ -2390,7 +2293,6 @@ Disassemble C, C++ or Fortran code under cursor
 Borrowed from https://github.com/protesilaos/denote/issues/115
 #+begin_src elisp
 (setq find-dired-refine-function nil)  ;; This needs to be set globally, find-dired works asynchronously.
-
 (defun my/zettel-signature-topics()
   (interactive)
   (if (not (featurep 'find-dired))
@@ -2412,10 +2314,6 @@ Borrowed from https://github.com/protesilaos/denote/issues/115
 #+end_src
 ** find orgmode dir files
 #+begin_src elisp
-(defun project-find-papers-dir-files ()
-  (interactive)
-  (dired (concat nowis-doc-emacs-dir "02-binary-files/02-searchable/01-papers-markable"))
-  (project-find-file t))
 (defun project-find-searchable-dir-files ()
   (interactive)
   (dired (concat nowis-doc-emacs-dir "02-binary-files/02-searchable"))
@@ -2461,24 +2359,10 @@ Org-Babel support for evaluating d2 diagram scripting language.
 (setup autoinsert
   (:defer
    (auto-insert-mode t))
-
    ;; Get default JSON template used for new excalidraw files.
   (define-auto-insert "\\.excalidraw\\'"
     (lambda ()
-      (insert
-       "{
-    \"type\": \"excalidraw\",
-    \"version\": 2,
-    \"source\": \"https://excalidraw.com\",
-    \"elements\": [],
-    \"appState\": {
-      \"gridSize\": null,
-      \"viewBackgroundColor\": \"#ffffff\"
-    },
-    \"files\": {}
-}
-"
-       )))
+      (insert org-excalidraw--default-base)))
   )
 #+end_src
 ** clue
@@ -2542,11 +2426,6 @@ My useage for =action.org=:
 ;; (add-hook 'org-capture-mode-hook 'delete-other-windows)
 
 ;; Key bindings
-
-;; Only if you use mu4e
-;; (require 'mu4e)
-;; (define-key mu4e-headers-mode-map (kbd "C-c i") 'org-capture-mail)
-;; (define-key mu4e-view-mode-map    (kbd "C-c i") 'org-capture-mail)
 
 ;; Refile
 (setq org-refile-use-outline-path 'file)
@@ -2632,21 +2511,6 @@ See also `org-save-all-org-buffers'"
   (setq org-agenda-property-position 'where-it-fits)
   )
 #+end_src
-** org-ql
-#+begin_src elisp :tangle no
-(setup ts)
-(setup ht)
-(setup org-super-agenda)
-(setup ov)
-(setup org-ql
-  (defun lewis/find-read-articles()
-          (interactive)
-          (org-ql-search (directory-files-recursively org-directory (rx ".org"))
-            '(and (property "zotero") (not (property "ANKI_NOTE_ID"))))
-
-          )
-  )
-#+end_src
 ** mpvi
 Integrate Org with Video
 #+begin_src elisp
@@ -2666,6 +2530,8 @@ Spaced Repetition System for Emacs org-mode
   (:with-map org-fc-review-rate-mode-map
     (:bind "RET" org-fc-review-rate-good
            ))
+  (:with-map org-fc-dashboard-mode-map
+             (:bind "c" org-fc-clarify-continue-reading))
   (:when-loaded
     (set-face-attribute 'org-fc-type-cloze-hole-face nil :box t)
 
@@ -2678,12 +2544,10 @@ Spaced Repetition System for Emacs org-mode
       "Generate an `org-mode' timestamp shanghai INTERVAL days from now."
       (let ((seconds (* interval 60 60 24))
             (now (time-to-seconds)))
-
         (format-time-string
          "%FT%TZ"
          (seconds-to-time  (time-to-seconds)  )
          "Asia/Shanghai")))
-
     )
   ;; +-----------------+
   ;; | load and keymap |
@@ -2701,7 +2565,7 @@ Spaced Repetition System for Emacs org-mode
       ("f" "find dashboard" org-fc-dashboard)
       ("r" "review-all" org-fc-review-all)
       ("R" "resume" org-fc-review-resume)
-      ("b" "review-buffer-hierachy" org-fc-review-buffer-hierarchy)
+      ("s" "suspend clarify" org-fc-clarify-continue-reading)
       ]
      ["init"
       ("c" "cloze" org-fc-type-cloze-init)
@@ -2713,20 +2577,12 @@ Spaced Repetition System for Emacs org-mode
     (if (not (featurep 'org-fc))
         (require 'org-fc))
     (org-fc-transient-map))
-
   ;; +---------------------+
   ;; | review and fontlock |
   ;; +---------------------+
-  (defun org-fc-review-buffer-hierarchy()
-    "org-fc review current buffer with hierachy"
-    (interactive)
-    (progn
-      (setq-local org-fc-shuffle-positions nil)
-      (org-fc-review-buffer)))
-
   (defface my-org-fc-cloze-face
-  '((t (:weight bold :box t)))
-  "A custom face with bold weight and a box.")
+    '((t (:weight bold :box t)))
+    "A custom face with bold weight and a box.")
 
   ;; font lock for cloze
   (defun org-fc-cloze-in-org-font-lock ()
@@ -2737,6 +2593,29 @@ Spaced Repetition System for Emacs org-mode
         ))))
 
   (add-hook 'org-mode-hook #'org-fc-cloze-in-org-font-lock)
+
+  (defun org-fc-clarify-continue-reading ()
+    "By determining whether all the cards in the file containing the article have been reviewed, decide whether this article can continue to be read."
+    (interactive)
+    (dolist (card (org-fc-index '(:filter (and (tag "suspended") (and (tag "article"))))))
+      (let ((file_path (oref (oref card file) path))
+            (should-review t))
+        (dolist (file-card (org-fc-index `(:paths ,file_path :filter (not (tag "suspended")))))
+          (if (< (plist-get (oref (car (oref file-card positions)) data) :interval)  1)
+              (setq should-review nil)))
+        (print should-review)
+        (if should-review
+            (save-window-excursion
+              (save-excursion
+                (message "unsuspending card: %s" (oref card title))
+                (org-id-goto (oref card id))
+                (let ((current-tags (org-get-tags)))
+                  (org-set-tags '())
+                  (org-set-tags '("fc" "article"))
+                  (save-buffer)
+                  ))))))
+    (org-fc-review-all)
+    )
   )
 #+end_src
 ** shrface
@@ -2783,32 +2662,6 @@ This is an Emacs package that creates graphviz directed graphs from the headings
   (org-mind-map-write-current-tree)
   (kill-local-variable 'org-mind-map-dot-output)
   )
-(defun org-mind-map-choose-type-dwim()
-  "Write current tree, load ox-org if unload"
-  (interactive)
-  (unless (featurep 'ox-org) (require 'ox-org))
-  (org-mind-map-write-current-tree))
-
-(defvar save-mind-map-minor-mode nil
-  "A flag indicating whether the minor mode is enabled or not.")
-
-(defun org-mind-map-print()
-  "Write current tree, load ox-org if unload"
-  (unless (featurep 'ox-org) (require 'ox-org))
-  (make-local-variable 'org-mind-map-dot-output)
-  (setq org-mind-map-dot-output '("pdf"))
-  (org-mind-map-write-current-tree)
-  (kill-local-variable 'org-mind-map-dot-output)
-  )
-
-(define-minor-mode save-mind-map-minor-mode
-  "Toggle save org mind map minor mode."
-  :init-value nil
-  :lighter " MindMap"
-  :global nil
-  (if save-mind-map-minor-mode
-      (add-hook 'after-save-hook #'org-mind-map-print t t)
-    (remove-hook 'after-save-hook #'org-mind-map-print t)))
 #+end_src
 * english 翻译
 ** go-translate
@@ -2838,7 +2691,6 @@ Powerful translator on Emacs. Supports multiple translation engines such as Goog
                  :taker (gt-taker :langs '(en zh) :text 'word)
                  :engines (gt-stardict-engine)
                  :render (gt-buffer-render))))
-
     ))
 #+end_src
 If you want to use *sdcv* for offline translate, then download dictionary data to ~/.stardict/dic or /usr/share/stardict/dic
@@ -3016,16 +2868,7 @@ function to produce the command for the inference engine of your choice."
           "--file" ,input-file)))
 
     (defun rk/get-ffmpeg-device ()
-      "Gets the list of devices available to ffmpeg.
-The output of the ffmpeg command is pretty messy, e.g.
-  [AVFoundation indev @ 0x7f867f004580] AVFoundation video devices:
-  [AVFoundation indev @ 0x7f867f004580] [0] FaceTime HD Camera (Built-in)
-  [AVFoundation indev @ 0x7f867f004580] AVFoundation audio devices:
-  [AVFoundation indev @ 0x7f867f004580] [0] Cam Link 4K
-  [AVFoundation indev @ 0x7f867f004580] [1] MacBook Pro Microphone
-so we need to parse it to get the list of devices.
-The return value contains two lists, one for video devices and one for audio devices.
-Each list contains a list of cons cells, where the car is the device number and the cdr is the device name."
+      "Gets the list of devices available to ffmpeg."
       (unless (string-equal system-type "darwin")
         (error "This function is currently only supported on macOS"))
 
@@ -3119,18 +2962,11 @@ If `DEVICE-NAME' is provided, it will be used instead of prompting the user."
   (async-shell-command " rsync -avbih --exclude '.git' --exclude '.svn' --delete\
  lewis-nas@192.168.31.108:/share/my_webdav/rsync/02-binary-files/ ~/Documents/emacs/02-binary-files/"))
 
-(defun backup-sync-tmp-doc()
-  (interactive)
-  (async-shell-command "
-rsync -avihu lewis-nas@192.168.31.108:/share/my_webdav/rsync/tmp/ ~/Downloads/tmp/ \
-    && rsync -avih --delete ~/Downloads/tmp/ lewis-nas@192.168.31.108:/share/my_webdav/rsync/tmp/ "))
-
 (transient-define-prefix backup-leader-map()
   "Define leader-key map for backup functions"
   [["rsync"
     ("p" "push doc" rsync-push-binary-files)
-    ("F" "pull doc" rsync-pull-binary-files)
-    ("t" "sync tmp dir" backup-sync-tmp-doc)]])
+    ("F" "pull doc" rsync-pull-binary-files)]])
 #+end_src
 ** video and music
 *** emms
@@ -3153,8 +2989,7 @@ rsync -avihu lewis-nas@192.168.31.108:/share/my_webdav/rsync/tmp/ ~/Downloads/tm
      (require 'server)
      (unless (server-running-p)
        (server-start)))
-   )
-  )
+   ))
 #+end_src
 ** atomic-chrome
 Edit text area on Chrome with Emacs using Atomic Chrome
