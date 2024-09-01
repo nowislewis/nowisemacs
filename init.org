@@ -804,7 +804,7 @@ Maybe I should add a new state.
     (if lewis-fixed-font
         (progn
           (set-face-attribute 'default nil :family lewis-fixed-font :height lewis-font-size)
-          (set-face-attribute 'fixed-pitch nil :family lewis-fixed-font :height 1.0)
+          ;; (set-face-attribute 'fixed-pitch nil :family lewis-fixed-font :height 1.0)
           ))
 
     ;; variable-pitch
@@ -2182,6 +2182,7 @@ Disassemble C, C++ or Fortran code under cursor
 ** weblorg
 #+begin_src elisp
 (setup templatel)
+(setup htmlize)
 (setup weblorg)
 #+end_src
 ** org-noter
@@ -2282,11 +2283,10 @@ Disassemble C, C++ or Fortran code under cursor
   ;; (add-hook 'dired-mode-hook #'denote-dired-mode-in-directories)
   (setq denote-templates
         `((action . ,(concat "* Destination\n\n"
-                           "* Roadmap\n\n"
-                           "* Action\n\n"
-                           "* Warnings\n\n"
-                           "* Links\n\n"))))
-  ;; should add a hook for disable diredfl-mode
+                             "* Roadmap\n\n"
+                             "* Action\n\n"
+                             "* Warnings\n\n"
+                             "* Links\n\n"))))
   )
 #+end_src
 *** denote-lumn
@@ -2531,9 +2531,9 @@ Spaced Repetition System for Emacs org-mode
     (:bind "RET" org-fc-review-rate-good
            ))
   (:with-map org-fc-dashboard-mode-map
-             (:bind "c" org-fc-clarify-continue-reading))
+    (:bind "r" org-fc-clarify-continue-reading))
   (:when-loaded
-    (set-face-attribute 'org-fc-type-cloze-hole-face nil :box t)
+    (set-face-attribute 'org-fc-type-cloze-hole-face nil :box t :foreground "pale violet red")
 
     (require 'org-fc-keymap-hint)
     (add-hook 'org-fc-review-flip-mode-hook 'meow-motion-mode)
@@ -2563,9 +2563,9 @@ Spaced Repetition System for Emacs org-mode
     [
      ["update"
       ("f" "find dashboard" org-fc-dashboard)
-      ("r" "review-all" org-fc-review-all)
-      ("R" "resume" org-fc-review-resume)
-      ("s" "suspend clarify" org-fc-clarify-continue-reading)
+      ("r" "review-with-clarify" org-fc-clarify-continue-reading)
+      ("R" "review" org-fc-review)
+      ("s" "suspend card" org-fc-suspend-card)
       ]
      ["init"
       ("c" "cloze" org-fc-type-cloze-init)
@@ -2581,14 +2581,14 @@ Spaced Repetition System for Emacs org-mode
   ;; | review and fontlock |
   ;; +---------------------+
   (defface my-org-fc-cloze-face
-    '((t (:weight bold :box t)))
+    '((t (:weight bold :box t :foreground "pale violet red")))
     "A custom face with bold weight and a box.")
 
   ;; font lock for cloze
   (defun org-fc-cloze-in-org-font-lock ()
     (font-lock-add-keywords
      nil
-     '(("{{\\([^}]+\\)}@[0-9]}"
+     '(("{{\\([^}]+\\)}@[0-9]+}"
         (1 'my-org-fc-cloze-face t)
         ))))
 
@@ -2605,15 +2605,20 @@ Spaced Repetition System for Emacs org-mode
               (setq should-review nil)))
         (print should-review)
         (if should-review
-            (save-window-excursion
-              (save-excursion
-                (message "unsuspending card: %s" (oref card title))
-                (org-id-goto (oref card id))
-                (let ((current-tags (org-get-tags)))
-                  (org-set-tags '())
-                  (org-set-tags '("fc" "article"))
-                  (save-buffer)
-                  ))))))
+            (progn
+              ;; (with-current-buffer (get-buffer-create "*Output*")
+              ;;   (erase-buffer)
+              ;;   (insert "hello world")
+              ;;   (display-buffer (current-buffer)))
+              (save-window-excursion
+                (save-excursion
+                  (message "unsuspending card: %s" (oref card title))
+                  (org-id-goto (oref card id))
+                  (let ((current-tags (org-get-tags)))
+                    (org-set-tags '())
+                    (org-set-tags '("fc" "article"))
+                    (save-buffer)
+                    )))))))
     (org-fc-review-all)
     )
   )
