@@ -77,6 +77,9 @@
 [submodule "dired-hacks"]
 	path = lib/dired-hacks
 	url = https://github.com/Fuco1/dired-hacks.git
+[submodule "dired-preview"]
+	path = lib/dired-preview
+	url = https://github.com/protesilaos/dired-preview.git
 [submodule "dired-sidebar"]
 	path = lib/dired-sidebar
 	url = https://github.com/jojojames/dired-sidebar.git

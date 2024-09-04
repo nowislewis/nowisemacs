@@ -577,6 +577,7 @@ Maybe I should add a new state.
   "Define leader-key map for notes functions"
   [["Roam"
     ("r f" "denote-open-or-create" denote-open-or-create)
+    ("r j" "denote-journal" denote-journal-extras-new-or-existing-entry)
     ("r s" "find-all-searchable" project-find-searchable-dir-files)
     ;; ("rc" "consult-notes" consult-notes)
     ("r g" "project-find-gtd-dir-files" project-find-gtd-dir-files)
@@ -1387,6 +1388,17 @@ Jump anywhere in the world
 #+begin_src elisp
 (setup dired-sidebar)
 #+end_src
+*** dired-preview
+#+begin_src elisp
+(setup dired-preview
+  (defun my-dired-preview-to-the-right ()
+    "My preferred `dired-preview-display-action-alist-function'."
+    '((display-buffer-in-side-window)
+      (side . right)
+      (width . 0.3)))
+  (setq dired-preview-display-action-alist #'my-dired-preview-to-the-right)
+  )
+#+end_src
 ** structure browsing
 *** imenu-list
 #+begin_src elisp
@@ -1395,7 +1407,7 @@ Jump anywhere in the world
   (setq imenu-list-focus-after-activation nil
            imenu-list-auto-resize t
            imenu-list-position 'left
-           imenu-list-auto-update nil
+           imenu-list-auto-update t
            )
   )
 #+end_src
@@ -1969,6 +1981,13 @@ Disassemble C, C++ or Fortran code under cursor
 (setup compile
   (setq compile-command "cd build && make && ./test"))
 #+end_src
+*** annotate
+#+begin_src elisp
+(setup annotate
+  (setq annotate-file (concat nowis-doc-emacs-dir "annotations.el")
+        annotate-warn-if-hash-mismatch nil)
+  (:hook-into prog-mode))
+#+end_src
 * Org Mode
 ** org-mode
 #+begin_src elisp
@@ -2525,7 +2544,7 @@ Spaced Repetition System for Emacs org-mode
 (setup org-fc
   (setq org-fc-directories (list denote-directory)
         org-fc-review-history-file (concat nowis-doc-emacs-dir "org-fc-reviews.tsv")
-        ;; org-fc-shuffle-positions nil
+        org-fc-shuffle-positions nil
         )
   (:with-map org-fc-review-rate-mode-map
     (:bind "RET" org-fc-review-rate-good
