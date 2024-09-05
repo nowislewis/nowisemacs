@@ -1357,7 +1357,7 @@ Jump anywhere in the world
 (when (eq system-type 'darwin)
   (setq
    ;; rime-emacs-module-header-root "/Applications/Emacs.app/Contents/Resources/include/" ;; use build-emacs
-   rime-emacs-module-header-root "/opt/homebrew/opt/emacs-plus@30/include" ;;use emacs-plus
+   rime-emacs-module-header-root "/opt/homebrew/opt/emacs-plus@31/include" ;;use emacs-plus
    rime-librime-root "~/Downloads/librime/dist"
    ))
 #+end_src
@@ -2567,6 +2567,11 @@ Spaced Repetition System for Emacs org-mode
          "%FT%TZ"
          (seconds-to-time  (time-to-seconds)  )
          "Asia/Shanghai")))
+
+    (add-to-list 'org-fc-custom-contexts
+                 '(not-low . (:filter (not (tag "low")))))
+    (add-to-list 'org-fc-custom-contexts
+                 '(only-review . (:filter (type cloze) :order shuffled)))
     )
   ;; +-----------------+
   ;; | load and keymap |
@@ -2638,7 +2643,7 @@ Spaced Repetition System for Emacs org-mode
                     (org-set-tags '("fc" "article"))
                     (save-buffer)
                     )))))))
-    (org-fc-review-all)
+    (call-interactively 'org-fc-review)
     )
   )
 #+end_src
