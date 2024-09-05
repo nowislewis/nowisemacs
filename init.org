@@ -2376,6 +2376,7 @@ Org-Babel support for evaluating d2 diagram scripting language.
 ** auto-insert
 #+begin_src elisp
 (setup autoinsert
+  (setq auto-insert-query nil)
   (:defer
    (auto-insert-mode t))
    ;; Get default JSON template used for new excalidraw files.
@@ -2559,15 +2560,6 @@ Spaced Repetition System for Emacs org-mode
     (add-hook 'org-fc-review-edit-mode-hook 'meow-normal-mode)
     (add-hook 'org-fc-review-rate-mode-hook 'meow-motion-mode)
 
-    (defun org-fc-timestamp-in (interval)
-      "Generate an `org-mode' timestamp shanghai INTERVAL days from now."
-      (let ((seconds (* interval 60 60 24))
-            (now (time-to-seconds)))
-        (format-time-string
-         "%FT%TZ"
-         (seconds-to-time  (time-to-seconds)  )
-         "Asia/Shanghai")))
-
     (add-to-list 'org-fc-custom-contexts
                  '(not-low . (:filter (not (tag "low")))))
     (add-to-list 'org-fc-custom-contexts
@@ -2590,6 +2582,7 @@ Spaced Repetition System for Emacs org-mode
       ("r" "review-with-clarify" org-fc-clarify-continue-reading)
       ("R" "review" org-fc-review)
       ("s" "suspend card" org-fc-suspend-card)
+      ("a" "set article" org-fc-set-article)
       ]
      ["init"
       ("c" "cloze" org-fc-type-cloze-init)
@@ -2643,8 +2636,11 @@ Spaced Repetition System for Emacs org-mode
                     (org-set-tags '("fc" "article"))
                     (save-buffer)
                     )))))))
-    (call-interactively 'org-fc-review)
-    )
+    (call-interactively 'org-fc-review))
+  (defun org-fc-set-article()
+    (interactive)
+    (org-fc-type-normal-init)
+    (org-set-tags '("article" "suspended" "fc")))
   )
 #+end_src
 ** shrface
@@ -3026,10 +3022,10 @@ Edit text area on Chrome with Emacs using Atomic Chrome
 (setup websocket)
 (setup atomic-chrome
   (setq atomic-chrome-url-major-mode-alist
-        '(("leetcode.cn" . c++-ts-mode)
+        '(("leetcode.cn" . c++-mode)
           ("redmine" . textile-mode)))
-  (setq atomic-chrome-create-file-strategy '((temp-file-ddirectory))
-        atomic-chrome-buffer-open-style 'frame
+  (setq atomic-chrome-create-file-strategy '(("/tmp/" :extension ("cpp" "c" "py" )))
+        atomic-chrome-buffer-open-style 'split
         atomic-chrome-auto-remove-file t)
   (:defer
    (atomic-chrome-start-server))
