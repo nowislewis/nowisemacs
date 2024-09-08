@@ -22,6 +22,15 @@
 [submodule "cape"]
 	path = lib/cape
 	url = https://github.com/minad/cape.git
+[submodule "casual-calc"]
+	path = lib/casual-calc
+	url = https://github.com/kickingvegas/casual-calc.git
+[submodule "casual-isearch"]
+	path = lib/casual-isearch
+	url = https://github.com/kickingvegas/casual-isearch.git
+[submodule "casual-lib"]
+	path = lib/casual-lib
+	url = https://github.com/kickingvegas/casual-lib.git
 [submodule "cdlatex"]
 	path = lib/cdlatex
 	url = https://github.com/cdominik/cdlatex.git
@@ -204,9 +213,6 @@
 [submodule "mood-line"]
 	path = lib/mood-line
 	url = https://git.tty.dog/jessieh/mood-line.git
-[submodule "mpvi"]
-	path = lib/mpvi
-	url = https://github.com/lorniu/mpvi.git
 [submodule "nerd-icons"]
 	path = lib/nerd-icons
 	url = https://github.com/rainstormstudio/nerd-icons.el.git

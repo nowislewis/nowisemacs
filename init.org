@@ -16,6 +16,7 @@ I failed in love with denote, so previous *org-roam* configs were refiled into [
   - [[#meow-leader-keybindings][meow leader keybindings]]
   - [[#which-key][which-key]]
   - [[#electric][electric]]
+  - [[#casual][casual]]
 - [[#package-library][Package Library]]
   - [[#dash][dash]]
   - [[#s][s]]
@@ -104,7 +105,6 @@ I failed in love with denote, so previous *org-roam* configs were refiled into [
   - [[#org-transclusion][org-transclusion]]
   - [[#agendagtd][agenda/gtd]]
   - [[#org-agenda-property][org-agenda-property]]
-  - [[#mpvi][mpvi]]
   - [[#org-fc][org-fc]]
   - [[#shrface][shrface]]
   - [[#org-mind-map][org-mind-map]]
@@ -638,11 +638,11 @@ Maybe I should add a new state.
     ["shell"
      ("i" "toggle-insert-cd" eat-toggle-insert-dir)
      ]
-    ["mpvi"
-     ("mo" "open" mpvi-open)
-     ("ms" "seek" mpvi-seek)
-     ("mi" "insert" mpvi-insert)
-     ("ma" "emms-add" mpvi-emms-add)]
+    ;; ["mpvi"
+    ;;  ("mo" "open" mpvi-open)
+    ;;  ("ms" "seek" mpvi-seek)
+    ;;  ("mi" "insert" mpvi-insert)
+    ;;  ("ma" "emms-add" mpvi-emms-add)]
     ["others"
      ;; ("t" "org-pomodoro" org-pomodoro)
      ;; ("l" "app-launcher-run-app" app-launcher-run-app)
@@ -728,6 +728,21 @@ Maybe I should add a new state.
 #+begin_src elisp
 (setup elec-pair
   (electric-pair-mode))
+#+end_src
+** casual
+*** casual-isearch
+#+begin_src elisp
+(setup casual-lib)
+(setup casual-isearch)
+(keymap-set isearch-mode-map "C-o" #'casual-isearch-tmenu)
+#+end_src
+*** casual-calc
+#+begin_src elisp
+(setup casual-calc)
+(setup calc
+  (:when-loaded
+    (keymap-set calc-mode-map "C-o" #'casual-calc-tmenu)
+    ))
 #+end_src
 * Package Library
 ** dash
@@ -905,14 +920,13 @@ Minimal mode line configuration for Emacs, inspired by doom-modeline
 (setup hide-mode-line)
 (setup mini-echo
   ;; set default segments of long/short style
-  (setq mini-echo-default-segments
+  (setq mini-echo-persistent-rule
         '(:long
           ("major-mode" "vcs" "flymake" "process"
            "selection-info" "narrow"  "profiler" "repeat" "eglot" "buffer-size" "buffer-position" "shrink-path"  "meow" "macro" "org-clock")
           :short
           ("major-mode" "vcs" "buffer-size" "buffer-position" "shrink-path"  "meow" "macro")))
   (setq mini-echo-separator "  ")
-  ;; (setq window-divider-default-places t)
   (setq mini-echo-window-divider-args '(t 2 2))
   (mini-echo-define-segment "org-clock"
    "Return org-clock."
@@ -1097,7 +1111,6 @@ Minimal mode line configuration for Emacs, inspired by doom-modeline
         (define-key map (kbd "s") #'isearch-repeat-forward)
         (define-key map (kbd "r") #'isearch-repeat-backward)
         map))
-
     (dolist (cmd '(isearch-repeat-forward isearch-repeat-backward))
       (put cmd 'repeat-map 'isearch-repeat-map))
 
@@ -1512,7 +1525,6 @@ Jump anywhere in the world
 #+end_src
 * shell
 ** eshell
-#+name: eshell
 #+begin_src elisp
 (setup eshell)
 #+end_src
@@ -1533,21 +1545,29 @@ Jump anywhere in the world
                    (display-buffer-reuse-window display-buffer-at-bottom)
                    (reusable-frames . visible)
                    (window-height . 0.3)))
+    ;; use M-o for ace-window
+    (progn
+      (add-to-list 'eat-semi-char-non-bound-keys [?\e ?o])
+      (eat-update-semi-char-mode-map))
     )
   (defun eat-toggle-window()
     "Toggle eshell buffer."
     (interactive)
     (if (get-buffer-window "*eat*")
         (delete-window (get-buffer-window "*eat*"))
-      (eat)))
-
+      (if (not (featurep 'eat))
+          (progn
+            (require 'eat)
+            (eat-reload)
+            (eat))
+        (eat))))
   (defun eat-toggle-insert-dir()
     "Toggle eshell buffer."
     (interactive)
-      (eat)
-      (eat--send-string "*eat*"
-                        (concat "cd " (file-name-directory (buffer-file-name))))
-      ))
+    (eat)
+    (eat--send-string "*eat*"
+                      (concat "cd " (file-name-directory (buffer-file-name)))))
+  )
 #+end_src
 * git
 ** magit
@@ -1929,7 +1949,12 @@ Citre is an advanced Ctags (or actually, readtags) frontend for Emacs.
 #+begin_src elisp
 (setup dape
   (setq dape-buffer-window-arrangment 'right)
-  (:global "<f5>"  dape))
+  (:global "<f5>"  dape)
+  (:when-loaded
+    (add-hook 'dape-repl-mode-hook (lambda()
+                                     (corfu-mode -1)
+                                     )
+  )))
 #+end_src
 **** edebug
 #+begin_src lisp
@@ -2531,14 +2556,6 @@ See also `org-save-all-org-buffers'"
   (setq org-agenda-property-position 'where-it-fits)
   )
 #+end_src
-** mpvi
-Integrate Org with Video
-#+begin_src elisp
-(setup mpvi
-  (setq mpvi-bilibili-enable-danmaku nil)
-  (setq mpvi-ytdlp-extra-args "--cookies-from-browser firefox")
-  )
-#+end_src
 ** org-fc
 Spaced Repetition System for Emacs org-mode
 #+begin_src elisp
@@ -2608,7 +2625,6 @@ Spaced Repetition System for Emacs org-mode
      '(("{{\\([^}]+\\)}@[0-9]+}"
         (1 'my-org-fc-cloze-face t)
         ))))
-
   (add-hook 'org-mode-hook #'org-fc-cloze-in-org-font-lock)
 
   (defun org-fc-clarify-continue-reading ()
@@ -2623,10 +2639,6 @@ Spaced Repetition System for Emacs org-mode
         (print should-review)
         (if should-review
             (progn
-              ;; (with-current-buffer (get-buffer-create "*Output*")
-              ;;   (erase-buffer)
-              ;;   (insert "hello world")
-              ;;   (display-buffer (current-buffer)))
               (save-window-excursion
                 (save-excursion
                   (message "unsuspending card: %s" (oref card title))
