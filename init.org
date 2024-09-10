@@ -2050,6 +2050,7 @@ Disassemble C, C++ or Fortran code under cursor
         org-todo-keyword-faces (quote (("TODO" :foreground "red" :weight bold)
                                        ("NEXT" :foreground "blue" :weight bold)
                                        ("DONE" :foreground "forest green" :weight bold)
+                                       ("AXED" :foreground "light green" :weight bold)
                                        ))
         ;; save state changes into logbook
         org-log-state-notes-into-drawer t
@@ -2485,7 +2486,7 @@ My useage for =action.org=:
 ;; TODO
 (setq org-log-done 'time)
 (setq org-todo-keywords
-      '((sequence "TODO(t)" "NEXT(n)" "HOLD(h)" "|" "DONE(d)")))
+      '((sequence "TODO(t)" "NEXT(n)" "HOLD(h)" "|" "DONE(d)" "AXED(a)")))
 (defun log-todo-next-creation-date (&rest ignore)
   "Log NEXT creation time in the property drawer under the key 'ACTIVATED'"
   (when (and (string= (org-get-todo-state) "NEXT")
@@ -2546,6 +2547,9 @@ See also `org-save-all-org-buffers'"
 (advice-add 'org-refile :after
             (lambda (&rest _)
               (gtd-save-org-buffers)))
+
+;; archive
+(setq org-archive-location (concat  "gtd_archive_" (format-time-string "%Y") "::datetree/"))
 #+end_src
 ** org-agenda-property
 #+begin_src elisp
@@ -3040,7 +3044,9 @@ Edit text area on Chrome with Emacs using Atomic Chrome
         atomic-chrome-buffer-open-style 'split
         atomic-chrome-auto-remove-file t)
   (:defer
-   (atomic-chrome-start-server))
+   (when (eq system-type 'gnu/linux)
+     (atomic-chrome-start-server))
+   )
   )
 #+end_src
 ** macos-ocr
