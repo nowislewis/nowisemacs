@@ -98,7 +98,7 @@ I failed in love with denote, so previous *org-roam* configs were refiled into [
   - [[#toc-org][toc-org]]
   - [[#denote-and-related][denote and related]]
   - [[#find-orgmode-dir-files][find orgmode dir files]]
-  - [[#org-imagine-excalidraw][org-imagine, excalidraw]]
+  - [[#excalidraw][excalidraw]]
   - [[#ob-d2][ob-d2]]
   - [[#auto-insert][auto-insert]]
   - [[#clue][clue]]
@@ -191,8 +191,9 @@ I failed in love with denote, so previous *org-roam* configs were refiled into [
 (setq next-screen-context-lines 0) ;; scroll up/down lines
 (setq-default tab-width 4)
 ;; 平滑地进行半屏滚动，避免滚动后recenter操作
-(setq scroll-step 1
+(setq scroll-step 0
       scroll-conservatively 10000)
+(setq redisplay-skip-fontification-on-input t)
 (setq completions-detailed t) ;;useful in emacs 28
 (setq use-dialog-box nil)               ;never pop dialog
 (setq mouse-yank-at-point t)            ;粘贴于光标处,而不是鼠标指针处
@@ -581,8 +582,8 @@ Maybe I should add a new state.
     ("r s" "find-all-searchable" project-find-searchable-dir-files)
     ;; ("rc" "consult-notes" consult-notes)
     ("r g" "project-find-gtd-dir-files" project-find-gtd-dir-files)
-    ("r z" "ls zettel" my/zettel-signature-topics)
-    ("r Z" "ls not zettel" my/zettel-not-signatured-topics)
+    ;; ("r z" "ls zettel" my/zettel-signature-topics)
+    ;; ("r Z" "ls not zettel" my/zettel-not-signatured-topics)
     ]
    ["bibtex"
     ("e" "ebib" ebib)
@@ -948,11 +949,19 @@ Minimal mode line configuration for Emacs, inspired by doom-modeline
   ;; Only highliht current buffer in current window
   (setq hl-line-sticky-flag nil
         global-hl-line-sticky-flag nil)
-  (global-hl-line-mode))
+  ;; (global-hl-line-mode)
+  )
 (defun nowis-recenter ()
   (interactive)
   (call-interactively 'recenter)
   (pulsar-pulse-line))
+#+end_src
+*** hl-line-plus
+#+begin_src elisp
+(setup hl-line-plus
+    (setq hl-line-idle-interval 0.5)
+    (toggle-hl-line-when-idle 1)
+  )
 #+end_src
 *** pulsar
 #+begin_src elisp
@@ -2334,25 +2343,6 @@ Disassemble C, C++ or Fortran code under cursor
                              "* Links\n\n"))))
   )
 #+end_src
-*** denote-lumn
-Borrowed from https://github.com/protesilaos/denote/issues/115
-#+begin_src elisp
-(setq find-dired-refine-function nil)  ;; This needs to be set globally, find-dired works asynchronously.
-(defun my/zettel-signature-topics()
-  (interactive)
-  (if (not (featurep 'find-dired))
-      (require 'find-dired))
-  (let ((find-ls-option '(" -exec ls -ld {} \\+| awk /==/ |sort -t '=' -k 3" . "-ld")))
-    (find-dired denote-directory ""))
-  (rename-buffer "signatured")
-  )
-
-(defun my/zettel-not-signatured-topics ()
-  (interactive)
-  (let ((find-ls-option '("-exec ls -ld {} \\+ |grep -v '=='| sort -t '=' -k 3" . "-ld")))
-    (find-dired denote-directory ""))
-  (rename-buffer "not signatured"))
-#+end_src
 *** denote-explorer
 #+begin_src elisp
 (setup denote-explore)
@@ -2368,7 +2358,7 @@ Borrowed from https://github.com/protesilaos/denote/issues/115
   (dired nowis-gtd-dir)
   (project-find-file t))
 #+end_src
-** org-imagine, excalidraw
+** excalidraw
 #+begin_src elisp
 (defvar org-excalidraw--default-base
   "{
@@ -2446,7 +2436,7 @@ My useage for =action.org=:
 
 ;; Capture
 (setq org-capture-templates
-      `(("i" "Inbox" entry  (file "inbox.org")
+      `(("i" "Inbox" entry  (file "gtd/inbox.org")
          ,(concat "* TODO %?\n"
                   "/Entered on/ %U"))       ("m" "Meeting" entry  (file+headline "agenda.org" "Future")
          ,(concat "* %? :meeting:\n"
