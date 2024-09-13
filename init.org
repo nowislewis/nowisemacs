@@ -16,7 +16,6 @@ I failed in love with denote, so previous *org-roam* configs were refiled into [
   - [[#meow-leader-keybindings][meow leader keybindings]]
   - [[#which-key][which-key]]
   - [[#electric][electric]]
-  - [[#casual][casual]]
 - [[#package-library][Package Library]]
   - [[#dash][dash]]
   - [[#s][s]]
@@ -91,7 +90,7 @@ I failed in love with denote, so previous *org-roam* configs were refiled into [
   - [[#org-mode-1][org-mode]]
   - [[#ui-1][ui]]
   - [[#org-download][org-download]]
-  - [[#weblorg][weblorg]]
+  - [[#ox-hugo][ox-hugo]]
   - [[#org-noter][org-noter]]
   - [[#org-present][org-present]]
   - [[#bibtex-related][bibtex related]]
@@ -110,7 +109,6 @@ I failed in love with denote, so previous *org-roam* configs were refiled into [
   - [[#org-mind-map][org-mind-map]]
 - [[#english-翻译][english 翻译]]
   - [[#go-translate][go-translate]]
-  - [[#immersive-translate][immersive-translate]]
 - [[#阅读][阅读]]
   - [[#pdf-tools][pdf-tools]]
   - [[#pdf-view-pagemark][pdf-view-pagemark]]
@@ -730,21 +728,6 @@ Maybe I should add a new state.
 (setup elec-pair
   (electric-pair-mode))
 #+end_src
-** casual
-*** casual-isearch
-#+begin_src elisp
-(setup casual-lib)
-(setup casual-isearch)
-(keymap-set isearch-mode-map "C-o" #'casual-isearch-tmenu)
-#+end_src
-*** casual-calc
-#+begin_src elisp
-(setup casual-calc)
-(setup calc
-  (:when-loaded
-    (keymap-set calc-mode-map "C-o" #'casual-calc-tmenu)
-    ))
-#+end_src
 * Package Library
 ** dash
 #+begin_src elisp
@@ -787,9 +770,9 @@ Maybe I should add a new state.
                                 return font))
 ;; variable font
 (setq lewis-variable-font (cl-loop for font in '(
-                                                 "Helvetica"
-                                                 "Times"
                                                  "Noto Sans CJK SC"
+                                                 "Times"
+                                                 "Helvetica"
                                                  "LXGW WenKai"
                                                  "Maple UI"
                                                  ;; "Source Han Sans SC VF"
@@ -921,6 +904,7 @@ Minimal mode line configuration for Emacs, inspired by doom-modeline
 (setup hide-mode-line)
 (setup mini-echo
   ;; set default segments of long/short style
+  (require 'popper) ;; FIXME for popper error
   (setq mini-echo-persistent-rule
         '(:long
           ("major-mode" "vcs" "flymake" "process"
@@ -931,8 +915,7 @@ Minimal mode line configuration for Emacs, inspired by doom-modeline
   (setq mini-echo-window-divider-args '(t 2 2))
   (mini-echo-define-segment "org-clock"
    "Return org-clock."
-   :fetch (when (featurep 'org-clock) (when (org-clocking-p) (org-clock-get-clock-string)))
-   )
+   :fetch (when (featurep 'org-clock) (when (org-clocking-p) (org-clock-get-clock-string))))
   (mini-echo-mode)
   )
 #+end_src
@@ -2233,11 +2216,12 @@ Disassemble C, C++ or Fortran code under cursor
   (:autoload org-download-screenshot
              org-download-yank))
 #+end_src
-** weblorg
+** ox-hugo
 #+begin_src elisp
-(setup templatel)
-(setup htmlize)
-(setup weblorg)
+(setup tomelr)
+(setup ox-hugo
+  (with-eval-after-load 'ox
+  (require 'ox-hugo)))
 #+end_src
 ** org-noter
 #+begin_src elisp
@@ -2564,7 +2548,7 @@ Spaced Repetition System for Emacs org-mode
   (:with-map org-fc-dashboard-mode-map
     (:bind "r" org-fc-clarify-continue-reading))
   (:when-loaded
-    (set-face-attribute 'org-fc-type-cloze-hole-face nil :box t :foreground "pale violet red")
+    (set-face-attribute 'org-fc-type-cloze-hole-face nil :underline t :foreground "pale violet red")
 
     (require 'org-fc-keymap-hint)
     (add-hook 'org-fc-review-flip-mode-hook 'meow-motion-mode)
@@ -2609,17 +2593,20 @@ Spaced Repetition System for Emacs org-mode
   ;; | review and fontlock |
   ;; +---------------------+
   (defface my-org-fc-cloze-face
-    '((t (:weight bold :box t :foreground "pale violet red")))
-    "A custom face with bold weight and a box.")
+    '((t (:weight bold :underline t :foreground "pale violet red")))
+    "A custom face with bold weight and a underline.")
 
   ;; font lock for cloze
-  (defun org-fc-cloze-in-org-font-lock ()
     (font-lock-add-keywords
-     nil
-     '(("{{\\([^}]+\\)}@[0-9]+}"
-        (1 'my-org-fc-cloze-face t)
-        ))))
-  (add-hook 'org-mode-hook #'org-fc-cloze-in-org-font-lock)
+     'org-mode
+     '(("\\({{\\)\\([^}]+\\)\\(}\\)\\({[^}]+}\\)?\\(@[0-9]}\\)"
+        ;; "\\({{\\)\\([^}]+\\)}\\({[^}]+}?@[0-9]}\\)"
+        (1 'shadow nil t)
+        (2 'my-org-fc-cloze-face t)
+        (3 'shadow nil t)
+        (4 'shadow nil t)
+        (5 'shadow nil t)
+        )))
 
   (defun org-fc-clarify-continue-reading ()
     "By determining whether all the cards in the file containing the article have been reviewed, decide whether this article can continue to be read."
@@ -2628,7 +2615,7 @@ Spaced Repetition System for Emacs org-mode
       (let ((file_path (oref (oref card file) path))
             (should-review t))
         (dolist (file-card (org-fc-index `(:paths ,file_path :filter (not (tag "suspended")))))
-          (if (< (plist-get (oref (car (oref file-card positions)) data) :interval)  1)
+          (if (< (plist-get (oref (car (oref file-card positions)) data) :interval)  6)
               (setq should-review nil)))
         (print should-review)
         (if should-review
@@ -2725,17 +2712,6 @@ Powerful translator on Emacs. Supports multiple translation engines such as Goog
     ))
 #+end_src
 If you want to use *sdcv* for offline translate, then download dictionary data to ~/.stardict/dic or /usr/share/stardict/dic
-** immersive-translate
-immersive-translate: Immersive Bilingual Translation
-#+begin_src elisp
-(setup immersive-translate)
-(add-hook 'elfeed-show-mode-hook #'immersive-translate-setup)
-(add-hook 'nov-pre-html-render-hook #'immersive-translate-setup)
-;; use translate-shell
-(setq immersive-translate-backend 'trans
-     immersive-translate-trans-engine "bing"
-      )
-#+end_src
 * 阅读
 ** pdf-tools
 #+begin_src elisp

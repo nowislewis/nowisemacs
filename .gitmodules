@@ -22,15 +22,6 @@
 [submodule "cape"]
 	path = lib/cape
 	url = https://github.com/minad/cape.git
-[submodule "casual-calc"]
-	path = lib/casual-calc
-	url = https://github.com/kickingvegas/casual-calc.git
-[submodule "casual-isearch"]
-	path = lib/casual-isearch
-	url = https://github.com/kickingvegas/casual-isearch.git
-[submodule "casual-lib"]
-	path = lib/casual-lib
-	url = https://github.com/kickingvegas/casual-lib.git
 [submodule "cdlatex"]
 	path = lib/cdlatex
 	url = https://github.com/cdominik/cdlatex.git
@@ -104,9 +95,6 @@
 [submodule "eglot-booster"]
 	path = lib/eglot-booster
 	url = https://github.com/jdtsmith/eglot-booster.git
-[submodule "eglot-hierarchy"]
-	path = lib/eglot-hierarchy
-	url = https://github.com/dolmens/eglot-hierarchy.git
 [submodule "el-themes"]
 	path = lib/el-themes
 	url = https://github.com/protesilaos/ef-themes.git
@@ -174,15 +162,9 @@
 [submodule "hl-todo"]
 	path = lib/hl-todo
 	url = https://github.com/tarsius/hl-todo.git
-[submodule "htmlize"]
-	path = lib/htmlize
-	url = https://github.com/hniksic/emacs-htmlize.git
 [submodule "imenu-list"]
 	path = lib/imenu-list
 	url = https://github.com/nowislewis/imenu-list.git
-[submodule "immersive-translate"]
-	path = lib/immersive-translate
-	url = https://github.com/Elilif/emacs-immersive-translate.git
 [submodule "inheritenv"]
 	path = lib/inheritenv
 	url = https://github.com/purcell/inheritenv.git
@@ -280,6 +262,9 @@
 [submodule "outli"]
 	path = lib/outli
 	url = https://github.com/jdtsmith/outli.git
+[submodule "ox-hugo"]
+	path = lib/ox-hugo
+	url = https://github.com/kaushalmodi/ox-hugo.git
 [submodule "parsebib"]
 	path = lib/parsebib
 	url = https://github.com/joostkremers/parsebib.git
@@ -340,12 +325,12 @@
 [submodule "tempel"]
 	path = lib/tempel
 	url = https://github.com/minad/tempel.git
-[submodule "templatel"]
-	path = lib/templatel
-	url = https://github.com/clarete/templatel.git
 [submodule "toc-org"]
 	path = lib/toc-org
 	url = https://github.com/snosov1/toc-org.git
+[submodule "tomelr"]
+	path = lib/tomelr
+	url = https://github.com/kaushalmodi/tomelr.git
 [submodule "treesit-auto"]
 	path = lib/treesit-auto
 	url = https://github.com/renzmann/treesit-auto.git
@@ -357,9 +342,6 @@
 [submodule "vundo"]
 	path = lib/vundo
 	url = https://github.com/casouri/vundo.git
-[submodule "weblorg"]
-	path = lib/weblorg
-	url = https://github.com/emacs-love/weblorg.git
 [submodule "websocket"]
 	path = lib/websocket
 	url = https://github.com/ahyatt/emacs-websocket.git
