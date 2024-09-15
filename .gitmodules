@@ -45,14 +45,14 @@
 [submodule "consult"]
 	path = lib/consult
 	url = https://github.com/minad/consult.git
-[submodule "consult-eglot"]
-	path = lib/consult-eglot
-	url = https://github.com/mohkale/consult-eglot.git
 [submodule "corfu"]
 	path = lib/corfu
 	url = https://github.com/minad/corfu.git
     load-path = .
     load-path = extensions
+[submodule "d2-mode"]
+	path = lib/d2-mode
+	url = https://github.com/andorsk/d2-mode.git
 [submodule "dape"]
 	path = lib/dape
 	url = https://github.com/svaante/dape.git
@@ -307,12 +307,6 @@
 [submodule "setup"]
 	path = lib/setup
 	url = https://github.com/emacsmirror/setup
-[submodule "shrface"]
-	path = lib/shrface
-	url = https://github.com/chenyanming/shrface.git
-[submodule "slime"]
-	path = lib/slime
-	url = https://github.com/slime/slime.git
 [submodule "super-save"]
 	path = lib/super-save
 	url = https://github.com/bbatsov/super-save.git

@@ -99,13 +99,13 @@ I failed in love with denote, so previous *org-roam* configs were refiled into [
   - [[#find-orgmode-dir-files][find orgmode dir files]]
   - [[#excalidraw][excalidraw]]
   - [[#ob-d2][ob-d2]]
+  - [[#d2-mode][d2-mode]]
   - [[#auto-insert][auto-insert]]
   - [[#clue][clue]]
   - [[#org-transclusion][org-transclusion]]
   - [[#agendagtd][agenda/gtd]]
   - [[#org-agenda-property][org-agenda-property]]
   - [[#org-fc][org-fc]]
-  - [[#shrface][shrface]]
   - [[#org-mind-map][org-mind-map]]
 - [[#english-翻译][english 翻译]]
   - [[#go-translate][go-translate]]
@@ -791,8 +791,10 @@ Maybe I should add a new state.
                                   return font))
 
 ;; symbol font
-(setq lewis-symbol-font (cl-loop for font in '("Symbola"
-                                               "Symbol")
+(setq lewis-symbol-font (cl-loop for font in '("Symbols Nerd Font mono"
+                                               "Symbola"
+                                               "Symbol"
+                                               )
                                  when (font-installed-p font)
                                  return font))
 
@@ -904,7 +906,6 @@ Minimal mode line configuration for Emacs, inspired by doom-modeline
 (setup hide-mode-line)
 (setup mini-echo
   ;; set default segments of long/short style
-  (require 'popper) ;; FIXME for popper error
   (setq mini-echo-persistent-rule
         '(:long
           ("major-mode" "vcs" "flymake" "process"
@@ -1692,7 +1693,7 @@ Emacs major-mode to work with Beancount ledger files
 (setup geiser-guile)
 #+end_src
 *** common lisp slime
-#+begin_src elisp
+#+begin_src elisp :tangle no
 (setup slime
   (setq inferior-lisp-program "sbcl"))
 #+end_src
@@ -1899,13 +1900,6 @@ borrowed from citre, now you can always jump-back use "M-," after any jump in th
   (dolist (lang org-babel-lang-list)
     (eval `(lsp-org-babel-enable ,lang)))
   )
-#+end_src
-***** consult-eglot
-#+begin_src elisp
-(setup consult-eglot
-  (:load-after eglot)
-  (:with-map eglot-mode-map
-    (:bind [remap xref-find-apropos] #'consult-eglot-symbols)))
 #+end_src
 ***** eglot-booster
 Improve the performance of eglot using a wrapper executable, you should install =emacs-lsp-booster= first
@@ -2373,6 +2367,10 @@ Org-Babel support for evaluating d2 diagram scripting language.
 #+begin_src elisp
 (setup ob-d2)
 #+end_src
+** d2-mode
+#+begin_src elisp
+(setup d2-mode)
+#+end_src
 ** auto-insert
 #+begin_src elisp
 (setup autoinsert
@@ -2634,26 +2632,6 @@ Spaced Repetition System for Emacs org-mode
     (interactive)
     (org-fc-type-normal-init)
     (org-set-tags '("article" "suspended" "fc")))
-  )
-#+end_src
-** shrface
-Extend eww/nov with org-mode features, archive web pages to org files with shr.
-#+begin_src elisp
-(setup shrface
-  (add-hook 'nov-mode-hook #'shrface-mode)
-  (add-hook 'eww-mode-hook #'shrface-mode)
-  (:when-loaded
-    (shrface-basic)
-    (shrface-trial)
-    (shrface-default-keybindings) ; setup default keybindings
-    (setq shrface-href-versatile t)
-    (setq nov-shr-rendering-functions '((img . nov-render-img) (title . nov-render-title)))
-    (setq nov-shr-rendering-functions (append nov-shr-rendering-functions shr-external-rendering-functions))
-    (setq shrface-bullets-bullet-list org-modern-replace-stars) ;;should load after org-modern
-    )
-  (:hook (lambda()(
-                   if  (featurep 'org)
-                       (org-indent-mode -1))))
   )
 #+end_src
 ** org-mind-map
