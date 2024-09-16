@@ -545,8 +545,8 @@ Maybe I should add a new state.
     ;; ("L" "Boxy imenu" boxy-imenu)
     ]
    ;; org-download
-   ["Org download"
-    ("d" "Screenshot" org-download-screenshot)]
+   ;; ["Org download"
+   ;;  ("d" "Screenshot" org-download-screenshot)]
    ["Translate"
     ;; ("t" "toggle english helper" lsp-bridge-toggle-sdcv-helper)
     ("i" "immersive translate buffer" immersive-translate-buffer)
@@ -597,8 +597,8 @@ Maybe I should add a new state.
    ["org-mind-map"
     ("m" "org-mind-map-dwim" org-mind-map-dwim)
     ("w" "org-mind-wbs-open" plantuml-org-to-wbs-open)
-    ("p" "org-mind-plantuml" plantuml-org-to-mindmap)
-    ("P" "org-mind-plantuml-open" plantuml-org-to-mindmap-open)
+    ("p" "org-plantuml" plantuml-org-to-mindmap)
+    ("P" "org-plantuml-open" plantuml-org-to-mindmap-open)
     ]
    ]
   )
@@ -613,10 +613,12 @@ Maybe I should add a new state.
    ["grep"
     ("d" "grep-dir" lewis/ripgrep-search-other-dir)
     ("D" "grep-project" consult-ripgrep)
-    ("g" "rg" rg)]
+    ("g" "rg" rg)
+    ("n" "grep-notes" lewis/ripgrep-search-notes)
+    ]
    ["find"
-    ("f" "find-in-current" consult-find)
-    ("F" "find-other-dir" lewis/find-file-other-dir)]
+    ("F" "find-in-current" consult-find)
+    ("f" "find-other-dir" lewis/find-file-other-dir)]
    ["built-in enhance"
     ("h" "history" consult-history)
     ("i" "imenu" consult-imenu)
@@ -1130,6 +1132,10 @@ Minimal mode line configuration for Emacs, inspired by doom-modeline
   (interactive)
   (let ((current-prefix-arg '(-1)))
     (call-interactively 'consult-ripgrep)))
+
+(defun lewis/ripgrep-search-notes()
+  (interactive)
+  (consult-ripgrep (concat nowis-doc-emacs-dir "01-orgmode")))
 
 (defun lewis/find-file-other-dir()
   (interactive)
@@ -2194,7 +2200,7 @@ Disassemble C, C++ or Fortran code under cursor
   (:hook-into org-mode))
 #+end_src
 ** org-download
-#+begin_src elisp
+#+begin_src elisp :tangle no
 (setup async)
 (setup org-download
   (setq org-download-method 'directory

@@ -4,9 +4,6 @@
 [submodule "annotate"]
 	path = lib/annotate
 	url = https://github.com/bastibe/annotate.el.git
-[submodule "async"]
-	path = lib/async
-	url = https://github.com/jwiegley/emacs-async.git
 [submodule "atomic-chrome"]
 	path = lib/atomic-chrome
 	url = https://github.com/KarimAziev/atomic-chrome.git
@@ -231,9 +228,6 @@
 [submodule "org-appear"]
 	path = lib/org-appear
 	url = https://github.com/awth13/org-appear.git
-[submodule "org-download"]
-	path = lib/org-download
-	url = https://github.com/abo-abo/org-download.git
 [submodule "org-elp"]
 	path = lib/org-elp
 	url = https://github.com/guanyilun/org-elp.git
