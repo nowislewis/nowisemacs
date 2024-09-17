@@ -549,7 +549,7 @@ Maybe I should add a new state.
    ;;  ("d" "Screenshot" org-download-screenshot)]
    ["Translate"
     ;; ("t" "toggle english helper" lsp-bridge-toggle-sdcv-helper)
-    ("i" "immersive translate buffer" immersive-translate-buffer)
+    ;; ("i" "immersive translate buffer" immersive-translate-buffer)
     ]])
 #+end_src
 *** buffer
@@ -2560,9 +2560,9 @@ Spaced Repetition System for Emacs org-mode
     (add-hook 'org-fc-review-rate-mode-hook 'meow-motion-mode)
 
     (add-to-list 'org-fc-custom-contexts
-                 '(not-low . (:filter (not (tag "low")))))
+                 '(high-not-low . (:filter (not (tag "low")))))
     (add-to-list 'org-fc-custom-contexts
-                 '(only-review . (:filter (type cloze) :order shuffled)))
+                 '(only-cloze-shuffled . (:filter (type cloze) :order shuffled)))
     )
   ;; +-----------------+
   ;; | load and keymap |
