@@ -2032,7 +2032,10 @@ Disassemble C, C++ or Fortran code under cursor
         org-confirm-babel-evaluate nil
         org-plantuml-jar-path plantuml-jar-path
         org-special-ctrl-a/e t
-        org-attach-id-dir (concat nowis-doc-emacs-dir "02-binary-files/01-pictures/01-org-attach")
+        ;; org-id
+        org-attach-id-dir (concat nowis-doc-emacs-dir "01-orgmode/org-attach")
+        org-id-method 'ts
+        ;; org-src
         org-src-window-setup 'split-window-below
 
         ;; habit
@@ -2548,6 +2551,7 @@ Spaced Repetition System for Emacs org-mode
         )
   (:with-map org-fc-review-rate-mode-map
     (:bind "RET" org-fc-review-rate-good
+           "z" org-fc-review-skip-card
            ))
   (:with-map org-fc-dashboard-mode-map
     (:bind "r" org-fc-clarify-continue-reading))
@@ -2601,19 +2605,19 @@ Spaced Repetition System for Emacs org-mode
     "A custom face with bold weight and a underline.")
 
   ;; font lock for cloze
-    (font-lock-add-keywords
-     'org-mode
-     '(("\\({{\\)\\([^}]+\\)\\(}\\)\\({[^}]+}\\)?\\(@[0-9]}\\)"
-        ;; "\\({{\\)\\([^}]+\\)}\\({[^}]+}?@[0-9]}\\)"
-        (1 'shadow nil t)
-        (2 'my-org-fc-cloze-face t)
-        (3 'shadow nil t)
-        (4 'shadow nil t)
-        (5 'shadow nil t)
-        )))
+  (font-lock-add-keywords
+   'org-mode
+   '(("\\({{\\)\\([^}]+\\)\\(}\\)\\({[^}]+}\\)?\\(@[0-9]}\\)"
+      ;; "\\({{\\)\\([^}]+\\)}\\({[^}]+}?@[0-9]}\\)"
+      (1 'shadow nil t)
+      (2 'my-org-fc-cloze-face t)
+      (3 'shadow nil t)
+      (4 'shadow nil t)
+      (5 'shadow nil t)
+      )))
 
   (defun org-fc-clarify-continue-reading ()
-    "By determining whether all the cards in the file containing the article have been reviewed, decide whether this article can continue to be read."
+    "(Need rg)By determining whether all the cards in the file containing the article have been reviewed, decide whether this article can continue to be read."
     (interactive)
     (dolist (card (org-fc-index '(:filter (and (tag "suspended") (and (tag "article"))))))
       (let ((file_path (oref (oref card file) path))
@@ -2621,18 +2625,20 @@ Spaced Repetition System for Emacs org-mode
         (dolist (file-card (org-fc-index `(:paths ,file_path :filter (not (tag "suspended")))))
           (if (< (plist-get (oref (car (oref file-card positions)) data) :interval)  6)
               (setq should-review nil)))
-        (print should-review)
         (if should-review
             (progn
               (save-window-excursion
                 (save-excursion
                   (message "unsuspending card: %s" (oref card title))
-                  (org-id-goto (oref card id))
-                  (let ((current-tags (org-get-tags)))
-                    (org-set-tags '())
-                    (org-set-tags '("fc" "article"))
-                    (save-buffer)
-                    )))))))
+                  (let* ((id (oref card id))
+                         (file (car (split-string (shell-command-to-string (format "rg -rl '%s' -t org" id)) "::"))))
+                    (find-file-noselect file)
+                    (org-id-goto id)
+                    (let ((current-tags (org-get-tags)))
+                      (org-set-tags '())
+                      (org-set-tags '("fc" "article"))
+                      (save-buffer)
+                      ))))))))
     (call-interactively 'org-fc-review))
   (defun org-fc-set-article()
     (interactive)
