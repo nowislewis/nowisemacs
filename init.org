@@ -755,6 +755,7 @@ Maybe I should add a new state.
 
 ;; fixed font
 (setq lewis-fixed-font (cl-loop for font in '(
+                                              "Maple Mono NF CN"
                                               "Maple Mono SC NF"
                                               "Unifont"
                                               ;; "InconsolataGo QiHei NF"
@@ -3016,7 +3017,8 @@ Edit text area on Chrome with Emacs using Atomic Chrome
 ESUP - Emacs Start Up Profiler
 #+begin_src elisp
 (setup esup
-  (if (eq system-type 'darwin)
-      (setq esup-depth 0))
+  ;; (if (eq system-type 'darwin)
+      (setq esup-depth 0)
+      ;; )
   )
 #+end_src
