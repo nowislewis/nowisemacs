@@ -1,5 +1,5 @@
 #+TITLE: Emacs Configuration
-#+PROPERTY: header-args:elisp :tangle ~/.emacs.d/modules/init-config.el
+#+PROPERTY: header-args:elisp :tangle ~/.emacs.d/init.el
 I failed in love with denote, so previous *org-roam* configs were refiled into [[file:useful-tools/old-elisps/org-roam-config.org][org-roam configs]]
 * Content                                                               :toc:
 - [[#startup-config][Startup config]]
@@ -129,9 +129,6 @@ I failed in love with denote, so previous *org-roam* configs were refiled into [
   - [[#atomic-chrome][atomic-chrome]]
   - [[#macos-ocr][macos-ocr]]
   - [[#esup][esup]]
-- [[#use-single-file-to-load-configs][use single file to load configs]]
-  - [[#provide][provide]]
-  - [[#load-init-configel][load init-config.el]]
 
 * Startup config
 ** UI speed up
@@ -916,11 +913,12 @@ Minimal mode line configuration for Emacs, inspired by doom-modeline
           ("major-mode" "vcs" "buffer-size" "buffer-position" "shrink-path"  "meow" "macro")))
   (setq mini-echo-separator "  ")
   (setq mini-echo-window-divider-args '(t 2 2))
-  (mini-echo-define-segment "org-clock"
-   "Return org-clock."
-   :fetch (when (featurep 'org-clock) (when (org-clocking-p) (org-clock-get-clock-string))))
   (mini-echo-mode)
-  )
+  (:when-loaded
+    (mini-echo-define-segment "org-clock"
+      "Return org-clock."
+      :fetch (when (featurep 'org-clock) (when (org-clocking-p) (org-clock-get-clock-string))))
+    ))
 #+end_src
 ** hl-todo
 #+begin_src elisp
@@ -1428,7 +1426,7 @@ Jump anywhere in the world
 #+begin_src elisp
 (setup tab-bar
   (setq tab-bar-new-button-show nil
-           tab-bar-close-button-show nil)
+        tab-bar-close-button-show nil)
   (:when-loaded
     (defun tab-bar-select-tab-1st()
       (interactive)
@@ -2581,7 +2579,7 @@ Spaced Repetition System for Emacs org-mode
     "Define transient-key map for org-fc functions"
     [
      ["update"
-      ("f" "find dashboard" org-fc-dashboard)
+      ("d" "find dashboard" org-fc-dashboard)
       ("r" "review-with-clarify" org-fc-clarify-continue-reading)
       ("R" "review" org-fc-review)
       ("s" "suspend card" org-fc-suspend-card)
@@ -2589,7 +2587,7 @@ Spaced Repetition System for Emacs org-mode
       ]
      ["init"
       ("c" "cloze" org-fc-type-cloze-init)
-      ("d" "double" org-fc-type-double-init)
+      ("N" "double normal" org-fc-type-double-init)
       ("n" "normal" org-fc-type-normal-init)
       ("t" "text input" org-fc-type-text-input-init)]])
   (defun org-fc-transient-load-map()
@@ -3017,17 +3015,8 @@ Edit text area on Chrome with Emacs using Atomic Chrome
 ** esup
 ESUP - Emacs Start Up Profiler
 #+begin_src elisp
-(setup esup)
-#+end_src
-* use single file to load configs
-this can avoid errors of native compilation of init.el
-** provide
-#+begin_src elisp
-(provide 'init-config)
-#+end_src
-** load init-config.el
-#+begin_src elisp :tangle ~/.emacs.d/init.el
-;; -*- lexical-binding: t; -*-
-(add-to-list 'load-path (expand-file-name "modules/" user-emacs-directory))
-(require 'init-config)
+(setup esup
+  (if (eq system-type 'darwin)
+      (setq esup-depth 0))
+  )
 #+end_src
