@@ -2002,7 +2002,8 @@ Disassemble C, C++ or Fortran code under cursor
 (setup annotate
   (setq annotate-file (concat nowis-doc-emacs-dir "annotations.el")
         annotate-warn-if-hash-mismatch nil)
-  (:hook-into prog-mode))
+  ;; (:hook-into prog-mode)
+  )
 #+end_src
 * Org Mode
 ** org-mode
@@ -2048,6 +2049,9 @@ Disassemble C, C++ or Fortran code under cursor
                                        ))
         ;; save state changes into logbook
         org-log-state-notes-into-drawer t
+
+        ;; export without _ or ^
+        org-use-sub-superscripts nil
         )
   (:when-loaded
     (require 'org-tempo) ;; so that <s is useful
@@ -2116,17 +2120,21 @@ Disassemble C, C++ or Fortran code under cursor
     (add-to-list 'org-file-apps '("\\.docx\\'" . default))
     (add-to-list 'org-structure-template-alist
                  '("jp" . "src jupyter-python :async yes :kernel python3 :session py"))
-    (defun lewis/org-export-docx ()
+
+    ;; borrowed from HM0880
+    (defun lewis/convert-org-to-docx-with-pandoc ()
+      "Use Pandoc to convert .org to .docx.
+Comments:
+- The `-N' flag numbers the headers lines.
+- Use the `--from org' flag to have this function work on files
+  that are in Org syntax but do not have a .org extension"
       (interactive)
-      (let ((docx-file (concat (file-name-sans-extension (buffer-file-name)) ".docx"))
-            (template-file (concat nowis-doc-emacs-dir
-                                   "02-binary-files/template.docx")))
-        (shell-command (format "pandoc %s -o %s --reference-doc=%s"
-                               (buffer-file-name)
-                               docx-file
-                               template-file
-                               ))
-        (message "Convert finish: %s" docx-file)))
+      (shell-command
+       (concat "pandoc -N --from org " (buffer-file-name)
+               " -o "
+               (file-name-sans-extension (buffer-file-name))
+               ".docx"))
+      (message "Convert finish: %s" docx-file))
 
     (dolist (face '((org-level-1 . 1.4)
                     (org-level-2 . 1.4)
@@ -2805,7 +2813,7 @@ Simple distraction-free editing. I use darkroom instead of writeroom because it'
 (setup gptel
   (setq gptel-default-mode 'org-mode
         gptel-crowdsourced-prompts-file (concat nowis-doc-emacs-dir "09-scripts/chatgpt.csv")
-        gptel-model "gpt-4o"
+        gptel-model "gpt-4o-mini"
         )
   (:global "M-p" gptel-send
            "M-P" gptel)
@@ -2816,7 +2824,7 @@ Simple distraction-free editing. I use darkroom instead of writeroom because it'
                     :header (lambda () `(("Authorization" . ,(concat "Bearer " (gptel--get-api-key)))))
                     :key 'gptel-api-key
                     :stream t
-                    :models '("gpt-4o-mini" "gpt-4o")))
+                    :models '("gpt-4o-mini" "gpt-4o-2024-08-06")))
     (gptel-make-gemini "Gemini" :key 'gptel-api-key :stream t)
     ))
 #+end_src
