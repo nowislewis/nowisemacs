@@ -322,6 +322,9 @@
 [submodule "treesit-auto"]
 	path = lib/treesit-auto
 	url = https://github.com/renzmann/treesit-auto.git
+[submodule "treesit-context"]
+	path = lib/treesit-context
+	url = https://github.com/zbelial/treesitter-context.el.git
 [submodule "vertico"]
 	path = lib/vertico
 	url = https://github.com/minad/vertico.git

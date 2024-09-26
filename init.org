@@ -1772,14 +1772,20 @@ borrowed from citre, now you can always jump-back use "M-," after any jump in th
 **** treesit-auto
 #+begin_src elisp
 (setup treesit-auto
+  (setq treesit-auto-install t
+        treesit-auto-langs '(python c cpp json org verilog))
   (:defer
    (if (treesit-available-p)
        (require 'treesit-auto)))
   (:when-loaded
-    ;; (global-treesit-auto-mode)
-    (setq treesit-auto-install t)
+    (global-treesit-auto-mode)
     )
   )
+#+end_src
+**** treesitter-context
+#+begin_src elisp
+(setup treesitter-context
+  (:hook-into python-ts-mode c-ts-mode c++-ts-mode json-ts-mode))
 #+end_src
 *** Complete
 **** corfu related
