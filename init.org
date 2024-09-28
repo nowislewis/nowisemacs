@@ -105,6 +105,7 @@ I failed in love with denote, so previous *org-roam* configs were refiled into [
   - [[#org-transclusion][org-transclusion]]
   - [[#agendagtd][agenda/gtd]]
   - [[#org-agenda-property][org-agenda-property]]
+  - [[#org-clock-watch][org-clock-watch]]
   - [[#org-fc][org-fc]]
   - [[#org-mind-map][org-mind-map]]
 - [[#english-翻译][english 翻译]]
@@ -1757,7 +1758,7 @@ borrowed from citre, now you can always jump-back use "M-," after any jump in th
   (electric-pair-mode))
 #+end_src
 **** outli
-#+begin_src elisp
+#+begin_src elisp :tangle no
 (setup outli
   (:hook-into prog-mode)
   (setq outli-allow-indented-headlines t)
@@ -2552,6 +2553,20 @@ See also `org-save-all-org-buffers'"
   (setq org-agenda-property-list '("GAIN"))
   (setq org-agenda-property-column 0)
   (setq org-agenda-property-position 'where-it-fits)
+  )
+#+end_src
+** org-clock-watch
+#+begin_src elisp
+(setup org-clock-watch
+  (require 'org-clock-watch)
+  (setq org-clock-watch-work-plan-file-path (concat nowis-gtd-dir "/action.org")
+        org-clock-watch-play-sound-command-str "mpv"
+        )
+  (add-hook 'org-agenda-mode-hook (lambda()
+                                    (if (not (featurep 'org-clock-watch))
+                                        (require 'org-clock-watch))
+                                    (org-clock-watch-toggle 'on)
+                                    ))
   )
 #+end_src
 ** org-fc

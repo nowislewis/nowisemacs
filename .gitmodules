@@ -228,6 +228,9 @@
 [submodule "org-appear"]
 	path = lib/org-appear
 	url = https://github.com/awth13/org-appear.git
+[submodule "org-clock-watch"]
+	path = lib/org-clock-watch
+	url = https://github.com/wztdream/org-clock-watch.git
 [submodule "org-elp"]
 	path = lib/org-elp
 	url = https://github.com/guanyilun/org-elp.git
@@ -253,9 +256,6 @@
 [submodule "org-transclusion"]
 	path = lib/org-transclusion
 	url = https://github.com/nobiot/org-transclusion.git
-[submodule "outli"]
-	path = lib/outli
-	url = https://github.com/jdtsmith/outli.git
 [submodule "ox-hugo"]
 	path = lib/ox-hugo
 	url = https://github.com/kaushalmodi/ox-hugo.git
