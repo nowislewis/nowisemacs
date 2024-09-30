@@ -113,6 +113,9 @@
 [submodule "emms"]
 	path = lib/emms
 	url = https://github.com/emacsmirror/emms.git
+[submodule "engrave-faces"]
+	path = lib/engrave-faces
+	url = https://code.tecosaur.net/tec/engrave-faces.git
 [submodule "esup"]
 	path = lib/esup
 	url = https://github.com/jschaf/esup.git
@@ -234,6 +237,9 @@
 [submodule "org-elp"]
 	path = lib/org-elp
 	url = https://github.com/guanyilun/org-elp.git
+[submodule "org-excalidraw"]
+	path = lib/org-excalidraw
+	url = https://github.com/4honor/org-excalidraw.git
 [submodule "org-fc"]
 	path = lib/org-fc
 	url = https://github.com/l3kn/org-fc.git

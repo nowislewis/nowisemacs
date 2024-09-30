@@ -97,7 +97,7 @@ I failed in love with denote, so previous *org-roam* configs were refiled into [
   - [[#toc-org][toc-org]]
   - [[#denote-and-related][denote and related]]
   - [[#find-orgmode-dir-files][find orgmode dir files]]
-  - [[#excalidraw][excalidraw]]
+  - [[#org-excalidraw][org-excalidraw]]
   - [[#ob-d2][ob-d2]]
   - [[#d2-mode][d2-mode]]
   - [[#auto-insert][auto-insert]]
@@ -597,6 +597,9 @@ Maybe I should add a new state.
     ("w" "org-mind-wbs-open" plantuml-org-to-wbs-open)
     ("p" "org-plantuml" plantuml-org-to-mindmap)
     ("P" "org-plantuml-open" plantuml-org-to-mindmap-open)
+    ]
+   ["excalidraw"
+    ("c" "create excalidraw" org-excalidraw-create-drawing)
     ]
    ]
   )
@@ -2015,6 +2018,7 @@ Disassemble C, C++ or Fortran code under cursor
 * Org Mode
 ** org-mode
 #+begin_src elisp
+(setup engrave-faces) ;; for code highlight when exporting pdfs
 (setup org
   (setq org-adapt-indentation nil
         org-startup-indented t
@@ -2063,7 +2067,32 @@ Disassemble C, C++ or Fortran code under cursor
   (:when-loaded
     (require 'org-tempo) ;; so that <s is useful
     ;; 导出相关的设置
-    (setq org-latex-pdf-process '("tectonic %f"))
+    (with-eval-after-load 'ox-latex
+      (setq org-latex-pdf-process '("tectonic %f")
+            org-latex-default-class "scrbook"
+            user-full-name "Lewis Liu"
+            org-latex-default-table-environment "longtable"
+            org-latex-listings 'engraved
+            org-latex-image-default-option "max size={\\textwidth}{\\textheight}" ;; use adjustbox
+            org-latex-image-default-width ""
+            )
+      (add-to-list 'org-latex-classes
+                   '("scrbook"
+                     "\\documentclass[openany,oneside]{scrbook}
+                      \\usepackage{ctex}
+                      \\usepackage[export]{adjustbox}
+                      \\usepackage{fancyhdr}
+                      \\pagestyle{fancy}
+                      \\fancyhead[L]{\\textsl{\\rightmark}}
+                      \\fancyhead[R]{\\textsl{\\leftmark}}
+                      \\renewcommand{\\footrulewidth}{0.4pt}"
+                     ("\\part{%s}" . "\\part*{%s}")
+                     ("\\chapter{%s}" . "\\chapter*{%s}")
+                     ("\\section{%s}" . "\\section*{%s}")
+                     ("\\subsection{%s}" . "\\subsection*{%s}")
+                     ("\\subsubsection{%s}" . "\\subsubsection*{%s}")))
+      )
+
     (plist-put org-format-latex-options :scale 2.0) ;; use a large preview for latex
     ;; (setq org-preview-latex-default-process 'dvisvgm)
 
@@ -2359,31 +2388,10 @@ Comments:
   (dired nowis-gtd-dir)
   (project-find-file t))
 #+end_src
-** excalidraw
+** org-excalidraw
 #+begin_src elisp
-(defvar org-excalidraw--default-base
-  "{
-    \"type\": \"excalidraw\",
-    \"version\": 2,
-    \"source\": \"https://excalidraw.com\",
-    \"elements\": [],
-    \"appState\": {
-      \"gridSize\": null,
-      \"viewBackgroundColor\": \"#ffffff\"
-    },
-    \"files\": {}
-  }
-"
-  "Get default JSON template used for new excalidraw files."
-  )
-
-(defun lewis-create-excalidraw()
-  (interactive)
-  (let* ((filename (concat (car (split-string (buffer-name) "\\.")) ".excalidraw"))
-         (path (concat nowis-doc-emacs-dir "05-excalidraw/" filename))
-         (link (format "[[file:%s]]" path)))
-    (insert link)
-    (with-temp-file path (insert org-excalidraw--default-base))))
+(setup org-excalidraw
+  (:load-after org))
 #+end_src
 ** ob-d2
 Org-Babel support for evaluating d2 diagram scripting language.
@@ -2400,10 +2408,6 @@ Org-Babel support for evaluating d2 diagram scripting language.
   (setq auto-insert-query nil)
   (:defer
    (auto-insert-mode t))
-   ;; Get default JSON template used for new excalidraw files.
-  (define-auto-insert "\\.excalidraw\\'"
-    (lambda ()
-      (insert org-excalidraw--default-base)))
   )
 #+end_src
 ** clue
@@ -2558,7 +2562,6 @@ See also `org-save-all-org-buffers'"
 ** org-clock-watch
 #+begin_src elisp
 (setup org-clock-watch
-  (require 'org-clock-watch)
   (setq org-clock-watch-work-plan-file-path (concat nowis-gtd-dir "/action.org")
         org-clock-watch-play-sound-command-str "mpv"
         )
