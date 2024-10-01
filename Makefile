@@ -18,3 +18,5 @@ init:
 # 修改 .gitmodules 后
 sync:
 	git submodule sync
+native-all: $(foreach package,$(notdir $(wildcard lib/*)), native/$(package))
+build-all: $(foreach package,$(notdir $(wildcard lib/*)), build/$(package))

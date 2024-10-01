@@ -886,7 +886,9 @@ diff-hl-mode highlights uncommitted changes on the left side of the window (area
 #+begin_src elisp
 (setup dashboard
   (setq dashboard-items '((recents . 5)
-                          (bookmarks . 5))
+                          (bookmarks . 5)
+                          )
+        dashboard-icon-type 'nerd-icons
         dashboard-set-heading-icons t
         dashboard-set-file-icons t
         dashboard-center-content t
@@ -1534,8 +1536,8 @@ Jump anywhere in the world
 #+begin_src elisp
 (setup eat
   ;; fix char error on macos
-  (when (eq system-type 'darwin)
-    (setq eat-term-name "xterm-256color"))
+  ;; (when (eq system-type 'darwin)
+  ;;   (setq eat-term-name "xterm-256color"))
   (:global "C-`" eat-toggle-window)
   (:when-loaded
     (add-to-list 'display-buffer-alist
@@ -1560,9 +1562,8 @@ Jump anywhere in the world
       (if (not (featurep 'eat))
           (progn
             (require 'eat)
-            (eat-reload)
-            (eat))
-        (eat))))
+            (eat-reload)))
+        (eat)))
   (defun eat-toggle-insert-dir()
     "Toggle eshell buffer."
     (interactive)
@@ -2565,11 +2566,12 @@ See also `org-save-all-org-buffers'"
   (setq org-clock-watch-work-plan-file-path (concat nowis-gtd-dir "/action.org")
         org-clock-watch-play-sound-command-str "mpv"
         )
-  (add-hook 'org-agenda-mode-hook (lambda()
-                                    (if (not (featurep 'org-clock-watch))
-                                        (require 'org-clock-watch))
-                                    (org-clock-watch-toggle 'on)
-                                    ))
+  (when (not (eq system-type 'darwin))
+    (add-hook 'org-agenda-mode-hook (lambda()
+                                      (if (not (featurep 'org-clock-watch))
+                                          (require 'org-clock-watch))
+                                      (org-clock-watch-toggle 'on)
+                                      )))
   )
 #+end_src
 ** org-fc
