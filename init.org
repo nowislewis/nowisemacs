@@ -44,7 +44,7 @@ I failed in love with denote, so previous *org-roam* configs were refiled into [
   - [[#no-littering][no-littering]]
   - [[#recentf][recentf]]
   - [[#自动换行][自动换行]]
-  - [[#so-long][so-long]]
+  - [[#long-line][long-line]]
   - [[#tramp][TRAMP]]
   - [[#automatically-clean-whitespace][Automatically clean whitespace]]
   - [[#exec-path-from-shell][exec-path-from-shell]]
@@ -68,7 +68,6 @@ I failed in love with denote, so previous *org-roam* configs were refiled into [
   - [[#ibuffer-1][ibuffer]]
 - [[#input][Input]]
   - [[#posframe][posframe]]
-  - [[#pyim][pyim]]
   - [[#rime][rime]]
 - [[#file-and-browsing][File and Browsing]]
   - [[#file-browsing][file browsing]]
@@ -77,6 +76,7 @@ I failed in love with denote, so previous *org-roam* configs were refiled into [
   - [[#tabspaces][tabspaces]]
   - [[#project][project]]
   - [[#project-rootfile][project-rootfile]]
+  - [[#auto-insert][auto-insert]]
 - [[#shell][shell]]
   - [[#eshell][eshell]]
   - [[#eat][eat]]
@@ -100,12 +100,9 @@ I failed in love with denote, so previous *org-roam* configs were refiled into [
   - [[#org-excalidraw][org-excalidraw]]
   - [[#ob-d2][ob-d2]]
   - [[#d2-mode][d2-mode]]
-  - [[#auto-insert][auto-insert]]
   - [[#clue][clue]]
   - [[#org-transclusion][org-transclusion]]
   - [[#agendagtd][agenda/gtd]]
-  - [[#org-agenda-property][org-agenda-property]]
-  - [[#org-clock-watch][org-clock-watch]]
   - [[#org-fc][org-fc]]
   - [[#org-mind-map][org-mind-map]]
 - [[#english-翻译][english 翻译]]
@@ -124,7 +121,6 @@ I failed in love with denote, so previous *org-roam* configs were refiled into [
   - [[#ai-related][ai related]]
   - [[#webjump][webjump]]
   - [[#backup-scripts][backup scripts]]
-  - [[#video-and-music][video and music]]
   - [[#literate-calc][literate-calc]]
   - [[#server][server]]
   - [[#atomic-chrome][atomic-chrome]]
@@ -592,12 +588,9 @@ Maybe I should add a new state.
     ("n" "org-noter" org-noter)]
    ["org-fc"
     ("f" "org-fc" org-fc-transient-load-map)]
-   ["org-mind-map"
-    ("m" "org-mind-map-dwim" org-mind-map-dwim)
-    ("w" "org-mind-wbs-open" plantuml-org-to-wbs-open)
-    ("p" "org-plantuml" plantuml-org-to-mindmap)
-    ("P" "org-plantuml-open" plantuml-org-to-mindmap-open)
-    ]
+   ;; ["org-mind-map"
+   ;;  ("m" "org-mind-map-write" org-mind-map-write)
+   ;;  ]
    ["excalidraw"
     ("c" "create excalidraw" org-excalidraw-create-drawing)
     ]
@@ -1061,13 +1054,13 @@ Minimal mode line configuration for Emacs, inspired by doom-modeline
 (setq word-wrap-by-category t)
 ;; (add-hook 'org-mode-hook 'turn-on-auto-fill)
 #+end_src
-** so-long
-解决长行卡死问题
+** long-line
 #+begin_src elisp
-(setup so-long
-  (:defer
-   (global-so-long-mode 1)
-   ))
+(setq-default bidi-display-reordering nil)
+(setq bidi-inhibit-bpa t
+      long-line-threshold 1000
+      large-hscroll-threshold 1000
+      syntax-wholeline-max 1000)
 #+end_src
 ** TRAMP
 #+begin_src elisp
@@ -1304,49 +1297,6 @@ Jump anywhere in the world
 #+begin_src elisp
 (setup posframe)
 #+end_src
-** pyim
-#+begin_src elisp :tangle no
-(setup xr)
-(setup pyim
-  (setq pyim-cloudim 'baidu
-           pyim-punctuation-translate-p '(no yes auto)
-           pyim-page-tooltip 'posframe
-           pyim-page-length 5
-           pyim-dcache-backend 'pyim-dregcache
-           pyim-dcache-directory (concat nowis-doc-emacs-dir "01-binary-files/pyim/dcache/")
-           )
-  (:when-loaded
-    (require 'popup nil t)
-    (require 'pyim-dregcache)
-    (require 'pyim-cregexp-utils)
-    (require 'pyim-cstring-utils)
-    (set-default 'pyim-punctuation-half-width-functions
-                 '(pyim-probe-punctuation-line-beginning pyim-probe-punctuation-after-punctuation))
-    ;; (pyim-default-scheme 'xiaohe-shuangpin)
-    (pyim-default-scheme 'quanpin)
-    (pyim-isearch-mode 1)
-
-    (defalias 'pyim-probe-meow-normal-mode #'(lambda nil
-                                               (meow-normal-mode-p)))
-    (set-default 'pyim-english-input-switch-functions '(pyim-probe-auto-english
-                                                        pyim-probe-isearch-mode
-                                                        pyim-probe-program-mode
-                                                        pyim-probe-org-structure-template
-                                                        pyim-probe-org-latex-mode
-                                                        pyim-probe-meow-normal-mode))
-    (defalias 'my-orderless-regexp
-      #'(lambda
-          (orig_func component)
-          (let
-              ((result
-                (funcall orig_func component)))
-            (pyim-cregexp-build result))))
-    (advice-add 'orderless-regexp :around #'my-orderless-regexp)
-    )
-   (require 'pyim)
-  ;; (setq default-input-method "pyim")
-  )
-#+end_src
 ** rime
 #+begin_src elisp
 (setq default-input-method "rime")
@@ -1527,6 +1477,14 @@ Jump anywhere in the world
   (setq project-rootfile-list '(".project"))
   )
 #+end_src
+** auto-insert
+#+begin_src elisp
+(setup autoinsert
+  (setq auto-insert-query nil)
+  (:defer
+   (auto-insert-mode t))
+  )
+#+end_src
 * shell
 ** eshell
 #+begin_src elisp
@@ -1624,17 +1582,6 @@ Jump anywhere in the world
 *** plantuml
 This Emacs tool use plantuml to generate images for org, json, yaml files.
 #+begin_src elisp
-(setup plantuml
-  (setq plantuml-output-type "svg"
-        plantuml-relative-path "./.temp_images/"
-        plantuml-theme "_none_"
-        plantuml-font lewis-variable-font
-        plantuml-add-index-number t
-        plantuml-mindmap-contains-org-content nil
-        plantuml-org-headline-bold nil)
-  (:autoload plantuml-org-to-mindmap-open
-             plantuml-org-to-wbs-open)
-  )
 ;; download plantuml jar
 (setq plantuml-jar-path (concat no-littering-var-directory "plantuml.jar"))
 (defun plantuml-download-jar ()
@@ -1761,13 +1708,6 @@ borrowed from citre, now you can always jump-back use "M-," after any jump in th
 (setup elec-pair
   (electric-pair-mode))
 #+end_src
-**** outli
-#+begin_src elisp :tangle no
-(setup outli
-  (:hook-into prog-mode)
-  (setq outli-allow-indented-headlines t)
-  )
-#+end_src
 *** treesit tools
 **** treesit
 #+begin_src elisp
@@ -1778,7 +1718,7 @@ borrowed from citre, now you can always jump-back use "M-," after any jump in th
 #+begin_src elisp
 (setup treesit-auto
   (setq treesit-auto-install t
-        treesit-auto-langs '(python c cpp json org verilog))
+        treesit-auto-langs '(python c cpp json org verilog cmake))
   (:defer
    (if (treesit-available-p)
        (require 'treesit-auto)))
@@ -1992,16 +1932,6 @@ Disassemble C, C++ or Fortran code under cursor
 #+begin_src elisp
 (setup disaster
   (setq disaster-objdump "objdump -d -M att -Sl --no-show-raw-insn"))
-#+end_src
-
-*** jupyter
-#+begin_src elisp :tangle no
-(setup websocket)
-(setup zmq)
-(setup simple-httpd)
-(setup jupyter
-  (setenv "PYDEVD_DISABLE_FILE_VALIDATION" "1") ;; to solve (json-number-format 5) problems because it fails to separate from stdout,
-  )
 #+end_src
 *** compile
 #+begin_src elisp
@@ -2404,14 +2334,6 @@ Org-Babel support for evaluating d2 diagram scripting language.
 #+begin_src elisp
 (setup d2-mode)
 #+end_src
-** auto-insert
-#+begin_src elisp
-(setup autoinsert
-  (setq auto-insert-query nil)
-  (:defer
-   (auto-insert-mode t))
-  )
-#+end_src
 ** clue
 Connecting clues while reading code.
 #+begin_src elisp
@@ -2552,29 +2474,6 @@ See also `org-save-all-org-buffers'"
 ;; archive
 (setq org-archive-location (concat  "gtd_archive_" (format-time-string "%Y") "::datetree/"))
 #+end_src
-** org-agenda-property
-#+begin_src elisp
-(setup org-agenda-property
-  (:load-after org)
-  (setq org-agenda-property-list '("GAIN"))
-  (setq org-agenda-property-column 0)
-  (setq org-agenda-property-position 'where-it-fits)
-  )
-#+end_src
-** org-clock-watch
-#+begin_src elisp
-(setup org-clock-watch
-  (setq org-clock-watch-work-plan-file-path (concat nowis-gtd-dir "/action.org")
-        org-clock-watch-play-sound-command-str "mpv"
-        )
-  (when (not (eq system-type 'darwin))
-    (add-hook 'org-agenda-mode-hook (lambda()
-                                      (if (not (featurep 'org-clock-watch))
-                                          (require 'org-clock-watch))
-                                      (org-clock-watch-toggle 'on)
-                                      )))
-  )
-#+end_src
 ** org-fc
 Spaced Repetition System for Emacs org-mode
 #+begin_src elisp
@@ -2685,7 +2584,8 @@ This is an Emacs package that creates graphviz directed graphs from the headings
 #+begin_src elisp
 (setup org-mind-map
   (:when-loaded
-    ;; (require 'ox-org)
+    (if (not (featurep 'ox-org))
+        (require 'ox-org))
     (setq org-mind-map-engine "dot")       ; Default. Directed Graph
     ;; (setq org-mind-map-engine "neato")  ; Undirected Spring Graph
     ;; (setq org-mind-map-engine "twopi")  ; Radial Layout
@@ -2695,15 +2595,6 @@ This is an Emacs package that creates graphviz directed graphs from the headings
     ;; (setq org-mind-map-engine "circo")  ; Circular Layout
     (add-to-list 'org-mind-map-default-graph-attribs '("fontname" . "Maple Mono SC F"))
     ))
-(defun org-mind-map-dwim()
-  "Write current tree, load ox-org if unload"
-  (interactive)
-  (unless (featurep 'ox-org) (require 'ox-org))
-  (make-local-variable 'org-mind-map-dot-output)
-  (setq org-mind-map-dot-output '("pdf"))
-  (org-mind-map-write-current-tree)
-  (kill-local-variable 'org-mind-map-dot-output)
-  )
 #+end_src
 * english 翻译
 ** go-translate
@@ -2998,15 +2889,6 @@ If `DEVICE-NAME' is provided, it will be used instead of prompting the user."
   [["rsync"
     ("p" "push doc" rsync-push-binary-files)
     ("F" "pull doc" rsync-pull-binary-files)]])
-#+end_src
-** video and music
-*** emms
-#+begin_src elisp
-(setup emms)
-;; (require 'emms-setup)
-;; (emms-standard)
-;; (emms-default-players)
-(setq emms-source-file-default-directory "~/Documents/video_music/")
 #+end_src
 ** literate-calc
 #+begin_src elisp
