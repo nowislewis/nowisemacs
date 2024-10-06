@@ -2023,7 +2023,7 @@ Disassemble C, C++ or Fortran code under cursor
 (setup org
   (setq org-adapt-indentation nil
         org-startup-indented t
-        org-startup-with-inline-images t
+        org-startup-with-inline-images nil
         org-startup-numerated nil
         org-startup-folded 'content
         org-edit-src-content-indentation 0
@@ -2392,7 +2392,8 @@ Comments:
 ** org-excalidraw
 #+begin_src elisp
 (setup org-excalidraw
-  (:load-after org))
+  (:autoload org-excalidraw-create-drawing)
+  )
 #+end_src
 ** ob-d2
 Org-Babel support for evaluating d2 diagram scripting language.
@@ -3029,7 +3030,10 @@ Edit text area on Chrome with Emacs using Atomic Chrome
   (setq atomic-chrome-url-major-mode-alist
         '(("leetcode.cn" . c++-mode)
           ("redmine" . textile-mode)))
-  (setq atomic-chrome-create-file-strategy '(("/tmp/" :extension ("cpp" "c" "py" )))
+  (setq atomic-chrome-create-file-strategy '(
+                                             ("~/Documents/emacs/21-codekit/cpp/src/"  :extension ("cpp" "c"))
+                                             ("/tmp/" :extension ("py" ))
+                                             )
         atomic-chrome-buffer-open-style 'split
         atomic-chrome-auto-remove-file t)
   (:defer
