@@ -591,9 +591,10 @@ Maybe I should add a new state.
    ;; ["org-mind-map"
    ;;  ("m" "org-mind-map-write" org-mind-map-write)
    ;;  ]
-   ["excalidraw"
-    ("c" "create excalidraw" org-excalidraw-create-drawing)
-    ]
+   ;; cann't use excalidraw, because transient will load it by default
+   ;; ["excalidraw"
+   ;;  ("c" "create excalidraw" org-excalidraw-create-drawing)
+   ;;  ]
    ]
   )
 #+end_src
@@ -913,11 +914,16 @@ Minimal mode line configuration for Emacs, inspired by doom-modeline
           ("major-mode" "vcs" "buffer-size" "buffer-position" "shrink-path"  "meow" "macro")))
   (setq mini-echo-separator "  ")
   (setq mini-echo-window-divider-args '(t 2 2))
+  (setq mini-echo-update-interval 0.1)
   (mini-echo-mode)
   (:when-loaded
     (mini-echo-define-segment "org-clock"
       "Return org-clock."
-      :fetch (when (featurep 'org-clock) (when (org-clocking-p) (org-clock-get-clock-string))))
+      :fetch
+      (when (and (fboundp 'org-clocking-p) (org-clocking-p))
+        (let* ((time-string (org-clock-get-clock-string))
+               (time-face 'mini-echo-magenta))
+          (mini-echo-segment--print time-string time-face))))
     ))
 #+end_src
 ** hl-todo
@@ -2840,6 +2846,13 @@ If `DEVICE-NAME' is provided, it will be used instead of prompting the user."
         (setq rk/default-audio-device (rk/find-device-matching name :audio))
         (when (boundp 'whisper--ffmpeg-input-device)
           (setq whisper--ffmpeg-input-device (format ":%s" rk/default-audio-device))))))
+  )
+#+end_src
+*** aider
+#+begin_src elisp
+(setup aider
+  (setq aider-args '("--model" "gpt-4o-mini"))
+  ;; (global-set-key (kbd "C-c a") 'aider-transient-menu))
   )
 #+end_src
 ** webjump
