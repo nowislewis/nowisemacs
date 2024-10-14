@@ -99,7 +99,6 @@ I failed in love with denote, so previous *org-roam* configs were refiled into [
   - [[#find-orgmode-dir-files][find orgmode dir files]]
   - [[#org-excalidraw][org-excalidraw]]
   - [[#ob-d2][ob-d2]]
-  - [[#d2-mode][d2-mode]]
   - [[#clue][clue]]
   - [[#org-transclusion][org-transclusion]]
   - [[#agendagtd][agenda/gtd]]
@@ -1817,6 +1816,7 @@ borrowed from citre, now you can always jump-back use "M-," after any jump in th
                               (unless (derived-mode-p 'emacs-lisp-mode 'lisp-mode 'makefile-mode 'snippet-mode)
                                 (eglot-ensure))))
   (:when-loaded
+    ;; hightlight face
     (defface new-hi-green
       '((((min-colors 88) (background dark))
          (:background "light green" :foreground "black"))
@@ -1825,6 +1825,9 @@ borrowed from citre, now you can always jump-back use "M-," after any jump in th
         (t (:background "green")))
       "Face for hi-lock mode.")
     (set-face-attribute 'eglot-highlight-symbol-face nil :inherit 'new-hi-green)
+    ;; more languare server
+    (add-to-list 'eglot-server-programs
+                 '(graphviz-dot-mode . ("dot-language-server" "--stdio")))
     )
   )
 (setup eldoc
@@ -1841,12 +1844,20 @@ borrowed from citre, now you can always jump-back use "M-," after any jump in th
     (let* ((edit-pre (intern (format "org-babel-edit-prep:%s" lang)))
            (intern-pre (intern (format "lsp--%s" (symbol-name edit-pre)))))
       `(progn
+         ;;;;;;;;;;;;; use :file as file_name
+         ;; (defun ,intern-pre (info)
+         ;;   (let ((file-name (->> info caddr (alist-get :file))))
+         ;;     (unless file-name
+         ;;       (setq file-name (make-temp-file "babel-lsp-")))
+         ;;     (setq buffer-file-name file-name)
+         ;;     (eglot-ensure)))
+
+         ;;;;;;;;;;;; always use temp file
          (defun ,intern-pre (info)
-           (let ((file-name (->> info caddr (alist-get :file))))
-             (unless file-name
-               (setq file-name (make-temp-file "babel-lsp-")))
+           (let ((file-name (make-temp-file "babel-lsp-")))
              (setq buffer-file-name file-name)
              (eglot-ensure)))
+
          ;; (lsp-deferred)))
          (put ',intern-pre 'function-documentation
               (format "Enable lsp-mode in the buffer of org source block (%s)."
@@ -1860,7 +1871,7 @@ borrowed from citre, now you can always jump-back use "M-," after any jump in th
                   (format "Prepare local buffer environment for org source block (%s)."
                           (upcase ,lang))))))))
   (defvar org-babel-lang-list
-    '("python" "C++" "C"))
+    '("python" "C++" "C" "c" "cpp" "dot"))
   (dolist (lang org-babel-lang-list)
     (eval `(lsp-org-babel-enable ,lang)))
   )
@@ -2340,10 +2351,6 @@ Comments:
 Org-Babel support for evaluating d2 diagram scripting language.
 #+begin_src elisp
 (setup ob-d2)
-#+end_src
-** d2-mode
-#+begin_src elisp
-(setup d2-mode)
 #+end_src
 ** clue
 Connecting clues while reading code.
