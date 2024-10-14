@@ -909,7 +909,8 @@ Minimal mode line configuration for Emacs, inspired by doom-modeline
   (setq mini-echo-persistent-rule
         '(:long
           ("major-mode" "vcs" "flymake" "process"
-           "selection-info" "narrow"  "profiler" "repeat" "eglot" "buffer-size" "buffer-position" "shrink-path"  "meow" "macro" "org-clock")
+            "narrow"  "profiler" "repeat" "eglot" "buffer-size" "buffer-position" "shrink-path"  "meow" "macro" "org-clock")
+          ;; remove "selection-info"
           :short
           ("major-mode" "vcs" "buffer-size" "buffer-position" "shrink-path"  "meow" "macro")))
   (setq mini-echo-separator "  ")
@@ -1364,11 +1365,12 @@ Jump anywhere in the world
 *** dired-preview
 #+begin_src elisp
 (setup dired-preview
+  (setq dired-preview-delay 0.1)
   (defun my-dired-preview-to-the-right ()
     "My preferred `dired-preview-display-action-alist-function'."
     '((display-buffer-in-side-window)
       (side . right)
-      (width . 0.3)))
+      (width . 0.5)))
   (setq dired-preview-display-action-alist #'my-dired-preview-to-the-right)
   )
 #+end_src
@@ -2000,6 +2002,9 @@ Disassemble C, C++ or Fortran code under cursor
 
         ;; export without _ or ^
         org-use-sub-superscripts nil
+
+        ;; plain list
+        org-list-demote-modify-bullet '(("+" . "-") ("-" . "+") ("*" . "+"))
         )
   (:when-loaded
     (require 'org-tempo) ;; so that <s is useful
@@ -2737,7 +2742,7 @@ Simple distraction-free editing. I use darkroom instead of writeroom because it'
 (setup gptel
   (setq gptel-default-mode 'org-mode
         gptel-crowdsourced-prompts-file (concat nowis-doc-emacs-dir "09-scripts/chatgpt.csv")
-        gptel-model "gpt-4o-mini"
+        gptel-model 'gpt-4o-mini
         )
   (:global "M-p" gptel-send
            "M-P" gptel)
@@ -2748,7 +2753,7 @@ Simple distraction-free editing. I use darkroom instead of writeroom because it'
                     :header (lambda () `(("Authorization" . ,(concat "Bearer " (gptel--get-api-key)))))
                     :key 'gptel-api-key
                     :stream t
-                    :models '("gpt-4o-mini" "gpt-4o-2024-08-06")))
+                    :models '(gpt-4o-mini gpt-4o-2024-08-06)))
     (gptel-make-gemini "Gemini" :key 'gptel-api-key :stream t)
     ))
 #+end_src
