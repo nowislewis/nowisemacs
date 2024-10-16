@@ -915,7 +915,7 @@ Minimal mode line configuration for Emacs, inspired by doom-modeline
   (setq mini-echo-separator "  ")
   (setq mini-echo-window-divider-args '(t 2 2))
   (setq mini-echo-update-interval 0.1)
-  (mini-echo-mode)
+  (require 'mini-echo)
   (:when-loaded
     (mini-echo-define-segment "org-clock"
       "Return org-clock."
@@ -924,6 +924,8 @@ Minimal mode line configuration for Emacs, inspired by doom-modeline
         (let* ((time-string (org-clock-get-clock-string))
                (time-face 'mini-echo-magenta))
           (mini-echo-segment--print time-string time-face))))
+      (mini-echo-mode)
+
     ))
 #+end_src
 ** hl-todo
@@ -2469,7 +2471,7 @@ My useage for =action.org=:
 
 ;; agenda clockreport
 (setq org-agenda-start-with-clockreport-mode t
-      org-agenda-clockreport-parameter-plist '(:link t :maxlevel 5)
+      org-agenda-clockreport-parameter-plist '(:link t :maxlevel 5 :properties ("Effort"))
       org-clock-out-remove-zero-time-clocks t)
 ;; agenda style
 (setq org-agenda-hide-tags-regexp ".")
