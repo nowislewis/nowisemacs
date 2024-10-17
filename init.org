@@ -88,6 +88,10 @@ I failed in love with denote, so previous *org-roam* configs were refiled into [
   - [[#useful-programing-tools][Useful programing tools]]
 - [[#org-mode][Org Mode]]
   - [[#org-mode-1][org-mode]]
+  - [[#org-src][org-src]]
+  - [[#org-zotero-parser][org-zotero-parser]]
+  - [[#org-oxlatexword][org-ox,latex,word]]
+  - [[#org-clock][org-clock]]
   - [[#ui-1][ui]]
   - [[#org-download][org-download]]
   - [[#ox-hugo][ox-hugo]]
@@ -908,14 +912,14 @@ Minimal mode line configuration for Emacs, inspired by doom-modeline
   (setq mini-echo-persistent-rule
         '(:long
           ("major-mode" "vcs" "flymake" "process"
-            "narrow"  "profiler" "repeat" "eglot" "buffer-size" "buffer-position" "shrink-path"  "meow" "macro" "org-clock")
+           "narrow"  "profiler" "repeat" "eglot" "buffer-size" "buffer-position" "shrink-path"  "meow" "macro" "org-clock")
           ;; remove "selection-info"
           :short
           ("major-mode" "vcs" "buffer-size" "buffer-position" "shrink-path"  "meow" "macro")))
   (setq mini-echo-separator "  ")
   (setq mini-echo-window-divider-args '(t 2 2))
   (setq mini-echo-update-interval 0.1)
-  (require 'mini-echo)
+  (mini-echo-mode -1)
   (:when-loaded
     (mini-echo-define-segment "org-clock"
       "Return org-clock."
@@ -924,8 +928,7 @@ Minimal mode line configuration for Emacs, inspired by doom-modeline
         (let* ((time-string (org-clock-get-clock-string))
                (time-face 'mini-echo-magenta))
           (mini-echo-segment--print time-string time-face))))
-      (mini-echo-mode)
-
+    (mini-echo-mode)
     ))
 #+end_src
 ** hl-todo
@@ -1229,6 +1232,7 @@ Popper is a minor-mode to tame the flood of ephemeral windows Emacs produces, wh
   (setq popper-reference-buffers '("\\*Messages\\*"
                                    "Output\\*$"
                                    "\\*Async Shell Command\\*"
+                                   "\\*Org Clock Reminder\\*"
                                    "gt-result"
                                    help-mode
                                    helpful-mode
@@ -1977,7 +1981,6 @@ Disassemble C, C++ or Fortran code under cursor
         org-startup-with-inline-images nil
         org-startup-numerated nil
         org-startup-folded 'content
-        org-edit-src-content-indentation 0
         org-imenu-depth 8
         org-return-follows-link t
         org-id-link-to-org-use-id t ;; Create an ID if needed to make a link to the current entry.
@@ -1992,14 +1995,11 @@ Disassemble C, C++ or Fortran code under cursor
 
         org-image-actual-width 800 ;; this will use 600 for width for all the images.
         org-preview-latex-image-directory (concat no-littering-var-directory "ltximg/")
-        org-confirm-babel-evaluate nil
         org-plantuml-jar-path plantuml-jar-path
         org-special-ctrl-a/e t
         ;; org-id
         org-attach-id-dir (concat nowis-doc-emacs-dir "01-orgmode/org-attach")
         org-id-method 'ts
-        ;; org-src
-        org-src-window-setup 'split-window-below
 
         ;; habit
         org-habit-following-days 2
@@ -2012,16 +2012,88 @@ Disassemble C, C++ or Fortran code under cursor
                                        ))
         ;; save state changes into logbook
         org-log-state-notes-into-drawer t
-
-        ;; export without _ or ^
-        org-use-sub-superscripts nil
-
         ;; plain list
         org-list-demote-modify-bullet '(("+" . "-") ("-" . "+") ("*" . "+"))
         )
   (:when-loaded
     (require 'org-tempo) ;; so that <s is useful
-    ;; 导出相关的设置
+    ))
+#+end_src
+** org-src
+#+begin_src elisp
+(setup org
+  (setq org-edit-src-content-indentation 0
+        org-confirm-babel-evaluate nil
+        ;; org-src
+        org-src-window-setup 'split-window-below)
+  (:when-loaded
+    ;; org-src-lang-modes
+    (add-to-list 'org-src-lang-modes '("dot" . graphviz-dot))
+    ;; dynamic load org-src modules to accelerate speed
+    (defun my/org-babel-execute-src-block (&optional _arg info _params)
+      "Load language if needed"
+      (let* ((lang (nth 0 info))
+             (sym (cond ((member (downcase lang) '("c" "cpp" "c++")) 'C)
+                        ((member (downcase lang) '("jupyter-python")) 'jupyter)
+                        (t (intern lang))))
+             (backup-languages org-babel-load-languages))
+        (unless (assoc sym backup-languages)
+          (condition-case err
+              (progn
+                (org-babel-do-load-languages 'org-babel-load-languages (list (cons sym t)))
+                (setq-default org-babel-load-languages (append (list (cons sym t)) backup-languages)))
+            (file-missing
+             (setq-default org-babel-load-languages backup-languages)
+             err)))))
+    (advice-add 'org-babel-execute-src-block :before #'my/org-babel-execute-src-block )
+    ;; didn't redisplay for now
+    ;; (add-hook 'org-babel-after-execute-hook 'org-redisplay-inline-images)
+    ))
+#+end_src
+** org-zotero-parser
+#+begin_src elisp
+(setup org
+  (:when-loaded
+        ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+    ;; for zotero annotations parser
+    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+    (defun org-zotero-open (path)
+      (browse-url (format "zotero:%s" path)))
+    (org-link-set-parameters "zotero" :follow #'org-zotero-open)
+
+    (defun parser-zotero-annotation-to-org-mode()
+      (interactive)
+      (while (re-search-forward "“\\([.]*\n*.*\\)” (\\[\\(.*\\)\\](zotero://selec.*)) (.*(\\(zotero.*\\)))" nil t)
+        (let ((begin (match-beginning 1))
+              (end (match-end 3))
+              (note (match-string 1))
+              (title (match-string 2))
+              (location (match-string 3))
+              )
+          (delete-region (1- begin) (+ 2 end)) ;; full region
+          (insert (format "** %s\n%s" title note))
+          (org-set-property "zotero" location)
+          (org-set-property "ref" title)
+
+          ;; for anki
+          (org-set-tags "wait_for_cloze") ;; for article
+          ;; (org-set-property "ANKI_DECK" "Default::2") ;; default with 0.9 mem rate
+          ;; (org-set-property "ANKI_NOTE_TYPE" "Cloze")
+
+          ;; for org-fc
+          (if (not (featurep 'org-fc))
+              (require 'org-fc))
+          (org-fc-type-normal-init)
+          )))
+    )
+  )
+#+end_src
+** org-ox,latex,word
+#+begin_src elisp
+(setup org
+  ;; export without _ or ^
+  (setq org-use-sub-superscripts nil)
+  (:when-loaded
     (with-eval-after-load 'ox-latex
       (setq org-latex-pdf-process '("tectonic %f")
             org-latex-default-class "scrbook"
@@ -2050,7 +2122,77 @@ Disassemble C, C++ or Fortran code under cursor
 
     (plist-put org-format-latex-options :scale 2.0) ;; use a large preview for latex
     ;; (setq org-preview-latex-default-process 'dvisvgm)
+    ;; export and open word
+    (add-to-list 'org-file-apps '("\\.docx\\'" . default))
+    (add-to-list 'org-structure-template-alist
+                 '("jp" . "src jupyter-python :async yes :kernel python3 :session py"))
 
+    ;; borrowed from HM0880
+    (defun lewis/convert-org-to-docx-with-pandoc ()
+      "Use Pandoc to convert .org to .docx.
+Comments:
+- The `-N' flag numbers the headers lines.
+- Use the `--from org' flag to have this function work on files
+  that are in Org syntax but do not have a .org extension"
+      (interactive)
+      (shell-command
+       (concat "pandoc -N --from org " (buffer-file-name)
+               " -o "
+               (file-name-sans-extension (buffer-file-name))
+               ".docx"))
+      (message "Convert finish: %s" docx-file))
+
+    ))
+#+end_src
+** org-clock
+#+begin_src elisp
+(setup org-clock
+  (:when-loaded
+    (defvar my/org-timer nil
+      "Timer for the 25-minute reminder.")
+
+    (defun my/org-start-timer ()
+      "Start a 25-minute reminder timer."
+      (setq my/org-timer
+            (run-at-time "25 min" 1500 'my/org-show-reminder)))
+    ;; (run-at-time "10" 5 'my/org-show-reminder)))
+
+    (defun my/org-cancel-timer ()
+      "Cancel the 25-minute reminder timer."
+      (when my/org-timer
+        (cancel-timer my/org-timer)
+        (setq my/org-timer nil)))
+
+    (defun my/org-show-reminder ()
+      "Function to show a reminder buffer."
+      (let ((buf (get-buffer-create "*Org Clock Reminder*"))
+            (message "25 minutes has passed. Time to take a break!"))
+        (with-current-buffer buf
+          (erase-buffer)
+          ;; use popper for buffer display (height=1/6)
+          (insert (make-string (max 0 (/ (- (frame-height) 1) 6)) ?\n)) ;; whitespace line
+          (insert (make-string (/ (- (frame-width) (length message)) 2) ?\ ) message)
+          (goto-char (point-min))
+          (display-buffer buf)
+          )))
+
+      (add-hook 'org-clock-in-hook #'my/org-start-timer)
+      (add-hook 'org-clock-out-hook #'my/org-cancel-timer)))
+#+end_src
+** ui
+*** org mode basic style
+#+begin_src elisp
+(setup org
+  (setq org-auto-align-tags nil
+        org-tags-column 0
+        org-ellipsis "⤵"
+        org-hide-emphasis-markers t
+        org-pretty-entities nil ;; can perfor ui such as "a_words" into small "awords"
+        org-habit-graph-column 50
+        ;; Agenda styling
+        org-agenda-tags-column 0
+        )
+  (:when-loaded
     ;; emphasis
     (defface my-org-emphasis-bold
       '((default :inherit bold)
@@ -2085,48 +2227,6 @@ Disassemble C, C++ or Fortran code under cursor
             ("+" (:strike-through t))
             ))
 
-    ;; dynamic load org-src modules to accelerate speed
-    (defun my/org-babel-execute-src-block (&optional _arg info _params)
-      "Load language if needed"
-      (let* ((lang (nth 0 info))
-             (sym (cond ((member (downcase lang) '("c" "cpp" "c++")) 'C)
-                        ((member (downcase lang) '("jupyter-python")) 'jupyter)
-                        (t (intern lang))))
-             (backup-languages org-babel-load-languages))
-        (unless (assoc sym backup-languages)
-          (condition-case err
-              (progn
-                (org-babel-do-load-languages 'org-babel-load-languages (list (cons sym t)))
-                (setq-default org-babel-load-languages (append (list (cons sym t)) backup-languages)))
-            (file-missing
-             (setq-default org-babel-load-languages backup-languages)
-             err)))))
-    (advice-add 'org-babel-execute-src-block :before #'my/org-babel-execute-src-block )
-
-
-    ;; didn't redisplay for now
-    ;; (add-hook 'org-babel-after-execute-hook 'org-redisplay-inline-images)
-
-    ;; export and open word
-    (add-to-list 'org-file-apps '("\\.docx\\'" . default))
-    (add-to-list 'org-structure-template-alist
-                 '("jp" . "src jupyter-python :async yes :kernel python3 :session py"))
-
-    ;; borrowed from HM0880
-    (defun lewis/convert-org-to-docx-with-pandoc ()
-      "Use Pandoc to convert .org to .docx.
-Comments:
-- The `-N' flag numbers the headers lines.
-- Use the `--from org' flag to have this function work on files
-  that are in Org syntax but do not have a .org extension"
-      (interactive)
-      (shell-command
-       (concat "pandoc -N --from org " (buffer-file-name)
-               " -o "
-               (file-name-sans-extension (buffer-file-name))
-               ".docx"))
-      (message "Convert finish: %s" docx-file))
-
     (dolist (face '((org-level-1 . 1.4)
                     (org-level-2 . 1.4)
                     (org-level-3 . 1.4)
@@ -2136,62 +2236,14 @@ Comments:
                     (org-level-7 . 1.4)
                     (org-level-8 . 1.1)))
       (set-face-attribute (car face) nil :weight 'medium :height (cdr face)))
-
-    ;; org-src-lang-modes
-    (add-to-list 'org-src-lang-modes '("dot" . graphviz-dot))
-    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-    ;; for zotero annotations parser
-    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-    (defun org-zotero-open (path)
-      (browse-url (format "zotero:%s" path)))
-    (org-link-set-parameters "zotero" :follow #'org-zotero-open)
-
-    (defun parser-zotero-annotation-to-org-mode()
-      (interactive)
-      (while (re-search-forward "“\\([.]*\n*.*\\)” (\\[\\(.*\\)\\](zotero://selec.*)) (.*(\\(zotero.*\\)))" nil t)
-        (let ((begin (match-beginning 1))
-              (end (match-end 3))
-              (note (match-string 1))
-              (title (match-string 2))
-              (location (match-string 3))
-              )
-          (delete-region (1- begin) (+ 2 end)) ;; full region
-          (insert (format "** %s\n%s" title note))
-          (org-set-property "zotero" location)
-          (org-set-property "ref" title)
-
-          ;; for anki
-          (org-set-tags "wait_for_cloze") ;; for article
-          ;; (org-set-property "ANKI_DECK" "Default::2") ;; default with 0.9 mem rate
-          ;; (org-set-property "ANKI_NOTE_TYPE" "Cloze")
-
-          ;; for org-fc
-          (if (not (featurep 'org-fc))
-              (require 'org-fc))
-          (org-fc-type-normal-init)
-          )))
     ))
-#+end_src
-** ui
-*** org mode basic style
-#+begin_src elisp
-(setup org
-  (setq org-auto-align-tags nil
-        org-tags-column 0
-        org-ellipsis "⤵"
-        org-hide-emphasis-markers t
-        org-pretty-entities nil ;; can perfor ui such as "a_words" into small "awords"
-        org-habit-graph-column 50
-        ;; Agenda styling
-        org-agenda-tags-column 0
-        ))
 #+end_src
 *** org-modern
 #+begin_src elisp
 (setup org-modern
   (setq org-modern-star 'replace
         org-modern-replace-stars '("Ⓐ" "Ⓑ" "Ⓒ" "Ⓓ" "Ⓔ" "Ⓕ" "Ⓖ" "Ⓗ" "Ⓘ" "Ⓙ" "Ⓚ" "Ⓛ" "Ⓜ")
-        org-modern-table t)
+        org-modern-table nil)
   (:hook-into org-mode)
   (add-hook 'org-agenda-finalize-hook #'org-modern-agenda))
 #+end_src
