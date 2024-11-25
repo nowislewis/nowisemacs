@@ -61,6 +61,7 @@ I failed in love with denote, so previous *org-roam* configs were refiled into [
   - [[#yasnippet][yasnippet]]
   - [[#tempel][tempel]]
 - [[#window-management][Window Management]]
+  - [[#window][window]]
   - [[#winner-mode][winner-mode]]
   - [[#popper][popper]]
   - [[#move][Move]]
@@ -1217,6 +1218,12 @@ should be check after reading the embark.el manual
            "M-["  tempel-previous)))
 #+end_src
 * Window Management
+** window
+#+begin_src elisp
+(setup window
+  (setq quit-restore-window-no-switch t)
+  )
+#+end_src
 ** winner-mode
 #+name: winner-mode
 #+begin_src elisp
@@ -2093,6 +2100,7 @@ Disassemble C, C++ or Fortran code under cursor
 (setup org
   ;; export without _ or ^
   (setq org-use-sub-superscripts nil)
+  (setq org-export-with-sub-superscripts nil)
   (:when-loaded
     (with-eval-after-load 'ox-latex
       (setq org-latex-pdf-process '("tectonic %f")
@@ -2321,7 +2329,9 @@ Comments:
            org-cite-follow-processor 'citar
            org-cite-activate-processor 'citar
            citar-library-paths (list nowis-bib-pdf-dir)
-           citar-bibliography org-cite-global-bibliography))
+           citar-bibliography org-cite-global-bibliography
+           ;; org-cite-export-processors '((t . (csl "modern-language-association.csl")))
+           ))
 #+end_src
 *** citar-denote
 #+begin_src elisp
