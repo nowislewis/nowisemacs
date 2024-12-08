@@ -2021,6 +2021,8 @@ Disassemble C, C++ or Fortran code under cursor
         org-log-state-notes-into-drawer t
         ;; plain list
         org-list-demote-modify-bullet '(("+" . "-") ("-" . "+") ("*" . "+"))
+        ;; attach
+        org-yank-image-save-method (concat nowis-doc-emacs-dir "02-binary-files/01-pictures/org_download_images")
         )
   (:when-loaded
     (require 'org-tempo) ;; so that <s is useful
@@ -2422,7 +2424,7 @@ Connecting clues while reading code.
 (setup clue)
 #+end_src
 ** org-transclusion
-#+begin_src elisp
+#+begin_src elisp :tangle no
 (setup org-transclusion)
 #+end_src
 ** agenda/gtd

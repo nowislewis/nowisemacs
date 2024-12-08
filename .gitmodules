@@ -251,9 +251,6 @@
 [submodule "org-present"]
 	path = lib/org-present
 	url = https://github.com/rlister/org-present.git
-[submodule "org-transclusion"]
-	path = lib/org-transclusion
-	url = https://github.com/nobiot/org-transclusion.git
 [submodule "ox-hugo"]
 	path = lib/ox-hugo
 	url = https://github.com/kaushalmodi/ox-hugo.git
