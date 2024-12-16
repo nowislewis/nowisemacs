@@ -172,6 +172,9 @@
 [submodule "language-id"]
 	path = lib/language-id
 	url = https://github.com/lassik/emacs-language-id.git
+[submodule "lisp-fsrs"]
+	path = lib/lisp-fsrs
+	url = https://github.com/open-spaced-repetition/lisp-fsrs.git
 [submodule "literate-calc"]
 	path = lib/literate-calc
 	url = https://github.com/sulami/literate-calc-mode.el.git
@@ -251,6 +254,9 @@
 [submodule "org-present"]
 	path = lib/org-present
 	url = https://github.com/rlister/org-present.git
+[submodule "org-srs"]
+	path = lib/org-srs
+	url = https://github.com/bohonghuang/org-srs.git
 [submodule "ox-hugo"]
 	path = lib/ox-hugo
 	url = https://github.com/kaushalmodi/ox-hugo.git

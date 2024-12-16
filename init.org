@@ -108,6 +108,7 @@ I failed in love with denote, so previous *org-roam* configs were refiled into [
   - [[#org-transclusion][org-transclusion]]
   - [[#agendagtd][agenda/gtd]]
   - [[#org-fc][org-fc]]
+  - [[#org-srs][org-srs]]
   - [[#org-mind-map][org-mind-map]]
 - [[#english-翻译][english 翻译]]
   - [[#go-translate][go-translate]]
@@ -130,6 +131,7 @@ I failed in love with denote, so previous *org-roam* configs were refiled into [
   - [[#atomic-chrome][atomic-chrome]]
   - [[#macos-ocr][macos-ocr]]
   - [[#esup][esup]]
+  - [[#windows-wslg][windows-wslg]]
 
 * Startup config
 ** UI speed up
@@ -433,7 +435,7 @@ Maybe I should add a new state.
                           '("." . repeat)
 
                           '("<escape>" . ignore)
-                          '("!" . meow-start-kmacro-or-insert-counter)
+                          '("!" . kmacro-start-macro-or-insert-counter)
                           '("@" . meow-end-or-call-kmacro)
                           '("#" . embark-toggle-highlight)
                           '("^" . meow-join)
@@ -1822,12 +1824,17 @@ borrowed from citre, now you can always jump-back use "M-," after any jump in th
 (setq read-process-output-max (* 1024 1024))
 (setup eglot
   (setq eglot-events-buffer-config'(:size 10000 :format full)
-        eglot-workspace-configuration '((:python.analysis :useLibraryCodeForTypes t))
+        ;; eglot-workspace-configuration '((:python.analysis :useLibraryCodeForTypes t))
+        eglot-workspace-configuration '(:basedpyright (:typeCheckingMode "off")
+                                        :basedpyright.analysis (:diagnosticSeverityOverrides (:reportUnusedCallResult "none")
+                                                                :inlayHints (:callArgumentNames :json-false)
+                                                                ))
         )
   (:autoload eglot-find-implementation)
   (add-hook 'prog-mode-hook (lambda ()
                               (unless (derived-mode-p 'emacs-lisp-mode 'lisp-mode 'makefile-mode 'snippet-mode)
                                 (eglot-ensure))))
+
   (:when-loaded
     ;; hightlight face
     (defface new-hi-green
@@ -2663,6 +2670,11 @@ Spaced Repetition System for Emacs org-mode
     (org-set-tags '("article" "suspended" "fc")))
   )
 #+end_src
+** org-srs
+#+begin_src elisp
+(setup lisp-fsrs)
+(setup org-srs)
+#+end_src
 ** org-mind-map
 This is an Emacs package that creates graphviz directed graphs from the headings of an org file
 #+begin_src elisp
@@ -2826,7 +2838,7 @@ Simple distraction-free editing. I use darkroom instead of writeroom because it'
                     :header (lambda () `(("Authorization" . ,(concat "Bearer " (gptel--get-api-key)))))
                     :key 'gptel-api-key
                     :stream t
-                    :models '(gpt-4o-mini gpt-4o-2024-08-06)))
+                    :models '(gpt-4o-mini gpt-4o)))
     (gptel-make-gemini "Gemini" :key 'gptel-api-key :stream t)
     ))
 #+end_src
@@ -3035,4 +3047,16 @@ ESUP - Emacs Start Up Profiler
       (setq esup-depth 0)
       ;; )
   )
+#+end_src
+** windows-wslg
+These codes are used to solve copy & paste problems under wslg inside win10/win11
+#+begin_src elisp :tangle no
+;; solve the problem of copying from windows to wslg
+(set-clipboard-coding-system 'gbk-dos)
+;; solve the problem of copying from wslg to windows
+(defun wsl-copy-region-to-clipboard (start end)
+  "Copy region to Windows clipboard."
+  (interactive "r")
+  (call-process-region start end "wl-copy" nil 0))
+(global-set-key [remap kill-ring-save] #'wsl-copy-region-to-clipboard)
 #+end_src
