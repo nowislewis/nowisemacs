@@ -107,6 +107,7 @@ I failed in love with denote, so previous *org-roam* configs were refiled into [
   - [[#clue][clue]]
   - [[#org-transclusion][org-transclusion]]
   - [[#agendagtd][agenda/gtd]]
+  - [[#org-super-agenda][org-super-agenda]]
   - [[#org-fc][org-fc]]
   - [[#org-srs][org-srs]]
   - [[#org-mind-map][org-mind-map]]
@@ -2451,7 +2452,7 @@ My useage for =action.org=:
 ++ Notes
 ++ Tasks
 #+end_example
-#+begin_src elisp
+#+begin_src elisp 
 ;; Files
 (setq org-directory "~/Documents/emacs/01-orgmode/xnotes")
 (setq org-agenda-files
@@ -2511,35 +2512,23 @@ My useage for =action.org=:
 ;; Agenda
 (setq org-agenda-custom-commands
       '(("g" "Get Things Done (GTD)"
-         ((agenda ""
-                  ;; ((org-agenda-skip-function
-                  ;;   '(org-agenda-skip-entry-if 'deadline))
-                  ;;  (org-deadline-warning-days 0))
-                  )
-          (todo "NEXT"
-                ((org-agenda-skip-function
-                  '(org-agenda-skip-entry-if 'deadline))
-                 (org-agenda-prefix-format "  %-12:c [%e] ")
-                 (org-agenda-overriding-header "\nTasks\n")))
-          (tags-todo "+action-TODO=\"NEXT\""
-                     ((org-agenda-prefix-format "  %-12:c [%e] ")
-                      (org-agenda-overriding-header "\nAvailiable Action\n")))
-          ;; (agenda nil
-          ;;         ((org-agenda-entry-types '(:deadline))
-          ;;          (org-agenda-format-date "")
-          ;;          (org-deadline-warning-days 7)
-          ;;          (org-agenda-skip-function
-          ;;           '(org-agenda-skip-entry-if 'notregexp "\\* NEXT"))
-          ;;          (org-agenda-overriding-header "\nDeadlines")))
+         ((agenda "" )
+          (tags-todo "+action" ((org-agenda-overriding-header "Action")
+                                (org-agenda-prefix-format "  %-12:c [%e] ")
+                                (org-super-agenda-groups
+                                 '(
+                                   (:name "outline" :auto-outline-path t
+                                          :tag "action")
+                                   ))))
           (tags-todo "inbox"
                      ((org-agenda-prefix-format "  %?-12t% s")
                       (org-agenda-overriding-header "\nInbox\n")))
+
           (tags "CLOSED>=\"<today>\""
                 ((org-agenda-overriding-header "\nCompleted today\n")))
           (tags "CLOSED>=\"<-1w>\""
                 ((org-agenda-overriding-header "\nCompleted last 7 days")))
           ))))
-
 ;; agenda clockreport
 (setq org-agenda-start-with-clockreport-mode t
       org-agenda-clockreport-parameter-plist '(:link t :maxlevel 5 :properties ("Effort"))
@@ -2564,6 +2553,20 @@ See also `org-save-all-org-buffers'"
 
 ;; archive
 (setq org-archive-location (concat  "gtd_archive_" (format-time-string "%Y") "::datetree/"))
+#+end_src
+** org-super-agenda
+#+begin_src elisp
+(setup ht)
+(setup ts)
+(setup org-super-agenda
+  (:hook-into org-agenda-mode-hook)
+  (:with-map org-super-agenda-header-map
+    (:bind "j" meow-next)
+    (:bind "k" meow-prev)
+    (:bind "h" meow-left)
+    (:bind "l" meow-right)
+    )
+  )
 #+end_src
 ** org-fc
 Spaced Repetition System for Emacs org-mode
@@ -2673,7 +2676,14 @@ Spaced Repetition System for Emacs org-mode
 ** org-srs
 #+begin_src elisp
 (setup lisp-fsrs)
-(setup org-srs)
+(setup org-srs
+  (add-hook 'org-mode-hook #'org-srs-embed-overlay-mode)
+  (:with-map org-mode-map
+    (:bind "<f5>"  org-srs-review-rate-easy
+           "<f6>"  org-srs-review-rate-good
+           "<f7>"  org-srs-review-rate-hard
+           "<f8>"  org-srs-review-rate-again))
+  )
 #+end_src
 ** org-mind-map
 This is an Emacs package that creates graphviz directed graphs from the headings of an org file
@@ -2834,7 +2844,7 @@ Simple distraction-free editing. I use darkroom instead of writeroom because it'
   (:when-loaded
     (setq-default gptel-backend
                   (gptel-make-openai "chatanywhere"
-                    :host "api.chatanywhere.com.cn"
+                    :host "api.chatanywhere.tech"
                     :header (lambda () `(("Authorization" . ,(concat "Bearer " (gptel--get-api-key)))))
                     :key 'gptel-api-key
                     :stream t
@@ -2936,13 +2946,6 @@ If `DEVICE-NAME' is provided, it will be used instead of prompting the user."
         (setq rk/default-audio-device (rk/find-device-matching name :audio))
         (when (boundp 'whisper--ffmpeg-input-device)
           (setq whisper--ffmpeg-input-device (format ":%s" rk/default-audio-device))))))
-  )
-#+end_src
-*** aider
-#+begin_src elisp
-(setup aider
-  (setq aider-args '("--model" "gpt-4o-mini"))
-  ;; (global-set-key (kbd "C-c a") 'aider-transient-menu))
   )
 #+end_src
 ** webjump

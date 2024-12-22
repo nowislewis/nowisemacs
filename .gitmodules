@@ -1,10 +1,6 @@
 [submodule "ace-window"]
 	path = lib/ace-window
 	url = https://github.com/abo-abo/ace-window.git
-[submodule "aider"]
-	path = lib/aider
-	url = https://github.com/tninja/aider.el.git
-    no-byte-compile = helm-aider.el
 [submodule "annotate"]
 	path = lib/annotate
 	url = https://github.com/bastibe/annotate.el.git
@@ -160,6 +156,9 @@
 [submodule "hl-todo"]
 	path = lib/hl-todo
 	url = https://github.com/tarsius/hl-todo.git
+[submodule "ht"]
+	path = lib/ht
+	url = https://github.com/Wilfred/ht.el.git
 [submodule "imenu-list"]
 	path = lib/imenu-list
 	url = https://github.com/nowislewis/imenu-list.git
@@ -257,6 +256,9 @@
 [submodule "org-srs"]
 	path = lib/org-srs
 	url = https://github.com/bohonghuang/org-srs.git
+[submodule "org-super-agenda"]
+	path = lib/org-super-agenda
+	url = https://github.com/alphapapa/org-super-agenda.git
 [submodule "ox-hugo"]
 	path = lib/ox-hugo
 	url = https://github.com/kaushalmodi/ox-hugo.git
@@ -323,6 +325,9 @@
 [submodule "treesit-context"]
 	path = lib/treesit-context
 	url = https://github.com/zbelial/treesitter-context.el.git
+[submodule "ts"]
+	path = lib/ts
+	url = https://github.com/alphapapa/ts.el.git
 [submodule "vertico"]
 	path = lib/vertico
 	url = https://github.com/minad/vertico.git
