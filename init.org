@@ -2097,10 +2097,10 @@ Disassemble C, C++ or Fortran code under cursor
           ;; (org-set-property "ANKI_DECK" "Default::2") ;; default with 0.9 mem rate
           ;; (org-set-property "ANKI_NOTE_TYPE" "Cloze")
 
-          ;; for org-fc
-          (if (not (featurep 'org-fc))
-              (require 'org-fc))
-          (org-fc-type-normal-init)
+          ;; for org-srs
+          (if (not (featurep 'org-srs))
+              (require 'org-srs))
+          (org-srs-item-new-normal)
           )))
     )
   )
@@ -2683,6 +2683,26 @@ Spaced Repetition System for Emacs org-mode
            "<f6>"  org-srs-review-rate-good
            "<f7>"  org-srs-review-rate-hard
            "<f8>"  org-srs-review-rate-again))
+  (defun org-srs-item-new-normal()
+    (interactive)
+    (org-srs-item-new-interactively
+     (prog1 'card
+       (org-id-get-create))))
+  (defun org-srs-item-new-cloze()
+    (interactive)
+    (org-srs-item-new-interactively
+     (prog1 'cloze
+       (org-id-get-create))))
+
+  ;; font lock for cloze
+  (font-lock-add-keywords
+   'org-mode
+   '(("\\({{[\\0-9a-z]+}{\\)\\([^}]+\\)\\(}}\\)"
+      ;; "\\({{\\)\\([^}]+\\)}\\({[^}]+}?@[0-9]}\\)"
+      (1 'shadow nil t)
+      (2 'my-org-fc-cloze-face t)
+      (3 'shadow nil t)
+      )))
   )
 #+end_src
 ** org-mind-map
