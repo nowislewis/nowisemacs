@@ -2499,7 +2499,7 @@ My useage for =action.org=:
 ;;       '(("action.org" :level . 2)))
 
 ;; TODO
-(setq org-log-done 'time)
+(setq org-log-done 'note)
 (setq org-todo-keywords
       '((sequence "TODO(t)" "NEXT(n)" "HOLD(h)" "|" "DONE(d)" "AXED(a)")))
 (defun log-todo-next-creation-date (&rest ignore)
@@ -2534,7 +2534,7 @@ My useage for =action.org=:
       org-agenda-clockreport-parameter-plist '(:link t :maxlevel 5 :properties ("Effort"))
       org-clock-out-remove-zero-time-clocks t)
 ;; agenda style
-(setq org-agenda-hide-tags-regexp ".")
+(setq org-agenda-hide-tags-regexp "\\(inbox\\|action\\)")
 ;; Save the corresponding buffers
 (defun gtd-save-org-buffers ()
   "Save `org-agenda-files' buffers without user confirmation.
