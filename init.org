@@ -104,6 +104,7 @@ I failed in love with denote, so previous *org-roam* configs were refiled into [
   - [[#find-orgmode-dir-files][find orgmode dir files]]
   - [[#org-excalidraw][org-excalidraw]]
   - [[#ob-d2][ob-d2]]
+  - [[#ob-tmux][ob-tmux]]
   - [[#clue][clue]]
   - [[#org-transclusion][org-transclusion]]
   - [[#agendagtd][agenda/gtd]]
@@ -2426,6 +2427,30 @@ Org-Babel support for evaluating d2 diagram scripting language.
 #+begin_src elisp
 (setup ob-d2)
 #+end_src
+** ob-tmux
+#+begin_src elisp
+;; (require 'ob-tmux)
+(setup ob-tmux
+  (setq org-babel-default-header-args:tmux
+        '((:results . "silent")	;
+          (:session . "default")	; The default tmux session to send code to
+          (:socket  . nil)))      ; The default tmux socket to communicate with
+
+  ;; The tmux sessions are prefixed with the following string.
+  ;; You can customize this if you like.
+  (setq org-babel-tmux-session-prefix "ob-")
+
+  ;; The terminal that will be used.
+  (setq org-babel-tmux-terminal "foot")
+  ;; (setq org-babel-tmux-terminal-opts '("-T" "ob-tmux" "-e"))
+                                        ; The default terminal is "gnome-terminal" with options "--".
+
+  ;; Finally, if your tmux is not in your $PATH for whatever reason, you
+  ;; may set the path to the tmux binary as follows:
+  ;; (setq org-babel-tmux-location "/usr/bin/tmux")
+  )
+#+end_src
+
 ** clue
 Connecting clues while reading code.
 #+begin_src elisp

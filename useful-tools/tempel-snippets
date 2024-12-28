@@ -10,7 +10,9 @@ org-mode
 (uml "#+begin_src plantuml :file ~/Documents/emacs/02-binary-files/01-pictures/plantuml_pictures/" (format-time-string "%Y%m%d%H%M%S") ".svg"
      " :cmdline -charset UTF-8" n> "title " p n> "#+end_src")
 (d2 "#+begin_src d2 :file ~/Documents/emacs/02-binary-files/01-pictures/d2_pictures/" (format-time-string "%Y%m%d%H%M%S") ".svg"
-     " :flags -l elk -t 101 -s" n> r> n> "#+end_src")
+    " :flags -l elk -t 101 -s" n> r> n> "#+end_src")
+
+(tmux "#+begin_src tmux :session ob-00:a" n> r> n> "#+end_src")
 
 ;; Local Variables:
 ;; mode: lisp-data

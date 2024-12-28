@@ -222,6 +222,9 @@
 [submodule "ob-d2"]
 	path = lib/ob-d2
 	url = https://github.com/xcapaldi/ob-d2.git
+[submodule "ob-tmux"]
+	path = lib/ob-tmux
+	url = https://github.com/ahendriksen/ob-tmux.git
 [submodule "orderless"]
 	path = lib/orderless
 	url = https://github.com/oantolin/orderless.git
