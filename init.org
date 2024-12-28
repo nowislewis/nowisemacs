@@ -91,7 +91,7 @@ I failed in love with denote, so previous *org-roam* configs were refiled into [
   - [[#org-mode-1][org-mode]]
   - [[#org-src][org-src]]
   - [[#org-zotero-parser][org-zotero-parser]]
-  - [[#org-oxlatexword][org-ox,latex,word]]
+  - [[#org-oxlatexwordmarkdown][org-ox,latex,word,markdown]]
   - [[#org-clock][org-clock]]
   - [[#ui-1][ui]]
   - [[#org-download][org-download]]
@@ -2106,7 +2106,7 @@ Disassemble C, C++ or Fortran code under cursor
     )
   )
 #+end_src
-** org-ox,latex,word
+** org-ox,latex,word,markdown
 #+begin_src elisp
 (setup org
   ;; export without _ or ^
@@ -2161,6 +2161,11 @@ Comments:
                ".docx"))
       (message "Convert finish: %s" docx-file))
 
+    (defun lewis/convert-md-to-org (start end)
+      "Convert region from markdown to org"
+      (interactive "r")
+      (shell-command-on-region start end "pandoc -f markdown -t org" t t)
+      (org-mode))
     ))
 #+end_src
 ** org-clock
@@ -3098,13 +3103,16 @@ ESUP - Emacs Start Up Profiler
 #+end_src
 ** windows-wslg
 These codes are used to solve copy & paste problems under wslg inside win10/win11
-#+begin_src elisp :tangle no
+#+begin_src elisp 
 ;; solve the problem of copying from windows to wslg
-(set-clipboard-coding-system 'gbk-dos)
-;; solve the problem of copying from wslg to windows
-(defun wsl-copy-region-to-clipboard (start end)
-  "Copy region to Windows clipboard."
-  (interactive "r")
-  (call-process-region start end "wl-copy" nil 0))
-(global-set-key [remap kill-ring-save] #'wsl-copy-region-to-clipboard)
+(if (string= "Arch" (getenv "WSL_DISTRO_NAME"))
+    (progn
+      (set-clipboard-coding-system 'gbk-dos)
+      ;; solve the problem of copying from wslg to windows
+      (defun wsl-copy-region-to-clipboard (start end)
+        "Copy region to Windows clipboard."
+        (interactive "r")
+         (call-process-region start end "wl-copy" nil 0))
+      (global-set-key [remap kill-ring-save] #'wsl-copy-region-to-clipboard)
+      ))
 #+end_src
