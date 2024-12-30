@@ -2430,6 +2430,7 @@ Comments:
 ** ob-d2
 Org-Babel support for evaluating d2 diagram scripting language.
 #+begin_src elisp
+(setup d2-mode)
 (setup ob-d2)
 #+end_src
 ** ob-tmux

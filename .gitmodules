@@ -47,6 +47,9 @@
 	url = https://github.com/minad/corfu.git
     load-path = .
     load-path = extensions
+[submodule "d2-mode"]
+	path = lib/d2-mode
+	url = https://github.com/andorsk/d2-mode.git
 [submodule "dape"]
 	path = lib/dape
 	url = https://github.com/svaante/dape.git
