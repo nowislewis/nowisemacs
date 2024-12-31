@@ -2050,7 +2050,7 @@ Disassemble C, C++ or Fortran code under cursor
     ;; dynamic load org-src modules to accelerate speed
     (defun my/org-babel-execute-src-block (&optional _arg info _params)
       "Load language if needed"
-      (let* ((lang (nth 0 info))
+      (let* ((lang (format "%s" (nth 0 info)))
              (sym (cond ((member (downcase lang) '("c" "cpp" "c++")) 'C)
                         ((member (downcase lang) '("jupyter-python")) 'jupyter)
                         (t (intern lang))))
