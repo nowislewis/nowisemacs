@@ -176,7 +176,7 @@
 	url = https://github.com/lassik/emacs-language-id.git
 [submodule "lewis-ob-d2"]
 	path = lib/lewis-ob-d2
-	url = git@github.com:nowislewis/lewis-ob-d2.git
+	url = https://github.com/nowislewis/lewis-ob-d2.git
 [submodule "lisp-fsrs"]
 	path = lib/lisp-fsrs
 	url = https://github.com/open-spaced-repetition/lisp-fsrs.git

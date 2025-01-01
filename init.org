@@ -2016,6 +2016,7 @@ Disassemble C, C++ or Fortran code under cursor
         ;; org-id
         org-attach-id-dir (concat nowis-doc-emacs-dir "01-orgmode/org-attach")
         org-id-method 'ts
+        org-id-ts-format "%Y%m%dT%H%M%S_%6N"
 
         ;; habit
         org-habit-following-days 2
