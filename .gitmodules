@@ -322,6 +322,9 @@
 [submodule "toc-org"]
 	path = lib/toc-org
 	url = https://github.com/snosov1/toc-org.git
+[submodule "toggle-term"]
+	path = lib/toggle-term
+	url = https://github.com/justinlime/toggle-term.el.git
 [submodule "tomelr"]
 	path = lib/tomelr
 	url = https://github.com/kaushalmodi/tomelr.git
@@ -339,6 +342,9 @@
 	url = https://github.com/minad/vertico.git
     load-path = .
     load-path = extensions
+[submodule "vterm"]
+	path = lib/vterm
+	url = https://github.com/akermu/emacs-libvterm.git
 [submodule "vundo"]
 	path = lib/vundo
 	url = https://github.com/casouri/vundo.git

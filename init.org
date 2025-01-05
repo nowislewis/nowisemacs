@@ -81,6 +81,7 @@ I failed in love with denote, so previous *org-roam* configs were refiled into [
 - [[#shell][shell]]
   - [[#eshell][eshell]]
   - [[#eat][eat]]
+  - [[#vterm][vterm]]
 - [[#git][git]]
   - [[#magit][magit]]
   - [[#ediff][ediff]]
@@ -133,7 +134,9 @@ I failed in love with denote, so previous *org-roam* configs were refiled into [
   - [[#atomic-chrome][atomic-chrome]]
   - [[#macos-ocr][macos-ocr]]
   - [[#esup][esup]]
+- [[#system-specific-config][system-specific-config]]
   - [[#windows-wslg][windows-wslg]]
+  - [[#android][android]]
 
 * Startup config
 ** UI speed up
@@ -169,13 +172,11 @@ I failed in love with denote, so previous *org-roam* configs were refiled into [
 
 ;; add support for android port of emacs
 (if (eq system-type 'android)
-    (setenv "PATH" (format "%s:%s" "/data/data/com.termux/files/usr/bin"
-		                   (getenv "PATH")))
-  (setenv "LD_LIBRARY_PATH" (format "%s:%s"
-				                    "/data/data/com.termux/files/usr/lib"
-				                    (getenv "LD_LIBRARY_PATH")))
-  (push "/data/data/com.termux/files/usr/bin" exec-path)
-  )
+    (progn
+      (setenv "PATH" (format "%s:%s" "/data/data/com.termux/files/usr/bin"
+		                     (getenv "PATH")))
+      (push "/data/data/com.termux/files/usr/bin" exec-path)))
+
 #+end_src
 ** basic modes
 #+NAME: basic-modes
@@ -640,7 +641,7 @@ Maybe I should add a new state.
     ("c" "capture" org-capture)
     ("I" "capture inbox" org-capture-inbox)]
     ["shell"
-     ("i" "toggle-insert-cd" eat-toggle-insert-dir)
+     ;; ("i" "toggle-insert-cd" eat-toggle-insert-dir)
      ]
     ;; ["mpvi"
     ;;  ("mo" "open" mpvi-open)
@@ -1515,7 +1516,7 @@ Jump anywhere in the world
 (setup eshell)
 #+end_src
 ** eat
-#+begin_src elisp
+#+begin_src elisp :tangle no
 (setup eat
   ;; fix char error on macos
   ;; (when (eq system-type 'darwin)
@@ -1553,6 +1554,16 @@ Jump anywhere in the world
     (eat--send-string "*eat*"
                       (concat "cd " (file-name-directory (buffer-file-name)))))
   )
+#+end_src
+** vterm
+#+begin_src elisp
+(setup vterm)
+(setup toggle-term
+  (:autoload toggle-term-toggle)
+  (:global "C-`" toggle-term-toggle)
+
+    (setq toggle-term-size 40)
+    (setq toggle-term-switch-upon-toggle t))
 #+end_src
 * git
 ** magit
@@ -3103,6 +3114,7 @@ ESUP - Emacs Start Up Profiler
       ;; )
   )
 #+end_src
+* system-specific-config
 ** windows-wslg
 These codes are used to solve copy & paste problems under wslg inside win10/win11
 #+begin_src elisp 
@@ -3117,4 +3129,8 @@ These codes are used to solve copy & paste problems under wslg inside win10/win1
          (call-process-region start end "wl-copy" nil 0))
       (global-set-key [remap kill-ring-save] #'wsl-copy-region-to-clipboard)
       ))
+#+end_src
+** android
+#+begin_src elisp
+;;(if (eq system-type 'android))
 #+end_src
