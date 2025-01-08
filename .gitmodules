@@ -47,6 +47,9 @@
 	url = https://github.com/minad/corfu.git
     load-path = .
     load-path = extensions
+[submodule "csv-mode"]
+	path = lib/csv-mode
+	url = https://github.com/emacs-straight/csv-mode.git
 [submodule "d2-mode"]
 	path = lib/d2-mode
 	url = https://github.com/andorsk/d2-mode.git
@@ -83,6 +86,9 @@
 [submodule "disaster"]
 	path = lib/disaster
 	url = https://github.com/jart/disaster.git
+[submodule "dracula"]
+	path = lib/dracula
+	url = https://github.com/dracula/emacs.git
 [submodule "eat"]
 	path = lib/eat
 	url = https://codeberg.org/akib/emacs-eat.git
@@ -322,9 +328,6 @@
 [submodule "toc-org"]
 	path = lib/toc-org
 	url = https://github.com/snosov1/toc-org.git
-[submodule "toggle-term"]
-	path = lib/toggle-term
-	url = https://github.com/justinlime/toggle-term.el.git
 [submodule "tomelr"]
 	path = lib/tomelr
 	url = https://github.com/kaushalmodi/tomelr.git

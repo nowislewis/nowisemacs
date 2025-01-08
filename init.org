@@ -158,7 +158,7 @@ I failed in love with denote, so previous *org-roam* configs were refiled into [
 ;; no title bar
 ;; (add-to-list 'default-frame-alist '(undecorated . t))
 ;; Faster to disable these here (before they've been initialized)
-(push '(alpha-background . 80) default-frame-alist)
+;; (push '(alpha-background . 80) default-frame-alist)
 (push '(menu-bar-lines . 0) default-frame-alist)
 (push '(tool-bar-lines . 0) default-frame-alist)
 (push '(vertical-scroll-bars) default-frame-alist)
@@ -1557,13 +1557,26 @@ Jump anywhere in the world
 #+end_src
 ** vterm
 #+begin_src elisp
-(setup vterm)
-(setup toggle-term
-  (:autoload toggle-term-toggle)
-  (:global "C-`" toggle-term-toggle)
-
-    (setq toggle-term-size 40)
-    (setq toggle-term-switch-upon-toggle t))
+(setup vterm
+  (:global "C-`" vterm-toggle-window)
+  (:when-loaded
+    (add-to-list 'display-buffer-alist
+                 '((lambda (buffer-or-name _)
+                     (let ((buffer (get-buffer buffer-or-name)))
+                       (with-current-buffer buffer
+                         (or (equal major-mode 'vterm-mode)
+                             (string-prefix-p "*vterm" (buffer-name buffer))))))
+                   (display-buffer-reuse-window display-buffer-at-bottom)
+                   (reusable-frames . visible)
+                   (window-height . 0.3)))
+    )
+  (defun vterm-toggle-window()
+    "Toggle eshell buffer."
+    (interactive)
+    (if (get-buffer-window "*vterm*")
+        (delete-window (get-buffer-window "*vterm*"))
+      (vterm)))
+  )
 #+end_src
 * git
 ** magit
@@ -1765,6 +1778,8 @@ borrowed from citre, now you can always jump-back use "M-," after any jump in th
 **** treesitter-context
 #+begin_src elisp
 (setup treesitter-context
+  (setq treesitter-context-idle-time 1.0
+        treesitter-context-frame-autohide-timeout 4)
   (:hook-into python-ts-mode c-ts-mode c++-ts-mode json-ts-mode))
 #+end_src
 *** Complete
@@ -3078,7 +3093,7 @@ If `DEVICE-NAME' is provided, it will be used instead of prompting the user."
 #+end_src
 ** atomic-chrome
 Edit text area on Chrome with Emacs using Atomic Chrome
-#+begin_src elisp
+#+begin_src elisp :tangle no
 (setup websocket)
 (setup atomic-chrome
   (setq atomic-chrome-url-major-mode-alist
@@ -3121,13 +3136,13 @@ These codes are used to solve copy & paste problems under wslg inside win10/win1
 ;; solve the problem of copying from windows to wslg
 (if (string= "Arch" (getenv "WSL_DISTRO_NAME"))
     (progn
-      (set-clipboard-coding-system 'gbk-dos)
+      ;; (set-clipboard-coding-system 'gbk-dos)
       ;; solve the problem of copying from wslg to windows
       (defun wsl-copy-region-to-clipboard (start end)
         "Copy region to Windows clipboard."
         (interactive "r")
          (call-process-region start end "wl-copy" nil 0))
-      (global-set-key [remap kill-ring-save] #'wsl-copy-region-to-clipboard)
+      ;; (global-set-key [remap kill-ring-save] #'wsl-copy-region-to-clipboard)
       ))
 #+end_src
 ** android
