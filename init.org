@@ -113,6 +113,7 @@ I failed in love with denote, so previous *org-roam* configs were refiled into [
   - [[#org-fc][org-fc]]
   - [[#org-srs][org-srs]]
   - [[#org-mind-map][org-mind-map]]
+  - [[#insert-from-snipaste][insert from snipaste]]
 - [[#english-翻译][english 翻译]]
   - [[#go-translate][go-translate]]
 - [[#阅读][阅读]]
@@ -1766,7 +1767,7 @@ borrowed from citre, now you can always jump-back use "M-," after any jump in th
 #+begin_src elisp
 (setup treesit-auto
   (setq treesit-auto-install t
-        treesit-auto-langs '(python c cpp json org verilog cmake))
+        treesit-auto-langs '(python c cpp json org verilog cmake bash vhdl lua))
   (:defer
    (if (treesit-available-p)
        (require 'treesit-auto)))
@@ -2779,6 +2780,16 @@ This is an Emacs package that creates graphviz directed graphs from the headings
     ;; (setq org-mind-map-engine "circo")  ; Circular Layout
     (add-to-list 'org-mind-map-default-graph-attribs '("fontname" . "Maple Mono SC F"))
     ))
+#+end_src
+** insert from snipaste
+#+begin_src elisp
+(defun insert-file-from-snipaste ()
+  "Prompt user to select a file from snipaste files and insert it into the current Org buffer."
+  (interactive)
+  (let ((file (read-file-name "Select a file from Downloads: " (concat nowis-doc-emacs-dir "02-binary-files/01-pictures/snipaste/"))))
+    (when (and file (file-exists-p file))
+      ;; (insert (format "[[file:%s][%s]]" file (file-name-nondirectory file))))))
+      (insert (format "[[file:%s]]" file)))))
 #+end_src
 * english 翻译
 ** go-translate
