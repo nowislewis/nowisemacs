@@ -1132,6 +1132,7 @@ Minimal mode line configuration for Emacs, inspired by doom-modeline
 #+name: consult
 #+begin_src elisp
 (setup consult
+  (:global "C-x b" consult-buffer)
   (setq register-preview-delay 0.1
            register-preview-function #'consult-register-format
            xref-show-xrefs-function #'consult-xref
@@ -1583,7 +1584,27 @@ Jump anywhere in the world
 ** magit
 #+begin_src elisp
 (setup with-editor)
-(setup magit)
+(setup magit
+  (:when-loaded
+    (defun lewis/magit-status-refresh-buffer-quick ()
+      (magit-insert-section (status)
+        (magit-insert-heading "Quick status")
+        (insert "\n")
+        (magit-insert-error-header)
+        (magit-insert-head-branch-header)
+        (insert "\n")
+        (magit-insert-unstaged-changes)
+        (magit-insert-staged-changes)))
+    (defun lewis/toggle-magit-quick-status ()
+      (interactive)
+      (if (advice-member-p 'lewis/magit-status-refresh-buffer-quick 'magit-status-refresh-buffer)
+          (progn
+            (advice-remove 'magit-status-refresh-buffer 'lewis/magit-status-refresh-buffer-quick)
+            (message "Quick magit status turned off"))
+        (advice-add 'magit-status-refresh-buffer :override 'lewis/magit-status-refresh-buffer-quick)
+        (message "Quick magit status turned on"))
+      (magit-refresh-all))
+    ))
 #+end_src
 ** ediff
 #+begin_src elisp
