@@ -2960,6 +2960,13 @@ Simple distraction-free editing. I use darkroom instead of writeroom because it'
                     :stream t
                     :models '(gpt-4o-mini gpt-4o)))
     (gptel-make-gemini "Gemini" :key 'gptel-api-key :stream t)
+    ;; DeepSeek offers an OpenAI compatible API
+    (gptel-make-openai "DeepSeek"       ;Any name you want
+      :host "api.deepseek.com"
+      :endpoint "/chat/completions"
+      :stream t
+      :key 'gptel-api-key
+      :models '(deepseek-chat deepseek-coder))
     ))
 #+end_src
 *** whisper
@@ -3057,6 +3064,11 @@ If `DEVICE-NAME' is provided, it will be used instead of prompting the user."
         (when (boundp 'whisper--ffmpeg-input-device)
           (setq whisper--ffmpeg-input-device (format ":%s" rk/default-audio-device))))))
   )
+#+end_src
+*** aider
+#+begin_src elisp
+(setup aider
+  (setq aider-args '("--deepseek")))
 #+end_src
 ** webjump
 #+begin_src elisp
