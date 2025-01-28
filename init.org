@@ -3068,7 +3068,11 @@ If `DEVICE-NAME' is provided, it will be used instead of prompting the user."
 *** aider
 #+begin_src elisp
 (setup aider
-  (setq aider-args '("--deepseek")))
+  (:also-load 'gptel)
+  (setq aider-args '("--deepseek"))
+  (:when-loaded
+  (setenv "DEEPSEEK_API_KEY" (gptel-api-key-from-auth-source "api.deepseek.com"))
+  ))
 #+end_src
 ** webjump
 #+begin_src elisp
@@ -3191,5 +3195,76 @@ These codes are used to solve copy & paste problems under wslg inside win10/win1
 #+end_src
 ** android
 #+begin_src elisp
-;;(if (eq system-type 'android))
+(if (eq system-type 'android)
+    (progn
+      (setq touch-screen-display-keyboard t)
+      ))
+(defun android-toggle-keyboard()
+  (interactive)
+  (if touch-screen-display-keyboard
+      (progn
+        (setq touch-screen-display-keyboard nil)
+        (tool-bar-add-item
+         "keyboard-off" 'android-toggle-keyboard
+         'android-toggle-keyboard
+         :help "Toggle keyboard")
+        (message "Disable virtual keyboard"))
+    (setq touch-screen-display-keyboard t)
+    (tool-bar-add-item
+     "keyboard" 'android-toggle-keyboard
+     'android-toggle-keyboard
+     :help "Toggle keyboard")
+    (message "Enable virtual keyboard")))
+
+;; (defun android-tool-bar-configs()
+;;   (when (and (fboundp 'tool-bar-mode)
+;;              (string-equal system-type "android"))
+
+;;     (tool-bar-mode +1)
+;;     (setq tool-bar-position 'bottom)
+;;     (setq tool-bar-button-margin 27)
+;;     ;; (modifier-bar-mode +1)
+;;     (setq tool-bar-map '(keymap nil))
+;;     (add-to-list 'image-load-path (expand-file-name "modules/pen" doom-private-dir))
+;;     (android-general-tool-bar 'tool-bar-add-item nil)
+;;     ))
+
+;; (defun android-general-tool-bar(fun map)
+;;   (mapc (lambda (args)
+;;           (apply fun args))
+;;         `(("keyboard-esc" tool-bar-item-escape keyboard-esc ,map)
+;;           ("file-find-outline" pen-occur file-find-outline ,map)
+;;           ("arrow-down-thick" pen-scroll-up button4 ,map)
+;;           ("arrow-up" tool-bar-item-up arrow-up ,map)
+;;           ("arrow-up-thick" pen-scroll-down button5 ,map)
+;;           ("pen" pen-annotation-mode button6 ,map)
+;;           ("star-plus" pen-add-online-word button7 ,map)
+;;           ("marker" pen-add-highlight button8 ,map)
+;;           ("image-filter-center-focus-strong-outline" focus-mode focus ,map)
+;;           ("menu" pen-goto-toc button10 ,map)
+
+;;           ("keyboard-tab" tool-bar-item-tab keyboard-tab ,map)
+;;           ("apple-keyboard-command" pen-step-backward apple-keyboard-command ,map)
+;;           ("arrow-left" tool-bar-item-left arrow-left ,map)
+;;           ("arrow-down" tool-bar-item-down arrow-down ,map)
+;;           ("arrow-right" tool-bar-item-right arrow-right ,map)
+;;           ("play" pen-view-note-play play ,map)
+;;           ("syllabary-hiragana" pen-view-current-thing button9 ,map)
+;;           ("history" consult-recent-file history ,map)
+;;           ("file-clock-outline" spacemacs/compleseus-switch-to-buffer file-clock-outline ,map)
+;;           ("keyboard-off" android-toggle-keyboard android-toggle-keyboard ,map)
+
+;;           ))
+
+;;   )
+
+
+;; (define-key key-translation-map [tool-bar apple-keyboard-command] #'tool-bar-event-apply-control-modifier)
+;; (define-key key-translation-map (kbd "<XF86Back>") [escape])
+;; (define-key key-translation-map [tool-bar keyboard-esc] [escape])
+;; (define-key key-translation-map [tool-bar keyboard-tab]  (kbd "TAB"))
+;; (define-key key-translation-map [tool-bar arrow-up] [up])
+;; (define-key key-translation-map [tool-bar arrow-down] [down])
+;; (define-key key-translation-map [tool-bar arrow-right] [right])
+;; (define-key key-translation-map [tool-bar arrow-left] [left])
 #+end_src
