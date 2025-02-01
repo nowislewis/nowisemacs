@@ -203,12 +203,18 @@ I failed in love with denote, so previous *org-roam* configs were refiled into [
 ** load-path
 #+NAME: load-path
 #+begin_src elisp
-(add-to-list 'load-path (expand-file-name "lib/borg" user-emacs-directory))
-(require 'borg)
-(setq borg-rewrite-urls-alist
-      '(("git@github.com:" . "https://github.com/")
-        ("git@gitlab.com:" . "https://gitlab.com/")))
-(borg-initialize)
+(defun add-subdirs-to-load-path (dir)
+  "Recursive add directories to `load-path'."
+  (let ((default-directory (file-name-as-directory dir)))
+    (add-to-list 'load-path dir)
+    (normal-top-level-add-subdirs-to-load-path)))
+(add-subdirs-to-load-path (concat user-emacs-directory "lib"))
+(setq custom-theme-load-path  '("/Users/lewisliu/.emacs.d/lib/el-themes/" "/Users/lewisliu/.emacs.d/lib/dracula/"
+ custom-theme-directory))
+(require 'cl-lib)
+
+(load (concat user-emacs-directory "autoloads.el"))
+
 #+end_src
 ** drop out
 The following content is not enabled yet, because I want to minimize unnecessary settings as much as possible
@@ -1171,6 +1177,7 @@ Minimal mode line configuration for Emacs, inspired by doom-modeline
 (setup vertico
   (:with-map vertico-map
     (:bind [backspace] vertico-directory-delete-char))
+  (require 'vertico-directory)
   (vertico-mode))
 #+end_src
 ** Orderless and pinyinlib

@@ -1,22 +1,14 @@
-DRONES_DIR = $(shell git config "borg.drones-directory" || echo "lib")
+EMACS = emacs
+LIB_DIR = lib
+AUTOLOAD_FILE = autoloads.el
 
--include $(DRONES_DIR)/borg/borg.mk
-
-bootstrap-borg:
-	@git submodule--helper clone --name borg --path $(DRONES_DIR)/borg \
- --url https://github.com/emacscollective/borg.git
-	@cd $(DRONES_DIR)/borg; git symbolic-ref HEAD refs/heads/main
-	@cd $(DRONES_DIR)/borg; git reset --hard HEAD
-init-clean: init-tangle
-# 更新到 remote 最新 commit
 update:
 	./useful-tools/update_submodule.sh
-# 初始化下载，更新到 .gitmodules 中指定的 commit
 init:
 	@git submodule update --init
 	@git submodule foreach git reset --hard
-# 修改 .gitmodules 后
-sync:
-	git submodule sync
-native-all: $(foreach package,$(notdir $(wildcard lib/*)), native/$(package))
-build-all: $(foreach package,$(notdir $(wildcard lib/*)), build/$(package))
+build:
+	$(EMACS) --batch -Q -l useful-tools/build.el \
+		--eval '''(progn \
+			(setq generated-autoload-file "$(AUTOLOAD_FILE)") \
+			(loaddefs-generate (find-package-dirs (expand-file-name "$(LIB_DIR)")) "$(AUTOLOAD_FILE)"))'''
