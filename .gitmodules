@@ -197,6 +197,9 @@
 [submodule "literate-calc"]
 	path = lib/literate-calc
 	url = https://github.com/sulami/literate-calc-mode.el.git
+[submodule "llama"]
+	path = lib/llama
+	url = https://github.com/tarsius/llama.git
 [submodule "lua-mode"]
 	path = lib/lua-mode
 	url = https://github.com/immerrr/lua-mode.git
