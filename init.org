@@ -3055,11 +3055,11 @@ If `DEVICE-NAME' is provided, it will be used instead of prompting the user."
 *** aider
 #+begin_src elisp
 (setup aider
-  (:also-load 'gptel)
+  (:also-load gptel)
   (setq aider-args '("--deepseek"))
   (:when-loaded
-  (setenv "DEEPSEEK_API_KEY" (gptel-api-key-from-auth-source "api.deepseek.com"))
-  ))
+    (setenv "DEEPSEEK_API_KEY" (gptel-api-key-from-auth-source "api.deepseek.com"))
+    ))
 #+end_src
 ** webjump
 #+begin_src elisp

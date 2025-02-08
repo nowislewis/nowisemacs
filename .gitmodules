@@ -57,7 +57,7 @@
     load-path = extensions
 [submodule "csv-mode"]
 	path = lib/csv-mode
-	url = https://github.com/emacs-straight/csv-mode.git
+	url = https://github.com/emacsmirror/csv-mode.git
 [submodule "d2-mode"]
 	path = lib/d2-mode
 	url = https://github.com/andorsk/d2-mode.git
@@ -97,9 +97,6 @@
 [submodule "dracula"]
 	path = lib/dracula
 	url = https://github.com/dracula/emacs.git
-[submodule "eat"]
-	path = lib/eat
-	url = https://codeberg.org/akib/emacs-eat.git
 [submodule "ebib"]
 	path = lib/ebib
 	url = https://github.com/joostkremers/ebib.git
