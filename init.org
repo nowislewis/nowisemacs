@@ -350,12 +350,12 @@ Maybe I should add a new state.
                                 (?s . sentence))
         )
   ;; motion keys
-  (meow-motion-overwrite-define-key '("j" . meow-next)
-                                    '("k" . meow-prev)
-                                    '("h" . meow-left)
-                                    '("l" . meow-right)
-                                    '("<escape>" . ignore)
-                                    '("." . repeat))
+  (meow-motion-define-key '("j" . meow-next)
+                          '("k" . meow-prev)
+                          '("h" . meow-left)
+                          '("l" . meow-right)
+                          '("<escape>" . ignore)
+                          '("." . repeat))
   ;; normal keys
   (meow-normal-define-key '("0" . meow-expand-0)
                           '("9" . meow-expand-9)
@@ -671,12 +671,6 @@ Maybe I should add a new state.
 #+begin_src elisp
 ;; default
 (meow-leader-define-key
- ;; SPC j/k will run the original command in MOTION state.
- '("j" . "H-j")
- '("k" . "H-k")
- '("h" . "H-h")
- '("l" . "H-l")
- '("." . "H-.")
  ;; Use SPC (0-9) for digit arguments.
  '("1" . meow-digit-argument)
  '("2" . meow-digit-argument)
@@ -689,10 +683,10 @@ Maybe I should add a new state.
  '("9" . meow-digit-argument)
  '("0" . meow-digit-argument)
  '("/" . meow-keypad-describe-key)
- '("?" . meow-cheatsheet))
+ '("?" . meow-cheatsheet)
 
 ;; buffer
-(meow-leader-define-key
+;; (meow-leader-define-key
  '("b" . buffer-leader-map)
  ;; lewisliu
  '("e" . lewis-leader-map)
@@ -919,7 +913,7 @@ Minimal mode line configuration for Emacs, inspired by doom-modeline
   (setq mini-echo-persistent-rule
         '(:long
           ("major-mode" "vcs" "flymake" "process"
-           "narrow"  "profiler" "repeat" "eglot" "buffer-size" "buffer-position" "shrink-path"  "meow" "macro" "org-clock")
+           "narrow"  "profiler" "repeat" "buffer-size" "buffer-position" "shrink-path"  "meow" "macro" "org-clock")
           ;; remove "selection-info"
           :short
           ("major-mode" "vcs" "buffer-size" "buffer-position" "shrink-path"  "meow" "macro")))
@@ -1480,13 +1474,6 @@ Jump anywhere in the world
         ]
        ]
       )
-    (:global "M-1" tab-bar-select-tab-1st
-             "M-2" tab-bar-select-tab-2nd
-             "M-3" tab-bar-select-tab-3rd
-             "M-4" tab-bar-select-tab-4th
-             "M-5" tab-bar-select-tab-5th
-             "M-6" tab-bar-select-tab-6th
-             "M-7" tab-bar-select-tab-7th)
     )
   )
 #+end_src
@@ -1798,7 +1785,7 @@ borrowed from citre, now you can always jump-back use "M-," after any jump in th
   )
 #+end_src
 **** treesitter-context
-#+begin_src elisp
+#+begin_src elisp :tangle no
 (setup treesitter-context
   (setq treesitter-context-idle-time 1.0
         treesitter-context-frame-autohide-timeout 4)

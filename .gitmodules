@@ -345,9 +345,6 @@
 [submodule "treesit-auto"]
 	path = lib/treesit-auto
 	url = https://github.com/renzmann/treesit-auto.git
-[submodule "treesit-context"]
-	path = lib/treesit-context
-	url = https://github.com/zbelial/treesitter-context.el.git
 [submodule "ts"]
 	path = lib/ts
 	url = https://github.com/alphapapa/ts.el.git
