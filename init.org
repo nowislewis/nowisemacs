@@ -678,11 +678,11 @@ Maybe I should add a new state.
   "Define leader-key map for ui functions"
   [["dictionary-overlay"
    ("s" "start" dictionary-overlay-start)
-   ("t" "render-toggle" dictionary-overlay-toggle)
+   ("r" "render-toggle" dictionary-overlay-toggle)
    ("m" "mark-word-unknown" dictionary-overlay-mark-word-unknown)
    ("M" "mark-word-known" dictionary-overlay-mark-word-known)
    ("i" "install" dictionary-overlay-install)
-   ("r" "restart" dictionary-overlay-restart)
+   ("R" "restart" dictionary-overlay-restart)
    ]])
 #+end_src
 ** meow leader keybindings
@@ -2846,10 +2846,10 @@ If you want to use *sdcv* for offline translate, then download dictionary data t
              dictionary-overlay-install
              dictionary-overlay-restart
              )
-  (setq dictionary-overlay-translators '("sdcv" "darwin" "web")
+  (setq dictionary-overlay-user-data-directory (concat nowis-doc-emacs-dir "12-dictionary-overlay")
         dictionary-overlay-lookup-with #'gt-quick-sdcv
-        dictionary-overlay-user-data-directory (concat nowis-doc-emacs-dir "12-dictionary-overlay")
-        dictionary-overlay-sdcv-dictionary-path (concat nowis-doc-emacs-dir "02-binary-files/03-stardicts/stardict-ecdict-2.4.2/stardict-ecdict-2.4.2")
+        ;; dictionary-overlay-translators '("local" "sdcv" "darwin" "web")
+        ;; dictionary-overlay-sdcv-dictionary-path (concat nowis-doc-emacs-dir "02-binary-files/03-stardicts/stardict-ecdict-2.4.2/stardict-ecdict-2.4.2")
         ))
 
 #+end_src
