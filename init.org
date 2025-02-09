@@ -350,9 +350,15 @@ Maybe I should add a new state.
         )
   ;; motion keys
   (meow-motion-define-key '("j" . meow-next)
+                          '("J" . meow-next-expand)
                           '("k" . meow-prev)
+                          '("K" . meow-prev-expand)
                           '("h" . meow-left)
+                          '("H" . meow-left-expand)
                           '("l" . meow-right)
+                          '("L" . meow-right-expand)
+                          '("v i" . meow-inner-of-thing)
+                          '("v a" . meow-bounds-of-thing)
                           '("<escape>" . ignore)
                           '("." . repeat))
   ;; normal keys
