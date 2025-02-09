@@ -107,7 +107,6 @@ I failed in love with denote, so previous *org-roam* configs were refiled into [
   - [[#ob-d2][ob-d2]]
   - [[#ob-tmux][ob-tmux]]
   - [[#clue][clue]]
-  - [[#org-transclusion][org-transclusion]]
   - [[#agendagtd][agenda/gtd]]
   - [[#org-super-agenda][org-super-agenda]]
   - [[#org-fc][org-fc]]
@@ -116,6 +115,7 @@ I failed in love with denote, so previous *org-roam* configs were refiled into [
   - [[#insert-from-snipaste][insert from snipaste]]
 - [[#english-翻译][english 翻译]]
   - [[#go-translate][go-translate]]
+  - [[#dictionary-overlay][dictionary-overlay]]
 - [[#阅读][阅读]]
   - [[#pdf-tools][pdf-tools]]
   - [[#pdf-view-pagemark][pdf-view-pagemark]]
@@ -130,7 +130,6 @@ I failed in love with denote, so previous *org-roam* configs were refiled into [
   - [[#ai-related][ai related]]
   - [[#webjump][webjump]]
   - [[#backup-scripts][backup scripts]]
-  - [[#literate-calc][literate-calc]]
   - [[#server][server]]
   - [[#atomic-chrome][atomic-chrome]]
   - [[#macos-ocr][macos-ocr]]
@@ -616,14 +615,15 @@ Maybe I should add a new state.
    ;; ["blink-search"
    ;;  ("b" "blink-search" blink-search)]
    ["grep"
-    ("d" "grep-dir" lewis/ripgrep-search-other-dir)
-    ("D" "grep-project" consult-ripgrep)
+    ("d" "consult-rg-in-dir" lewis/ripgrep-search-other-dir)
+    ("D" "consult-rg" consult-ripgrep)
     ("g" "rg" rg)
     ("n" "grep-notes" lewis/ripgrep-search-notes)
     ]
    ["find"
-    ("F" "find-in-current" consult-find)
-    ("f" "find-other-dir" lewis/find-file-other-dir)]
+    ("f" "consult-fd-in-dir" lewis/find-file-other-dir)
+    ("F" "consult-fd" consult-fd)
+    ]
    ["built-in enhance"
     ("h" "history" consult-history)
     ("i" "imenu" consult-imenu)
@@ -666,6 +666,19 @@ Maybe I should add a new state.
    ("d" "toggle-darkroom" darkroom-mode)
     ])
 #+end_src
+*** dictionary
+#+begin_src elisp
+(transient-define-prefix dictionary-leader-map()
+  "Define leader-key map for ui functions"
+  [["dictionary-overlay"
+   ("s" "start" dictionary-overlay-start)
+   ("t" "render-toggle" dictionary-overlay-toggle)
+   ("m" "mark-word-unknown" dictionary-overlay-mark-word-unknown)
+   ("M" "mark-word-known" dictionary-overlay-mark-word-known)
+   ("i" "install" dictionary-overlay-install)
+   ("r" "restart" dictionary-overlay-restart)
+   ]])
+#+end_src
 ** meow leader keybindings
 #+name: meow-leader-keys
 #+begin_src elisp
@@ -704,6 +717,7 @@ Maybe I should add a new state.
  ;; '("d" . org-gtd-leader-map)
  ;; ui
  '("t" . toggle-leader-map)
+ '("d" . dictionary-leader-map)
 
  ;; remark
  '("r m" . org-remark-mark)
@@ -877,8 +891,9 @@ diff-hl-mode highlights uncommitted changes on the left side of the window (area
 ** fringe-mode
 #+begin_src elisp
 (setup fringe
-  (fringe-mode 4)
-)
+  (if (featurep 'fringe)
+      (fringe-mode 4)
+    ))
 #+end_src
 ** emacs-dashboard
 #+begin_src elisp
@@ -1036,7 +1051,7 @@ Minimal mode line configuration for Emacs, inspired by doom-modeline
 *** savehist
 #+begin_src elisp
 (setup savehist
-  (setq history-length 10000
+  (setq history-length 100
         history-delete-duplicates t
         savehist-save-minibuffer-history t)
   (savehist-mode))
@@ -1151,7 +1166,7 @@ Minimal mode line configuration for Emacs, inspired by doom-modeline
 (defun lewis/find-file-other-dir()
   (interactive)
   (let ((current-prefix-arg '(-1)))
-    (call-interactively 'consult-find)))
+    (call-interactively 'consult-fd)))
 #+end_src
 ** rg.el
 #+begin_src elisp
@@ -1375,18 +1390,6 @@ Jump anywhere in the world
 #+begin_src elisp
 (setup dired-sidebar)
 #+end_src
-*** dired-preview
-#+begin_src elisp
-(setup dired-preview
-  (setq dired-preview-delay 0.1)
-  (defun my-dired-preview-to-the-right ()
-    "My preferred `dired-preview-display-action-alist-function'."
-    '((display-buffer-in-side-window)
-      (side . right)
-      (width . 0.5)))
-  (setq dired-preview-display-action-alist #'my-dired-preview-to-the-right)
-  )
-#+end_src
 ** structure browsing
 *** imenu-list
 #+begin_src elisp
@@ -1494,7 +1497,7 @@ Jump anywhere in the world
 ** auto-insert
 #+begin_src elisp
 (setup autoinsert
-  (setq auto-insert-query nil)
+  (setq auto-insert-query t)
   (:defer
    (auto-insert-mode t))
   )
@@ -2498,10 +2501,6 @@ Connecting clues while reading code.
 #+begin_src elisp
 (setup clue)
 #+end_src
-** org-transclusion
-#+begin_src elisp :tangle no
-(setup org-transclusion)
-#+end_src
 ** agenda/gtd
 Borrowed from https://github.com/rougier/emacs-GTD
 
@@ -2830,6 +2829,24 @@ Powerful translator on Emacs. Supports multiple translation engines such as Goog
     ))
 #+end_src
 If you want to use *sdcv* for offline translate, then download dictionary data to ~/.stardict/dic or /usr/share/stardict/dic
+** dictionary-overlay
+#+begin_src elisp
+(setup websocket-bridge)
+(setup dictionary-overlay
+  (:autoload dictionary-overlay-start
+             dictionary-overlay-toggle
+             dictionary-overlay-mark-word-unknown
+             dictionary-overlay-mark-word-known
+             dictionary-overlay-install
+             dictionary-overlay-restart
+             )
+  (setq dictionary-overlay-translators '("sdcv" "darwin" "web")
+        dictionary-overlay-lookup-with #'gt-quick-sdcv
+        dictionary-overlay-user-data-directory (concat nowis-doc-emacs-dir "12-dictionary-overlay")
+        dictionary-overlay-sdcv-dictionary-path (concat nowis-doc-emacs-dir "02-binary-files/03-stardicts/stardict-ecdict-2.4.2/stardict-ecdict-2.4.2")
+        ))
+
+#+end_src
 * 阅读
 ** pdf-tools
 #+begin_src elisp
@@ -3111,10 +3128,6 @@ If `DEVICE-NAME' is provided, it will be used instead of prompting the user."
   [["rsync"
     ("p" "push doc" rsync-push-binary-files)
     ("F" "pull doc" rsync-pull-binary-files)]])
-#+end_src
-** literate-calc
-#+begin_src elisp
-(setup literate-calc)
 #+end_src
 ** server
 #+begin_src elisp

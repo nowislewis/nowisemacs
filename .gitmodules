@@ -79,15 +79,15 @@
 [submodule "denote-explore"]
 	path = lib/denote-explore
 	url = https://github.com/pprevos/denote-explore.git
+[submodule "dictionary-overlay"]
+	path = lib/dictionary-overlay
+	url = https://github.com/ginqi7/dictionary-overlay.git
 [submodule "diff-hl"]
 	path = lib/diff-hl
 	url = https://github.com/dgutov/diff-hl.git
 [submodule "dired-hacks"]
 	path = lib/dired-hacks
 	url = https://github.com/Fuco1/dired-hacks.git
-[submodule "dired-preview"]
-	path = lib/dired-preview
-	url = https://github.com/protesilaos/dired-preview.git
 [submodule "dired-sidebar"]
 	path = lib/dired-sidebar
 	url = https://github.com/jojojames/dired-sidebar.git
@@ -136,9 +136,6 @@
 [submodule "f"]
 	path = lib/f
 	url = https://github.com/rejeep/f.el.git
-[submodule "fd-dired"]
-	path = lib/fd-dired
-	url = https://github.com/yqrashawn/fd-dired.git
 [submodule "format-all"]
 	path = lib/format-all
 	url = https://github.com/lassik/emacs-format-all-the-code.git
@@ -191,9 +188,6 @@
 [submodule "lisp-fsrs"]
 	path = lib/lisp-fsrs
 	url = https://github.com/open-spaced-repetition/lisp-fsrs.git
-[submodule "literate-calc"]
-	path = lib/literate-calc
-	url = https://github.com/sulami/literate-calc-mode.el.git
 [submodule "llama"]
 	path = lib/llama
 	url = https://github.com/tarsius/llama.git
@@ -359,6 +353,9 @@
 [submodule "websocket"]
 	path = lib/websocket
 	url = https://github.com/ahyatt/emacs-websocket.git
+[submodule "websocket-bridge"]
+	path = lib/websocket-bridge
+	url = https://github.com/ginqi7/websocket-bridge.git
 [submodule "wgrep"]
 	path = lib/wgrep
 	url = https://github.com/mhayashi1120/Emacs-wgrep.git
