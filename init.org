@@ -65,6 +65,7 @@ I failed in love with denote, so previous *org-roam* configs were refiled into [
   - [[#winner-mode][winner-mode]]
   - [[#popper][popper]]
   - [[#move][Move]]
+  - [[#burly][burly]]
 - [[#ibuffer][ibuffer]]
   - [[#ibuffer-1][ibuffer]]
 - [[#input][Input]]
@@ -359,6 +360,7 @@ Maybe I should add a new state.
                           '("L" . meow-right-expand)
                           '("v i" . meow-inner-of-thing)
                           '("v a" . meow-bounds-of-thing)
+                          '("y" . meow-save)
                           '("<escape>" . ignore)
                           '("." . repeat))
   ;; normal keys
@@ -434,8 +436,10 @@ Maybe I should add a new state.
 
                           '("-" . negative-argument)
                           '("=" . indent-region)
-                          '("[" . meow-beginning-of-thing)
-                          '("]" . meow-end-of-thing)
+                          '("(" . backward-sentence)
+                          '(")" . forward-sentence)
+                          '("{" . backward-paragraph)
+                          '("}" . forward-paragraph)
                           '("\\" . quoted-insert)
                           '(";" . meow-expand-1)
                           ;; '(":" . async-shell-command)
@@ -576,6 +580,11 @@ Maybe I should add a new state.
     ("j" "bookmark-jump" bookmark-jump)
     ("m" "bookmark-set" bookmark-set)
     ("M" "bookmark-delete" bookmark-delete)]
+   ["Burly"
+    ("w" "burly-bookmark-windows" burly-bookmark-windows)
+    ("f" "burly-bookmark-frames" burly-bookmark-frames)
+    ("o" "burly-open" burly-open-bookmark)
+    ]
    ]
   )
 #+end_src
@@ -1325,6 +1334,12 @@ Jump anywhere in the world
 (setq aw-keys '(?a ?s ?d ?f ?g ?h ?j ?k ?l)
       aw-scope 'frame
       )
+#+end_src
+** burly
+#+begin_src elisp
+(setup burly
+  (:defer
+   (burly-tabs-mode)))
 #+end_src
 * ibuffer
 ** ibuffer
