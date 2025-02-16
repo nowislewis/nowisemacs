@@ -822,7 +822,7 @@ Maybe I should add a new state.
                                   return font))
 
 ;; symbol font
-(setq lewis-symbol-font (cl-loop for font in '("Symbols Nerd Font mono"
+(setq lewis-symbol-font (cl-loop for font in '("Symbols Nerd Font Mono"
                                                "Symbola"
                                                "Symbol"
                                                )
@@ -2269,7 +2269,7 @@ Comments:
 (setup org
   (setq org-auto-align-tags nil
         org-tags-column 0
-        org-ellipsis "⤵"
+        org-ellipsis " "
         org-hide-emphasis-markers t
         org-pretty-entities nil ;; can perfor ui such as "a_words" into small "awords"
         org-habit-graph-column 50
@@ -2325,8 +2325,9 @@ Comments:
 *** org-modern
 #+begin_src elisp
 (setup org-modern
+  (:load-after org)
   (setq org-modern-star 'replace
-        org-modern-replace-stars '("Ⓐ" "Ⓑ" "Ⓒ" "Ⓓ" "Ⓔ" "Ⓕ" "Ⓖ" "Ⓗ" "Ⓘ" "Ⓙ" "Ⓚ" "Ⓛ" "Ⓜ")
+        org-modern-replace-stars '("󰯬" "󰯯" "󰯲" "󰯵" "󰯸" "󰯻")
         org-modern-table nil)
   (:hook-into org-mode)
   (add-hook 'org-agenda-finalize-hook #'org-modern-agenda))
@@ -2334,6 +2335,7 @@ Comments:
 *** org-appear
 #+begin_src elisp
 (setup org-appear
+  (:load-after org)
   (:hook-into org-mode))
 #+end_src
 ** org-download
@@ -2864,7 +2866,7 @@ If you want to use *sdcv* for offline translate, then download dictionary data t
   (setq dictionary-overlay-user-data-directory (concat nowis-doc-emacs-dir "12-dictionary-overlay")
         dictionary-overlay-lookup-with #'gt-quick-sdcv
         ;; dictionary-overlay-translators '("local" "sdcv" "darwin" "web")
-        ;; dictionary-overlay-sdcv-dictionary-path (concat nowis-doc-emacs-dir "02-binary-files/03-stardicts/stardict-ecdict-2.4.2/stardict-ecdict-2.4.2")
+        dictionary-overlay-sdcv-dictionary-path (concat nowis-doc-emacs-dir "02-binary-files/03-stardicts/stardict-ecdict-2.4.2/stardict-ecdict-2.4.2")
         ))
 
 #+end_src
@@ -3219,6 +3221,7 @@ These codes are used to solve copy & paste problems under wslg inside win10/win1
 (if (eq system-type 'android)
     (progn
       (setq touch-screen-display-keyboard t)
+      (setq overriding-text-conversion-style nil)
       ))
 (defun android-toggle-keyboard()
   (interactive)
