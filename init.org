@@ -2311,13 +2311,13 @@ Comments:
             ("+" (:strike-through t))
             ))
 
-    (dolist (face '((org-level-1 . 1.4)
-                    (org-level-2 . 1.4)
-                    (org-level-3 . 1.4)
-                    (org-level-4 . 1.4)
-                    (org-level-5 . 1.4)
-                    (org-level-6 . 1.4)
-                    (org-level-7 . 1.4)
+    (dolist (face '((org-level-1 . 1.2)
+                    (org-level-2 . 1.2)
+                    (org-level-3 . 1.2)
+                    (org-level-4 . 1.2)
+                    (org-level-5 . 1.2)
+                    (org-level-6 . 1.2)
+                    (org-level-7 . 1.2)
                     (org-level-8 . 1.1)))
       (set-face-attribute (car face) nil :weight 'medium :height (cdr face)))
     ))
@@ -2597,13 +2597,18 @@ My useage for =action.org=:
              (not (org-entry-get nil "ACTIVATED")))
     (org-entry-put nil "ACTIVATED" (format-time-string "[%Y-%m-%d]"))))
 (add-hook 'org-after-todo-state-change-hook #'log-todo-next-creation-date)
+(setq org-priority-lowest 69)
 
 ;; Agenda
 (setq org-agenda-custom-commands
       '(("g" "Get Things Done (GTD)"
          ((agenda "" )
+          (tags-todo "+action" ((org-agenda-overriding-header "Priority")
+                                (org-agenda-prefix-format "  %-12:c [%-4e] ")
+                                (org-agenda-sorting-strategy
+                                 '(priority-down))))
           (tags-todo "+action" ((org-agenda-overriding-header "Action")
-                                (org-agenda-prefix-format "  %-12:c [%e] ")
+                                (org-agenda-prefix-format "  %-12:c [%-4e] ")
                                 (org-super-agenda-groups
                                  '(
                                    (:name "outline" :auto-outline-path t

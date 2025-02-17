@@ -1,11 +1,6 @@
 [submodule "ace-window"]
 	path = lib/ace-window
 	url = https://github.com/abo-abo/ace-window.git
-[submodule "aider"]
-	path = lib/aider
-	url = https://github.com/tninja/aider.el.git
-    no-byte-compile = aider-helm.el
-    no-byte-compile = aider-doom.el
 [submodule "annotate"]
 	path = lib/annotate
 	url = https://github.com/bastibe/annotate.el.git
@@ -154,6 +149,9 @@
 [submodule "gptel"]
 	path = lib/gptel
 	url = https://github.com/karthink/gptel.git
+[submodule "gptel-aibo"]
+	path = lib/gptel-aibo
+	url = https://github.com/dolmens/gptel-aibo.git
 [submodule "graphviz-dot-mode"]
 	path = lib/graphviz-dot-mode
 	url = https://github.com/ppareit/graphviz-dot-mode.git
