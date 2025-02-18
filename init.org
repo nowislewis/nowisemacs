@@ -3001,6 +3001,10 @@ Simple distraction-free editing. I use darkroom instead of writeroom because it'
       :models '(deepseek-chat deepseek-coder))
     ))
 #+end_src
+*** gptel-aibo
+#+begin_src elisp
+(setup gptel-aibo)
+#+end_src
 *** whisper
 #+begin_src elisp
 (setup whisper
@@ -3098,7 +3102,7 @@ If `DEVICE-NAME' is provided, it will be used instead of prompting the user."
   )
 #+end_src
 *** aider
-#+begin_src elisp
+#+begin_src elisp :tangle no
 (setup aider
   (:also-load gptel)
   (setq aider-args '("--deepseek"))
@@ -3217,7 +3221,20 @@ These codes are used to solve copy & paste problems under wslg inside win10/win1
       (defun wsl-copy-region-to-clipboard (start end)
         "Copy region to Windows clipboard."
         (interactive "r")
-         (call-process-region start end "wl-copy" nil 0))
+        (call-process-region start end "wl-copy" nil 0))
+
+      (defun wsl-clipboard-to-string ()
+        "Return Windows clipboard as string."
+        (let ((coding-system-for-read 'dos))
+          (substring; remove added trailing \n
+           (shell-command-to-string
+            "wl-paste") 0 -1)))
+      (defun wsl-paste-from-clipboard (arg)
+        "Insert Windows clipboard at point. With prefix ARG, also add to kill-ring"
+        (interactive "P")
+        (let ((clip (wsl-clipboard-to-string)))
+          (insert clip)
+          (if arg (kill-new clip))))
       ;; (global-set-key [remap kill-ring-save] #'wsl-copy-region-to-clipboard)
       ))
 #+end_src
