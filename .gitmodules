@@ -252,6 +252,9 @@
 [submodule "org-fc"]
 	path = lib/org-fc
 	url = https://github.com/l3kn/org-fc.git
+[submodule "org-kanban"]
+	path = lib/org-kanban
+	url = https://github.com/gizmomogwai/org-kanban.git
 [submodule "org-mind-map"]
 	path = lib/org-mind-map
     url = https://github.com/nowislewis/org-mind-map.git

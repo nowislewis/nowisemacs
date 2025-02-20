@@ -444,6 +444,7 @@ Maybe I should add a new state.
                           '(";" . meow-expand-1)
                           ;; '(":" . async-shell-command)
                           '("'" . consult-register-load)
+                          '("\"" . consult-register)
                           '("," . meow-reverse)
                           '("." . repeat)
 
@@ -556,6 +557,10 @@ Maybe I should add a new state.
    ["Imenu"
     ("l" "Imenu list smart toggle" imenu-list-smart-toggle)
     ;; ("L" "Boxy imenu" boxy-imenu)
+    ]
+   ["gptel-aibo"
+    ("a" "aibo" gptel-aibo)
+    ("c" "complete-at-point" gptel-aibo-complete-at-point)
     ]
    ;; org-download
    ;; ["Org download"
@@ -2182,6 +2187,9 @@ Disassemble C, C++ or Fortran code under cursor
             org-latex-image-default-option "max size={\\textwidth}{\\textheight}" ;; use adjustbox
             org-latex-image-default-width ""
             )
+      ;; if you want to add svg support:
+      ;;  1. install inkscape
+      ;;  2. \usepackage[inkscapeversion=1]{svg}
       (add-to-list 'org-latex-classes
                    '("scrbook"
                      "\\documentclass[openany,oneside]{scrbook}
@@ -2198,6 +2206,21 @@ Disassemble C, C++ or Fortran code under cursor
                      ("\\subsection{%s}" . "\\subsection*{%s}")
                      ("\\subsubsection{%s}" . "\\subsubsection*{%s}")))
       )
+
+    ;; preview latex
+    (add-to-list 'org-preview-latex-process-alist
+	             '(tectonic :programs ("tectonic" "convert")
+			                :description "pdf > png"
+			                :message "you need install the programs: tectonic and imagemagick."
+			                :image-input-type "pdf"
+			                :image-output-type "png"
+			                :image-size-adjust (1.0 . 1.0)
+			                :latex-compiler
+			                ("tectonic -Z shell-escape-cwd=%o --outfmt pdf --outdir %o %f")
+			                :image-converter
+			                ("convert -density %D -trim -antialias %f -quality 300 %O")))
+    (setq org-preview-latex-default-process 'tectonic) ;; need to install tectonic and imagemagick
+
 
     (plist-put org-format-latex-options :scale 2.0) ;; use a large preview for latex
     ;; (setq org-preview-latex-default-process 'dvisvgm)
@@ -2328,7 +2351,7 @@ Comments:
   (:load-after org)
   (setq org-modern-star 'replace
         org-modern-replace-stars '("󰯬" "󰯯" "󰯲" "󰯵" "󰯸" "󰯻")
-        org-modern-table nil)
+        org-modern-table t)
   (:hook-into org-mode)
   (add-hook 'org-agenda-finalize-hook #'org-modern-agenda))
 #+end_src
@@ -2813,7 +2836,7 @@ This is an Emacs package that creates graphviz directed graphs from the headings
     ;; (setq org-mind-map-engine "sfdp")   ; Multiscale version of fdp for the layout of large graphs
     ;; (setq org-mind-map-engine "twopi")  ; Radial layouts
     ;; (setq org-mind-map-engine "circo")  ; Circular Layout
-    (add-to-list 'org-mind-map-default-graph-attribs '("fontname" . "Maple Mono SC F"))
+    ;; (add-to-list 'org-mind-map-default-graph-attribs '("fontname" . "Maple Mono NF CN"))
     ))
 #+end_src
 ** insert from snipaste
@@ -2990,7 +3013,7 @@ Simple distraction-free editing. I use darkroom instead of writeroom because it'
                     :header (lambda () `(("Authorization" . ,(concat "Bearer " (gptel--get-api-key)))))
                     :key 'gptel-api-key
                     :stream t
-                    :models '(gpt-4o-mini gpt-4o)))
+                    :models '(gpt-4o-mini deepseek-reasoner gemini-1.5-flash-latest)))
     (gptel-make-gemini "Gemini" :key 'gptel-api-key :stream t)
     ;; DeepSeek offers an OpenAI compatible API
     (gptel-make-openai "DeepSeek"       ;Any name you want
@@ -3003,7 +3026,10 @@ Simple distraction-free editing. I use darkroom instead of writeroom because it'
 #+end_src
 *** gptel-aibo
 #+begin_src elisp
-(setup gptel-aibo)
+(setup gptel-aibo
+  (:when-loaded
+    (define-key gptel-aibo-mode-map
+                (kbd "M-p") #'gptel-aibo-send)))
 #+end_src
 *** whisper
 #+begin_src elisp
