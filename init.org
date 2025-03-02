@@ -248,7 +248,7 @@ emacs
 ├── 01-orgmode
 │   ├── org-remark
 │   └── xnotes
-├── 02-binary-files
+├── 02-binary-git/binary-files
 │   ├── 01-pictures
 │   ├── 02-searchable
 │   ├── 03-stardicts
@@ -263,9 +263,9 @@ emacs
 ├── 08-keys
 └── 09-scripts
 #+end_example
-1. All files and folders except =02-binary-files= are managed under git control, and =02-binary-file= is managed under =rsync= or =restic=.
+1. All files and folders except =02-binary-git/binary-files= are managed under git control, and =02-binary-file= is managed under =rsync= or =restic=.
 2. =01-orgmode= stores .org files, where =org-remark= is used to store remark notes, =xnote= is the default directory of =Denote= .
-3. =02-binary-files=, as its name, storing binary-fils. For example, =02-searchable= is used store the PDF of the literature
+3. =02-binary-git/binary-files=, as its name, storing binary-fils. For example, =02-searchable= is used store the PDF of the literature
    and daily MS Office files, the meaning of searchable means that all files under this folder maybe searched or
    modified latter, and they should have nice naming specifications for convenience search.
 
@@ -275,7 +275,7 @@ emacs
 (defvar nowis-doc-emacs-dir (file-truename "~/Documents/emacs/"))
 (defvar nowis-gtd-dir (concat nowis-doc-emacs-dir "01-orgmode/xnotes/gtd"))
 (defvar nowis-bib-dir (concat nowis-doc-emacs-dir "03-bibliography/"))
-(defvar nowis-bib-pdf-dir (concat nowis-doc-emacs-dir "02-binary-files/02-searchable/01-papers-markable/"))
+(defvar nowis-bib-pdf-dir (concat nowis-doc-emacs-dir "02-binary-git/binary-files/02-searchable/01-papers-markable/"))
 #+end_src
 * Package Management
 ** setup
@@ -1880,7 +1880,7 @@ borrowed from citre, now you can always jump-back use "M-," after any jump in th
     ;; if not find ispell-dict, use cape as default
     (if (null ispell-alternate-dictionary)
         (progn
-          (setq ispell-complete-word-dict (concat nowis-doc-emacs-dir "02-binary-files/12-spell-dict/en_US.dict"))))))
+          (setq ispell-complete-word-dict (concat nowis-doc-emacs-dir "02-binary-git/binary-files/12-spell-dict/en_US.dict"))))))
 #+end_src
 ***** nerd-icons-corfu
 #+begin_src elisp
@@ -2100,7 +2100,7 @@ Disassemble C, C++ or Fortran code under cursor
         ;; plain list
         org-list-demote-modify-bullet '(("+" . "-") ("-" . "+") ("*" . "+"))
         ;; attach
-        org-yank-image-save-method (concat nowis-doc-emacs-dir "02-binary-files/01-pictures/org_download_images")
+        org-yank-image-save-method (concat nowis-doc-emacs-dir "02-binary-git/binary-files/01-pictures/org_download_images")
         )
   (:when-loaded
     (require 'org-tempo) ;; so that <s is useful
@@ -2371,7 +2371,7 @@ Comments:
 (setup org-download
   (setq org-download-method 'directory
            org-download-screenshot-basename "screenshot.jpg"
-           org-download-image-dir (concat nowis-doc-emacs-dir "02-binary-files/01-pictures/org_download_images")
+           org-download-image-dir (concat nowis-doc-emacs-dir "02-binary-git/binary-files/01-pictures/org_download_images")
            org-download-abbreviate-filename-function 'expand-file-name)
   (:when-loaded
     (when (eq system-type 'gnu/linux)
@@ -2392,7 +2392,7 @@ Comments:
 ** org-noter
 #+begin_src elisp
 (setup org-noter
-  (setq org-noter-notes-search-path (concat nowis-doc-emacs-dir "02-binary-files/02-searchable/01-papers-markable/")
+  (setq org-noter-notes-search-path (concat nowis-doc-emacs-dir "02-binary-git/binary-files/02-searchable/01-papers-markable/")
            org-noter-auto-save-last-location t
            org-noter-separate-notes-from-heading nil
            org-noter-hide-other nil
@@ -2503,7 +2503,7 @@ Comments:
 #+begin_src elisp
 (defun project-find-searchable-dir-files ()
   (interactive)
-  (dired (concat nowis-doc-emacs-dir "02-binary-files/02-searchable"))
+  (dired (concat nowis-doc-emacs-dir "02-binary-git/binary-files/02-searchable"))
   (project-find-file t))
 (defun project-find-gtd-dir-files ()
   (interactive)
@@ -2513,6 +2513,7 @@ Comments:
 ** org-excalidraw
 #+begin_src elisp
 (setup org-excalidraw
+   (setq org-excalidraw-default-directory (concat nowis-doc-emacs-dir "05-excalidraw/"))
   (:autoload org-excalidraw-create-drawing)
   )
 #+end_src
@@ -2848,7 +2849,7 @@ This is an Emacs package that creates graphviz directed graphs from the headings
 (defun insert-file-from-snipaste ()
   "Prompt user to select a file from snipaste files and insert it into the current Org buffer."
   (interactive)
-  (let ((file (read-file-name "Select a file from Downloads: " (concat nowis-doc-emacs-dir "02-binary-files/01-pictures/snipaste/"))))
+  (let ((file (read-file-name "Select a file from Downloads: " (concat nowis-doc-emacs-dir "02-binary-git/binary-files/01-pictures/snipaste/"))))
     (when (and file (file-exists-p file))
       ;; (insert (format "[[file:%s][%s]]" file (file-name-nondirectory file))))))
       (insert (format "[[file:%s]]" file)))))
@@ -2898,7 +2899,7 @@ If you want to use *sdcv* for offline translate, then download dictionary data t
   (setq dictionary-overlay-user-data-directory (concat nowis-doc-emacs-dir "12-dictionary-overlay")
         dictionary-overlay-lookup-with #'gt-quick-sdcv
         ;; dictionary-overlay-translators '("local" "sdcv" "darwin" "web")
-        dictionary-overlay-sdcv-dictionary-path (concat nowis-doc-emacs-dir "02-binary-files/03-stardicts/stardict-ecdict-2.4.2/stardict-ecdict-2.4.2")
+        dictionary-overlay-sdcv-dictionary-path (concat nowis-doc-emacs-dir "02-binary-git/binary-files/03-stardicts/stardict-ecdict-2.4.2/stardict-ecdict-2.4.2")
         ))
 
 #+end_src
@@ -3172,18 +3173,18 @@ If `DEVICE-NAME' is provided, it will be used instead of prompting the user."
 (defun rsync-push-binary-files()
   (interactive)
   (async-shell-command "rsync -avbihn --exclude '.git' --exclude '.svn' --delete \
-     ~/Documents/emacs/02-binary-files/ lewis-nas@192.168.31.108:/share/my_webdav/rsync/02-binary-files/")
+     ~/Documents/emacs/02-binary-git/binary-files/ lewis-nas@192.168.31.108:/share/my_webdav/rsync/02-binary-git/binary-files/")
   (let ((answer (read-char-choice "Do you want to continue? [y/n] " '(?y ?n))))
     (cond
      ((eq answer ?y)
       (async-shell-command " rsync -avbih --exclude '.git' --exclude '.svn' --delete \
-     ~/Documents/emacs/02-binary-files/ lewis-nas@192.168.31.108:/share/my_webdav/rsync/02-binary-files/"))
+     ~/Documents/emacs/02-binary-git/binary-files/ lewis-nas@192.168.31.108:/share/my_webdav/rsync/02-binary-git/binary-files/"))
      ((eq answer ?n) (message "transfer exit")))))
 
 (defun rsync-pull-binary-files()
   (interactive)
   (async-shell-command " rsync -avbih --exclude '.git' --exclude '.svn' --delete\
- lewis-nas@192.168.31.108:/share/my_webdav/rsync/02-binary-files/ ~/Documents/emacs/02-binary-files/"))
+ lewis-nas@192.168.31.108:/share/my_webdav/rsync/02-binary-git/binary-files/ ~/Documents/emacs/02-binary-git/binary-files/"))
 
 (transient-define-prefix backup-leader-map()
   "Define leader-key map for backup functions"
