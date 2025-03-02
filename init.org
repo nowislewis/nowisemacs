@@ -2831,9 +2831,8 @@ Spaced Repetition System for Emacs org-mode
 This is an Emacs package that creates graphviz directed graphs from the headings of an org file
 #+begin_src elisp
 (setup org-mind-map
+  (:also-load ox-org)
   (:when-loaded
-    (if (not (featurep 'ox-org))
-        (require 'ox-org))
     (setq org-mind-map-engine "dot")       ; Default. Directed Graph
     ;; (setq org-mind-map-engine "neato")  ; Undirected Spring Graph
     ;; (setq org-mind-map-engine "twopi")  ; Radial Layout
@@ -2842,6 +2841,9 @@ This is an Emacs package that creates graphviz directed graphs from the headings
     ;; (setq org-mind-map-engine "twopi")  ; Radial layouts
     ;; (setq org-mind-map-engine "circo")  ; Circular Layout
     ;; (add-to-list 'org-mind-map-default-graph-attribs '("fontname" . "Maple Mono NF CN"))
+    (setq org-mind-map-display 'window)
+    (add-to-list 'org-mind-map-default-graph-attribs '("rankdir" . "TB"))
+
     ))
 #+end_src
 ** insert from snipaste
