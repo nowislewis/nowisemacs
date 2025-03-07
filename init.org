@@ -3134,14 +3134,30 @@ If `DEVICE-NAME' is provided, it will be used instead of prompting the user."
           (setq whisper--ffmpeg-input-device (format ":%s" rk/default-audio-device))))))
   )
 #+end_src
-*** aider
+*** copilot
 #+begin_src elisp :tangle no
-(setup aider
+(setup copilot
+  (if (string= "Arch" (getenv "WSL_DISTRO_NAME"))
+      (add-hook 'prog-mode-hook 'copilot-mode)
+    (:when-loaded
+      (define-key copilot-completion-map (kbd "<tab>") 'copilot-accept-completion)
+      (define-key copilot-completion-map (kbd "TAB") 'copilot-accept-completion))))
+#+end_src
+*** aidermacs
+#+begin_src elisp
+(setup aidermacs
   (:also-load gptel)
-  (setq aider-args '("--deepseek"))
   (:when-loaded
-    (setenv "DEEPSEEK_API_KEY" (gptel-api-key-from-auth-source "api.deepseek.com"))
-    ))
+  (setq aidermacs-default-model "sonnet")
+  (global-set-key (kbd "C-c a") 'aidermacs-transient-menu)
+  ; Enable minor mode for Aider files
+  (aidermacs-setup-minor-mode)
+  ; See the Configuration section below
+  (setq aidermacs-auto-commits t
+        aidermacs-use-architect-mode t
+        aidermacs-backend 'vterm
+        )
+  (setenv "DEEPSEEK_API_KEY" (gptel-api-key-from-auth-source "api.deepseek.com"))))
 #+end_src
 ** webjump
 #+begin_src elisp
