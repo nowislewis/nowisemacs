@@ -1,9 +1,6 @@
 [submodule "ace-window"]
 	path = lib/ace-window
 	url = https://github.com/abo-abo/ace-window.git
-[submodule "aidermacs"]
-	path = lib/aidermacs
-	url = https://github.com/MatthewZMD/aidermacs.git
 [submodule "annotate"]
 	path = lib/annotate
 	url = https://github.com/bastibe/annotate.el.git
