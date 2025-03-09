@@ -1594,7 +1594,7 @@ Jump anywhere in the world
                    (reusable-frames . visible)
                    (window-height . 0.3)))
     ;; in order to toggle-input-method
-    (unbind-key "C-\\" vterm-mode-map)
+    ;; (unbind-key "C-\\" vterm-mode-map)
     )
   (defun vterm-toggle-window()
     "Toggle eshell buffer."
@@ -2653,11 +2653,11 @@ My useage for =action.org=:
 (setq org-refile-use-outline-path 'file)
 (setq org-outline-path-complete-in-steps nil)
 (setq org-refile-targets
-      '(("action.org" :regexp . "\\(?:\\(?:Note\\|Task\\)s\\)")
-        ("incubate.org" :regexp . "\\(?:\\(?:Note\\|Task\\)s\\)")
+      '(("action.org" :regexp . "*")
+        ("incubate.org"  :regexp . "*")
         ))
-;; (setq org-refile-targets
-;;       '(("action.org" :level . 2)))
+      ;; '(("action.org" :regexp . "\\(?:\\(?:Note\\|Task\\)s\\)")
+      ;;   ("incubate.org" :regexp . "\\(?:\\(?:Note\\|Task\\)s\\)")
 
 ;; TODO
 (setq org-log-done 'note)
