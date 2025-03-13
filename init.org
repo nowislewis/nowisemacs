@@ -666,7 +666,10 @@ Maybe I should add a new state.
   [["agenda"
     ("a" "org-agenda" org-agenda)
     ("c" "capture" org-capture)
-    ("I" "capture inbox" org-capture-inbox)]
+    ("I" "capture inbox" org-capture-inbox)
+    ("s" "subtree archive" nowis-org-archive-subtree)
+    ]
+
     ["shell"
      ;; ("i" "toggle-insert-cd" eat-toggle-insert-dir)
      ]
@@ -2617,9 +2620,7 @@ My useage for =action.org=:
 ;; Files
 (setq org-directory "~/Documents/emacs/01-orgmode/xnotes")
 (setq org-agenda-files
-      (mapcar 'file-truename
-              (file-expand-wildcards (concat org-directory "/gtd/*.org"))))
-
+      (directory-files-recursively (concat org-directory  "/gtd") "\\.org$"))
 ;; Capture
 (setq org-capture-templates
       `(("i" "Inbox" entry  (file "gtd/inbox.org")
@@ -2656,8 +2657,8 @@ My useage for =action.org=:
       '(("action.org" :regexp . "*")
         ("incubate.org"  :regexp . "*")
         ))
-      ;; '(("action.org" :regexp . "\\(?:\\(?:Note\\|Task\\)s\\)")
-      ;;   ("incubate.org" :regexp . "\\(?:\\(?:Note\\|Task\\)s\\)")
+;; '(("action.org" :regexp . "\\(?:\\(?:Note\\|Task\\)s\\)")
+;;   ("incubate.org" :regexp . "\\(?:\\(?:Note\\|Task\\)s\\)")
 
 ;; TODO
 (setq org-log-done 'note)
@@ -2672,29 +2673,50 @@ My useage for =action.org=:
 (setq org-priority-lowest 69)
 
 ;; Agenda
-(setq org-agenda-custom-commands
-      '(("g" "Get Things Done (GTD)"
-         ((agenda "" )
-          (tags-todo "+action" ((org-agenda-overriding-header "Priority")
-                                (org-agenda-prefix-format "  %-12:c [%-4e] ")
-                                (org-agenda-sorting-strategy
-                                 '(priority-down))))
-          (tags-todo "+action" ((org-agenda-overriding-header "Action")
-                                (org-agenda-prefix-format "  %-12:c [%-4e] ")
-                                (org-super-agenda-groups
-                                 '(
-                                   (:name "outline" :auto-outline-path t
-                                          :tag "action")
-                                   ))))
+(defmacro nowis-create-agenda-command (key description tag)
+  `(list ,key ,description
+         '((agenda "")
+           (tags-todo ,(concat "+action" tag) ((org-agenda-overriding-header "Action")
+                                               (org-agenda-prefix-format "%-12:c [%-4e] ")
+                                               (org-super-agenda-groups
+                                                '(
+                                                  (:name "outline" :auto-outline-path t
+                                                         :tag "action")
+                                                  ))))
           (tags-todo "inbox"
                      ((org-agenda-prefix-format "  %?-12t% s")
                       (org-agenda-overriding-header "\nInbox\n")))
 
-          (tags "CLOSED>=\"<today>\""
-                ((org-agenda-overriding-header "\nCompleted today\n")))
-          (tags "CLOSED>=\"<-1w>\""
+          (tags ,(concat "CLOSED>=\"<today>\"" tag)
+                     ((org-agenda-overriding-header "\nCompleted today\n")))
+          (tags ,(concat "CLOSED>=\"<-1w>\"" tag)
                 ((org-agenda-overriding-header "\nCompleted last 7 days")))
-          ))))
+          )))
+
+(setq org-agenda-custom-commands
+      (list (nowis-create-agenda-command "g" "GTD" "")
+            (nowis-create-agenda-command "w" "Work" "+work")
+            ))
+;; (setq org-agenda-custom-commands
+;;       '(("g" "Get Things Done (GTD)"
+;;          ((agenda "" )
+;;           (tags-todo "+action" ((org-agenda-overriding-header "Action")
+;;                                 (org-agenda-prefix-format "[%-4e] ")
+;;                                 (org-super-agenda-groups
+;;                                  '(
+;;                                    (:name "outline" :auto-outline-path t
+;;                                           :tag "action")
+;;                                    ))))
+;;           (tags-todo "inbox"
+;;                      ((org-agenda-prefix-format "  %?-12t% s")
+;;                       (org-agenda-overriding-header "\nInbox\n")))
+
+;;           (tags-todo "CLOSED>=\"<today>\"+action"
+;;                      ((org-agenda-overriding-header "\nCompleted today\n")))
+;;           (tags "CLOSED>=\"<-1w>\"+test"
+;;                 ((org-agenda-overriding-header "\nCompleted last 7 days")))
+;;           ))
+;;         ))
 ;; agenda clockreport
 (setq org-agenda-start-with-clockreport-mode t
       org-agenda-clockreport-parameter-plist '(:link t :maxlevel 5 :properties ("Effort"))
@@ -2718,7 +2740,22 @@ See also `org-save-all-org-buffers'"
               (gtd-save-org-buffers)))
 
 ;; archive
-(setq org-archive-location (concat  "gtd_archive_" (format-time-string "%Y") "::datetree/"))
+(defun nowis-get-closed-time-or-current-time ()
+  "Get the CLOSED time of the current subtree or use the current time if not available."
+  (let ((closed-time (org-entry-get (point) "CLOSED")))
+    (if closed-time
+        (org-time-string-to-time closed-time)
+      (current-time))))
+
+(defun nowis-org-archive-subtree ()
+  "Archive the current subtree to a corresponding archive file based on the task's completion date."
+  (interactive)
+  (let* ((current-file (buffer-file-name))
+         (completed-time (nowis-get-closed-time-or-current-time))
+         (archive-file (concat "gtd_archive_" (format-time-string "%Y" completed-time)
+                               ".org::datetree/")))
+    (setq org-archive-location archive-file)
+    (org-archive-subtree)))
 #+end_src
 ** org-super-agenda
 #+begin_src elisp
