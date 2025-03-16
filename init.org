@@ -605,7 +605,7 @@ Maybe I should add a new state.
   "Define leader-key map for notes functions"
   [["Roam"
     ("r f" "denote-open-or-create" denote-open-or-create)
-    ("r j" "denote-journal" denote-journal-extras-new-or-existing-entry)
+    ;; ("r j" "denote-journal" denote-journal-extras-new-or-existing-entry)
     ("r s" "find-all-searchable" project-find-searchable-dir-files)
     ;; ("rc" "consult-notes" consult-notes)
     ("r g" "project-find-gtd-dir-files" project-find-gtd-dir-files)
@@ -2531,15 +2531,21 @@ Comments:
         denote-prompts '(title keywords signature template)
         denote-dired-directories-include-subdirectories t
         ;; journal
-        denote-journal-extras-title-format 'day-date-month-year
+        ;; denote-journal-extras-title-format 'day-date-month-year
         )
   ;; (add-hook 'dired-mode-hook #'denote-dired-mode-in-directories)
   (setq denote-templates
-        `((action . ,(concat "* Destination\n\n"
+        `((essence . ,(concat "* 本质思考\n"
+                             "** 事物的根本属性\n"
+                             "** 问题的根源\n"
+                             "** 现象背后的底层逻辑\n"
+                             "* notes\n"))
+          (action . ,(concat "* Destination\n\n"
                              "* Roadmap\n\n"
                              "* Action\n\n"
                              "* Warnings\n\n"
-                             "* Links\n\n"))))
+                             "* Links\n\n"))
+          ))
   )
 #+end_src
 *** denote-explorer
