@@ -441,10 +441,10 @@ Maybe I should add a new state.
                           '(")" . forward-sentence)
                           '("{" . backward-paragraph)
                           '("}" . forward-paragraph)
-                          '("]" . (lambda()
-                                    (interactive)
-                                    (meow-bounds-of-thing ?\"))
-                            )
+                          '("]" . nowis-graphviz-symbol-with-label)
+                          ;; '("]" . (lambda()
+                          ;;           (interactive)
+                          ;;           (meow-bounds-of-thing ?\")))
                           '("\\" . quoted-insert)
                           '(";" . meow-expand-1)
                           ;; '(":" . async-shell-command)
@@ -1689,7 +1689,21 @@ Jump anywhere in the world
 (setup graphviz-dot-mode
   (:file-match "\\.dot\\'")
   (setq graphviz-dot-indent-width 4)
-  )
+  (setq nowis-graphviz-current-num 0)
+  (defun nowis-graphviz-symbol-with-label ()
+    "Wrap the current symbol with [label=\"symbol\"]."
+    (interactive)
+    (let ((symbol (thing-at-point 'symbol)))
+      (when symbol
+        (delete-region (beginning-of-thing 'symbol) (end-of-thing 'symbol))
+        (insert (format "%s [label=\"%s\"]" nowis-graphviz-current-num symbol))
+        (setq nowis-graphviz-current-num (1+ nowis-graphviz-current-num))
+        )))
+  (defun nowis-graphviz-reset-number ()
+    "Reset number to 0"
+    (interactive)
+    (setq nowis-graphviz-current-num 0))
+    )
 #+end_src
 *** plantuml
 This Emacs tool use plantuml to generate images for org, json, yaml files.
