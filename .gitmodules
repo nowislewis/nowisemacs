@@ -4,9 +4,6 @@
 [submodule "annotate"]
 	path = lib/annotate
 	url = https://github.com/bastibe/annotate.el.git
-[submodule "atomic-chrome"]
-	path = lib/atomic-chrome
-	url = https://github.com/KarimAziev/atomic-chrome.git
 [submodule "avy"]
 	path = lib/avy
 	url = https://github.com/abo-abo/avy.git
@@ -42,9 +39,6 @@
 [submodule "cmake-mode"]
 	path = lib/cmake-mode
 	url = https://github.com/emacsmirror/cmake-mode.git
-[submodule "compat"]
-	path = lib/compat
-	url = https://github.com/emacs-compat/compat.git
 [submodule "consult"]
 	path = lib/consult
 	url = https://github.com/minad/consult.git

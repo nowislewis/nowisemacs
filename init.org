@@ -666,7 +666,8 @@ Maybe I should add a new state.
   [["agenda"
     ("a" "org-agenda" org-agenda)
     ("c" "capture" org-capture)
-    ("I" "capture inbox" org-capture-inbox)
+    ("h" "insert here" org-capture-here)
+    ("i" "capture inbox" org-capture-inbox)
     ("s" "subtree archive" nowis-org-archive-subtree)
     ]
 
@@ -877,6 +878,20 @@ Maybe I should add a new state.
 (advice-add 'variable-pitch-mode :after #'dynamic-change-line-spacing)
 #+end_src
 ** Theme
+*** modus-themes
+#+begin_src elisp
+(setup modus-themes
+  (setq modus-themes-common-palette-overrides
+      '((fg-heading-1 blue)
+        (fg-heading-2 fg-main)
+        (fg-heading-3 fg-main)
+        (fg-heading-4 fg-main)
+        (fg-heading-5 fg-main)
+        (fg-heading-6 fg-main)
+        (fg-heading-7 fg-main)
+        ))
+  )
+#+end_src
 *** ef-themes
 #+name: themes
 #+begin_src elisp
@@ -2627,6 +2642,10 @@ My useage for =action.org=:
 (setq org-directory "~/Documents/emacs/01-orgmode/xnotes")
 (setq org-agenda-files
       (directory-files-recursively (concat org-directory  "/gtd") "\\.org$"))
+(setq org-refile-files
+      (cl-remove-if (lambda (file) (string-match-p "inbox.org$" file))
+                    org-agenda-files))
+
 ;; Capture
 (setq org-capture-templates
       `(("i" "Inbox" entry  (file "gtd/inbox.org")
@@ -2646,6 +2665,11 @@ My useage for =action.org=:
   (call-interactively 'org-store-link)
   (org-capture nil "i"))
 
+(defun org-capture-here ()
+  "Insert an org capture template at point."
+  (interactive)
+  (org-capture 0))
+
 (defun org-capture-mail ()
   (interactive)
   (call-interactively 'org-store-link)
@@ -2659,10 +2683,7 @@ My useage for =action.org=:
 ;; Refile
 (setq org-refile-use-outline-path 'file)
 (setq org-outline-path-complete-in-steps nil)
-(setq org-refile-targets
-      '(("action.org" :regexp . "*")
-        ("incubate.org"  :regexp . "*")
-        ))
+(setq org-refile-targets '((org-refile-files :regexp . "*")))
 ;; '(("action.org" :regexp . "\\(?:\\(?:Note\\|Task\\)s\\)")
 ;;   ("incubate.org" :regexp . "\\(?:\\(?:Note\\|Task\\)s\\)")
 
@@ -2689,15 +2710,15 @@ My useage for =action.org=:
                                                   (:name "outline" :auto-outline-path t
                                                          :tag "action")
                                                   ))))
-          (tags-todo "inbox"
-                     ((org-agenda-prefix-format "  %?-12t% s")
-                      (org-agenda-overriding-header "\nInbox\n")))
+           (tags-todo "inbox"
+                      ((org-agenda-prefix-format "  %?-12t% s")
+                       (org-agenda-overriding-header "\nInbox\n")))
 
-          (tags ,(concat "CLOSED>=\"<today>\"" tag)
-                     ((org-agenda-overriding-header "\nCompleted today\n")))
-          (tags ,(concat "CLOSED>=\"<-1w>\"" tag)
-                ((org-agenda-overriding-header "\nCompleted last 7 days")))
-          )))
+           (tags ,(concat "CLOSED>=\"<today>\"" tag)
+                 ((org-agenda-overriding-header "\nCompleted today\n")))
+           (tags ,(concat "CLOSED>=\"<-1w>\"" tag)
+                 ((org-agenda-overriding-header "\nCompleted last 7 days")))
+           )))
 
 (setq org-agenda-custom-commands
       (list (nowis-create-agenda-command "g" "GTD" "")
@@ -2759,7 +2780,7 @@ See also `org-save-all-org-buffers'"
   (let* ((current-file (buffer-file-name))
          (completed-time (nowis-get-closed-time-or-current-time))
          (archive-file (concat "gtd_archive_" (format-time-string "%Y" completed-time)
-                               ".org::datetree/")))
+                               "::datetree/")))
     (setq org-archive-location archive-file)
     (org-archive-subtree)))
 #+end_src
