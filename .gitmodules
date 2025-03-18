@@ -95,9 +95,6 @@
 [submodule "ebib"]
 	path = lib/ebib
 	url = https://github.com/joostkremers/ebib.git
-[submodule "eglot-booster"]
-	path = lib/eglot-booster
-	url = https://github.com/jdtsmith/eglot-booster.git
 [submodule "el-themes"]
 	path = lib/el-themes
 	url = https://github.com/protesilaos/ef-themes.git
@@ -171,6 +168,9 @@
 [submodule "imenu-list"]
 	path = lib/imenu-list
 	url = https://github.com/nowislewis/imenu-list.git
+[submodule "indent-bars"]
+	path = lib/indent-bars
+	url = https://github.com/jdtsmith/indent-bars.git
 [submodule "inheritenv"]
 	path = lib/inheritenv
 	url = https://github.com/purcell/inheritenv.git
@@ -274,6 +274,9 @@
 [submodule "org-super-agenda"]
 	path = lib/org-super-agenda
 	url = https://github.com/alphapapa/org-super-agenda.git
+[submodule "org-visual-outline"]
+	path = lib/org-visual-outline
+	url = https://github.com/legalnonsense/org-visual-outline.git
 [submodule "ox-hugo"]
 	path = lib/ox-hugo
 	url = https://github.com/kaushalmodi/ox-hugo.git

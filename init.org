@@ -92,6 +92,7 @@ I failed in love with denote, so previous *org-roam* configs were refiled into [
 - [[#org-mode][Org Mode]]
   - [[#org-mode-1][org-mode]]
   - [[#org-src][org-src]]
+  - [[#org-pipeline][org-pipeline]]
   - [[#org-sidebar][org-sidebar]]
   - [[#org-zotero-parser][org-zotero-parser]]
   - [[#org-oxlatexwordmarkdown][org-ox,latex,word,markdown]]
@@ -2004,7 +2005,7 @@ borrowed from citre, now you can always jump-back use "M-," after any jump in th
 #+end_src
 ***** eglot-booster
 Improve the performance of eglot using a wrapper executable, you should install =emacs-lsp-booster= first
-#+begin_src elisp
+#+begin_src elisp :tangle no
 (setup eglot-booster
   (when (executable-find "emacs-lsp-booster")
     (:load-after eglot)
@@ -2185,6 +2186,25 @@ Disassemble C, C++ or Fortran code under cursor
       (add-hook 'org-babel-after-execute-hook 'nowis-open-generated-image)
       ))
 #+end_src
+** org-pipeline
+#+begin_src elisp :tangle no
+(defun org-babel-execute:pipeline (body params)
+  (let* ((script (cdr (assoc :script params)))
+         (in-file (make-temp-file "org-input-"))
+         (out-file (make-temp-file "org-output-"))
+         (cmd (format "cat %s | %s > %s"
+                     (shell-quote-argument in-file)
+                     script
+                     (shell-quote-argument out-file))))
+
+    (write-region body nil in-file nil 'silent)
+    (message cmd)
+    (shell-command cmd)
+      (with-temp-buffer
+        (insert-file-contents out-file)
+        (buffer-string))))
+#+end_src
+
 ** org-sidebar
 #+begin_src elisp
 (defun nowis-org-toggle-sidebar()
@@ -2440,6 +2460,11 @@ Comments:
 (setup org-appear
   (:load-after org)
   (:hook-into org-mode))
+#+end_src
+*** org-viusal-outline
+#+begin_src elisp
+(setup org-visual-outline
+  (add-hook 'org-mode-hook #'org-visual-indent-mode))
 #+end_src
 ** org-download
 #+begin_src elisp :tangle no
@@ -2716,7 +2741,9 @@ My useage for =action.org=:
 ;; Agenda
 (defmacro nowis-create-agenda-command (key description tag)
   `(list ,key ,description
-         '((agenda "")
+         '((agenda ""
+                   ((org-agenda-skip-function
+                     '(org-agenda-skip-if nil '(todo done)))))
            (tags-todo ,(concat "+action" tag) ((org-agenda-overriding-header "Action")
                                                (org-agenda-prefix-format "%-12:c [%-4e] ")
                                                (org-super-agenda-groups
