@@ -3171,13 +3171,9 @@ Simple distraction-free editing. I use darkroom instead of writeroom because it'
                     :stream t
                     :models '(gpt-4o-mini deepseek-reasoner gemini-1.5-flash-latest)))
     (gptel-make-gemini "Gemini" :key 'gptel-api-key :stream t)
-    ;; DeepSeek offers an OpenAI compatible API
-    (gptel-make-openai "DeepSeek"       ;Any name you want
-      :host "api.deepseek.com"
-      :endpoint "/chat/completions"
-      :stream t
-      :key 'gptel-api-key
-      :models '(deepseek-chat deepseek-coder deepseek-reasoner))
+    (gptel-make-deepseek "DeepSeek"       ;Any name you want
+      :stream t                           ;for streaming responses
+      :key 'gptel-api-key)               ;can be a function that returns the key
     ))
 #+end_src
 *** gptel-aibo
@@ -3185,7 +3181,9 @@ Simple distraction-free editing. I use darkroom instead of writeroom because it'
 (setup gptel-aibo
   (:when-loaded
     (define-key gptel-aibo-mode-map
-                (kbd "M-p") #'gptel-aibo-send)))
+                (kbd "M-p") #'gptel-aibo-send)
+    (define-key prog-mode-map (kbd "C-i") #'gptel-aibo-summon)
+    ))
 #+end_src
 *** whisper
 #+begin_src elisp
