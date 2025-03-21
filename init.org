@@ -565,9 +565,11 @@ Maybe I should add a new state.
     ("o" "org mode sidebar" nowis-org-toggle-sidebar)
     ;; ("L" "Boxy imenu" boxy-imenu)
     ]
-   ["gptel-aibo"
+   ["gptel"
     ("a" "aibo" gptel-aibo)
-    ("c" "complete-at-point" gptel-aibo-complete-at-point)
+    ("s" "gptel-aibo-summon" gptel-aibo-summon)
+    ("r" "gptel-rewrite" gptel-rewrite)
+    ("f" "gtpeel-file-add" gptel-add-file)
     ]
    ;; org-download
    ;; ["Org download"
@@ -1854,13 +1856,6 @@ borrowed from citre, now you can always jump-back use "M-," after any jump in th
     )
   )
 #+end_src
-**** treesitter-context
-#+begin_src elisp :tangle no
-(setup treesitter-context
-  (setq treesitter-context-idle-time 1.0
-        treesitter-context-frame-autohide-timeout 4)
-  (:hook-into python-ts-mode c-ts-mode c++-ts-mode json-ts-mode))
-#+end_src
 *** Complete
 **** corfu related
 ***** corfu
@@ -1931,6 +1926,7 @@ borrowed from citre, now you can always jump-back use "M-," after any jump in th
 (setq read-process-output-max (* 1024 1024))
 (setup eglot
   (setq eglot-events-buffer-config'(:size 10000 :format full)
+        eglot-extend-to-xref t
         ;; eglot-workspace-configuration '((:python.analysis :useLibraryCodeForTypes t))
         eglot-workspace-configuration '(:basedpyright (:typeCheckingMode "off")
                                         :basedpyright.analysis (:diagnosticSeverityOverrides (:reportUnusedCallResult "none")
@@ -2005,7 +2001,7 @@ borrowed from citre, now you can always jump-back use "M-," after any jump in th
 #+end_src
 ***** eglot-booster
 Improve the performance of eglot using a wrapper executable, you should install =emacs-lsp-booster= first
-#+begin_src elisp :tangle no
+#+begin_src elisp
 (setup eglot-booster
   (when (executable-find "emacs-lsp-booster")
     (:load-after eglot)
@@ -3169,7 +3165,7 @@ Simple distraction-free editing. I use darkroom instead of writeroom because it'
                     :header (lambda () `(("Authorization" . ,(concat "Bearer " (gptel--get-api-key)))))
                     :key 'gptel-api-key
                     :stream t
-                    :models '(gpt-4o-mini deepseek-reasoner gemini-1.5-flash-latest)))
+                    :models '(gpt-4o-mini deepseek-r1 deepseek-v3 claude-3-7-sonnet-20250219)))
     (gptel-make-gemini "Gemini" :key 'gptel-api-key :stream t)
     (gptel-make-deepseek "DeepSeek"       ;Any name you want
       :stream t                           ;for streaming responses
