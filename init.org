@@ -569,7 +569,8 @@ Maybe I should add a new state.
     ("a" "aibo" gptel-aibo)
     ("s" "gptel-aibo-summon" gptel-aibo-summon)
     ("r" "gptel-rewrite" gptel-rewrite)
-    ("f" "gtpeel-file-add" gptel-add-file)
+    ("f" "gptel-file-add" gptel-add-file)
+    ("q" "gptel-quick" gptel-quick)
     ]
    ;; org-download
    ;; ["Org download"
@@ -3009,8 +3010,8 @@ Powerful translator on Emacs. Supports multiple translation engines such as Goog
   (setq gt-translate-list '(("en" "zh"))
         gts-supress-warning t
         )
-  (:global "M-L" gt-do-translate)
-  (:global "M-l" gt-quick-sdcv)
+  ;; (:global "M-L" gt-do-translate)
+  (:global "M-L" gt-quick-sdcv)
 
   (:when-loaded
     (setq gt-default-translator (gt-translator
@@ -3180,6 +3181,14 @@ Simple distraction-free editing. I use darkroom instead of writeroom because it'
                 (kbd "M-p") #'gptel-aibo-send)
     (define-key prog-mode-map (kbd "C-i") #'gptel-aibo-summon)
     ))
+#+end_src
+*** gptel-quick
+#+begin_src elisp
+(setup gptel-quick
+    (:global "M-l" gptel-quick)
+    (with-eval-after-load 'embark
+        (keymap-set embark-general-map "?" #'gptel-quick))
+  )
 #+end_src
 *** whisper
 #+begin_src elisp

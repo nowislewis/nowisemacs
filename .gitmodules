@@ -149,6 +149,9 @@
 [submodule "gptel-aibo"]
 	path = lib/gptel-aibo
 	url = https://github.com/dolmens/gptel-aibo.git
+[submodule "gptel-quick"]
+	path = lib/gptel-quick
+	url = https://github.com/karthink/gptel-quick.git
 [submodule "graphviz-dot-mode"]
 	path = lib/graphviz-dot-mode
 	url = https://github.com/ppareit/graphviz-dot-mode.git
