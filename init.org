@@ -1838,6 +1838,10 @@ borrowed from citre, now you can always jump-back use "M-," after any jump in th
 (setup elec-pair
   (electric-pair-mode))
 #+end_src
+**** indent-bars
+#+begin_src elisp
+(setup indent-bars)
+#+end_src
 *** treesit tools
 **** treesit
 #+begin_src elisp
@@ -3287,7 +3291,7 @@ If `DEVICE-NAME' is provided, it will be used instead of prompting the user."
   )
 #+end_src
 *** copilot
-#+begin_src elisp :tangle no
+#+begin_src elisp
 (setup copilot
   (if (string= "Arch" (getenv "WSL_DISTRO_NAME"))
       (add-hook 'prog-mode-hook 'copilot-mode)
