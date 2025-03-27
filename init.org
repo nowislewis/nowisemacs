@@ -265,7 +265,7 @@ emacs
 ├── 08-keys
 └── 09-scripts
 #+end_example
-1. All files and folders except =02-binary-git/binary-files= are managed under git control, and =02-binary-file= is managed under =rsync= or =restic=.
+1. All files and folders except =02-binary-git/binary-files= are managed under git control, and =binary-file= is managed under =rsync= or =restic=.
 2. =01-orgmode= stores .org files, where =org-remark= is used to store remark notes, =xnote= is the default directory of =Denote= .
 3. =02-binary-git/binary-files=, as its name, storing binary-fils. For example, =02-searchable= is used store the PDF of the literature
    and daily MS Office files, the meaning of searchable means that all files under this folder maybe searched or
@@ -1054,6 +1054,7 @@ Minimal mode line configuration for Emacs, inspired by doom-modeline
   (dolist (hook (list
                  'prog-mode-hook
                  'org-mode-hook
+                 'vterm-mode-hook
                  ))
     (add-hook hook (lambda () (visual-line-mode))))
 
@@ -1604,6 +1605,7 @@ Jump anywhere in the world
 ** vterm
 #+begin_src elisp
 (setup vterm
+  (setq vterm-min-window-width 400)
   (:global "C-`" vterm-toggle-window)
   (:when-loaded
     (add-to-list 'display-buffer-alist
@@ -2757,9 +2759,13 @@ My useage for =action.org=:
                        (org-agenda-overriding-header "\nInbox\n")))
 
            (tags ,(concat "CLOSED>=\"<today>\"" tag)
-                 ((org-agenda-overriding-header "\nCompleted today\n")))
+                 ((org-agenda-overriding-header "\nCompleted today\n")
+                  (org-agenda-prefix-format "%b ")
+                  ))
            (tags ,(concat "CLOSED>=\"<-1w>\"" tag)
-                 ((org-agenda-overriding-header "\nCompleted last 7 days")))
+                 ((org-agenda-overriding-header "\nCompleted last 7 days")
+                  (org-agenda-prefix-format "%b ")
+                  ))
            )))
 
 (setq org-agenda-custom-commands
@@ -3189,6 +3195,7 @@ Simple distraction-free editing. I use darkroom instead of writeroom because it'
 *** gptel-quick
 #+begin_src elisp
 (setup gptel-quick
+    (setq gptel-quick-timeout 40)
     (:global "M-l" gptel-quick)
     (with-eval-after-load 'embark
         (keymap-set embark-general-map "?" #'gptel-quick))
