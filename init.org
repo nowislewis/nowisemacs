@@ -1605,7 +1605,6 @@ Jump anywhere in the world
 ** vterm
 #+begin_src elisp
 (setup vterm
-  (setq vterm-min-window-width 400)
   (:global "C-`" vterm-toggle-window)
   (:when-loaded
     (add-to-list 'display-buffer-alist
@@ -3165,7 +3164,7 @@ Simple distraction-free editing. I use darkroom instead of writeroom because it'
 (setup gptel
   (setq gptel-default-mode 'org-mode
         gptel-crowdsourced-prompts-file (concat nowis-doc-emacs-dir "09-scripts/chatgpt.csv")
-        gptel-model 'gpt-4o-mini
+        gptel-model 'deepseek-v3
         )
   (:global "M-p" gptel-send
            "M-P" gptel)
@@ -3296,15 +3295,6 @@ If `DEVICE-NAME' is provided, it will be used instead of prompting the user."
         (when (boundp 'whisper--ffmpeg-input-device)
           (setq whisper--ffmpeg-input-device (format ":%s" rk/default-audio-device))))))
   )
-#+end_src
-*** copilot
-#+begin_src elisp
-(setup copilot
-  (if (string= "Arch" (getenv "WSL_DISTRO_NAME"))
-      (add-hook 'prog-mode-hook 'copilot-mode)
-    (:when-loaded
-      (define-key copilot-completion-map (kbd "<tab>") 'copilot-accept-completion)
-      (define-key copilot-completion-map (kbd "TAB") 'copilot-accept-completion))))
 #+end_src
 ** webjump
 #+begin_src elisp

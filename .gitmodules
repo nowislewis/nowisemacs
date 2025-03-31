@@ -42,9 +42,6 @@
 [submodule "consult"]
 	path = lib/consult
 	url = https://github.com/minad/consult.git
-[submodule "copilot"]
-	path = lib/copilot
-	url = https://github.com/copilot-emacs/copilot.el.git
 [submodule "corfu"]
 	path = lib/corfu
 	url = https://github.com/minad/corfu.git
@@ -255,9 +252,6 @@
 [submodule "org-fc"]
 	path = lib/org-fc
 	url = https://github.com/l3kn/org-fc.git
-[submodule "org-kanban"]
-	path = lib/org-kanban
-	url = https://github.com/gizmomogwai/org-kanban.git
 [submodule "org-mind-map"]
 	path = lib/org-mind-map
     url = https://github.com/nowislewis/org-mind-map.git
