@@ -2682,7 +2682,11 @@ My useage for =action.org=:
 ;; Files
 (setq org-directory "~/Documents/emacs/01-orgmode/xnotes")
 (setq org-agenda-files
-      (directory-files-recursively (concat org-directory  "/gtd") "\\.org$"))
+      (when (file-exists-p (concat org-directory "/gtd"))
+        (directory-files-recursively (concat org-directory "/gtd") "\\.org$")))
+
+;; (setq org-agenda-files
+;;       (directory-files-recursively (concat org-directory  "/gtd") "\\.org$"))
 (setq org-refile-files
       (cl-remove-if (lambda (file) (string-match-p "inbox.org$" file))
                     org-agenda-files))
