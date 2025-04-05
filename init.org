@@ -629,7 +629,8 @@ Maybe I should add a new state.
    ;;  ]
    ;; ["org-noter"
    ;;  ("n" "org-noter" org-noter)]
-   ["org-fc"
+   ["review cards"
+    ("s" "org-srs" org-srs-transient-map)
     ("f" "org-fc" org-fc-transient-load-map)]
    ;; ["org-mind-map"
    ;;  ("m" "org-mind-map-write" org-mind-map-write)
@@ -2888,17 +2889,19 @@ Spaced Repetition System for Emacs org-mode
            "<f6>"  org-srs-review-rate-good
            "<f7>"  org-srs-review-rate-hard
            "<f8>"  org-srs-review-rate-again))
-  (defun org-srs-item-new-normal()
-    (interactive)
-    (org-srs-item-new-interactively
-     (prog1 'card
-       (org-id-get-create))))
-  (defun org-srs-item-new-cloze()
-    (interactive)
-    (org-srs-item-new-interactively
-     (prog1 'cloze
-       (org-id-get-create))))
-
+  (transient-define-prefix org-srs-transient-map()
+    "Define transient-key map for org-fc functions"
+    [
+     ["review"
+      ("s" "start" org-srs-review-start)
+      ("q" "quit" org-srs-review-quit)
+      ]
+     ["create"
+      ("n" "new create" org-srs-item-create)
+      ("c" "cloze" org-srs-item-cloze-dwim)
+      ("C" "uncloze" org-srs-item-uncloze-dwim)
+      ("u" "update cloze" org-srs-item-cloze-update)
+      ]])
   ;; font lock for cloze
   (font-lock-add-keywords
    'org-mode
