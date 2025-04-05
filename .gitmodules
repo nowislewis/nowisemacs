@@ -159,9 +159,6 @@
 [submodule "hl-todo"]
 	path = lib/hl-todo
 	url = https://github.com/tarsius/hl-todo.git
-[submodule "ht"]
-	path = lib/ht
-	url = https://github.com/Wilfred/ht.el.git
 [submodule "imenu-list"]
 	path = lib/imenu-list
 	url = https://github.com/nowislewis/imenu-list.git
@@ -254,9 +251,6 @@
 	path = lib/org-srs
 	url = https://github.com/bohonghuang/org-srs.git
     build-step = echo "skip"
-[submodule "org-super-agenda"]
-	path = lib/org-super-agenda
-	url = https://github.com/alphapapa/org-super-agenda.git
 [submodule "org-visual-outline"]
 	path = lib/org-visual-outline
 	url = https://github.com/legalnonsense/org-visual-outline.git
@@ -323,9 +317,6 @@
 [submodule "treesit-auto"]
 	path = lib/treesit-auto
 	url = https://github.com/renzmann/treesit-auto.git
-[submodule "ts"]
-	path = lib/ts
-	url = https://github.com/alphapapa/ts.el.git
 [submodule "vertico"]
 	path = lib/vertico
 	url = https://github.com/minad/vertico.git
