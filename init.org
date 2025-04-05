@@ -2873,7 +2873,9 @@ Spaced Repetition System for Emacs org-mode
   ;; font lock for cloze
   (font-lock-add-keywords
    'org-mode
-   '(("\\({{[\\0-9a-z]+}{\\)\\([^}]+\\)\\(}}\\)"
+   '((
+      "\\({{[\\0-9a-z]+}{\\)\\([^}]+\\)\\(.*?}}\\)"
+      ;; "\\({{[\\0-9a-z]+}{\\)\\([^}]+\\)\\(}}\\)"
       ;; "\\({{\\)\\([^}]+\\)}\\({[^}]+}?@[0-9]}\\)"
       (1 'shadow nil t)
       (2 'my-org-fc-cloze-face t)
