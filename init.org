@@ -31,7 +31,6 @@ I failed in love with denote, so previous *org-roam* configs were refiled into [
   - [[#diff-hl][diff-hl]]
   - [[#fringe-mode][fringe-mode]]
   - [[#emacs-dashboard][emacs-dashboard]]
-  - [[#mood-line][mood-line]]
   - [[#mini-echo][mini-echo]]
   - [[#hl-todo][hl-todo]]
   - [[#highlight-line][highlight line]]
@@ -92,15 +91,12 @@ I failed in love with denote, so previous *org-roam* configs were refiled into [
 - [[#org-mode][Org Mode]]
   - [[#org-mode-1][org-mode]]
   - [[#org-src][org-src]]
-  - [[#org-pipeline][org-pipeline]]
   - [[#org-sidebar][org-sidebar]]
   - [[#org-zotero-parser][org-zotero-parser]]
   - [[#org-oxlatexwordmarkdown][org-ox,latex,word,markdown]]
   - [[#org-clock][org-clock]]
   - [[#ui-1][ui]]
-  - [[#org-download][org-download]]
   - [[#ox-hugo][ox-hugo]]
-  - [[#org-noter][org-noter]]
   - [[#org-present][org-present]]
   - [[#bibtex-related][bibtex related]]
   - [[#toc-org][toc-org]]
@@ -108,7 +104,6 @@ I failed in love with denote, so previous *org-roam* configs were refiled into [
   - [[#find-orgmode-dir-files][find orgmode dir files]]
   - [[#org-excalidraw][org-excalidraw]]
   - [[#ob-d2][ob-d2]]
-  - [[#ob-tmux][ob-tmux]]
   - [[#clue][clue]]
   - [[#agendagtd][agenda/gtd]]
   - [[#org-super-agenda][org-super-agenda]]
@@ -365,7 +360,16 @@ Maybe I should add a new state.
                           '("y" . meow-save)
                           '("<escape>" . ignore)
                           '("." . repeat))
+
   ;; normal keys
+  (setq wrap-keymap
+        (let ((map (make-keymap)))
+          (suppress-keymap map)
+          (dolist (k '("(" "[" "{" "<"))
+            (define-key map k #'insert-pair))
+          map
+          ))
+
   (meow-normal-define-key '("0" . meow-expand-0)
                           '("9" . meow-expand-9)
                           '("8" . meow-expand-8)
@@ -446,7 +450,7 @@ Maybe I should add a new state.
                           ;; '("]" . (lambda()
                           ;;           (interactive)
                           ;;           (meow-bounds-of-thing ?\")))
-                          '("\\" . quoted-insert)
+                          (cons "\\" wrap-keymap)
                           '(";" . meow-expand-1)
                           ;; '(":" . async-shell-command)
                           '("'" . consult-register-load)
@@ -623,8 +627,8 @@ Maybe I should add a new state.
    ;; ["serch engine"
    ;;  ("x" "xeft" xeft)
    ;;  ]
-   ["org-noter"
-    ("n" "org-noter" org-noter)]
+   ;; ["org-noter"
+   ;;  ("n" "org-noter" org-noter)]
    ["org-fc"
     ("f" "org-fc" org-fc-transient-load-map)]
    ;; ["org-mind-map"
@@ -688,7 +692,7 @@ Maybe I should add a new state.
      ;; ("l" "app-launcher-run-app" app-launcher-run-app)
      ("e" "elfeed" my-elfeed)
      ("r" "restart emacs" restart-emacs)
-     ("w" "whisper" whisper-run)
+     ;; ("w" "whisper" whisper-run)
      ]
     ])
 #+end_src
@@ -956,16 +960,6 @@ diff-hl-mode highlights uncommitted changes on the left side of the window (area
         dashboard-startup-banner (concat nowis-config-useful-tools "banner.txt")
         dashboard-set-init-info t)
   (dashboard-setup-startup-hook)
-  )
-#+end_src
-** mood-line
-Minimal mode line configuration for Emacs, inspired by doom-modeline
-#+begin_src elisp
-(setup mood-line
-  (require 'mood-line)
-  (setq mood-line-glyph-alist mood-line-glyphs-fira-code)
-  (setq mood-line-format mood-line-format-default-extended)
-  ;; (mood-line-mode)
   )
 #+end_src
 ** mini-echo
@@ -1931,7 +1925,7 @@ borrowed from citre, now you can always jump-back use "M-," after any jump in th
 (setup project)
 (setq read-process-output-max (* 1024 1024))
 (setup eglot
-  (setq eglot-events-buffer-config'(:size 10000 :format full)
+  (setq eglot-events-buffer-config'(:size 20000 :format full)
         eglot-extend-to-xref t
         ;; eglot-workspace-configuration '((:python.analysis :useLibraryCodeForTypes t))
         eglot-workspace-configuration '(:basedpyright (:typeCheckingMode "off")
@@ -2188,25 +2182,6 @@ Disassemble C, C++ or Fortran code under cursor
       (add-hook 'org-babel-after-execute-hook 'nowis-open-generated-image)
       ))
 #+end_src
-** org-pipeline
-#+begin_src elisp :tangle no
-(defun org-babel-execute:pipeline (body params)
-  (let* ((script (cdr (assoc :script params)))
-         (in-file (make-temp-file "org-input-"))
-         (out-file (make-temp-file "org-output-"))
-         (cmd (format "cat %s | %s > %s"
-                     (shell-quote-argument in-file)
-                     script
-                     (shell-quote-argument out-file))))
-
-    (write-region body nil in-file nil 'silent)
-    (message cmd)
-    (shell-command cmd)
-      (with-temp-buffer
-        (insert-file-contents out-file)
-        (buffer-string))))
-#+end_src
-
 ** org-sidebar
 #+begin_src elisp
 (defun nowis-org-toggle-sidebar()
@@ -2468,41 +2443,12 @@ Comments:
 (setup org-visual-outline
   (add-hook 'org-mode-hook #'org-visual-indent-mode))
 #+end_src
-** org-download
-#+begin_src elisp :tangle no
-(setup async)
-(setup org-download
-  (setq org-download-method 'directory
-           org-download-screenshot-basename "screenshot.jpg"
-           org-download-image-dir (concat nowis-doc-emacs-dir "02-binary-git/binary-files/01-pictures/org_download_images")
-           org-download-abbreviate-filename-function 'expand-file-name)
-  (:when-loaded
-    (when (eq system-type 'gnu/linux)
-      (setq-default org-download-screenshot-method "scrot -s %s"))
-
-    (when (eq system-type 'darwin)
-      (setq org-download-screenshot-method "screencapture -i %s")))
-  (:autoload org-download-screenshot
-             org-download-yank))
-#+end_src
 ** ox-hugo
 #+begin_src elisp
 (setup tomelr)
 (setup ox-hugo
   (with-eval-after-load 'ox
   (require 'ox-hugo)))
-#+end_src
-** org-noter
-#+begin_src elisp
-(setup org-noter
-  (setq org-noter-notes-search-path (concat nowis-doc-emacs-dir "02-binary-git/binary-files/02-searchable/01-papers-markable/")
-           org-noter-auto-save-last-location t
-           org-noter-separate-notes-from-heading nil
-           org-noter-hide-other nil
-           org-noter-doc-split-percentage '(0.6 . 0.4)
-           org-noter-highlight-selected-text t
-           )
-  )
 #+end_src
 ** org-present
 #+begin_src elisp
@@ -2632,30 +2578,6 @@ Org-Babel support for evaluating d2 diagram scripting language.
 (setup d2-mode)
 (setup ob-d2)
 #+end_src
-** ob-tmux
-#+begin_src elisp
-;; (require 'ob-tmux)
-(setup ob-tmux
-  (setq org-babel-default-header-args:tmux
-        '((:results . "silent")	;
-          (:session . "default")	; The default tmux session to send code to
-          (:socket  . nil)))      ; The default tmux socket to communicate with
-
-  ;; The tmux sessions are prefixed with the following string.
-  ;; You can customize this if you like.
-  (setq org-babel-tmux-session-prefix "ob-")
-
-  ;; The terminal that will be used.
-  (setq org-babel-tmux-terminal "foot")
-  ;; (setq org-babel-tmux-terminal-opts '("-T" "ob-tmux" "-e"))
-                                        ; The default terminal is "gnome-terminal" with options "--".
-
-  ;; Finally, if your tmux is not in your $PATH for whatever reason, you
-  ;; may set the path to the tmux binary as follows:
-  ;; (setq org-babel-tmux-location "/usr/bin/tmux")
-  )
-#+end_src
-
 ** clue
 Connecting clues while reading code.
 #+begin_src elisp
@@ -2958,6 +2880,8 @@ Spaced Repetition System for Emacs org-mode
 #+begin_src elisp
 (setup lisp-fsrs)
 (setup org-srs
+  (with-eval-after-load 'org
+    (require 'org-srs-embed))
   (add-hook 'org-mode-hook #'org-srs-embed-overlay-mode)
   (:with-map org-mode-map
     (:bind "<f5>"  org-srs-review-rate-easy
@@ -3047,7 +2971,7 @@ Powerful translator on Emacs. Supports multiple translation engines such as Goog
 #+end_src
 If you want to use *sdcv* for offline translate, then download dictionary data to ~/.stardict/dic or /usr/share/stardict/dic
 ** dictionary-overlay
-#+begin_src elisp
+#+begin_src elisp :tangle no
 (setup websocket-bridge)
 (setup dictionary-overlay
   (:autoload dictionary-overlay-start
@@ -3205,7 +3129,7 @@ Simple distraction-free editing. I use darkroom instead of writeroom because it'
   )
 #+end_src
 *** whisper
-#+begin_src elisp
+#+begin_src elisp :tangle no
 (setup whisper
   (setq whisper-language "auto"
         whisper-model "small"
@@ -3451,56 +3375,4 @@ These codes are used to solve copy & paste problems under wslg inside win10/win1
      'android-toggle-keyboard
      :help "Toggle keyboard")
     (message "Enable virtual keyboard")))
-
-;; (defun android-tool-bar-configs()
-;;   (when (and (fboundp 'tool-bar-mode)
-;;              (string-equal system-type "android"))
-
-;;     (tool-bar-mode +1)
-;;     (setq tool-bar-position 'bottom)
-;;     (setq tool-bar-button-margin 27)
-;;     ;; (modifier-bar-mode +1)
-;;     (setq tool-bar-map '(keymap nil))
-;;     (add-to-list 'image-load-path (expand-file-name "modules/pen" doom-private-dir))
-;;     (android-general-tool-bar 'tool-bar-add-item nil)
-;;     ))
-
-;; (defun android-general-tool-bar(fun map)
-;;   (mapc (lambda (args)
-;;           (apply fun args))
-;;         `(("keyboard-esc" tool-bar-item-escape keyboard-esc ,map)
-;;           ("file-find-outline" pen-occur file-find-outline ,map)
-;;           ("arrow-down-thick" pen-scroll-up button4 ,map)
-;;           ("arrow-up" tool-bar-item-up arrow-up ,map)
-;;           ("arrow-up-thick" pen-scroll-down button5 ,map)
-;;           ("pen" pen-annotation-mode button6 ,map)
-;;           ("star-plus" pen-add-online-word button7 ,map)
-;;           ("marker" pen-add-highlight button8 ,map)
-;;           ("image-filter-center-focus-strong-outline" focus-mode focus ,map)
-;;           ("menu" pen-goto-toc button10 ,map)
-
-;;           ("keyboard-tab" tool-bar-item-tab keyboard-tab ,map)
-;;           ("apple-keyboard-command" pen-step-backward apple-keyboard-command ,map)
-;;           ("arrow-left" tool-bar-item-left arrow-left ,map)
-;;           ("arrow-down" tool-bar-item-down arrow-down ,map)
-;;           ("arrow-right" tool-bar-item-right arrow-right ,map)
-;;           ("play" pen-view-note-play play ,map)
-;;           ("syllabary-hiragana" pen-view-current-thing button9 ,map)
-;;           ("history" consult-recent-file history ,map)
-;;           ("file-clock-outline" spacemacs/compleseus-switch-to-buffer file-clock-outline ,map)
-;;           ("keyboard-off" android-toggle-keyboard android-toggle-keyboard ,map)
-
-;;           ))
-
-;;   )
-
-
-;; (define-key key-translation-map [tool-bar apple-keyboard-command] #'tool-bar-event-apply-control-modifier)
-;; (define-key key-translation-map (kbd "<XF86Back>") [escape])
-;; (define-key key-translation-map [tool-bar keyboard-esc] [escape])
-;; (define-key key-translation-map [tool-bar keyboard-tab]  (kbd "TAB"))
-;; (define-key key-translation-map [tool-bar arrow-up] [up])
-;; (define-key key-translation-map [tool-bar arrow-down] [down])
-;; (define-key key-translation-map [tool-bar arrow-right] [right])
-;; (define-key key-translation-map [tool-bar arrow-left] [left])
 #+end_src

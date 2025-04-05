@@ -71,9 +71,6 @@
 [submodule "denote-explore"]
 	path = lib/denote-explore
 	url = https://github.com/pprevos/denote-explore.git
-[submodule "dictionary-overlay"]
-	path = lib/dictionary-overlay
-	url = https://github.com/ginqi7/dictionary-overlay.git
 [submodule "diff-hl"]
 	path = lib/diff-hl
 	url = https://github.com/dgutov/diff-hl.git
@@ -86,9 +83,6 @@
 [submodule "disaster"]
 	path = lib/disaster
 	url = https://github.com/jart/disaster.git
-[submodule "dracula"]
-	path = lib/dracula
-	url = https://github.com/dracula/emacs.git
 [submodule "ebib"]
 	path = lib/ebib
 	url = https://github.com/joostkremers/ebib.git
@@ -189,6 +183,7 @@
 [submodule "lisp-fsrs"]
 	path = lib/lisp-fsrs
 	url = https://github.com/open-spaced-repetition/lisp-fsrs.git
+    build-step = echo "skip"
 [submodule "llama"]
 	path = lib/llama
 	url = https://github.com/tarsius/llama.git
@@ -210,9 +205,6 @@
 [submodule "mini-echo"]
 	path = lib/mini-echo
 	url = https://github.com/liuyinz/mini-echo.el.git
-[submodule "mood-line"]
-	path = lib/mood-line
-	url = https://git.tty.dog/jessieh/mood-line.git
 [submodule "nerd-icons"]
 	path = lib/nerd-icons
 	url = https://github.com/rainstormstudio/nerd-icons.el.git
@@ -234,9 +226,6 @@
 [submodule "nov-xwidget"]
 	path = lib/nov-xwidget
 	url = https://github.com/chenyanming/nov-xwidget.git
-[submodule "ob-tmux"]
-	path = lib/ob-tmux
-	url = https://github.com/ahendriksen/ob-tmux.git
 [submodule "orderless"]
 	path = lib/orderless
 	url = https://github.com/oantolin/orderless.git
@@ -258,19 +247,13 @@
 [submodule "org-modern"]
 	path = lib/org-modern
 	url = https://github.com/minad/org-modern.git
-[submodule "org-noter"]
-	path = lib/org-noter
-	url = https://github.com/org-noter/org-noter.git
-    load-path = .
-    load-path = modules
-    no-byte-compile = org-noter-test-utils.el
-    no-byte-compile = emacs-devel.el
 [submodule "org-present"]
 	path = lib/org-present
 	url = https://github.com/rlister/org-present.git
 [submodule "org-srs"]
 	path = lib/org-srs
 	url = https://github.com/bohonghuang/org-srs.git
+    build-step = echo "skip"
 [submodule "org-super-agenda"]
 	path = lib/org-super-agenda
 	url = https://github.com/alphapapa/org-super-agenda.git
@@ -357,17 +340,11 @@
 [submodule "websocket"]
 	path = lib/websocket
 	url = https://github.com/ahyatt/emacs-websocket.git
-[submodule "websocket-bridge"]
-	path = lib/websocket-bridge
-	url = https://github.com/ginqi7/websocket-bridge.git
 [submodule "wgrep"]
 	path = lib/wgrep
 	url = https://github.com/mhayashi1120/Emacs-wgrep.git
     no-byte-compile = wgrep-subtest.el
     no-byte-compile = wgrep-ag.el
-[submodule "whisper"]
-	path = lib/whisper
-	url = https://github.com/natrys/whisper.el.git
 [submodule "with-editor"]
 	path = lib/with-editor
 	url = https://github.com/magit/with-editor.git
