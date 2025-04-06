@@ -701,19 +701,6 @@ Maybe I should add a new state.
    ("d" "toggle-darkroom" darkroom-mode)
     ])
 #+end_src
-*** dictionary
-#+begin_src elisp
-(transient-define-prefix dictionary-leader-map()
-  "Define leader-key map for ui functions"
-  [["dictionary-overlay"
-   ("s" "start" dictionary-overlay-start)
-   ("r" "render-toggle" dictionary-overlay-toggle)
-   ("m" "mark-word-unknown" dictionary-overlay-mark-word-unknown)
-   ("M" "mark-word-known" dictionary-overlay-mark-word-known)
-   ("i" "install" dictionary-overlay-install)
-   ("R" "restart" dictionary-overlay-restart)
-   ]])
-#+end_src
 ** meow leader keybindings
 #+name: meow-leader-keys
 #+begin_src elisp
@@ -752,7 +739,7 @@ Maybe I should add a new state.
  ;; '("d" . org-gtd-leader-map)
  ;; ui
  '("t" . toggle-leader-map)
- '("d" . dictionary-leader-map)
+ ;; '("d" . dictionary-leader-map)
 
  ;; remark
  '("r m" . org-remark-mark)
