@@ -102,9 +102,7 @@ I failed in love with denote, so previous *org-roam* configs were refiled into [
   - [[#toc-org][toc-org]]
   - [[#denote-and-related][denote and related]]
   - [[#find-orgmode-dir-files][find orgmode dir files]]
-  - [[#org-excalidraw][org-excalidraw]]
   - [[#ob-d2][ob-d2]]
-  - [[#clue][clue]]
   - [[#agendagtd][agenda/gtd]]
   - [[#org-fc][org-fc]]
   - [[#org-srs][org-srs]]
@@ -112,7 +110,6 @@ I failed in love with denote, so previous *org-roam* configs were refiled into [
   - [[#insert-from-snipaste][insert from snipaste]]
 - [[#english-翻译][english 翻译]]
   - [[#go-translate][go-translate]]
-  - [[#dictionary-overlay][dictionary-overlay]]
 - [[#阅读][阅读]]
   - [[#pdf-tools][pdf-tools]]
   - [[#pdf-view-pagemark][pdf-view-pagemark]]
@@ -523,10 +520,10 @@ Maybe I should add a new state.
    ["Navigate"
     ("m" "consult-mark" consult-mark)
     ]
-   ["Clue"
-    ("y" "clue-copy" clue-copy)
-    ("p" "clue-yank" clue-paste)
-    ]
+   ;; ["Clue"
+   ;;  ("y" "clue-copy" clue-copy)
+   ;;  ("p" "clue-yank" clue-paste)
+   ;;  ]
    ["citre"
     ("c d" "citre-jump" citre-jump)
     ("c D" "citre-jump-to-reference" citre-jump-to-reference)
@@ -1798,6 +1795,10 @@ Emacs major-mode to work with Beancount ledger files
 #+begin_src elisp
 (setup cmake-mode)
 #+end_src
+*** csv-mode
+#+begin_src elisp
+(setup csv-mode)
+#+end_src
 ** Useful programing tools
 *** xref related
 **** xref
@@ -2565,23 +2566,11 @@ Comments:
   (dired nowis-gtd-dir)
   (project-find-file t))
 #+end_src
-** org-excalidraw
-#+begin_src elisp
-(setup org-excalidraw
-   (setq org-excalidraw-default-directory (concat nowis-doc-emacs-dir "05-excalidraw/"))
-  (:autoload org-excalidraw-create-drawing)
-  )
-#+end_src
 ** ob-d2
 Org-Babel support for evaluating d2 diagram scripting language.
 #+begin_src elisp
 (setup d2-mode)
 (setup ob-d2)
-#+end_src
-** clue
-Connecting clues while reading code.
-#+begin_src elisp
-(setup clue)
 #+end_src
 ** agenda/gtd
 Borrowed from https://github.com/rougier/emacs-GTD
@@ -2915,7 +2904,7 @@ This is an Emacs package that creates graphviz directed graphs from the headings
 * english 翻译
 ** go-translate
 Powerful translator on Emacs. Supports multiple translation engines such as Google, Bing, deepL, StarDict, Youdao.
-#+begin_src elisp
+#+begin_src elisp :tangle no
 (setup go-translate
   (setq gt-translate-list '(("en" "zh"))
         gts-supress-warning t
@@ -2943,24 +2932,6 @@ Powerful translator on Emacs. Supports multiple translation engines such as Goog
     ))
 #+end_src
 If you want to use *sdcv* for offline translate, then download dictionary data to ~/.stardict/dic or /usr/share/stardict/dic
-** dictionary-overlay
-#+begin_src elisp :tangle no
-(setup websocket-bridge)
-(setup dictionary-overlay
-  (:autoload dictionary-overlay-start
-             dictionary-overlay-toggle
-             dictionary-overlay-mark-word-unknown
-             dictionary-overlay-mark-word-known
-             dictionary-overlay-install
-             dictionary-overlay-restart
-             )
-  (setq dictionary-overlay-user-data-directory (concat nowis-doc-emacs-dir "12-dictionary-overlay")
-        dictionary-overlay-lookup-with #'gt-quick-sdcv
-        ;; dictionary-overlay-translators '("local" "sdcv" "darwin" "web")
-        dictionary-overlay-sdcv-dictionary-path (concat nowis-doc-emacs-dir "02-binary-git/binary-files/03-stardicts/stardict-ecdict-2.4.2/stardict-ecdict-2.4.2")
-        ))
-
-#+end_src
 * 阅读
 ** pdf-tools
 #+begin_src elisp

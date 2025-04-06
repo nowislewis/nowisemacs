@@ -33,9 +33,6 @@
 [submodule "citre"]
 	path = lib/citre
 	url = https://github.com/universal-ctags/citre.git
-[submodule "clue"]
-	path = lib/clue
-	url = https://github.com/AmaiKinono/clue.git
 [submodule "cmake-mode"]
 	path = lib/cmake-mode
 	url = https://github.com/emacsmirror/cmake-mode.git
@@ -131,9 +128,6 @@
 [submodule "geiser-guile"]
 	path = lib/geiser-guile
 	url = https://github.com/emacsmirror/geiser-guile.git
-[submodule "go-translate"]
-	path = lib/go-translate
-	url = https://github.com/lorniu/go-translate.git
 [submodule "gptel"]
 	path = lib/gptel
 	url = https://github.com/karthink/gptel.git
@@ -232,9 +226,6 @@
 [submodule "org-elp"]
 	path = lib/org-elp
 	url = https://github.com/guanyilun/org-elp.git
-[submodule "org-excalidraw"]
-	path = lib/org-excalidraw
-	url = https://github.com/4honor/org-excalidraw.git
 [submodule "org-fc"]
 	path = lib/org-fc
 	url = https://github.com/l3kn/org-fc.git
@@ -328,9 +319,6 @@
 [submodule "vundo"]
 	path = lib/vundo
 	url = https://github.com/casouri/vundo.git
-[submodule "websocket"]
-	path = lib/websocket
-	url = https://github.com/ahyatt/emacs-websocket.git
 [submodule "wgrep"]
 	path = lib/wgrep
 	url = https://github.com/mhayashi1120/Emacs-wgrep.git
