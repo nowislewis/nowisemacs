@@ -1823,7 +1823,9 @@ borrowed from citre, now you can always jump-back use "M-," after any jump in th
 #+end_src
 **** indent-bars
 #+begin_src elisp
-(setup indent-bars)
+(setup indent-bars
+  (:hook-into prog-mode)
+  )
 #+end_src
 *** treesit tools
 **** treesit
