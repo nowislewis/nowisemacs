@@ -571,9 +571,6 @@ Maybe I should add a new state.
     ("f" "gptel-file-add" gptel-add-file)
     ("q" "gptel-quick" gptel-quick)
     ]
-   ;; org-download
-   ;; ["Org download"
-   ;;  ("d" "Screenshot" org-download-screenshot)]
    ["Translate"
     ;; ("t" "toggle english helper" lsp-bridge-toggle-sdcv-helper)
     ;; ("i" "immersive translate buffer" immersive-translate-buffer)
@@ -612,8 +609,6 @@ Maybe I should add a new state.
     ("r s" "find-all-searchable" project-find-searchable-dir-files)
     ;; ("rc" "consult-notes" consult-notes)
     ("r g" "project-find-gtd-dir-files" project-find-gtd-dir-files)
-    ;; ("r z" "ls zettel" my/zettel-signature-topics)
-    ;; ("r Z" "ls not zettel" my/zettel-not-signatured-topics)
     ]
    ["bibtex"
     ("e" "ebib" ebib)
@@ -631,7 +626,6 @@ Maybe I should add a new state.
    ;; ["org-mind-map"
    ;;  ("m" "org-mind-map-write" org-mind-map-write)
    ;;  ]
-   ;; cann't use excalidraw, because transient will load it by default
    ;; ["excalidraw"
    ;;  ("c" "create excalidraw" org-excalidraw-create-drawing)
    ;;  ]
@@ -679,15 +673,10 @@ Maybe I should add a new state.
     ["shell"
      ;; ("i" "toggle-insert-cd" eat-toggle-insert-dir)
      ]
-    ;; ["mpvi"
-    ;;  ("mo" "open" mpvi-open)
-    ;;  ("ms" "seek" mpvi-seek)
-    ;;  ("mi" "insert" mpvi-insert)
-    ;;  ("ma" "emms-add" mpvi-emms-add)]
     ["others"
      ;; ("t" "org-pomodoro" org-pomodoro)
      ;; ("l" "app-launcher-run-app" app-launcher-run-app)
-     ("e" "elfeed" my-elfeed)
+     ;; ("e" "elfeed" my-elfeed)
      ("r" "restart emacs" restart-emacs)
      ;; ("w" "whisper" whisper-run)
      ]
@@ -2569,15 +2558,6 @@ In short, you will need 3 files:
 2. =agenda.org= for recurrent events
 3. =action.org= for all tasks moving from inbox
 4. (Option) =incubate.org= for incubate ideas
-My useage for =action.org=:
-#+begin_example
-+ Single #single
-++ Notes
-++ Tasks
-+ Project #project
-++ Notes
-++ Tasks
-#+end_example
 #+begin_src elisp 
 ;; Files
 (setq org-directory "~/Documents/emacs/01-orgmode/xnotes")
