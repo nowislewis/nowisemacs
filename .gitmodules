@@ -89,12 +89,6 @@
 [submodule "el-themes"]
 	path = lib/el-themes
 	url = https://github.com/protesilaos/ef-themes.git
-[submodule "elfeed"]
-	path = lib/elfeed
-	url = https://github.com/skeeto/elfeed.git
-[submodule "elfeed-org"]
-	path = lib/elfeed-org
-	url = https://github.com/remyhonig/elfeed-org.git
 [submodule "elisp-demos"]
 	path = lib/elisp-demos
 	url = https://github.com/xuchunyang/elisp-demos.git
@@ -226,9 +220,6 @@
 [submodule "org-elp"]
 	path = lib/org-elp
 	url = https://github.com/guanyilun/org-elp.git
-[submodule "org-fc"]
-	path = lib/org-fc
-	url = https://github.com/l3kn/org-fc.git
 [submodule "org-mind-map"]
 	path = lib/org-mind-map
     url = https://github.com/nowislewis/org-mind-map.git

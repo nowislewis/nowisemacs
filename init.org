@@ -113,8 +113,7 @@ I failed in love with denote, so previous *org-roam* configs were refiled into [
 - [[#阅读][阅读]]
   - [[#pdf-tools][pdf-tools]]
   - [[#pdf-view-pagemark][pdf-view-pagemark]]
-  - [[#elfeed][elfeed]]
-  - [[#efleed-org][efleed-org]]
+  - [[#newsticker][newsticker]]
   - [[#nov][nov]]
   - [[#nov-xwidget][nov-xwidget]]
   - [[#darkroom][darkroom]]
@@ -567,7 +566,7 @@ Maybe I should add a new state.
     ]
    ["gptel"
     ("a" "aibo" gptel-aibo)
-    ("s" "gptel-aibo-summon" gptel-aibo-summon)
+    ("i" "gptel-aibo-summon/insert" gptel-aibo-summon)
     ("r" "gptel-rewrite" gptel-rewrite)
     ("f" "gptel-file-add" gptel-add-file)
     ("q" "gptel-quick" gptel-quick)
@@ -627,7 +626,8 @@ Maybe I should add a new state.
    ;;  ("n" "org-noter" org-noter)]
    ["review cards"
     ("s" "org-srs" org-srs-transient-map)
-    ("f" "org-fc" org-fc-transient-load-map)]
+    ;; ("f" "org-fc" org-fc-transient-load-map)
+    ]
    ;; ["org-mind-map"
    ;;  ("m" "org-mind-map-write" org-mind-map-write)
    ;;  ]
@@ -2660,11 +2660,11 @@ My useage for =action.org=:
 
            (tags ,(concat "CLOSED>=\"<today>\"" tag)
                  ((org-agenda-overriding-header "\nCompleted today\n")
-                  (org-agenda-prefix-format "%b ")
+                  (org-agenda-prefix-format "%-16:(org-get-parent-heading): [%-4e] ")
                   ))
            (tags ,(concat "CLOSED>=\"<-1w>\"" tag)
                  ((org-agenda-overriding-header "\nCompleted last 7 days")
-                  (org-agenda-prefix-format "%b ")
+                  (org-agenda-prefix-format "%-16:(org-get-parent-heading): [%-4e] ")
                   ))
            )))
 
@@ -2720,7 +2720,7 @@ See also `org-save-all-org-buffers'"
 #+end_src
 ** org-fc
 Spaced Repetition System for Emacs org-mode
-#+begin_src elisp
+#+begin_src elisp :tangle no
 (setup org-fc
   (setq org-fc-directories (list denote-directory)
         org-fc-review-history-file (concat nowis-doc-emacs-dir "org-fc-reviews.tsv")
@@ -2950,22 +2950,13 @@ If you want to use *sdcv* for offline translate, then download dictionary data t
 (setup pdf-view-pagemark
   (:hook-into pdf-view-mode-hook))
 #+end_src
-** elfeed
+** newsticker
 #+begin_src elisp
-(setup elfeed
-  (setq elfeed-show-entry-switch 'display-buffer))
-#+end_src
-** efleed-org
-#+begin_src elisp
-(setup elfeed-org
-  (with-eval-after-load 'no-littering
-    (setq rmh-elfeed-org-files (list (concat nowis-config-useful-tools "elfeed.org"))))
-  )
-(defun my-elfeed()
-  (interactive)
-  (unless (featurep 'elfeed-org)
-    (elfeed-org))
-  (elfeed))
+(setq newsticker-url-list '(("Planet Emacslife" "https://planet.emacslife.com/atom.xml")
+                            ("sachachua" "https://sachachua.com/blog/feed/")
+                            ("karthinks" "https://karthinks.com/index.xml")
+                            ("protesilaos" "https://protesilaos.com/codelog.xml")
+                            ("lazycat" "https://manateelazycat.github.io/feed.xml")))
 #+end_src
 ** nov
 #+begin_src elisp
@@ -3049,7 +3040,7 @@ Simple distraction-free editing. I use darkroom instead of writeroom because it'
   (:when-loaded
     (define-key gptel-aibo-mode-map
                 (kbd "M-p") #'gptel-aibo-send)
-    (define-key prog-mode-map (kbd "C-i") #'gptel-aibo-summon)
+    (define-key prog-mode-map (kbd "C-c i") #'gptel-aibo-summon)
     ))
 #+end_src
 *** gptel-quick
