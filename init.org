@@ -797,6 +797,7 @@ Maybe I should add a new state.
                                 return font))
 ;; variable font
 (setq lewis-variable-font (cl-loop for font in '(
+                                                 "IBM Plex Sans SC"
                                                  "Noto Sans CJK SC"
                                                  "Times"
                                                  "Helvetica"
@@ -1358,26 +1359,27 @@ Jump anywhere in the world
 #+begin_src elisp
 (setq default-input-method "rime")
 (with-eval-after-load 'rime
-(setq rime-disable-predicates '(meow-normal-mode-p
-                                   meow-motion-mode-p
-                                   meow-keypad-mode-p
-                                   rime-predicate-prog-in-code-p
-                                   rime-predicate-punctuation-line-begin-p ;;在行首要输入符号时
-                                   rime-predicate-after-alphabet-char-p ;;在英文字符串之后（必须为以字母开头的英文字符串）
-                                   rime-predicate-current-input-punctuation-p ;;当要输入的是符号时
-                                   ;; rime-predicate-after-ascii-char-p ;;任意英文字符后 ,enable this to use with <s
-                                   rime-predicate-current-uppercase-letter-p ;; 将要输入的为大写字母时
-                                   rime-predicate-space-after-cc-p ;;在中文字符且有空格之后
-                                   ;; for org-fc
-                                   org-fc-review-flip-or-rate-mode-p
-                                   )
-         rime-show-candidate 'posframe
-         rime-posframe-properties (list :internal-border-width 1
-                                        :font lewis-fixed-font
-                                        )
-         rime-user-data-dir "~/Documents/rime/"
-         rime-inline-ascii-trigger 'shift-r
-         ))
+  (setq rime-disable-predicates '(meow-normal-mode-p
+                                  meow-motion-mode-p
+                                  meow-keypad-mode-p
+                                  rime-predicate-prog-in-code-p
+                                  rime-predicate-punctuation-line-begin-p ;;在行首要输入符号时
+                                  rime-predicate-after-alphabet-char-p ;;在英文字符串之后（必须为以字母开头的英文字符串）
+                                  rime-predicate-current-input-punctuation-p ;;当要输入的是符号时
+                                  ;; rime-predicate-after-ascii-char-p ;;任意英文字符后 ,enable this to use with <s
+                                  rime-predicate-current-uppercase-letter-p ;; 将要输入的为大写字母时
+                                  rime-predicate-space-after-cc-p ;;在中文字符且有空格之后
+                                  ;; for org-fc
+                                  ;; org-fc-review-flip-or-rate-mode-p
+                                  )
+        rime-show-candidate 'posframe
+        rime-posframe-properties (list :internal-border-width 1
+                                       :font lewis-fixed-font
+                                       )
+        rime-user-data-dir "~/Documents/rime/"
+        rime-share-data-dir "~/Documents/rime/"
+        rime-inline-ascii-trigger 'shift-r
+        ))
 (when (eq system-type 'darwin)
   (setq
    ;; rime-emacs-module-header-root "/Applications/Emacs.app/Contents/Resources/include/" ;; use build-emacs
