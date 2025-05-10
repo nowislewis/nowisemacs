@@ -95,6 +95,7 @@ I failed in love with denote, so previous *org-roam* configs were refiled into [
   - [[#org-zotero-parser][org-zotero-parser]]
   - [[#org-oxlatexwordmarkdown][org-ox,latex,word,markdown]]
   - [[#org-clock][org-clock]]
+  - [[#appt][appt]]
   - [[#ui-1][ui]]
   - [[#ox-hugo][ox-hugo]]
   - [[#org-present][org-present]]
@@ -2343,6 +2344,16 @@ Comments:
 
       (add-hook 'org-clock-in-hook #'my/org-start-timer)
       (add-hook 'org-clock-out-hook #'my/org-cancel-timer)))
+#+end_src
+** appt
+#+begin_src elisp
+(setup appt
+  (run-at-time nil 3600 'org-agenda-to-appt)
+  ;; 更新agenda时，同步appt
+  (add-hook 'org-finalize-agenda-hook 'org-agenda-to-appt)
+  ;; 激活提醒
+  (appt-activate 1)
+  )
 #+end_src
 ** ui
 *** org mode basic style
