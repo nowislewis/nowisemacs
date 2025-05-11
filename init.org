@@ -2,7 +2,7 @@
 #+PROPERTY: header-args:elisp :tangle ~/.emacs.d/init.el
 I failed in love with denote, so previous *org-roam* configs were refiled into [[file:useful-tools/old-elisps/org-roam-config.org][org-roam configs]]
 * Content                                                               :toc:
-- [[#startup-config][Startup config]]
+- [[#startup-configs][Startup configs]]
   - [[#ui-speed-up][UI speed up]]
   - [[#basic-modes][basic modes]]
   - [[#load-path][load-path]]
@@ -132,7 +132,7 @@ I failed in love with denote, so previous *org-roam* configs were refiled into [
   - [[#windows-wslg][windows-wslg]]
   - [[#android][android]]
 
-* Startup config
+* Startup configs
 ** UI speed up
 #+NAME: ui-speed-up
 #+begin_src elisp :tangle ~/.emacs.d/early-init.el
@@ -2004,6 +2004,18 @@ Citre is an advanced Ctags (or actually, readtags) frontend for Emacs.
         )
   )
 #+end_src
+*** spell-check
+**** jinx
+#+begin_src elisp
+(setup jinx
+  (dolist (hook '(text-mode-hook conf-mode-hook))
+    (add-hook hook #'jinx-mode))
+  (:when-loaded
+    ;; (setq jinx-languages '("en"))
+    (add-to-list 'jinx-exclude-regexps '(t "\\cc"))
+    (keymap-global-set "M-$" #'jinx-correct)
+    (keymap-global-set "C-M-$" #'jinx-languages)))
+#+end_src
 *** debug
 **** gdb
 #+begin_src elisp
@@ -2052,7 +2064,7 @@ Citre is an advanced Ctags (or actually, readtags) frontend for Emacs.
 (setup format-all)
 #+end_src
 *** disaster
-Disassemble C, C++ or Fortran code under cursor
+Disassemble C, C++ or FORTRAN code under cursor
 #+begin_src elisp
 (setup disaster
   (setq disaster-objdump "objdump -d -M att -Sl --no-show-raw-insn"))
@@ -2348,12 +2360,14 @@ Comments:
 ** appt
 #+begin_src elisp
 (setup appt
+  (:load-after org)
+  (:when-loaded
   (run-at-time nil 3600 'org-agenda-to-appt)
   ;; 更新agenda时，同步appt
   (add-hook 'org-finalize-agenda-hook 'org-agenda-to-appt)
   ;; 激活提醒
   (appt-activate 1)
-  )
+  ))
 #+end_src
 ** ui
 *** org mode basic style
@@ -2430,7 +2444,7 @@ Comments:
   (:load-after org)
   (:hook-into org-mode))
 #+end_src
-*** org-viusal-outline
+*** org-visual-outline
 #+begin_src elisp
 (setup org-visual-outline
   (add-hook 'org-mode-hook #'org-visual-indent-mode))
@@ -2567,7 +2581,7 @@ Org-Babel support for evaluating d2 diagram scripting language.
 Borrowed from https://github.com/rougier/emacs-GTD
 
 In short, you will need 3 files:
-1. =index.org= for capture inbox todos
+1. =index.org= for capture inbox TODOs
 2. =agenda.org= for recurrent events
 3. =action.org= for all tasks moving from inbox
 4. (Option) =incubate.org= for incubate ideas
@@ -3009,26 +3023,25 @@ Simple distraction-free editing. I use darkroom instead of writeroom because it'
 (setup gptel
   (setq gptel-default-mode 'org-mode
         gptel-crowdsourced-prompts-file (concat nowis-doc-emacs-dir "09-scripts/chatgpt.csv")
-        gptel-model 'deepseek-v3
+        ;; gptel-model 'deepseek-v3
+        gptel-model 'gptel-4o
         )
   (:global "M-p" gptel-send
            "M-P" gptel)
   (:when-loaded
-    (setq-default gptel-backend
-                  (gptel-make-openai "chatanywhere"
-                    :host "api.chatanywhere.tech"
-                    :header (lambda () `(("Authorization" . ,(concat "Bearer " (gptel--get-api-key)))))
-                    :key 'gptel-api-key
-                    :stream t
-                    :models '(gpt-4o-mini deepseek-r1 deepseek-v3 claude-3-7-sonnet-20250219)))
+    (setq-default gptel-backend (gptel-make-gh-copilot "Copilot"))
+    (gptel-make-openai "chatanywhere"
+      :host "api.chatanywhere.tech"
+      :header (lambda () `(("Authorization" . ,(concat "Bearer " (gptel--get-api-key)))))
+      :key 'gptel-api-key
+      :stream t
+      :models '(gpt-4o-mini deepseek-r1 deepseek-v3 claude-3-7-sonnet-20250219))
     (gptel-make-openai "momenta"
       :host "llm-gateway.momenta.works"
       :header (lambda () `(("Authorization" . ,(concat "Bearer " (gptel--get-api-key)))))
       :key 'gptel-api-key
       :stream t
       :models '(us.anthropic.claude-3-7-sonnet-20250219-v1:0 azure/gpt-4.1 gemini/gemini-2.5-pro-preview-03-25 gemini-2.5-flash-preview-04-17))
-    ;; OPTIONAL configuration
-    (gptel-make-gh-copilot "Copilot")
     (gptel-make-gemini "Gemini" :key 'gptel-api-key :stream t)
     (gptel-make-deepseek "DeepSeek"       ;Any name you want
       :stream t                           ;for streaming responses
