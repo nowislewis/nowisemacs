@@ -2362,12 +2362,12 @@ Comments:
 (setup appt
   (:load-after org)
   (:when-loaded
-  (run-at-time nil 3600 'org-agenda-to-appt)
-  ;; 更新agenda时，同步appt
-  (add-hook 'org-finalize-agenda-hook 'org-agenda-to-appt)
-  ;; 激活提醒
-  (appt-activate 1)
-  ))
+    (run-at-time nil 3600 'org-agenda-to-appt)
+    ;; 更新agenda时，同步appt
+    (add-hook 'org-finalize-agenda-hook 'org-agenda-to-appt)
+    ;; 激活提醒
+    (appt-activate 1)
+    ))
 #+end_src
 ** ui
 *** org mode basic style
@@ -3027,6 +3027,7 @@ Simple distraction-free editing. I use darkroom instead of writeroom because it'
         gptel-model 'gptel-4o
         )
   (:global "M-p" gptel-send
+           "M-r" gptel-rewrite
            "M-P" gptel)
   (:when-loaded
     (setq-default gptel-backend (gptel-make-gh-copilot "Copilot"))
