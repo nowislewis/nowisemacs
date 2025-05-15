@@ -2657,7 +2657,7 @@ In short, you will need 3 files:
          '((agenda ""
                    ((org-agenda-skip-function
                      '(org-agenda-skip-if nil '(todo done)))))
-           (tags-todo ,(concat "+PRIORITY=\"A\"" tag)
+           (tags-todo ,(concat "+action+PRIORITY=\"A\"" tag)
                       ((org-agenda-overriding-header "Top 5 Priority Tasks")
                        (org-agenda-sorting-strategy '(priority-down deadline-up))
                        (org-agenda-max-entries 5)
@@ -3029,7 +3029,7 @@ Simple distraction-free editing. I use darkroom instead of writeroom because it'
   (setq gptel-default-mode 'org-mode
         gptel-crowdsourced-prompts-file (concat nowis-doc-emacs-dir "09-scripts/chatgpt.csv")
         ;; gptel-model 'deepseek-v3
-        gptel-model 'gptel-4.1
+        gptel-model 'gpt-4.1
         )
   (:global "M-p" gptel-send
            "M-r" gptel-rewrite
@@ -3047,7 +3047,7 @@ Simple distraction-free editing. I use darkroom instead of writeroom because it'
       :header (lambda () `(("Authorization" . ,(concat "Bearer " (gptel--get-api-key)))))
       :key 'gptel-api-key
       :stream t
-      :models '(us.anthropic.claude-3-7-sonnet-20250219-v1:0 azure/gpt-4.1 gemini/gemini-2.5-pro-preview-03-25 gemini-2.5-flash-preview-04-17))
+      :models '(us.anthropic.claude-3-7-sonnet-20250219-v1:0 azure/gpt-4.1 gemini/gemini-2.5-pro-preview-05-06 gemini-2.5-flash-preview-04-17))
     (gptel-make-gemini "Gemini" :key 'gptel-api-key :stream t)
     (gptel-make-deepseek "DeepSeek"       ;Any name you want
       :stream t                           ;for streaming responses
