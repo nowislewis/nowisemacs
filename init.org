@@ -944,14 +944,14 @@ diff-hl-mode highlights uncommitted changes on the left side of the window (area
   ;; set default segments of long/short style
   (setq mini-echo-persistent-rule
         '(:long
-          ("major-mode" "vcs" "flymake" "process"
-           "narrow"  "profiler" "repeat" "buffer-size" "buffer-position" "shrink-path"  "meow" "macro" "org-clock")
+          ("major-mode" "vcs" "time" "flymake" "process"
+           "narrow"  "profiler" "repeat" "buffer-size" "buffer-position" "buffer-percent" "shrink-path"  "meow" "macro" "org-clock")
           ;; remove "selection-info"
           :short
-          ("major-mode" "vcs" "buffer-size" "buffer-position" "shrink-path"  "meow" "macro")))
+          ("major-mode" "vcs" "time" "buffer-size" "buffer-position" "shrink-path"  "meow" "macro")))
   (setq mini-echo-separator "  ")
   (setq mini-echo-window-divider-args '(t 2 2))
-  (setq mini-echo-update-interval 0.1)
+  (setq mini-echo-update-interval 0.05)
   (mini-echo-mode -1)
   (:when-loaded
     (mini-echo-define-segment "org-clock"
@@ -961,6 +961,17 @@ diff-hl-mode highlights uncommitted changes on the left side of the window (area
         (let* ((time-string (org-clock-get-clock-string))
                (time-face 'mini-echo-magenta))
           (mini-echo-segment--print time-string time-face))))
+    (mini-echo-define-segment "time"
+      "Show the current time."
+      :fetch
+      (mini-echo-segment--print (format-time-string "%H:%M Day%u") 'mini-echo-green))
+    (mini-echo-define-segment "buffer-percent"
+      "Return the current line as a percentage of total lines in buffer."
+      :fetch
+      (when-let* ((total-lines (line-number-at-pos (point-max)))
+                  (current-line (line-number-at-pos (point)))
+                  ((> total-lines 0)))
+         (format "%d%%" (/ (* current-line 100) total-lines))))
     (mini-echo-mode)
     ))
 #+end_src
@@ -2011,7 +2022,7 @@ Citre is an advanced Ctags (or actually, readtags) frontend for Emacs.
   (dolist (hook '(text-mode-hook conf-mode-hook))
     (add-hook hook #'jinx-mode))
   (:when-loaded
-    ;; (setq jinx-languages '("en"))
+    (setq jinx-languages "en_US")
     (add-to-list 'jinx-exclude-regexps '(t "\\cc"))
     (keymap-global-set "M-$" #'jinx-correct)
     (keymap-global-set "C-M-$" #'jinx-languages)))
