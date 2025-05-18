@@ -2384,7 +2384,9 @@ Comments:
 ** pomm
 #+begin_src elisp
 (setup alert
-  (setq alert-default-style 'libnotify)
+  (if (eq system-type 'darwin)
+      (setq alert-default-style 'osx-notifier)
+    (setq alert-default-style 'libnotify))
   )
 (setup pomm
   (setq pomm-csv-history-file (concat nowis-doc-emacs-dir "pomm_history.csv")
