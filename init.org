@@ -96,6 +96,7 @@ I failed in love with denote, so previous *org-roam* configs were refiled into [
   - [[#org-oxlatexwordmarkdown][org-ox,latex,word,markdown]]
   - [[#org-clock][org-clock]]
   - [[#appt][appt]]
+  - [[#pomm][pomm]]
   - [[#ui-1][ui]]
   - [[#ox-hugo][ox-hugo]]
   - [[#org-present][org-present]]
@@ -2379,6 +2380,18 @@ Comments:
     ;; 激活提醒
     (appt-activate 1)
     ))
+#+end_src
+** pomm
+#+begin_src elisp
+(setup alert
+  (setq alert-default-style 'libnotify)
+  )
+(setup pomm
+  (setq pomm-csv-history-file (concat nowis-doc-emacs-dir "pomm_history.csv")
+        pomm-third-time-csv-history-file (concat nowis-doc-emacs-dir "pomm_third_time_history.csv")
+        pomm-csv-history-file-timestamp-format "%F %T"
+        )
+  )
 #+end_src
 ** ui
 *** org mode basic style
