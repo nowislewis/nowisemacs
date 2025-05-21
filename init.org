@@ -2387,7 +2387,27 @@ Comments:
   (if (eq system-type 'darwin)
       (setq alert-default-style 'osx-notifier)
     (setq alert-default-style 'libnotify))
-  )
+  (:when-loaded
+    (if (string= "Arch" (getenv "WSL_DISTRO_NAME"))
+        (progn
+          (setq alert-libnotify-command "wsl-notify-send.exe")
+          (defun alert-libnotify-notify (info)
+            (if alert-libnotify-command
+                (let* ((args
+                        (append
+                         (list
+                          "--category" "Emacs"
+                          "--urgency" "normal"
+                          "--expire-time" "5000"
+                          )
+                         (copy-tree alert-libnotify-additional-args))))
+                  (nconc args (list
+                               (alert-encode-string (plist-get info :message))))
+                  (apply #'call-process alert-libnotify-command nil
+                         (list (get-buffer-create " *libnotify output*") t) nil args))
+              (alert-message-notify info)))
+          ))
+    ))
 (setup pomm
   (setq pomm-csv-history-file (concat nowis-doc-emacs-dir "pomm_history.csv")
         pomm-third-time-csv-history-file (concat nowis-doc-emacs-dir "pomm_third_time_history.csv")
