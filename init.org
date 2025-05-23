@@ -1545,11 +1545,11 @@ Jump anywhere in the world
 (setup eshell)
 #+end_src
 ** eat
-#+begin_src elisp :tangle no
+#+begin_src elisp
 (setup eat
   ;; fix char error on macos
-  ;; (when (eq system-type 'darwin)
-  ;;   (setq eat-term-name "xterm-256color"))
+  (when (eq system-type 'darwin)
+    (setq eat-term-name "xterm-256color"))
   (:global "C-`" eat-toggle-window)
   (:when-loaded
     (add-to-list 'display-buffer-alist
@@ -1585,7 +1585,7 @@ Jump anywhere in the world
   )
 #+end_src
 ** vterm
-#+begin_src elisp
+#+begin_src elisp :tangle no
 (setup vterm
   (:global "C-`" vterm-toggle-window)
   (:when-loaded
@@ -1613,6 +1613,7 @@ Jump anywhere in the world
 ** magit
 #+begin_src elisp
 (setup with-editor)
+(setup transient)
 (setup magit
   (:when-loaded
     (defun lewis/magit-status-refresh-buffer-quick ()
