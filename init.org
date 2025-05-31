@@ -95,6 +95,7 @@ I failed in love with denote, so previous *org-roam* configs were refiled into [
   - [[#org-zotero-parser][org-zotero-parser]]
   - [[#org-oxlatexwordmarkdown][org-ox,latex,word,markdown]]
   - [[#org-clock][org-clock]]
+  - [[#org-timer][org-timer]]
   - [[#appt][appt]]
   - [[#pomm][pomm]]
   - [[#ui-1][ui]]
@@ -946,13 +947,13 @@ diff-hl-mode highlights uncommitted changes on the left side of the window (area
   (setq mini-echo-persistent-rule
         '(:long
           ("major-mode" "vcs" "time" "flymake" "process"
-           "narrow"  "profiler" "repeat" "buffer-size" "buffer-position" "buffer-percent" "shrink-path"  "meow" "macro" "org-clock")
+           "narrow"  "profiler" "repeat" "buffer-size" "buffer-position" "buffer-percent" "shrink-path"  "meow" "macro" "org-clock" "org-timer")
           ;; remove "selection-info"
           :short
-          ("major-mode" "vcs" "time" "buffer-size" "buffer-position" "shrink-path"  "meow" "macro")))
+          ("major-mode" "vcs" "time" "buffer-size" "buffer-position" "shrink-path"  "meow" "macro" "org-timer")))
   (setq mini-echo-separator "  ")
   (setq mini-echo-window-divider-args '(t 2 2))
-  (setq mini-echo-update-interval 0.05)
+  (setq mini-echo-update-interval 0.04)
   (mini-echo-mode -1)
   (:when-loaded
     (mini-echo-define-segment "org-clock"
@@ -962,6 +963,12 @@ diff-hl-mode highlights uncommitted changes on the left side of the window (area
         (let* ((time-string (org-clock-get-clock-string))
                (time-face 'mini-echo-magenta))
           (mini-echo-segment--print time-string time-face))))
+    (mini-echo-define-segment "org-timer"
+      "Return org-clock."
+      :fetch
+      (when (and (boundp 'org-timer-mode-line-string)
+                 org-timer-start-time)
+        (mini-echo-segment--print (concat "⏱" org-timer-mode-line-string) 'diff-added)))
     (mini-echo-define-segment "time"
       "Show the current time."
       :fetch
@@ -972,7 +979,7 @@ diff-hl-mode highlights uncommitted changes on the left side of the window (area
       (when-let* ((total-lines (line-number-at-pos (point-max)))
                   (current-line (line-number-at-pos (point)))
                   ((> total-lines 0)))
-         (format "%d%%" (/ (* current-line 100) total-lines))))
+        (format "%d%%" (/ (* current-line 100) total-lines))))
     (mini-echo-mode)
     ))
 #+end_src
@@ -2357,21 +2364,31 @@ Comments:
     (defun my/org-show-reminder ()
       "Function to show a reminder buffer."
       (let ((buf (get-buffer-create "*Org Clock Reminder*"))
-            (message "25 minutes has passed. Time to take a break!"))
+            (messages
+             (list
+              (propertize "Finished a time-box!" 'face '(:weight bold :height 1.5))
+              (propertize "Take a break and think what's most important!" 'face '(:foreground "orange" :weight semi-bold))))
+            )
         (with-current-buffer buf
           (erase-buffer)
-          ;; use popper for buffer display (height=1/6)
           (insert (make-string (max 0 (/ (- (frame-height) 1) 6)) ?\n)) ;; whitespace line
-          (insert (make-string (/ (- (frame-width) (length message)) 2) ?\ ) message)
+          (dolist (message messages)
+            (insert (make-string (/ (- (frame-width) (length message)) 2) ?\ ) message "\n"))
           (goto-char (point-min))
           (display-buffer buf)
           )))
 
-      (add-hook 'org-clock-in-hook #'my/org-start-timer)
-      (add-hook 'org-clock-out-hook #'my/org-cancel-timer)))
+    (add-hook 'org-clock-in-hook #'my/org-start-timer)
+    (add-hook 'org-timer-done-hook #'my/org-show-reminder)
+    (add-hook 'org-clock-out-hook #'my/org-cancel-timer)))
+#+end_src
+** org-timer
+#+begin_src elisp
+(setup org-timer
+  (setq org-timer-default-timer 25))
 #+end_src
 ** appt
-#+begin_src elisp
+#+begin_src elisp :tangle no
 (setup appt
   (:load-after org)
   (:when-loaded
@@ -2383,8 +2400,9 @@ Comments:
     ))
 #+end_src
 ** pomm
-#+begin_src elisp
+#+begin_src elisp :tangle no
 (setup alert
+  (setq alert-fade-time 20)
   (if (eq system-type 'darwin)
       (setq alert-default-style 'osx-notifier)
     (setq alert-default-style 'libnotify))
@@ -2898,7 +2916,8 @@ Spaced Repetition System for Emacs org-mode
     "Define transient-key map for org-fc functions"
     [
      ["review"
-      ("s" "start" org-srs-review-start)
+      ("s" "start all" my/denote-review-srs-files-batch)
+      ("S" "start current" org-srs-review-start)
       ("q" "quit" org-srs-review-quit)
       ]
      ["create"
@@ -2908,6 +2927,10 @@ Spaced Repetition System for Emacs org-mode
       ("u" "update cloze" org-srs-item-cloze-update)
       ]])
   ;; font lock for cloze
+  (defface my-org-fc-cloze-face
+    '((t (:weight bold :underline t :foreground "pale violet red")))
+    "A custom face with bold weight and a underline.")
+
   (font-lock-add-keywords
    'org-mode
    '((
@@ -2918,6 +2941,34 @@ Spaced Repetition System for Emacs org-mode
       (2 'my-org-fc-cloze-face t)
       (3 'shadow nil t)
       )))
+  (defun my/denote-find-files-with-srs-tag ()
+    "Return a list of Denote files that have the \"srs\" tag."
+    (if (not (featurep 'denote))
+        (require 'denote))
+
+    (let ((files (denote-directory-files))
+          (result '()))
+      (dolist (file files)
+        (let ((tags (denote-extract-keywords-from-path file)))
+          (when (member "srs" tags)
+            (push file result))))
+      (nreverse result)))
+
+  (defun my/denote-review-srs-files-batch ()
+    "依次在所有带 \"srs\" 标签的 Denote 文件运行 org-srs-review-start。"
+    (interactive)
+    (let ((files (my/denote-find-files-with-srs-tag))
+          (org-startup-folded nil)
+          )
+      (dolist (file files)
+        (with-current-buffer (find-file file)
+          (message file)
+          (when (derived-mode-p 'org-mode)
+            (message (buffer-file-name))
+            (org-srs-review-start (buffer-file-name)))
+          ;; 可选：你可以这里 (org-srs-review-quit) 直接跳过（自动review），但一般需要人工交互
+          ))))
+
   )
 #+end_src
 ** org-mind-map

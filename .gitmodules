@@ -1,9 +1,6 @@
 [submodule "ace-window"]
 	path = lib/ace-window
 	url = https://github.com/abo-abo/ace-window.git
-[submodule "alert"]
-	path = lib/alert
-	url = https://github.com/jwiegley/alert.git
 [submodule "annotate"]
 	path = lib/annotate
 	url = https://github.com/bastibe/annotate.el.git
@@ -260,9 +257,6 @@
 [submodule "pinyinlib"]
 	path = lib/pinyinlib
 	url = https://github.com/nowislewis/pinyinlib.el.git
-[submodule "pomm"]
-	path = lib/pomm
-	url = https://github.com/SqrtMinusOne/pomm.el.git
 [submodule "popper"]
 	path = lib/popper
 	url = https://github.com/karthink/popper.git
