@@ -2373,7 +2373,8 @@ Comments:
           (erase-buffer)
           (insert (make-string (max 0 (/ (- (frame-height) 1) 6)) ?\n)) ;; whitespace line
           (dolist (message messages)
-            (insert (make-string (/ (- (frame-width) (length message)) 2) ?\ ) message "\n"))
+            (insert message "\n"))
+          (center-region (point-min) (point-max))
           (goto-char (point-min))
           (display-buffer buf)
           )))
@@ -2916,8 +2917,8 @@ Spaced Repetition System for Emacs org-mode
     "Define transient-key map for org-fc functions"
     [
      ["review"
-      ("s" "start all" my/denote-review-srs-files-batch)
-      ("S" "start current" org-srs-review-start)
+      ("s" "start current" org-srs-review-start)
+      ("S" "start all" my/denote-review-srs-files-batch)
       ("q" "quit" org-srs-review-quit)
       ]
      ["create"
@@ -2935,8 +2936,6 @@ Spaced Repetition System for Emacs org-mode
    'org-mode
    '((
       "\\({{[\\0-9a-z]+}{\\)\\([^}]+\\)\\(.*?}}\\)"
-      ;; "\\({{[\\0-9a-z]+}{\\)\\([^}]+\\)\\(}}\\)"
-      ;; "\\({{\\)\\([^}]+\\)}\\({[^}]+}?@[0-9]}\\)"
       (1 'shadow nil t)
       (2 'my-org-fc-cloze-face t)
       (3 'shadow nil t)
@@ -2945,7 +2944,6 @@ Spaced Repetition System for Emacs org-mode
     "Return a list of Denote files that have the \"srs\" tag."
     (if (not (featurep 'denote))
         (require 'denote))
-
     (let ((files (denote-directory-files))
           (result '()))
       (dolist (file files)
@@ -2957,17 +2955,15 @@ Spaced Repetition System for Emacs org-mode
   (defun my/denote-review-srs-files-batch ()
     "依次在所有带 \"srs\" 标签的 Denote 文件运行 org-srs-review-start。"
     (interactive)
-    (let ((files (my/denote-find-files-with-srs-tag))
-          (org-startup-folded nil)
-          )
+    (let ((files (my/denote-find-files-with-srs-tag)))
       (dolist (file files)
         (with-current-buffer (find-file file)
           (message file)
           (when (derived-mode-p 'org-mode)
             (message (buffer-file-name))
             (org-srs-review-start (buffer-file-name)))
-          ;; 可选：你可以这里 (org-srs-review-quit) 直接跳过（自动review），但一般需要人工交互
-          ))))
+          )))
+    )
 
   )
 #+end_src
