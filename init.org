@@ -357,7 +357,10 @@ Maybe I should add a new state.
                           '("v a" . meow-bounds-of-thing)
                           '("y" . meow-save)
                           '("<escape>" . ignore)
-                          '("." . repeat))
+                          '("." . repeat)
+                          '("!" . kmacro-start-macro-or-insert-counter)
+                          '("@" . meow-end-or-call-kmacro)
+                          )
 
   ;; normal keys
   (setq wrap-keymap
@@ -948,7 +951,7 @@ diff-hl-mode highlights uncommitted changes on the left side of the window (area
            "narrow"  "profiler" "repeat" "buffer-size" "buffer-position" "buffer-percent" "shrink-path"  "meow" "macro" "org-clock" "org-timer")
           ;; remove "selection-info"
           :short
-          ("major-mode" "vcs" "time" "buffer-size" "buffer-position" "shrink-path"  "meow" "macro" "org-timer")))
+          ("major-mode" "vcs" "time" "buffer-size" "buffer-position" "shrink-path"  "meow" "macro" "org-clock" "org-timer")))
   (setq mini-echo-separator "  ")
   (setq mini-echo-window-divider-args '(t 2 2))
   (setq mini-echo-update-interval 0.04)
@@ -957,10 +960,15 @@ diff-hl-mode highlights uncommitted changes on the left side of the window (area
     (mini-echo-define-segment "org-clock"
       "Return org-clock."
       :fetch
-      (when (and (fboundp 'org-clocking-p) (org-clocking-p))
+      (when (and (fboundp 'org-clocking-p)
+                 (org-clocking-p)
+                 (not
+                  (and (boundp 'org-timer-mode-line-string)
+                       org-timer-start-time)))
         (let* ((time-string (org-clock-get-clock-string))
                (time-face 'mini-echo-magenta))
           (mini-echo-segment--print time-string time-face))))
+
     (mini-echo-define-segment "org-timer"
       "Return org-clock."
       :fetch
@@ -2343,22 +2351,8 @@ Comments:
 ** org-clock
 #+begin_src elisp
 (setup org-clock
+  (setq org-clock-mode-line-entry 'current)
   (:when-loaded
-    (defvar my/org-timer nil
-      "Timer for the 25-minute reminder.")
-
-    (defun my/org-start-timer ()
-      "Start a 25-minute reminder timer."
-      (setq my/org-timer
-            (run-at-time "25 min" 1500 'my/org-show-reminder)))
-    ;; (run-at-time "10" 5 'my/org-show-reminder)))
-
-    (defun my/org-cancel-timer ()
-      "Cancel the 25-minute reminder timer."
-      (when my/org-timer
-        (cancel-timer my/org-timer)
-        (setq my/org-timer nil)))
-
     (defun my/org-show-reminder ()
       "Function to show a reminder buffer."
       (let ((buf (get-buffer-create "*Org Clock Reminder*"))
@@ -2377,9 +2371,10 @@ Comments:
           (display-buffer buf)
           )))
 
-    (add-hook 'org-clock-in-hook #'my/org-start-timer)
+    (add-hook 'org-timer-set-hook #'org-clock-in)
     (add-hook 'org-timer-done-hook #'my/org-show-reminder)
-    (add-hook 'org-clock-out-hook #'my/org-cancel-timer)))
+    (add-hook 'org-timer-done-hook #'org-clock-out)
+    ))
 #+end_src
 ** org-timer
 #+begin_src elisp
