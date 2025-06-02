@@ -363,7 +363,7 @@ Maybe I should add a new state.
   (setq wrap-keymap
         (let ((map (make-keymap)))
           (suppress-keymap map)
-          (dolist (k '("(" "[" "{" "<" "\""))
+          (dolist (k '("(" "[" "{" "<" "\"" "*"))
             (define-key map k #'insert-pair))
           map
           ))
@@ -608,9 +608,9 @@ Maybe I should add a new state.
   "Define leader-key map for notes functions"
   [["Roam"
     ("r f" "denote-open-or-create" denote-open-or-create)
-    ;; ("r j" "denote-journal" denote-journal-extras-new-or-existing-entry)
+    ("r j" "denote-journal" denote-journal-new-or-existing-entry)
     ("r s" "find-all-searchable" project-find-searchable-dir-files)
-    ;; ("rc" "consult-notes" consult-notes)
+    ("r c" "calendar" calendar)
     ("r g" "project-find-gtd-dir-files" project-find-gtd-dir-files)
     ]
    ["bibtex"
@@ -668,8 +668,6 @@ Maybe I should add a new state.
   [["agenda"
     ("a" "org-agenda" org-agenda)
     ("c" "capture" org-capture)
-    ("h" "insert here" org-capture-here)
-    ("i" "capture inbox" org-capture-inbox)
     ("s" "subtree archive" nowis-org-archive-subtree)
     ]
 
@@ -2604,8 +2602,6 @@ Comments:
         denote-modules '(project)
         denote-prompts '(title keywords signature template)
         denote-dired-directories-include-subdirectories t
-        ;; journal
-        ;; denote-journal-extras-title-format 'day-date-month-year
         )
   ;; (add-hook 'dired-mode-hook #'denote-dired-mode-in-directories)
   (setq denote-templates
@@ -2619,7 +2615,16 @@ Comments:
                              "* Action\n\n"
                              "* Warnings\n\n"
                              "* Links\n\n"))
+          (gtd . ,(concat "* Important\n\n"
+                             "* Diary\n\n"))
           ))
+  )
+#+end_src
+*** denote-journal
+#+begin_src elisp
+(setup denote-journal
+   (setq denote-journal-title-format "%Y_%m_%d_%a_%j")
+   (add-hook 'calendar-mode-hook #'denote-journal-calendar-mode)
   )
 #+end_src
 *** denote-explorer
@@ -2651,61 +2656,30 @@ In short, you will need 3 files:
 2. =agenda.org= for recurrent events
 3. =action.org= for all tasks moving from inbox
 4. (Option) =incubate.org= for incubate ideas
-#+begin_src elisp 
+*** file
+#+begin_src elisp
 ;; Files
 (setq org-directory "~/Documents/emacs/01-orgmode/xnotes")
-(setq org-agenda-files
-      (when (file-exists-p (concat org-directory "/gtd"))
-        (directory-files-recursively (concat org-directory "/gtd") "\\.org$")))
 
-;; (setq org-agenda-files
-;;       (directory-files-recursively (concat org-directory  "/gtd") "\\.org$"))
-(setq org-refile-files
-      (cl-remove-if (lambda (file) (string-match-p "inbox.org$" file))
-                    org-agenda-files))
+(setup org
+  (:when-loaded
+    (let* ((gtd-dir (concat org-directory "/gtd"))
+           (gtd-files (when (file-exists-p gtd-dir)
+                        (directory-files-recursively gtd-dir "\\.org$")))
+           (journal-file (progn
+                           (if (not (featurep 'denote-journal))
+                               (require 'denote-journal))
+                           (denote-journal--entry-today (current-time)))))
+      (setq org-agenda-files (append gtd-files journal-file)))
 
-;; Capture
-(setq org-capture-templates
-      `(("i" "Inbox" entry  (file "gtd/inbox.org")
-         ,(concat "* TODO %?\n"
-                  "/Entered on/ %U"))       ("m" "Meeting" entry  (file+headline "agenda.org" "Future")
-         ,(concat "* %? :meeting:\n"
-                  "<%<%Y-%m-%d %a %H:00>>"))
-                  ("n" "Note" entry  (file "notes.org")
-                   ,(concat "* Note (%a)\n"
-                            "/Entered on/ %U\n" "\n" "%?"))
-                  ("@" "Inbox [mu4e]" entry (file "inbox.org")
-                   ,(concat "* TODO Reply to \"%a\" %?\n"
-                            "/Entered on/ %U"))))
+    (setq org-refile-files
+          (cl-remove-if (lambda (file) (string-match-p "inbox.org$" file))
+                        org-agenda-files))
+    ))
 
-(defun org-capture-inbox ()
-  (interactive)
-  (call-interactively 'org-store-link)
-  (org-capture nil "i"))
-
-(defun org-capture-here ()
-  "Insert an org capture template at point."
-  (interactive)
-  (org-capture 0))
-
-(defun org-capture-mail ()
-  (interactive)
-  (call-interactively 'org-store-link)
-  (org-capture nil "@"))
-
-;; Use full window for org-capture
-;; (add-hook 'org-capture-mode-hook 'delete-other-windows)
-
-;; Key bindings
-
-;; Refile
-(setq org-refile-use-outline-path 'file)
-(setq org-outline-path-complete-in-steps nil)
-(setq org-refile-targets '((org-refile-files :regexp . "*")))
-;; '(("action.org" :regexp . "\\(?:\\(?:Note\\|Task\\)s\\)")
-;;   ("incubate.org" :regexp . "\\(?:\\(?:Note\\|Task\\)s\\)")
-
-;; TODO
+#+end_src
+*** todos
+#+begin_src elisp
 (setq org-log-done 'note)
 (setq org-todo-keywords
       '((sequence "TODO(t)" "NEXT(n)" "HOLD(h)" "|" "DONE(d)" "AXED(a)")))
@@ -2717,16 +2691,67 @@ In short, you will need 3 files:
 (add-hook 'org-after-todo-state-change-hook #'log-todo-next-creation-date)
 (setq org-priority-lowest 69)
 
-;; Agenda
+#+end_src
+*** capture
+#+begin_src elisp
+;; Use full window for org-capture
+;; (add-hook 'org-capture-mode-hook 'delete-other-windows)
+
+(setq org-capture-templates
+      `(("i" "Inbox" entry  (file "gtd/inbox.org")
+         ,(concat "* TODO %?\n"
+                  "/Entered on/ %U"))
+        ("m" "Meeting" entry  (file+headline "agenda.org" "Future")
+         ,(concat "* %? :meeting:\n"
+                  "<%<%Y-%m-%d %a %H:00>>"))
+                  ("n" "Note" entry  (file "notes.org")
+                   ,(concat "* Note (%a)\n"
+                            "/Entered on/ %U\n" "\n" "%?"))
+                  ("@" "Inbox [mu4e]" entry (file "inbox.org")
+                   ,(concat "* TODO Reply to \"%a\" %?\n"
+                            "/Entered on/ %U"))))
+#+end_src elisp
+*** refile
+#+begin_src elisp
+(setup org
+  (:when-loaded
+(setq org-refile-use-outline-path 'file)
+(setq org-outline-path-complete-in-steps nil)
+(setq org-refile-targets '((org-refile-files :regexp . "*")))
+;; '(("action.org" :regexp . "\\(?:\\(?:Note\\|Task\\)s\\)")
+;;   ("incubate.org" :regexp . "\\(?:\\(?:Note\\|Task\\)s\\)")
+;; Save the corresponding buffers
+(defun gtd-save-org-buffers ()
+  "Save `org-agenda-files' buffers without user confirmation.
+See also `org-save-all-org-buffers'"
+  (interactive)
+  (message "Saving org-agenda-files buffers...")
+  (save-some-buffers t (lambda ()
+                         (when (member (buffer-file-name) org-agenda-files)
+                           t)))
+  (message "Saving org-agenda-files buffers... done"))
+
+;; Add it after refile
+(advice-add 'org-refile :after
+            (lambda (&rest _)
+              (gtd-save-org-buffers)))
+))
+#+end_src
+*** agenda
+#+begin_src elisp
+(defun org-get-parent-heading ()
+  (save-excursion
+    (when (org-up-heading-safe)
+      (let ((parent (org-get-heading 'no-tags 'no-todo 'no-priority 'no-comment)))
+        (truncate-string-to-width parent 16 nil ?\s)))))
 (defmacro nowis-create-agenda-command (key description tag)
   `(list ,key ,description
          '((agenda ""
                    ((org-agenda-skip-function
                      '(org-agenda-skip-if nil '(todo done)))))
-           (tags-todo ,(concat "+action+PRIORITY=\"A\"" tag)
-                      ((org-agenda-overriding-header "Top 5 Priority Tasks")
+           (tags-todo ,(concat "+journal" tag)
+                      ((org-agenda-overriding-header "Journal")
                        (org-agenda-sorting-strategy '(priority-down deadline-up))
-                       (org-agenda-max-entries 5)
                        (org-agenda-prefix-format "%-16:(org-get-parent-heading): [%-4e] ")))
            (tags-todo ,(concat "+action" tag) ((org-agenda-overriding-header "Action")
                                                (org-agenda-prefix-format "%-16:(org-get-parent-heading): [%-4e] ")
@@ -2746,11 +2771,6 @@ In short, you will need 3 files:
                   ))
            )))
 
-(defun org-get-parent-heading ()
-  (save-excursion
-    (when (org-up-heading-safe)
-      (let ((parent (org-get-heading 'no-tags 'no-todo 'no-priority 'no-comment)))
-        (truncate-string-to-width parent 16 nil ?\s)))))
 
 (setq org-agenda-custom-commands
       (list (nowis-create-agenda-command "g" "GTD" "")
@@ -2761,24 +2781,10 @@ In short, you will need 3 files:
       org-agenda-clockreport-parameter-plist '(:link t :maxlevel 5 :properties ("Effort"))
       org-clock-out-remove-zero-time-clocks t)
 ;; agenda style
-(setq org-agenda-hide-tags-regexp "\\(inbox\\|action\\)")
-;; Save the corresponding buffers
-(defun gtd-save-org-buffers ()
-  "Save `org-agenda-files' buffers without user confirmation.
-See also `org-save-all-org-buffers'"
-  (interactive)
-  (message "Saving org-agenda-files buffers...")
-  (save-some-buffers t (lambda ()
-                         (when (member (buffer-file-name) org-agenda-files)
-                           t)))
-  (message "Saving org-agenda-files buffers... done"))
-
-;; Add it after refile
-(advice-add 'org-refile :after
-            (lambda (&rest _)
-              (gtd-save-org-buffers)))
-
-;; archive
+(setq org-agenda-hide-tags-regexp "\\(inbox\\|action\\|journal\\)")
+#+end_src
+*** archive
+#+begin_src elisp
 (defun nowis-get-closed-time-or-current-time ()
   "Get the CLOSED time of the current subtree or use the current time if not available."
   (let ((closed-time (org-entry-get (point) "CLOSED")))
@@ -2795,6 +2801,7 @@ See also `org-save-all-org-buffers'"
                                "::datetree/")))
     (setq org-archive-location archive-file)
     (org-archive-subtree)))
+
 #+end_src
 ** org-fc
 Spaced Repetition System for Emacs org-mode
