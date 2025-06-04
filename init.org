@@ -3174,7 +3174,7 @@ Simple distraction-free editing. I use darkroom instead of writeroom because it'
   (setq whisper-language "auto"
         whisper-model "large-v3-turbo"
         whisper-translate nil
-        whisper-use-threads (num-processors)
+        whisper-use-threads (- (num-processors) 1)
         whisper--ffmpeg-input-device "default"
         whisper--ffmpeg-input-format "pulse"
         )

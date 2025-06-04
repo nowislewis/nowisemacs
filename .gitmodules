@@ -327,7 +327,6 @@
 [submodule "whisper"]
 	path = lib/whisper
 	url = https://github.com/natrys/whisper.el.git
-    no-byte-compile = whisper.el
 [submodule "with-editor"]
 	path = lib/with-editor
 	url = https://github.com/magit/with-editor.git
