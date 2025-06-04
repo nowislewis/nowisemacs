@@ -3169,99 +3169,15 @@ Simple distraction-free editing. I use darkroom instead of writeroom because it'
   )
 #+end_src
 *** whisper
-#+begin_src elisp :tangle no
+#+begin_src elisp
 (setup whisper
   (setq whisper-language "auto"
-        whisper-model "small"
+        whisper-model "large-v3-turbo"
         whisper-translate nil
-        whisper-use-threads (num-processors))
-
-  (:when-loaded
-    ;; make whisper to break sentense
-    (defun whisper--break-sentences (n)
-      "Put a paragraph break every N sentences."
-      (catch 'return
-        (while t
-          (dotimes (_ n)
-            (forward-sentence 1)
-            (when (eobp) (throw 'return nil)))
-          (insert "\n\n")
-          (when (= (char-after) ?\ )
-            (delete-horizontal-space)))))
-    (add-hook 'whisper-post-process-hook
-              (lambda ()
-                (whisper--break-sentences 1))) ;; add a paragraph break every 5 sentences
-
-    ;; make whisper output punctuation
-    (setq prompt_ch "以下是普通话的句子,")
-    (defun whisper-command (input-file)
-      "Produces whisper.cpp command to be run on the INPUT-FILE.
-
-If you want to use something other than whisper.cpp, you should override this
-function to produce the command for the inference engine of your choice."
-      (let ((base (expand-file-name (file-name-as-directory whisper--install-path))))
-        `(,(concat base (if (eq system-type 'windows-nt) "main.exe" "main"))
-          ,@(when whisper-use-threads (list "--threads" (number-to-string whisper-use-threads)))
-          ;; ,@(when whisper-enable-speed-up '("--speed-up"))
-          ,@(when whisper-translate '("--translate"))
-          ,@(when whisper-show-progress-in-mode-line '("--print-progress"))
-          "--language" ,whisper-language
-          "--model" ,(whisper--model-file whisper-quantize)
-          "--no-timestamps"
-          "--prompt" ,prompt_ch
-          "--file" ,input-file)))
-
-    (defun rk/get-ffmpeg-device ()
-      "Gets the list of devices available to ffmpeg."
-      (unless (string-equal system-type "darwin")
-        (error "This function is currently only supported on macOS"))
-
-      (let ((lines (string-split (shell-command-to-string "ffmpeg -list_devices true -f avfoundation -i dummy || true") "\n")))
-        (cl-loop with at-video-devices = nil
-                 with at-audio-devices = nil
-                 with video-devices = nil
-                 with audio-devices = nil
-                 for line in lines
-                 when (string-match "AVFoundation video devices:" line)
-                 do (setq at-video-devices t
-                          at-audio-devices nil)
-                 when (string-match "AVFoundation audio devices:" line)
-                 do (setq at-audio-devices t
-                          at-video-devices nil)
-                 when (and at-video-devices
-                           (string-match "\\[\\([0-9]+\\)\\] \\(.+\\)" line))
-                 do (push (cons (string-to-number (match-string 1 line)) (match-string 2 line)) video-devices)
-                 when (and at-audio-devices
-                           (string-match "\\[\\([0-9]+\\)\\] \\(.+\\)" line))
-                 do (push (cons (string-to-number (match-string 1 line)) (match-string 2 line)) audio-devices)
-                 finally return (list (nreverse video-devices) (nreverse audio-devices)))))
-
-    (defun rk/find-device-matching (string type)
-      "Get the devices from `rk/get-ffmpeg-device' and look for a device
-matching `STRING'. `TYPE' can be :video or :audio."
-      (let* ((devices (rk/get-ffmpeg-device))
-             (device-list (if (eq type :video)
-                              (car devices)
-                            (cadr devices))))
-        (cl-loop for device in device-list
-                 when (string-match-p string (cdr device))
-                 return (car device))))
-
-    (defcustom rk/default-audio-device nil
-      "The default audio device to use for whisper.el and outher audio processes."
-      :type 'string)
-
-    (defun whisper-select-default-audio-device (&optional device-name)
-      "Interactively select an audio device to use for whisper.el and other audio processes.
-If `DEVICE-NAME' is provided, it will be used instead of prompting the user."
-      (interactive)
-      (let* ((audio-devices (cadr (rk/get-ffmpeg-device)))
-             (indexes (mapcar #'car audio-devices))
-             (names (mapcar #'cdr audio-devices))
-             (name (or device-name (completing-read "Select audio device: " names nil t))))
-        (setq rk/default-audio-device (rk/find-device-matching name :audio))
-        (when (boundp 'whisper--ffmpeg-input-device)
-          (setq whisper--ffmpeg-input-device (format ":%s" rk/default-audio-device))))))
+        whisper-use-threads (num-processors)
+        whisper--ffmpeg-input-device "default"
+        whisper--ffmpeg-input-format "pulse"
+        )
   )
 #+end_src
 ** webjump

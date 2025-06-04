@@ -324,6 +324,10 @@
 	url = https://github.com/mhayashi1120/Emacs-wgrep.git
     no-byte-compile = wgrep-subtest.el
     no-byte-compile = wgrep-ag.el
+[submodule "whisper"]
+	path = lib/whisper
+	url = https://github.com/natrys/whisper.el.git
+    no-byte-compile = whisper.el
 [submodule "with-editor"]
 	path = lib/with-editor
 	url = https://github.com/magit/with-editor.git
