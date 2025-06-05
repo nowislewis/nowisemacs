@@ -682,7 +682,7 @@ Maybe I should add a new state.
      ;; ("l" "app-launcher-run-app" app-launcher-run-app)
      ;; ("e" "elfeed" my-elfeed)
      ("r" "restart emacs" restart-emacs)
-     ;; ("w" "whisper" whisper-run)
+     ("w" "whisper" whisper-run)
      ]
     ])
 #+end_src
@@ -3178,6 +3178,32 @@ Simple distraction-free editing. I use darkroom instead of writeroom because it'
         whisper--ffmpeg-input-device "default"
         whisper--ffmpeg-input-format "pulse"
         )
+  (:when-loaded
+    (setq sense_bin "~/.emacs.d/.cache/SenseVoice.cpp/build/bin/sense-voice-main")
+    (setq sense_model (expand-file-name "~/.emacs.d/.cache/SenseVoice.cpp/sense-voice-small-fp32.gguf"))
+    (defun whisper--sensevoice-command (input-file)
+      `(,sense_bin
+        "-m" ,sense_model
+        "-t" "12"
+        "-l" "zh"
+        "-ng"
+        "-itn"
+        "--min_silence_duration_ms" "1000"
+        ,input-file))
+    (advice-add 'whisper-command :override #'whisper--sensevoice-command)
+    ;; scene voice can only use AC one
+    (defun whisper--record-command (output-file)
+      "Produces FFmpeg command to be run given location of OUTPUT-FILE."
+      `("ffmpeg"
+        ,@(unless whisper--ffmpeg-input-file
+            (list "-f" whisper--ffmpeg-input-format))
+        "-i" ,(or whisper--ffmpeg-input-file whisper--ffmpeg-input-device)
+        ,@(when (and (not whisper--ffmpeg-input-file) whisper-recording-timeout)
+            (list "-t" (number-to-string whisper-recording-timeout)))
+        "-ar" "16000"
+        "-ac" "1"
+        "-y" ,output-file))
+    )
   )
 #+end_src
 ** webjump
