@@ -215,7 +215,6 @@ The following content is not enabled yet, because I want to minimize unnecessary
 (setq process-adaptive-read-buffering nil)
 (setq read-process-output-max (* 1024 1024))
 
-(transient-mark-mode 1)                 ;标记高亮
 (global-subword-mode 1)                 ;Word移动支持 FooBar 的格式
 (setq initial-scratch-message "") ;关闭启动空白buffer, 这个buffer会干扰session恢复
 (setq-default comment-style 'indent)    ;设定自动缩进的注释风格
@@ -671,7 +670,8 @@ Maybe I should add a new state.
   [["agenda"
     ("a" "org-agenda" org-agenda)
     ("c" "capture" org-capture)
-    ("s" "subtree archive" nowis-org-archive-subtree)
+    ("A" "archive" nowis-org-archive-subtree)
+    ("s" "scratch-buffer" scratch-buffer)
     ]
 
     ["shell"
@@ -1002,19 +1002,25 @@ diff-hl-mode highlights uncommitted changes on the left side of the window (area
   ;; Only highliht current buffer in current window
   (setq hl-line-sticky-flag nil
         global-hl-line-sticky-flag nil)
-  ;; (global-hl-line-mode)
-  )
-(defun nowis-recenter ()
-  (interactive)
-  (call-interactively 'recenter)
-  (pulsar-pulse-line))
-#+end_src
-*** hl-line-plus
-#+begin_src elisp
-(setup hl-line-plus
-    (setq hl-line-idle-interval 0.5)
-    (toggle-hl-line-when-idle 1)
-  )
+  (global-hl-line-mode)
+  (:when-loaded
+    ;; update only 0.05 timer
+    (defvar my/global-hl-line-timer nil)
+
+    (defun my/global-hl-line-highlight-debounce ()
+      (when my/global-hl-line-timer
+        (cancel-timer my/global-hl-line-timer))
+      (setq my/global-hl-line-timer
+            (run-with-idle-timer 0.05 nil #'global-hl-line-highlight)))
+    (remove-hook 'post-command-hook #'global-hl-line-highlight)
+    (add-hook 'post-command-hook #'my/global-hl-line-highlight-debounce)
+
+    ))
+  (defun nowis-recenter ()
+    (interactive)
+    (call-interactively 'recenter)
+    (pulsar-pulse-line))
+  (defvar my-hl-line-timer nil)
 #+end_src
 *** pulsar
 #+begin_src elisp
@@ -1626,28 +1632,7 @@ Jump anywhere in the world
 ** magit
 #+begin_src elisp
 (setup with-editor)
-(setup transient)
-(setup magit
-  (:when-loaded
-    (defun lewis/magit-status-refresh-buffer-quick ()
-      (magit-insert-section (status)
-        (magit-insert-heading "Quick status")
-        (insert "\n")
-        (magit-insert-error-header)
-        (magit-insert-head-branch-header)
-        (insert "\n")
-        (magit-insert-unstaged-changes)
-        (magit-insert-staged-changes)))
-    (defun lewis/toggle-magit-quick-status ()
-      (interactive)
-      (if (advice-member-p 'lewis/magit-status-refresh-buffer-quick 'magit-status-refresh-buffer)
-          (progn
-            (advice-remove 'magit-status-refresh-buffer 'lewis/magit-status-refresh-buffer-quick)
-            (message "Quick magit status turned off"))
-        (advice-add 'magit-status-refresh-buffer :override 'lewis/magit-status-refresh-buffer-quick)
-        (message "Quick magit status turned on"))
-      (magit-refresh-all))
-    ))
+(setup magit)
 #+end_src
 ** ediff
 #+begin_src elisp
@@ -1975,14 +1960,6 @@ borrowed from citre, now you can always jump-back use "M-," after any jump in th
     (let* ((edit-pre (intern (format "org-babel-edit-prep:%s" lang)))
            (intern-pre (intern (format "lsp--%s" (symbol-name edit-pre)))))
       `(progn
-         ;;;;;;;;;;;;; use :file as file_name
-         ;; (defun ,intern-pre (info)
-         ;;   (let ((file-name (->> info caddr (alist-get :file))))
-         ;;     (unless file-name
-         ;;       (setq file-name (make-temp-file "babel-lsp-")))
-         ;;     (setq buffer-file-name file-name)
-         ;;     (eglot-ensure)))
-
          ;;;;;;;;;;;; always use temp file
          (defun ,intern-pre (info)
            (let ((file-name (make-temp-file "babel-lsp-")))

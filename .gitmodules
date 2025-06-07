@@ -147,9 +147,6 @@
 [submodule "hide-mode-line"]
 	path = lib/hide-mode-line
 	url = https://github.com/hlissner/emacs-hide-mode-line.git
-[submodule "hl-line-plus"]
-	path = lib/hl-line-plus
-	url = https://github.com/nowislewis/hl-line-plus.git
 [submodule "hl-todo"]
 	path = lib/hl-todo
 	url = https://github.com/tarsius/hl-todo.git
@@ -305,9 +302,6 @@
 [submodule "tomelr"]
 	path = lib/tomelr
 	url = https://github.com/kaushalmodi/tomelr.git
-[submodule "transient"]
-	path = lib/transient
-	url = https://github.com/magit/transient.git
 [submodule "treesit-auto"]
 	path = lib/treesit-auto
 	url = https://github.com/renzmann/treesit-auto.git
