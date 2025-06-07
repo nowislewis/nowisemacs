@@ -3145,6 +3145,26 @@ Simple distraction-free editing. I use darkroom instead of writeroom because it'
         (keymap-set embark-general-map "?" #'gptel-quick))
   )
 #+end_src
+*** mcp.el
+#+begin_src elisp
+(setup mcp
+  (setq mcp-hub-servers
+        `(("fetch" . (:command "uvx" :args ("mcp-server-fetch")))
+          ("claude-code" . (
+                            :command "uvx"
+                            :args ("--from",
+                                   "mcp-claude-code",
+                                   "claudecode",
+                                   "--allow-path",
+                                   "~/Documents/codes")
+                            ))
+          )
+        )
+  (:when-loaded
+    (require 'gptel-integrations)
+    )
+  )
+#+end_src
 *** whisper
 #+begin_src elisp
 (setup whisper

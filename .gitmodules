@@ -190,6 +190,9 @@
 [submodule "markdown-mode"]
 	path = lib/markdown-mode
 	url = https://github.com/jrblevin/markdown-mode.git
+[submodule "mcp"]
+	path = lib/mcp
+	url = https://github.com/lizqwerscott/mcp.el.git
 [submodule "meow"]
 	path = lib/meow
 	url = https://github.com/meow-edit/meow.git
