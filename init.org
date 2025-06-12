@@ -2635,19 +2635,23 @@ In short, you will need 3 files:
 
 (setup org
   (:when-loaded
-    (let* ((gtd-dir (concat org-directory "/gtd"))
-           (gtd-files (when (file-exists-p gtd-dir)
-                        (directory-files-recursively gtd-dir "\\.org$")))
-           (journal-file (progn
-                           (if (not (featurep 'denote-journal))
-                               (require 'denote-journal))
-                           (denote-journal--entry-today (current-time)))))
-      (setq org-agenda-files (append gtd-files journal-file)))
+    (defun org-agenda-update-agenda-files()
+      "update agenda file list together with refile list"
+      (interactive)
+      (let* ((gtd-dir (concat org-directory "/gtd"))
+             (gtd-files (when (file-exists-p gtd-dir)
+                          (directory-files-recursively gtd-dir "\\.org$")))
+             (journal-file (progn
+                             (if (not (featurep 'denote-journal))
+                                 (require 'denote-journal))
+                             (denote-journal--entry-today (current-time)))))
+        (setq org-agenda-files (append gtd-files journal-file)))
 
-    (setq org-refile-files
-          (cl-remove-if (lambda (file) (string-match-p "inbox.org$" file))
-                        org-agenda-files))
-    ))
+      (setq org-refile-files
+            (cl-remove-if (lambda (file) (string-match-p "inbox.org$" file))
+                          org-agenda-files)))
+    (org-agenda-update-agenda-files)
+      ))
 
 #+end_src
 *** todos
