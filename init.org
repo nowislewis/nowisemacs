@@ -2725,6 +2725,10 @@ See also `org-save-all-org-buffers'"
          '((agenda ""
                    ((org-agenda-skip-function
                      '(org-agenda-skip-if nil '(todo done)))))
+           (tags-todo ,(concat "+week" tag)
+                      ((org-agenda-overriding-header "Weekly-Target")
+                       (org-agenda-sorting-strategy '(priority-down deadline-up))
+                       (org-agenda-prefix-format "%-16:(org-get-parent-heading): [%-4e] ")))
            (tags-todo ,(concat "+journal" tag)
                       ((org-agenda-overriding-header "Journal")
                        (org-agenda-sorting-strategy '(priority-down deadline-up))
@@ -3205,17 +3209,17 @@ Simple distraction-free editing. I use darkroom instead of writeroom because it'
     ;;     "-ac" "1"
     ;;     "-y" ,output-file))
 
-    (defun whisper--ctranslate2-command (input-file)
-      `("whisper-ctranslate2"
-        ,@(when whisper-use-threads (list "--threads" (number-to-string whisper-use-threads)))
-        "--task" ,(if whisper-translate "translate" "transcribe")
-        "--model" ,whisper-model
-        "--language" "zh"
-        "--output_dir" "/tmp/"
-        "--output_format" "txt"
-        ,input-file))
+    ;; (defun whisper--ctranslate2-command (input-file)
+    ;;   `("whisper-ctranslate2"
+    ;;     ,@(when whisper-use-threads (list "--threads" (number-to-string whisper-use-threads)))
+    ;;     "--task" ,(if whisper-translate "translate" "transcribe")
+    ;;     "--model" ,whisper-model
+    ;;     "--language" "zh"
+    ;;     "--output_dir" "/tmp/"
+    ;;     "--output_format" "txt"
+    ;;     ,input-file))
 
-    (advice-add 'whisper-command :override #'whisper--ctranslate2-command)
+    ;; (advice-add 'whisper-command :override #'whisper--ctranslate2-command)
     )
   )
 #+end_src
