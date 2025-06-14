@@ -113,9 +113,6 @@
 [submodule "esxml"]
 	path = lib/esxml
 	url = https://github.com/tali713/esxml.git
-[submodule "exec-path-from-shell"]
-	path = lib/exec-path-from-shell
-	url = https://github.com/purcell/exec-path-from-shell.git
 [submodule "f"]
 	path = lib/f
 	url = https://github.com/rejeep/f.el.git
@@ -217,9 +214,6 @@
 [submodule "nov"]
 	path = lib/nov
 	url = https://depp.brause.cc/nov.el.git
-[submodule "nov-xwidget"]
-	path = lib/nov-xwidget
-	url = https://github.com/chenyanming/nov-xwidget.git
 [submodule "orderless"]
 	path = lib/orderless
 	url = https://github.com/oantolin/orderless.git
@@ -287,18 +281,12 @@
 [submodule "setup"]
 	path = lib/setup
 	url = https://github.com/emacsmirror/setup
-[submodule "super-save"]
-	path = lib/super-save
-	url = https://github.com/bbatsov/super-save.git
 [submodule "tablist"]
 	path = lib/tablist
 	url = https://github.com/politza/tablist.git
 [submodule "tabspaces"]
 	path = lib/tabspaces
 	url = https://github.com/mclear-tools/tabspaces.git
-[submodule "tempel"]
-	path = lib/tempel
-	url = https://github.com/minad/tempel.git
 [submodule "toc-org"]
 	path = lib/toc-org
 	url = https://github.com/snosov1/toc-org.git
@@ -308,6 +296,9 @@
 [submodule "treesit-auto"]
 	path = lib/treesit-auto
 	url = https://github.com/renzmann/treesit-auto.git
+[submodule "uniline"]
+	path = lib/uniline
+	url = https://github.com/tbanel/uniline.git
 [submodule "vertico"]
 	path = lib/vertico
 	url = https://github.com/minad/vertico.git

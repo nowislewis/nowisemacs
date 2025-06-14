@@ -2,5 +2,13 @@
 # name: org_dot
 # key: dot
 # --
-#+BEGIN_SRC dot :file ~/Documents/emacs/other-files/PicturesForAll/dot_pictures/`(format-time-string "%Y%m%d%H%M%S")`.jpg
-#+END_SRC
+
+#+begin_src dot :file ~/Documents/emacs/02-binary-git/binary-files/01-pictures/dot_pictures/`(format-time-string "%Y%m%d%H%M%S")`.png
+digraph {
+    node[shape=record]
+    subgraph cluster_a {
+    }
+    $1
+}
+#+end_src
+$0

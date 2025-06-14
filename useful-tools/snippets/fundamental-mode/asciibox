@@ -1,0 +1,9 @@
+# -*- mode: fundamental -*-
+# name: asciibox
+# key: asciibox
+# --
+
+${1:$(concat comment-start " +-" (make-string (string-width yas-text) ?-) "-+")}
+`comment-start` | ${1:Title} |
+${1:$(concat comment-start " +-" (make-string (string-width yas-text) ?-) "-+")}
+$0

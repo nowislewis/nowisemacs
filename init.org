@@ -58,7 +58,6 @@ I failed in love with denote, so previous *org-roam* configs were refiled into [
   - [[#marginalia][Marginalia]]
   - [[#embark][embark]]
   - [[#yasnippet][yasnippet]]
-  - [[#tempel][tempel]]
 - [[#window-management][Window Management]]
   - [[#window][window]]
   - [[#winner-mode][winner-mode]]
@@ -81,7 +80,6 @@ I failed in love with denote, so previous *org-roam* configs were refiled into [
 - [[#shell][shell]]
   - [[#eshell][eshell]]
   - [[#eat][eat]]
-  - [[#vterm][vterm]]
 - [[#git][git]]
   - [[#magit][magit]]
   - [[#ediff][ediff]]
@@ -130,6 +128,7 @@ I failed in love with denote, so previous *org-roam* configs were refiled into [
   - [[#atomic-chrome][atomic-chrome]]
   - [[#macos-ocr][macos-ocr]]
   - [[#esup][esup]]
+  - [[#uniline][uniline]]
 - [[#system-specific-config][system-specific-config]]
   - [[#windows-wslg][windows-wslg]]
   - [[#android][android]]
@@ -941,7 +940,7 @@ diff-hl-mode highlights uncommitted changes on the left side of the window (area
   )
 #+end_src
 ** mini-echo
-#+begin_src elisp
+#+begin_src elisp :tangle no
 (setup hide-mode-line)
 (setup mini-echo
   ;; set default segments of long/short style
@@ -1088,14 +1087,15 @@ diff-hl-mode highlights uncommitted changes on the left side of the window (area
   (repeat-mode))
 #+end_src
 ** backup
-*** super-save
+*** auto-save
 #+begin_src elisp
-(setq make-backup-files nil)
-(setq auto-save-default nil)
-
-(setup super-save
-  (setq super-save-auto-save-when-idle t)
-   (super-save-mode 1))
+(setup auto-save
+  (setq auto-save-default nil
+        create-lockfiles nil
+        make-backup-files nil
+        auto-save-visited-interval 1)
+  (auto-save-visited-mode)
+  )
 #+end_src
 *** savehist
 #+begin_src elisp
@@ -1149,11 +1149,11 @@ diff-hl-mode highlights uncommitted changes on the left side of the window (area
 #+end_src
 ** exec-path-from-shell
 可以优化速度, 建议看一下官网的一篇文章
-#+name: exec-path-from-shell
-#+begin_src elisp
+#+begin_src elisp :tangle no
 (setup exec-path-from-shell
   (:defer
    (when (memq window-system '(mac ns x))
+     (setq exec-path-from-shell-arguments '("-l"))
      (exec-path-from-shell-initialize)))
   )
 #+end_src
@@ -1267,20 +1267,10 @@ should be check after reading the embark.el manual
 ** yasnippet
 #+begin_src elisp
 (setup yasnippet
+  (:global "M-*" yas-insert-snippet)
   (setq yas-snippet-dirs (list (concat nowis-config-useful-tools "snippets")))
   (yas-global-mode)
   )
-#+end_src
-** tempel
-#+begin_src elisp
-(setup tempel
-  (setq tempel-path "~/.emacs.d/useful-tools/tempel-snippets"
-           tempel-trigger-prefix "<")
-  (:global "M-*" tempel-insert
-           "M-+"  tempel-complete)
-  (:with-map tempel-map
-    (:bind "M-]"  tempel-next
-           "M-["  tempel-previous)))
 #+end_src
 * Window Management
 ** window
@@ -1601,31 +1591,6 @@ Jump anywhere in the world
     (eat)
     (eat--send-string "*eat*"
                       (concat "cd " (file-name-directory (buffer-file-name)))))
-  )
-#+end_src
-** vterm
-#+begin_src elisp :tangle no
-(setup vterm
-  (:global "C-`" vterm-toggle-window)
-  (:when-loaded
-    (add-to-list 'display-buffer-alist
-                 '((lambda (buffer-or-name _)
-                     (let ((buffer (get-buffer buffer-or-name)))
-                       (with-current-buffer buffer
-                         (or (equal major-mode 'vterm-mode)
-                             (string-prefix-p "*vterm" (buffer-name buffer))))))
-                   (display-buffer-reuse-window display-buffer-at-bottom)
-                   (reusable-frames . visible)
-                   (window-height . 0.3)))
-    ;; in order to toggle-input-method
-    ;; (unbind-key "C-\\" vterm-mode-map)
-    )
-  (defun vterm-toggle-window()
-    "Toggle eshell buffer."
-    (interactive)
-    (if (get-buffer-window "*vterm*")
-        (delete-window (get-buffer-window "*vterm*"))
-      (vterm)))
   )
 #+end_src
 * git
@@ -3060,7 +3025,7 @@ If you want to use *sdcv* for offline translate, then download dictionary data t
   (:file-match "\\.epub\\'"))
 #+end_src
 ** nov-xwidget
-#+begin_src elisp
+#+begin_src elisp :tangle no
 (setup nov-xwidget
   (:load-after nov)
   (:with-map nov-xwidget-webkit-mode-map
@@ -3321,6 +3286,10 @@ ESUP - Emacs Start Up Profiler
       (setq esup-depth 0)
       ;; )
   )
+#+end_src
+** uniline
+#+begin_src elisp
+(setup uniline)
 #+end_src
 * system-specific-config
 ** windows-wslg
