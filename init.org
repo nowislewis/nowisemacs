@@ -2637,21 +2637,23 @@ In short, you will need 3 files:
 #+begin_src elisp
 ;; Use full window for org-capture
 ;; (add-hook 'org-capture-mode-hook 'delete-other-windows)
-
-(setq org-capture-templates
-      `(("i" "Inbox" entry  (file "gtd/inbox.org")
-         ,(concat "* TODO %?\n"
-                  "/Entered on/ %U"))
-        ("m" "Meeting" entry  (file+headline "agenda.org" "Future")
-         ,(concat "* %? :meeting:\n"
-                  "<%<%Y-%m-%d %a %H:00>>"))
-                  ("n" "Note" entry  (file "notes.org")
-                   ,(concat "* Note (%a)\n"
-                            "/Entered on/ %U\n" "\n" "%?"))
-                  ("@" "Inbox [mu4e]" entry (file "inbox.org")
-                   ,(concat "* TODO Reply to \"%a\" %?\n"
-                            "/Entered on/ %U"))))
-#+end_src elisp
+(setup org
+  (:when-loaded
+    (setq org-capture-templates
+          `(("i" "Inbox" entry  (file "gtd/inbox.org")
+             ,(concat "* TODO %?\n"
+                      "/Entered on/ %U"))
+            ("m" "Meeting" entry  (file+headline "agenda.org" "Future")
+             ,(concat "* %? :meeting:\n"
+                      "<%<%Y-%m-%d %a %H:00>>"))
+            ("n" "Note" entry  (file "notes.org")
+             ,(concat "* Note (%a)\n"
+                      "/Entered on/ %U\n" "\n" "%?"))
+            ("@" "Inbox [mu4e]" entry (file "inbox.org")
+             ,(concat "* TODO Reply to \"%a\" %?\n"
+                      "/Entered on/ %U")))))
+  )
+#+end_src
 *** refile
 #+begin_src elisp
 (setup org
