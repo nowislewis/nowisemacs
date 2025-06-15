@@ -612,6 +612,7 @@ Maybe I should add a new state.
     ("r j" "denote-journal" denote-journal-new-or-existing-entry)
     ("r s" "find-all-searchable" project-find-searchable-dir-files)
     ("r c" "calendar" calendar)
+    ("r w" "week-target" my/denote-journal-this-week-major-tasks)
     ("r g" "project-find-gtd-dir-files" project-find-gtd-dir-files)
     ]
    ["bibtex"
@@ -2543,25 +2544,36 @@ Comments:
   ;; (add-hook 'dired-mode-hook #'denote-dired-mode-in-directories)
   (setq denote-templates
         `((essence . ,(concat "* 本质思考\n"
-                             "** 事物的根本属性\n"
-                             "** 问题的根源\n"
-                             "** 现象背后的底层逻辑\n"
-                             "* notes\n"))
+                              "** 事物的根本属性\n"
+                              "** 问题的根源\n"
+                              "** 现象背后的底层逻辑\n"
+                              "* notes\n"))
           (action . ,(concat "* Destination\n\n"
                              "* Roadmap\n\n"
                              "* Action\n\n"
                              "* Warnings\n\n"
                              "* Links\n\n"))
           (gtd . ,(concat "* Important\n\n"
-                             "* Diary\n\n"))
+                          "* Diary\n\n"))
           ))
   )
 #+end_src
 *** denote-journal
 #+begin_src elisp
 (setup denote-journal
-   (setq denote-journal-title-format "%Y_%m_%d_%a_%j")
-   (add-hook 'calendar-mode-hook #'denote-journal-calendar-mode)
+  (setq denote-journal-title-format "%Y_%m_%d_%a_%j")
+  (add-hook 'calendar-mode-hook #'denote-journal-calendar-mode)
+  (defun my/denote-journal-this-week-major-tasks ()
+    "Open this week's Saturday journal and jump to or insert '本周重点任务' headline."
+    (interactive)
+    (let ((date (my/current-week-saturday)))
+      (denote-journal-new-or-existing-entry date)
+      (goto-char (point-min))
+      (unless (re-search-forward "^\\*+ 本周重点任务" nil t)
+        (goto-char (point-max))
+        (unless (bolp) (insert "\n"))
+        (insert "* 本周重点任务 :week:\n"))
+      (org-show-entry)))
   )
 #+end_src
 *** denote-explorer
@@ -2600,23 +2612,35 @@ In short, you will need 3 files:
 
 (setup org
   (:when-loaded
-    (defun org-agenda-update-agenda-files()
-      "update agenda file list together with refile list"
+    (defun my/current-week-saturday ()
+      "Return the date string for this week's Saturday in YYYY-MM-DD format."
+      (let* ((now (current-time))
+             (dow (string-to-number (format-time-string "%u" now))) ;; 1=Mon ... 7=Sun
+             (offset (- 6 dow)) ;; 6为Sat, 1为Mon
+             (saturday (time-add now (days-to-time offset))))
+        saturday))
+    ;; (format-time-string "%Y-%m-%d" saturday)))
+    (defun org-agenda-update-agenda-files ()
+      "Update agenda file list together with refile list."
       (interactive)
       (let* ((gtd-dir (concat org-directory "/gtd"))
              (gtd-files (when (file-exists-p gtd-dir)
                           (directory-files-recursively gtd-dir "\\.org$")))
-             (journal-file (progn
-                             (if (not (featurep 'denote-journal))
-                                 (require 'denote-journal))
-                             (denote-journal--entry-today (current-time)))))
-        (setq org-agenda-files (append gtd-files journal-file)))
+             (journal-files
+              (progn
+                (unless (featurep 'denote-journal)
+                  (require 'denote-journal))
+                (let ((dates (list (current-time) (my/current-week-saturday)))) ;; add today and current saturday
+                  (apply #'append
+                         (delq nil
+                               (mapcar #'denote-journal--entry-today dates))))))) ;;remove nil
+        (setq org-agenda-files (append gtd-files journal-files)))
 
       (setq org-refile-files
             (cl-remove-if (lambda (file) (string-match-p "inbox.org$" file))
                           org-agenda-files)))
     (org-agenda-update-agenda-files)
-      ))
+    ))
 
 #+end_src
 *** todos
@@ -2687,33 +2711,41 @@ See also `org-save-all-org-buffers'"
     (when (org-up-heading-safe)
       (let ((parent (org-get-heading 'no-tags 'no-todo 'no-priority 'no-comment)))
         (truncate-string-to-width parent 16 nil ?\s)))))
+(defun nowis-align-to-window-center(text)
+  (let* ((title text)
+         (width (window-width (get-buffer-window)))
+         (pad (/ (1+ (- width (string-width title))) 2)))
+    (concat (make-string (max 0 pad) ? ) title)))
 (defmacro nowis-create-agenda-command (key description tag)
   `(list ,key ,description
          '((agenda ""
                    ((org-agenda-skip-function
                      '(org-agenda-skip-if nil '(todo done)))))
            (tags-todo ,(concat "+week" tag)
-                      ((org-agenda-overriding-header "Weekly-Target")
+                      ((org-agenda-overriding-header
+                        (nowis-align-to-window-center "󰛨 Week's Target 󰛨"))
                        (org-agenda-sorting-strategy '(priority-down deadline-up))
                        (org-agenda-prefix-format "%-16:(org-get-parent-heading): [%-4e] ")))
-           (tags-todo ,(concat "+journal" tag)
-                      ((org-agenda-overriding-header "Journal")
+
+           (tags-todo ,(concat "+journal-week" tag)
+                      ((org-agenda-overriding-header (nowis-align-to-window-center "Today's Target"))
                        (org-agenda-sorting-strategy '(priority-down deadline-up))
                        (org-agenda-prefix-format "%-16:(org-get-parent-heading): [%-4e] ")))
-           (tags-todo ,(concat "+action" tag) ((org-agenda-overriding-header "Action")
+
+           (tags-todo ,(concat "+action" tag) ((org-agenda-overriding-header (nowis-align-to-window-center "Soft Time Tasks"))
                                                (org-agenda-prefix-format "%-16:(org-get-parent-heading): [%-4e] ")
                                                (org-agenda-sorting-strategy '(priority-down timestamp-up))
                                                ))
            (tags-todo "inbox"
                       ((org-agenda-prefix-format "  %?-12t% s")
-                       (org-agenda-overriding-header "\nInbox\n")))
+                       (org-agenda-overriding-header (nowis-align-to-window-center "Inbox"))))
 
            (tags ,(concat "CLOSED>=\"<today>\"" tag)
-                 ((org-agenda-overriding-header "\nCompleted today\n")
+                 ((org-agenda-overriding-header (nowis-align-to-window-center "Completed today"))
                   (org-agenda-prefix-format "%-16:(org-get-parent-heading): [%-4e] ")
                   ))
            (tags ,(concat "CLOSED>=\"<-1w>\"" tag)
-                 ((org-agenda-overriding-header "\nCompleted last 7 days")
+                 ((org-agenda-overriding-header (nowis-align-to-window-center "Completed last 7 days"))
                   (org-agenda-prefix-format "%-16:(org-get-parent-heading): [%-4e] ")
                   ))
            )))
