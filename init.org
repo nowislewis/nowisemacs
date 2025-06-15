@@ -95,7 +95,6 @@ I failed in love with denote, so previous *org-roam* configs were refiled into [
   - [[#org-clock][org-clock]]
   - [[#org-timer][org-timer]]
   - [[#appt][appt]]
-  - [[#pomm][pomm]]
   - [[#ui-1][ui]]
   - [[#ox-hugo][ox-hugo]]
   - [[#org-present][org-present]]
@@ -105,12 +104,10 @@ I failed in love with denote, so previous *org-roam* configs were refiled into [
   - [[#find-orgmode-dir-files][find orgmode dir files]]
   - [[#ob-d2][ob-d2]]
   - [[#agendagtd][agenda/gtd]]
-  - [[#org-fc][org-fc]]
   - [[#org-srs][org-srs]]
   - [[#org-mind-map][org-mind-map]]
   - [[#insert-from-snipaste][insert from snipaste]]
 - [[#english-翻译][english 翻译]]
-  - [[#go-translate][go-translate]]
 - [[#阅读][阅读]]
   - [[#pdf-tools][pdf-tools]]
   - [[#pdf-view-pagemark][pdf-view-pagemark]]
@@ -120,7 +117,6 @@ I failed in love with denote, so previous *org-roam* configs were refiled into [
   - [[#darkroom][darkroom]]
   - [[#markdown-mode][markdown-mode]]
 - [[#tools][tools]]
-  - [[#holo-layer][holo-layer]]
   - [[#ai-related][ai related]]
   - [[#webjump][webjump]]
   - [[#backup-scripts][backup scripts]]
@@ -941,7 +937,7 @@ diff-hl-mode highlights uncommitted changes on the left side of the window (area
   )
 #+end_src
 ** mini-echo
-#+begin_src elisp :tangle no
+#+begin_src elisp
 (setup hide-mode-line)
 (setup mini-echo
   ;; set default segments of long/short style
@@ -2336,41 +2332,6 @@ Comments:
     (appt-activate 1)
     ))
 #+end_src
-** pomm
-#+begin_src elisp :tangle no
-(setup alert
-  (setq alert-fade-time 20)
-  (if (eq system-type 'darwin)
-      (setq alert-default-style 'osx-notifier)
-    (setq alert-default-style 'libnotify))
-  (:when-loaded
-    (if (string= "Arch" (getenv "WSL_DISTRO_NAME"))
-        (progn
-          (setq alert-libnotify-command "wsl-notify-send.exe")
-          (defun alert-libnotify-notify (info)
-            (if alert-libnotify-command
-                (let* ((args
-                        (append
-                         (list
-                          "--category" "Emacs"
-                          "--urgency" "normal"
-                          "--expire-time" "5000"
-                          )
-                         (copy-tree alert-libnotify-additional-args))))
-                  (nconc args (list
-                               (alert-encode-string (plist-get info :message))))
-                  (apply #'call-process alert-libnotify-command nil
-                         (list (get-buffer-create " *libnotify output*") t) nil args))
-              (alert-message-notify info)))
-          ))
-    ))
-(setup pomm
-  (setq pomm-csv-history-file (concat nowis-doc-emacs-dir "pomm_history.csv")
-        pomm-third-time-csv-history-file (concat nowis-doc-emacs-dir "pomm_third_time_history.csv")
-        pomm-csv-history-file-timestamp-format "%F %T"
-        )
-  )
-#+end_src
 ** ui
 *** org mode basic style
 #+begin_src elisp
@@ -2723,7 +2684,7 @@ See also `org-save-all-org-buffers'"
                      '(org-agenda-skip-if nil '(todo done)))))
            (tags-todo ,(concat "+week" tag)
                       ((org-agenda-overriding-header
-                        (nowis-align-to-window-center "󰛨 Week's Target 󰛨"))
+                        (nowis-align-to-window-center "󰛨 Week's Target 󰛨\n"))
                        (org-agenda-sorting-strategy '(priority-down deadline-up))
                        (org-agenda-prefix-format "%-16:(org-get-parent-heading): [%-4e] ")))
 
@@ -2781,111 +2742,6 @@ See also `org-save-all-org-buffers'"
     (setq org-archive-location archive-file)
     (org-archive-subtree)))
 
-#+end_src
-** org-fc
-Spaced Repetition System for Emacs org-mode
-#+begin_src elisp :tangle no
-(setup org-fc
-  (setq org-fc-directories (list denote-directory)
-        org-fc-review-history-file (concat nowis-doc-emacs-dir "org-fc-reviews.tsv")
-        org-fc-shuffle-positions nil
-        )
-  (:with-map org-fc-review-rate-mode-map
-    (:bind "RET" org-fc-review-rate-good
-           "z" org-fc-review-skip-card
-           ))
-  (:with-map org-fc-dashboard-mode-map
-    (:bind "r" org-fc-clarify-continue-reading))
-  (:when-loaded
-    (set-face-attribute 'org-fc-type-cloze-hole-face nil :underline t :foreground "pale violet red")
-
-    (require 'org-fc-keymap-hint)
-    (add-hook 'org-fc-review-flip-mode-hook 'meow-motion-mode)
-    (add-hook 'org-fc-review-edit-mode-hook 'meow-normal-mode)
-    (add-hook 'org-fc-review-rate-mode-hook 'meow-motion-mode)
-
-    (add-to-list 'org-fc-custom-contexts
-                 '(high-not-low . (:filter (not (tag "low")))))
-    (add-to-list 'org-fc-custom-contexts
-                 '(only-cloze-shuffled . (:filter (type cloze) :order shuffled)))
-    )
-  ;; +-----------------+
-  ;; | load and keymap |
-  ;; +-----------------+
-  (defun org-fc-review-flip-or-rate-mode-p()
-    "return t if inside flip or rate mode"
-    (if (or (bound-and-true-p org-fc-review-flip-mode)
-            (bound-and-true-p org-fc-review-rate-mode))
-        t
-      nil))
-  (transient-define-prefix org-fc-transient-map()
-    "Define transient-key map for org-fc functions"
-    [
-     ["update"
-      ("d" "find dashboard" org-fc-dashboard)
-      ("r" "review-with-clarify" org-fc-clarify-continue-reading)
-      ("R" "review" org-fc-review)
-      ("s" "suspend card" org-fc-suspend-card)
-      ("a" "set article" org-fc-set-article)
-      ]
-     ["init"
-      ("c" "cloze" org-fc-type-cloze-init)
-      ("N" "double normal" org-fc-type-double-init)
-      ("n" "normal" org-fc-type-normal-init)
-      ("t" "text input" org-fc-type-text-input-init)]])
-  (defun org-fc-transient-load-map()
-    (interactive)
-    (if (not (featurep 'org-fc))
-        (require 'org-fc))
-    (org-fc-transient-map))
-  ;; +---------------------+
-  ;; | review and fontlock |
-  ;; +---------------------+
-  (defface my-org-fc-cloze-face
-    '((t (:weight bold :underline t :foreground "pale violet red")))
-    "A custom face with bold weight and a underline.")
-
-  ;; font lock for cloze
-  (font-lock-add-keywords
-   'org-mode
-   '(("\\({{\\)\\([^}]+\\)\\(}\\)\\({[^}]+}\\)?\\(@[0-9]}\\)"
-      ;; "\\({{\\)\\([^}]+\\)}\\({[^}]+}?@[0-9]}\\)"
-      (1 'shadow nil t)
-      (2 'my-org-fc-cloze-face t)
-      (3 'shadow nil t)
-      (4 'shadow nil t)
-      (5 'shadow nil t)
-      )))
-
-  (defun org-fc-clarify-continue-reading ()
-    "(Need rg)By determining whether all the cards in the file containing the article have been reviewed, decide whether this article can continue to be read."
-    (interactive)
-    (dolist (card (org-fc-index '(:filter (and (tag "suspended") (and (tag "article"))))))
-      (let ((file_path (oref (oref card file) path))
-            (should-review t))
-        (dolist (file-card (org-fc-index `(:paths ,file_path :filter (not (tag "suspended")))))
-          (if (< (plist-get (oref (car (oref file-card positions)) data) :interval)  6)
-              (setq should-review nil)))
-        (if should-review
-            (progn
-              (save-window-excursion
-                (save-excursion
-                  (message "unsuspending card: %s" (oref card title))
-                  (let* ((id (oref card id))
-                         (file (car (split-string (shell-command-to-string (format "rg -rl '%s' -t org" id)) "::"))))
-                    (find-file-noselect file)
-                    (org-id-goto id)
-                    (let ((current-tags (org-get-tags)))
-                      (org-set-tags '())
-                      (org-set-tags '("fc" "article"))
-                      (save-buffer)
-                      ))))))))
-    (call-interactively 'org-fc-review))
-  (defun org-fc-set-article()
-    (interactive)
-    (org-fc-type-normal-init)
-    (org-set-tags '("article" "suspended" "fc")))
-  )
 #+end_src
 ** org-srs
 #+begin_src elisp
@@ -2983,36 +2839,6 @@ This is an Emacs package that creates graphviz directed graphs from the headings
       (insert (format "[[file:%s]]" file)))))
 #+end_src
 * english 翻译
-** go-translate
-Powerful translator on Emacs. Supports multiple translation engines such as Google, Bing, deepL, StarDict, Youdao.
-#+begin_src elisp :tangle no
-(setup go-translate
-  (setq gt-translate-list '(("en" "zh"))
-        gts-supress-warning t
-        )
-  ;; (:global "M-L" gt-do-translate)
-  (:global "M-L" gt-quick-sdcv)
-
-  (:when-loaded
-    (setq gt-default-translator (gt-translator
-                                 :taker (gt-taker :langs '(en zh) :text 'sentence :prompt 'buffer)
-                                 :engines (list
-                                           (gt-bing-engine)
-                                           ;; (gt-google-engine)
-                                           )
-                                 :render (gt-buffer-render)))
-    )
-  (defun gt-quick-sdcv ()
-    (interactive)
-    (if (not (featurep 'go-translate))
-        (require 'go-translate)
-      (gt-start (gt-translator
-                 :taker (gt-taker :langs '(en zh) :text 'word)
-                 :engines (gt-stardict-engine)
-                 :render (gt-buffer-render))))
-    ))
-#+end_src
-If you want to use *sdcv* for offline translate, then download dictionary data to ~/.stardict/dic or /usr/share/stardict/dic
 * 阅读
 ** pdf-tools
 #+begin_src elisp
@@ -3084,24 +2910,6 @@ Simple distraction-free editing. I use darkroom instead of writeroom because it'
   (:file-match "\\.md\\'"))
 #+end_src
 * tools
-** holo-layer
-#+begin_src elisp :tangle no
-(setup holo-layer
-  (when (eq system-type 'darwin)
-    (require 'holo-layer)
-    (setq holo-layer-enable-cursor-animation t
-          holo-layer-enable-window-border nil
-          holo-layer-enable-place-info nil
-          holo-layer-hide-mode-line nil
-          holo-layer-enable-indent-rainbow t
-          holo-layer-enable-type-animation t
-          holo-layer-type-animation-style "flame"
-          holo-layer-python-command "~/.pyenv/shims/python3"
-          )
-    (holo-layer-enable)
-    )
-  )
-#+end_src
 ** ai related
 *** gptel
 #+begin_src elisp
