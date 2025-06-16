@@ -519,10 +519,6 @@ Maybe I should add a new state.
    ["Navigate"
     ("m" "consult-mark" consult-mark)
     ]
-   ;; ["Clue"
-   ;;  ("y" "clue-copy" clue-copy)
-   ;;  ("p" "clue-yank" clue-paste)
-   ;;  ]
    ["citre"
     ("c d" "citre-jump" citre-jump)
     ("c D" "citre-jump-to-reference" citre-jump-to-reference)
@@ -571,10 +567,7 @@ Maybe I should add a new state.
     ("f" "gptel-file-add" gptel-add-file)
     ("q" "gptel-quick" gptel-quick)
     ]
-   ["Translate"
-    ;; ("t" "toggle english helper" lsp-bridge-toggle-sdcv-helper)
-    ;; ("i" "immersive translate buffer" immersive-translate-buffer)
-    ]])
+    ])
 #+end_src
 *** buffer
 #+begin_src elisp
@@ -586,7 +579,10 @@ Maybe I should add a new state.
     ("l" "meow-last-buffer" meow-last-buffer)
     ("n" "next-buffer" next-buffer)
     ("p" "previous-buffer" previous-buffer)
-    ("r" "revert-buffer" revert-buffer)]
+    ("r" "revert-buffer" revert-buffer)
+    ("c" "clean-buffer" clean-buffer-list)
+    ("s" "scratch-buffer" scratch-buffer)
+    ]
    ["Bookmark"
     ("j" "bookmark-jump" bookmark-jump)
     ("m" "bookmark-set" bookmark-set)
@@ -615,21 +611,9 @@ Maybe I should add a new state.
     ("e" "ebib" ebib)
     ("b" "citar-open" citar-open)
     ]
-   ;; ["serch engine"
-   ;;  ("x" "xeft" xeft)
-   ;;  ]
-   ;; ["org-noter"
-   ;;  ("n" "org-noter" org-noter)]
    ["review cards"
     ("s" "org-srs" org-srs-transient-map)
-    ;; ("f" "org-fc" org-fc-transient-load-map)
     ]
-   ;; ["org-mind-map"
-   ;;  ("m" "org-mind-map-write" org-mind-map-write)
-   ;;  ]
-   ;; ["excalidraw"
-   ;;  ("c" "create excalidraw" org-excalidraw-create-drawing)
-   ;;  ]
    ]
   )
 #+end_src
@@ -667,7 +651,6 @@ Maybe I should add a new state.
     ("a" "org-agenda" org-agenda)
     ("c" "capture" org-capture)
     ("A" "archive" nowis-org-archive-subtree)
-    ("s" "scratch-buffer" scratch-buffer)
     ]
 
     ["shell"
@@ -2391,15 +2374,34 @@ Comments:
     ;;   (set-face-attribute (car face) nil :weight 'medium :height (cdr face)))
     ))
 #+end_src
-*** org-modern
+*** org beatury
 #+begin_src elisp
-(setup org-modern
-  (:load-after org)
-  (setq org-modern-star 'replace
-        org-modern-replace-stars '("󰯬" "󰯯" "󰯲" "󰯵" "󰯸" "󰯻")
-        org-modern-table t)
-  (:hook-into org-mode)
-  (add-hook 'org-agenda-finalize-hook #'org-modern-agenda))
+(with-eval-after-load 'org
+  (setq org-hide-leading-stars t)
+  (let ((star-list '("󰯬" "󰯯" "󰯲" "󰯵" "󰯸" "󰯻")))
+    (dotimes (i (length star-list))
+      (font-lock-add-keywords
+       'org-mode
+       `((,(format "^\\(\\*\\{%d\\}\\) " (+ i 1)) ;; 只捕获星号
+          (1 (prog1 nil   ;; 1 是第一个 group（星号）
+               (compose-region (match-beginning 1) (match-end 1)
+                               ,(nth i star-list))))))))
+    ))
+(add-hook 'org-mode-hook (lambda()
+                           (setq prettify-symbols-alist
+                                 '(("#+begin_src" . ?)
+                                   ("#+end_src" . ?)
+                                   ))
+                           (prettify-symbols-mode)
+                           ))
+;; (setup org-modern
+;;   (:load-after org)
+;;   (setq org-modern-star 'replace
+;;         org-modern-replace-stars '("󰯬" "󰯯" "󰯲" "󰯵" "󰯸" "󰯻")
+;;         org-modern-table t)
+;;   (:hook-into org-mode)
+;;   ;; (add-hook 'org-agenda-finalize-hook #'org-modern-agenda)
+;;   )
 #+end_src
 *** org-appear
 #+begin_src elisp
@@ -2991,30 +2993,30 @@ Simple distraction-free editing. I use darkroom instead of writeroom because it'
         whisper--ffmpeg-input-format "pulse"
         )
   (:when-loaded
-    ;; (setq sense_bin "~/.emacs.d/.cache/SenseVoice.cpp/build/bin/sense-voice-main")
-    ;; (setq sense_model (expand-file-name "~/.emacs.d/.cache/SenseVoice.cpp/sense-voice-small-fp32.gguf"))
-    ;; (defun whisper--sensevoice-command (input-file)
-    ;;   `(,sense_bin
-    ;;     "-m" ,sense_model
-    ;;     "-t" "12"
-    ;;     "-l" "zh"
-    ;;     "-ng"
-    ;;     "-itn"
-    ;;     "--min_silence_duration_ms" "1000"
-    ;;     ,input-file))
-    ;; (advice-add 'whisper-command :override #'whisper--sensevoice-command)
-    ;; ;; scene voice can only use AC one
-    ;; (defun whisper--record-command (output-file)
-    ;;   "Produces FFmpeg command to be run given location of OUTPUT-FILE."
-    ;;   `("ffmpeg"
-    ;;     ,@(unless whisper--ffmpeg-input-file
-    ;;         (list "-f" whisper--ffmpeg-input-format))
-    ;;     "-i" ,(or whisper--ffmpeg-input-file whisper--ffmpeg-input-device)
-    ;;     ,@(when (and (not whisper--ffmpeg-input-file) whisper-recording-timeout)
-    ;;         (list "-t" (number-to-string whisper-recording-timeout)))
-    ;;     "-ar" "16000"
-    ;;     "-ac" "1"
-    ;;     "-y" ,output-file))
+    (setq sense_bin "~/.emacs.d/.cache/SenseVoice.cpp/build/bin/sense-voice-main")
+    (setq sense_model (expand-file-name "~/.emacs.d/.cache/SenseVoice.cpp/sense-voice-small-fp32.gguf"))
+    (defun whisper--sensevoice-command (input-file)
+      `(,sense_bin
+        "-m" ,sense_model
+        "-t" "12"
+        "-l" "zh"
+        "-ng"
+        "-itn"
+        "--min_silence_duration_ms" "1000"
+        ,input-file))
+    (advice-add 'whisper-command :override #'whisper--sensevoice-command)
+    ;; scene voice can only use AC one
+    (defun whisper--record-command (output-file)
+      "Produces FFmpeg command to be run given location of OUTPUT-FILE."
+      `("ffmpeg"
+        ,@(unless whisper--ffmpeg-input-file
+            (list "-f" whisper--ffmpeg-input-format))
+        "-i" ,(or whisper--ffmpeg-input-file whisper--ffmpeg-input-device)
+        ,@(when (and (not whisper--ffmpeg-input-file) whisper-recording-timeout)
+            (list "-t" (number-to-string whisper-recording-timeout)))
+        "-ar" "16000"
+        "-ac" "1"
+        "-y" ,output-file))
 
     ;; (defun whisper--ctranslate2-command (input-file)
     ;;   `("whisper-ctranslate2"

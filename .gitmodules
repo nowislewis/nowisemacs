@@ -229,9 +229,6 @@
 [submodule "org-mind-map"]
 	path = lib/org-mind-map
     url = https://github.com/nowislewis/org-mind-map.git
-[submodule "org-modern"]
-	path = lib/org-modern
-	url = https://github.com/minad/org-modern.git
 [submodule "org-present"]
 	path = lib/org-present
 	url = https://github.com/rlister/org-present.git
