@@ -500,7 +500,7 @@ Maybe I should add a new state.
 (transient-define-prefix g-extra-commands()
   "Define notes leader-key maps"
   [["Code find"
-    ("d" "find-definitions" xref-find-definitions)
+    ("d" "find-definitions" (lambda () (interactive) (call-interactively (key-binding (kbd "M-.")))))
     ("D" "find-references" xref-find-references)
     ("i" "find-impl" eglot-find-implementation)
     ("s" "find-symbols" xref-find-apropos)
