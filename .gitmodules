@@ -47,9 +47,6 @@
 [submodule "csv-mode"]
 	path = lib/csv-mode
 	url = https://github.com/emacsmirror/csv-mode.git
-[submodule "d2-mode"]
-	path = lib/d2-mode
-	url = https://github.com/andorsk/d2-mode.git
 [submodule "dape"]
 	path = lib/dape
 	url = https://github.com/svaante/dape.git
@@ -165,22 +162,15 @@
 [submodule "language-id"]
 	path = lib/language-id
 	url = https://github.com/lassik/emacs-language-id.git
-[submodule "lewis-ob-d2"]
-	path = lib/lewis-ob-d2
-	url = https://github.com/nowislewis/lewis-ob-d2.git
 [submodule "lisp-fsrs"]
 	path = lib/lisp-fsrs
 	url = https://github.com/open-spaced-repetition/lisp-fsrs.git
-    build-step = echo "skip"
 [submodule "llama"]
 	path = lib/llama
 	url = https://github.com/tarsius/llama.git
 [submodule "lua-mode"]
 	path = lib/lua-mode
 	url = https://github.com/immerrr/lua-mode.git
-[submodule "macher"]
-	path = lib/macher
-	url = https://github.com/kmontag/macher.git
 [submodule "magit"]
 	path = lib/magit
 	url = https://github.com/magit/magit
@@ -226,16 +216,12 @@
 [submodule "org-elp"]
 	path = lib/org-elp
 	url = https://github.com/guanyilun/org-elp.git
-[submodule "org-mind-map"]
-	path = lib/org-mind-map
-    url = https://github.com/nowislewis/org-mind-map.git
 [submodule "org-present"]
 	path = lib/org-present
 	url = https://github.com/rlister/org-present.git
 [submodule "org-srs"]
 	path = lib/org-srs
 	url = https://github.com/bohonghuang/org-srs.git
-    build-step = echo "skip"
 [submodule "org-visual-outline"]
 	path = lib/org-visual-outline
 	url = https://github.com/legalnonsense/org-visual-outline.git

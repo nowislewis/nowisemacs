@@ -102,10 +102,8 @@ I failed in love with denote, so previous *org-roam* configs were refiled into [
   - [[#toc-org][toc-org]]
   - [[#denote-and-related][denote and related]]
   - [[#find-orgmode-dir-files][find orgmode dir files]]
-  - [[#ob-d2][ob-d2]]
   - [[#agendagtd][agenda/gtd]]
   - [[#org-srs][org-srs]]
-  - [[#org-mind-map][org-mind-map]]
   - [[#insert-from-snipaste][insert from snipaste]]
 - [[#english-翻译][english 翻译]]
 - [[#阅读][阅读]]
@@ -113,7 +111,6 @@ I failed in love with denote, so previous *org-roam* configs were refiled into [
   - [[#pdf-view-pagemark][pdf-view-pagemark]]
   - [[#newsticker][newsticker]]
   - [[#nov][nov]]
-  - [[#nov-xwidget][nov-xwidget]]
   - [[#darkroom][darkroom]]
   - [[#markdown-mode][markdown-mode]]
 - [[#tools][tools]]
@@ -121,7 +118,6 @@ I failed in love with denote, so previous *org-roam* configs were refiled into [
   - [[#webjump][webjump]]
   - [[#backup-scripts][backup scripts]]
   - [[#server][server]]
-  - [[#atomic-chrome][atomic-chrome]]
   - [[#macos-ocr][macos-ocr]]
   - [[#esup][esup]]
   - [[#uniline][uniline]]
@@ -2554,12 +2550,6 @@ Comments:
   (dired nowis-gtd-dir)
   (project-find-file t))
 #+end_src
-** ob-d2
-Org-Babel support for evaluating d2 diagram scripting language.
-#+begin_src elisp
-(setup d2-mode)
-(setup ob-d2)
-#+end_src
 ** agenda/gtd
 Borrowed from https://github.com/rougier/emacs-GTD
 
@@ -2749,9 +2739,9 @@ See also `org-save-all-org-buffers'"
 #+begin_src elisp
 (setup lisp-fsrs)
 (setup org-srs
-  (with-eval-after-load 'org
-    (require 'org-srs-embed))
-  (add-hook 'org-mode-hook #'org-srs-embed-overlay-mode)
+  ;; (with-eval-after-load 'org
+  ;;   (require 'org-srs-embed))
+  ;; (add-hook 'org-mode-hook #'org-srs-embed-overlay-mode)
   (:with-map org-mode-map
     (:bind "<f5>"  org-srs-review-rate-easy
            "<f6>"  org-srs-review-rate-good
@@ -2811,25 +2801,6 @@ See also `org-save-all-org-buffers'"
 
   )
 #+end_src
-** org-mind-map
-This is an Emacs package that creates graphviz directed graphs from the headings of an org file
-#+begin_src elisp
-(setup org-mind-map
-  (:also-load ox-org)
-  (:when-loaded
-    (setq org-mind-map-engine "dot")       ; Default. Directed Graph
-    ;; (setq org-mind-map-engine "neato")  ; Undirected Spring Graph
-    ;; (setq org-mind-map-engine "twopi")  ; Radial Layout
-    ;; (setq org-mind-map-engine "fdp")    ; Undirected Spring Force-Directed
-    ;; (setq org-mind-map-engine "sfdp")   ; Multiscale version of fdp for the layout of large graphs
-    ;; (setq org-mind-map-engine "twopi")  ; Radial layouts
-    ;; (setq org-mind-map-engine "circo")  ; Circular Layout
-    ;; (add-to-list 'org-mind-map-default-graph-attribs '("fontname" . "Maple Mono NF CN"))
-    (setq org-mind-map-display 'window)
-    (add-to-list 'org-mind-map-default-graph-attribs '("rankdir" . "TB"))
-
-    ))
-#+end_src
 ** insert from snipaste
 #+begin_src elisp
 (defun insert-file-from-snipaste ()
@@ -2885,21 +2856,6 @@ This is an Emacs package that creates graphviz directed graphs from the headings
   (:bind "]" nov-scroll-up
          "[" nov-scroll-down)
   (:file-match "\\.epub\\'"))
-#+end_src
-** nov-xwidget
-#+begin_src elisp :tangle no
-(setup nov-xwidget
-  (:load-after nov)
-  (:with-map nov-xwidget-webkit-mode-map
-    (:bind "n" 'nov-xwidget-next-document
-           "p" 'nov-xwidget-previous-document
-           "]" 'nov-xwidget-next-document
-           "[" 'nov-xwidget-previous-document
-           "t" 'nov-xwidget-goto-toc
-           "S" 'nov-xwidget-find-source-file))
-  (:when-loaded
-    (define-key nov-mode-map (kbd "o") 'nov-xwidget-view)
-    (add-hook 'nov-mode-hook 'nov-xwidget-inject-all-files)))
 #+end_src
 ** darkroom
 Simple distraction-free editing. I use darkroom instead of writeroom because it's more simple
@@ -2993,30 +2949,32 @@ Simple distraction-free editing. I use darkroom instead of writeroom because it'
         whisper--ffmpeg-input-format "pulse"
         )
   (:when-loaded
-    (setq sense_bin "~/.emacs.d/.cache/SenseVoice.cpp/build/bin/sense-voice-main")
-    (setq sense_model (expand-file-name "~/.emacs.d/.cache/SenseVoice.cpp/sense-voice-small-fp32.gguf"))
-    (defun whisper--sensevoice-command (input-file)
-      `(,sense_bin
-        "-m" ,sense_model
-        "-t" "12"
-        "-l" "zh"
-        "-ng"
-        "-itn"
-        "--min_silence_duration_ms" "1000"
-        ,input-file))
-    (advice-add 'whisper-command :override #'whisper--sensevoice-command)
-    ;; scene voice can only use AC one
-    (defun whisper--record-command (output-file)
-      "Produces FFmpeg command to be run given location of OUTPUT-FILE."
-      `("ffmpeg"
-        ,@(unless whisper--ffmpeg-input-file
-            (list "-f" whisper--ffmpeg-input-format))
-        "-i" ,(or whisper--ffmpeg-input-file whisper--ffmpeg-input-device)
-        ,@(when (and (not whisper--ffmpeg-input-file) whisper-recording-timeout)
-            (list "-t" (number-to-string whisper-recording-timeout)))
-        "-ar" "16000"
-        "-ac" "1"
-        "-y" ,output-file))
+    (if (string= "Arch" (getenv "WSL_DISTRO_NAME"))
+        (progn
+          (setq sense_bin "~/.emacs.d/.cache/SenseVoice.cpp/build/bin/sense-voice-main")
+          (setq sense_model (expand-file-name "~/.emacs.d/.cache/SenseVoice.cpp/sense-voice-small-fp32.gguf"))
+          (defun whisper--sensevoice-command (input-file)
+            `(,sense_bin
+              "-m" ,sense_model
+              "-t" "12"
+              "-l" "zh"
+              "-ng"
+              "-itn"
+              "--min_silence_duration_ms" "1000"
+              ,input-file))
+          (advice-add 'whisper-command :override #'whisper--sensevoice-command)
+          ;; scene voice can only use AC one
+          (defun whisper--record-command (output-file)
+            "Produces FFmpeg command to be run given location of OUTPUT-FILE."
+            `("ffmpeg"
+              ,@(unless whisper--ffmpeg-input-file
+                  (list "-f" whisper--ffmpeg-input-format))
+              "-i" ,(or whisper--ffmpeg-input-file whisper--ffmpeg-input-device)
+              ,@(when (and (not whisper--ffmpeg-input-file) whisper-recording-timeout)
+                  (list "-t" (number-to-string whisper-recording-timeout)))
+              "-ar" "16000"
+              "-ac" "1"
+              "-y" ,output-file))))
 
     ;; (defun whisper--ctranslate2-command (input-file)
     ;;   `("whisper-ctranslate2"
@@ -3093,26 +3051,6 @@ Simple distraction-free editing. I use darkroom instead of writeroom because it'
        (server-start)))
    ))
 #+end_src
-** atomic-chrome
-Edit text area on Chrome with Emacs using Atomic Chrome
-#+begin_src elisp :tangle no
-(setup websocket)
-(setup atomic-chrome
-  (setq atomic-chrome-url-major-mode-alist
-        '(("leetcode.cn" . c++-mode)
-          ("redmine" . textile-mode)))
-  (setq atomic-chrome-create-file-strategy '(
-                                             ("~/Documents/emacs/21-codekit/cpp/src/"  :extension ("cpp" "c"))
-                                             ("/tmp/" :extension ("py" ))
-                                             )
-        atomic-chrome-buffer-open-style 'split
-        atomic-chrome-auto-remove-file t)
-  (:defer
-   (when (eq system-type 'gnu/linux)
-     (atomic-chrome-start-server))
-   )
-  )
-#+end_src
 ** macos-ocr
 #+begin_src elisp
 (defun my/siri-ocr ()
@@ -3133,7 +3071,12 @@ ESUP - Emacs Start Up Profiler
 #+end_src
 ** uniline
 #+begin_src elisp
-(setup uniline)
+(setup uniline
+    (:bind "C-i" uniline-launch-interface)
+  )
+(setup uniline-transient
+  (:autoload uniline-mode uniline-launch-interface)
+  )
 #+end_src
 * system-specific-config
 ** windows-wslg
