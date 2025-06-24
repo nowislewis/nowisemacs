@@ -1291,6 +1291,7 @@ Jump anywhere in the world
 #+begin_src elisp
 (setup avy
   (:global "M-j" avy-goto-char-timer)
+  (setq avy-keys (number-sequence ?1 ?9))
   (:when-loaded
   (defun avy-action-embark (pt)
     (unwind-protect
@@ -1331,7 +1332,8 @@ Jump anywhere in the world
 #+begin_src elisp
 (setup ace-window
   (:global "M-o" ace-window))
-(setq aw-keys '(?a ?s ?d ?f ?g ?h ?j ?k ?l)
+(setq
+ ;; aw-keys '(?a ?s ?d ?f ?g ?h ?j ?k ?l)
       aw-scope 'frame
       )
 #+end_src
@@ -3072,7 +3074,7 @@ ESUP - Emacs Start Up Profiler
 ** uniline
 #+begin_src elisp
 (setup uniline
-    (:bind "C-i" uniline-launch-interface)
+  (:bind "M-i" #'uniline-launch-interface)
   )
 (setup uniline-transient
   (:autoload uniline-mode uniline-launch-interface)
