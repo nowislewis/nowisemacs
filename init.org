@@ -77,6 +77,7 @@ I failed in love with denote, so previous *org-roam* configs were refiled into [
   - [[#project][project]]
   - [[#project-rootfile][project-rootfile]]
   - [[#auto-insert][auto-insert]]
+  - [[#midnight][midnight]]
 - [[#shell][shell]]
   - [[#eshell][eshell]]
   - [[#eat][eat]]
@@ -121,6 +122,7 @@ I failed in love with denote, so previous *org-roam* configs were refiled into [
   - [[#macos-ocr][macos-ocr]]
   - [[#esup][esup]]
   - [[#uniline][uniline]]
+  - [[#excalidraw][excalidraw]]
 - [[#system-specific-config][system-specific-config]]
   - [[#windows-wslg][windows-wslg]]
   - [[#android][android]]
@@ -563,7 +565,7 @@ Maybe I should add a new state.
     ("f" "gptel-file-add" gptel-add-file)
     ("q" "gptel-quick" gptel-quick)
     ]
-    ])
+   ])
 #+end_src
 *** buffer
 #+begin_src elisp
@@ -602,6 +604,11 @@ Maybe I should add a new state.
     ("r c" "calendar" calendar)
     ("r w" "week-target" my/denote-journal-this-week-major-tasks)
     ("r g" "project-find-gtd-dir-files" project-find-gtd-dir-files)
+    ("r e" "find excalidraw" (lambda ()
+                               (interactive)
+                               (let ((denote-directory org-excalidraw-default-directory))
+                                 (call-interactively #'denote-open-or-create)
+                                 )))
     ]
    ["bibtex"
     ("e" "ebib" ebib)
@@ -1525,6 +1532,11 @@ Jump anywhere in the world
   (:defer
    (auto-insert-mode t))
   )
+#+end_src
+** midnight
+#+begin_src elisp
+(setup midnight)
+(setq clean-buffer-list-delay-general 1)
 #+end_src
 * shell
 ** eshell
@@ -3079,6 +3091,44 @@ ESUP - Emacs Start Up Profiler
 (setup uniline-transient
   (:autoload uniline-mode uniline-launch-interface)
   )
+#+end_src
+** excalidraw
+#+begin_src elisp
+(setq org-excalidraw-default-directory (concat denote-directory "/excalidraw/"))
+(defconst org-excalidraw-default-template
+  "{
+    \"type\": \"excalidraw\",
+    \"version\": 2,
+    \"source\": \"https://excalidraw.com\",
+    \"elements\": [],
+    \"appState\": {
+      \"gridSize\": null,
+      \"viewBackgroundColor\": \"#ffffff\"
+    },
+    \"files\": {}
+  }
+"
+  "excalidraw template in JSON.")
+
+(defun org-excalidraw-create-drawing ()
+  "Create an excalidraw drawing and optionally insert an org-mode link at point."
+  (interactive)
+  (let* ((directory (if org-excalidraw-default-directory
+                        (expand-file-name org-excalidraw-default-directory)
+                      nil))
+         (temp-path (concat directory "temp.excalidraw"))
+         (origin-buffer (current-buffer))
+         (new-buf (find-file-noselect temp-path))
+         (new-path (with-current-buffer new-buf
+                     (insert org-excalidraw-default-template)
+                     (save-buffer)
+                     (let ((new-path (call-interactively #'denote-rename-file)))
+                       (embark-open-externally new-path)
+                       new-path))
+                   ))
+    (switch-to-buffer origin-buffer)
+    (when (derived-mode-p 'org-mode)
+      (insert (format "[[file:%s]]" new-path)))))
 #+end_src
 * system-specific-config
 ** windows-wslg
