@@ -1298,7 +1298,7 @@ Jump anywhere in the world
 #+begin_src elisp
 (setup avy
   (:global "M-j" avy-goto-char-timer)
-  (setq avy-keys (number-sequence ?1 ?9))
+  ;; (setq avy-keys (number-sequence ?1 ?9))
   (:when-loaded
   (defun avy-action-embark (pt)
     (unwind-protect
@@ -1339,8 +1339,7 @@ Jump anywhere in the world
 #+begin_src elisp
 (setup ace-window
   (:global "M-o" ace-window))
-(setq
- ;; aw-keys '(?a ?s ?d ?f ?g ?h ?j ?k ?l)
+(setq aw-keys '(?a ?s ?d ?f ?g ?h ?j ?k ?l)
       aw-scope 'frame
       )
 #+end_src
@@ -2913,7 +2912,7 @@ Simple distraction-free editing. I use darkroom instead of writeroom because it'
       :stream t                           ;for streaming responses
       :key 'gptel-api-key)               ;can be a function that returns the key
     ))
-           #+end_src
+#+end_src
 *** gptel-aibo
 #+begin_src elisp
 (setup gptel-aibo
@@ -3156,7 +3155,8 @@ These codes are used to solve copy & paste problems under wslg inside win10/win1
         (let ((clip (wsl-clipboard-to-string)))
           (insert clip)
           (if arg (kill-new clip))))
-      ;; (global-set-key [remap kill-ring-save] #'wsl-copy-region-to-clipboard)
+      (global-set-key [remap kill-ring-save] #'wsl-copy-region-to-clipboard)
+      (global-set-key [remap meow-yank] #'wsl-paste-from-clipboard)
       ))
 #+end_src
 ** android
