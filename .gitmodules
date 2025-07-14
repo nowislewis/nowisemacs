@@ -171,6 +171,9 @@
 [submodule "lua-mode"]
 	path = lib/lua-mode
 	url = https://github.com/immerrr/lua-mode.git
+[submodule "macher"]
+	path = lib/macher
+	url = https://github.com/kmontag/macher.git
 [submodule "magit"]
 	path = lib/magit
 	url = https://github.com/magit/magit
@@ -231,12 +234,6 @@
 [submodule "parsebib"]
 	path = lib/parsebib
 	url = https://github.com/joostkremers/parsebib.git
-[submodule "pdf-tools"]
-	path = lib/pdf-tools
-	url = https://github.com/vedang/pdf-tools.git
-[submodule "pdf-view-pagemark"]
-	path = lib/pdf-view-pagemark
-	url = https://github.com/kimim/pdf-view-pagemark.git
 [submodule "pinyinlib"]
 	path = lib/pinyinlib
 	url = https://github.com/nowislewis/pinyinlib.el.git
@@ -255,6 +252,10 @@
 [submodule "rainbow-delimiters"]
 	path = lib/rainbow-delimiters
 	url = https://github.com/Fanael/rainbow-delimiters.git
+[submodule "reader"]
+	path = lib/reader
+	url = https://codeberg.org/divyaranjan/emacs-reader.git
+    build-step = make all
 [submodule "rg"]
 	path = lib/rg
 	url = https://github.com/dajva/rg.el.git
@@ -267,9 +268,6 @@
 [submodule "setup"]
 	path = lib/setup
 	url = https://github.com/emacsmirror/setup
-[submodule "tablist"]
-	path = lib/tablist
-	url = https://github.com/politza/tablist.git
 [submodule "tabspaces"]
 	path = lib/tabspaces
 	url = https://github.com/mclear-tools/tabspaces.git

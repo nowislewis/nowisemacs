@@ -110,6 +110,7 @@ I failed in love with denote, so previous *org-roam* configs were refiled into [
 - [[#阅读][阅读]]
   - [[#pdf-tools][pdf-tools]]
   - [[#pdf-view-pagemark][pdf-view-pagemark]]
+  - [[#reader][reader]]
   - [[#newsticker][newsticker]]
   - [[#nov][nov]]
   - [[#darkroom][darkroom]]
@@ -2827,7 +2828,7 @@ See also `org-save-all-org-buffers'"
 * english 翻译
 * 阅读
 ** pdf-tools
-#+begin_src elisp
+#+begin_src elisp :tangle no
 (setup tablist)
 (setup pdf-tools
   (setq pdf-view-use-scaling t
@@ -2850,9 +2851,13 @@ See also `org-save-all-org-buffers'"
           #'TeX-revert-document-buffer)
 #+end_src
 ** pdf-view-pagemark
-#+begin_src elisp
+#+begin_src elisp :tangle no
 (setup pdf-view-pagemark
   (:hook-into pdf-view-mode-hook))
+#+end_src
+** reader
+#+begin_src elisp
+(setup reader
 #+end_src
 ** newsticker
 #+begin_src elisp
@@ -2930,6 +2935,10 @@ Simple distraction-free editing. I use darkroom instead of writeroom because it'
     (with-eval-after-load 'embark
         (keymap-set embark-general-map "?" #'gptel-quick))
   )
+#+end_src
+*** macher
+#+begin_src elisp
+(setup macher)
 #+end_src
 *** mcp.el
 #+begin_src elisp
