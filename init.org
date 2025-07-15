@@ -2857,7 +2857,7 @@ See also `org-save-all-org-buffers'"
 #+end_src
 ** reader
 #+begin_src elisp
-(setup reader
+(setup reader)
 #+end_src
 ** newsticker
 #+begin_src elisp
