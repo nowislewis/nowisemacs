@@ -1421,6 +1421,12 @@ Jump anywhere in the world
 #+begin_src elisp
 (setup dired-sidebar)
 #+end_src
+*** dired-rsync
+#+begin_src elisp
+(setup dired-rsync
+  (:with-map dired-mode-map
+    (:bind "C" dired-rsync)))
+#+end_src
 ** structure browsing
 *** imenu-list
 #+begin_src elisp
@@ -1681,8 +1687,6 @@ Emacs major-mode to work with Beancount ledger files
 #+begin_src elisp
 (setup beancount
   (:file-match "\\.beancount\\'"))
-(add-to-list 'auto-mode-alist
-             (cons "\\.[pP][dD][fF]\\'" 'eaf-mode))
 #+end_src
 *** latex
 **** basic
@@ -2857,7 +2861,11 @@ See also `org-save-all-org-buffers'"
 #+end_src
 ** reader
 #+begin_src elisp
-(setup reader)
+(setup reader
+  (:when-loaded
+    (require 'reader-saveplace)
+    )
+  )
 #+end_src
 ** newsticker
 #+begin_src elisp
@@ -2938,7 +2946,12 @@ Simple distraction-free editing. I use darkroom instead of writeroom because it'
 #+end_src
 *** macher
 #+begin_src elisp
-(setup macher)
+(setup macher
+  (setq macher-action-buffer-ui 'org)
+  (:when-loaded
+    (macher-install)
+    )
+  )
 #+end_src
 *** mcp.el
 #+begin_src elisp
