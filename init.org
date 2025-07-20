@@ -1889,6 +1889,7 @@ borrowed from citre, now you can always jump-back use "M-," after any jump in th
   (add-hook 'prog-mode-hook (lambda ()
                               (unless (derived-mode-p 'emacs-lisp-mode 'lisp-mode 'makefile-mode 'snippet-mode)
                                 (eglot-ensure))))
+  ;; (add-hook 'org-mode-hook (lambda() (eglot-ensure)))
 
   (:when-loaded
     ;; hightlight face
@@ -1968,7 +1969,7 @@ Citre is an advanced Ctags (or actually, readtags) frontend for Emacs.
 #+end_src
 *** spell-check
 **** jinx
-#+begin_src elisp
+#+begin_src elisp :tangle no
 (setup jinx
   (dolist (hook '(text-mode-hook conf-mode-hook))
     (add-hook hook #'jinx-mode))
@@ -1977,6 +1978,32 @@ Citre is an advanced Ctags (or actually, readtags) frontend for Emacs.
     (add-to-list 'jinx-exclude-regexps '(t "\\cc"))
     (keymap-global-set "M-$" #'jinx-correct)
     (keymap-global-set "C-M-$" #'jinx-languages)))
+#+end_src
+**** harper
+#+begin_src elisp
+;; (with-eval-after-load 'eglot
+;;   (add-to-list 'eglot-server-programs
+;;                '(text-mode . ("harper-ls" "--stdio"))))
+;; (setq-default eglot-workspace-configuration
+;;               '(:harper-ls (:userDictPath ""
+;;                             :fileDictPath ""
+;;                             :linters (:SpellCheck t
+;;                                       :SpelledNumbers :json-false
+;;                                       :AnA t
+;;                                       :SentenceCapitalization t
+;;                                       :UnclosedQuotes t
+;;                                       :WrongQuotes :json-false
+;;                                       :LongSentences t
+;;                                       :RepeatedWords t
+;;                                       :Spaces t
+;;                                       :Matcher t
+;;                                       :CorrectNumberSuffix t)
+;;                             :codeActions (:ForceStable :json-false)
+;;                             :markdown (:IgnoreLinkTitle :json-false)
+;;                             :diagnosticSeverity "hint"
+;;                             :isolateEnglish :json-false
+;;                             :dialect "American"
+;;                             :maxFileLength 120000)))
 #+end_src
 *** debug
 **** gdb

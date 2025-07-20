@@ -156,9 +156,6 @@
 [submodule "inheritenv"]
 	path = lib/inheritenv
 	url = https://github.com/purcell/inheritenv.git
-[submodule "jinx"]
-	path = lib/jinx
-	url = https://github.com/minad/jinx.git
 [submodule "kv"]
 	path = lib/kv
 	url = https://github.com/nicferrier/emacs-kv.git
