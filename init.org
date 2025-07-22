@@ -105,6 +105,7 @@ I failed in love with denote, so previous *org-roam* configs were refiled into [
   - [[#find-orgmode-dir-files][find orgmode dir files]]
   - [[#agendagtd][agenda/gtd]]
   - [[#org-srs][org-srs]]
+  - [[#org-inc][org-inc]]
   - [[#insert-from-snipaste][insert from snipaste]]
 - [[#english-翻译][english 翻译]]
 - [[#阅读][阅读]]
@@ -2845,6 +2846,12 @@ See also `org-save-all-org-buffers'"
     )
 
   )
+#+end_src
+** org-inc
+#+begin_src elisp
+(setup org-inc)
+  (setq org-inc-directory (expand-file-name "org-inc/" org-directory))
+  (setq org-srs-item-confirm #'org-srs-item-confirm-command)
 #+end_src
 ** insert from snipaste
 #+begin_src elisp
