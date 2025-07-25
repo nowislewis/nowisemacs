@@ -1947,7 +1947,7 @@ borrowed from citre, now you can always jump-back use "M-," after any jump in th
 #+end_src
 ***** eglot-booster
 Improve the performance of eglot using a wrapper executable, you should install =emacs-lsp-booster= first
-#+begin_src elisp
+#+begin_src elisp :tangle no
 (setup eglot-booster
   (when (executable-find "emacs-lsp-booster")
     (:load-after eglot)
@@ -2065,7 +2065,7 @@ Disassemble C, C++ or FORTRAN code under cursor
   (setq compile-command "cd build && make && ./test"))
 #+end_src
 *** annotate
-#+begin_src elisp
+#+begin_src elisp :tangle no
 (setup annotate
   (setq annotate-file (concat nowis-doc-emacs-dir "annotations.el")
         annotate-warn-if-hash-mismatch nil)
