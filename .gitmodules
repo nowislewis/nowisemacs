@@ -1,6 +1,9 @@
 [submodule "ace-window"]
 	path = lib/ace-window
 	url = https://github.com/abo-abo/ace-window.git
+[submodule "async"]
+	path = lib/async
+	url = https://github.com/jwiegley/emacs-async.git
 [submodule "avy"]
 	path = lib/avy
 	url = https://github.com/abo-abo/avy.git
@@ -71,9 +74,6 @@
 [submodule "dired-hacks"]
 	path = lib/dired-hacks
 	url = https://github.com/Fuco1/dired-hacks.git
-[submodule "dired-rsync"]
-	path = lib/dired-rsync
-	url = https://github.com/stsquad/dired-rsync.git
 [submodule "dired-sidebar"]
 	path = lib/dired-sidebar
 	url = https://github.com/jojojames/dired-sidebar.git
@@ -125,6 +125,9 @@
 [submodule "gptel-aibo"]
 	path = lib/gptel-aibo
 	url = https://github.com/dolmens/gptel-aibo.git
+[submodule "gptel-prompts"]
+	path = lib/gptel-prompts
+	url = https://github.com/jwiegley/gptel-prompts.git
 [submodule "gptel-quick"]
 	path = lib/gptel-quick
 	url = https://github.com/karthink/gptel-quick.git

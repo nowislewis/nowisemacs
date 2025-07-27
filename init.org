@@ -1422,11 +1422,11 @@ Jump anywhere in the world
 #+begin_src elisp
 (setup dired-sidebar)
 #+end_src
-*** dired-rsync
+*** dired-async
 #+begin_src elisp
-(setup dired-rsync
-  (:with-map dired-mode-map
-    (:bind "C" dired-rsync)))
+(setup async
+  (with-eval-after-load 'dired
+    (dired-async-mode 1)))
 #+end_src
 ** structure browsing
 *** imenu-list
@@ -1945,16 +1945,6 @@ borrowed from citre, now you can always jump-back use "M-," after any jump in th
     (eval `(lsp-org-babel-enable ,lang)))
   )
 #+end_src
-***** eglot-booster
-Improve the performance of eglot using a wrapper executable, you should install =emacs-lsp-booster= first
-#+begin_src elisp :tangle no
-(setup eglot-booster
-  (when (executable-find "emacs-lsp-booster")
-    (:load-after eglot)
-    (:when-loaded
-      (eglot-booster-mode)
-      )))
-#+end_src
 **** citre
 Citre is an advanced Ctags (or actually, readtags) frontend for Emacs.
 #+begin_src elisp
@@ -2040,12 +2030,6 @@ Citre is an advanced Ctags (or actually, readtags) frontend for Emacs.
     (:hook hs-minor-mode))
   (add-to-list 'hs-special-modes-alist '(verilog-mode "\\(\\<begin\\>\\|\\<case\\>\\|\\<module\\>\\|\\<class\\>\\|\\<function\\>\\|\\<task\\>\\)"
                                                       )))
-
-;; (setup hideif
-;;   (add-hook 'c-mode-common-hook
-;;             (lambda ()
-;;               (hide-ifdef-mode)
-;;               (add-hook 'after-save-hook (lambda () (hide-ifdefs))))))
 #+end_src
 *** format-all
 #+begin_src elisp
@@ -2063,14 +2047,6 @@ Disassemble C, C++ or FORTRAN code under cursor
 #+begin_src elisp
 (setup compile
   (setq compile-command "cd build && make && ./test"))
-#+end_src
-*** annotate
-#+begin_src elisp :tangle no
-(setup annotate
-  (setq annotate-file (concat nowis-doc-emacs-dir "annotations.el")
-        annotate-warn-if-hash-mismatch nil)
-  ;; (:hook-into prog-mode)
-  )
 #+end_src
 * Org Mode
 ** org-mode
@@ -2977,6 +2953,15 @@ Simple distraction-free editing. I use darkroom instead of writeroom because it'
     (with-eval-after-load 'embark
         (keymap-set embark-general-map "?" #'gptel-quick))
   )
+#+end_src
+*** gptel-prompts
+#+begin_src elisp
+(setup gptel-prompts
+  (setq gptel-prompts-directory (concat nowis-doc-emacs-dir "99-gptel-prompts"))
+  (with-eval-after-load 'gptel
+    (require 'gptel-prompts)
+    (gptel-prompts-update)
+    ))
 #+end_src
 *** macher
 #+begin_src elisp
