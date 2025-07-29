@@ -2629,7 +2629,8 @@ In short, you will need 3 files:
              (not (org-entry-get nil "ACTIVATED")))
     (org-entry-put nil "ACTIVATED" (format-time-string "[%Y-%m-%d]"))))
 (add-hook 'org-after-todo-state-change-hook #'log-todo-next-creation-date)
-(setq org-priority-lowest 69)
+(setq org-priority-lowest 69) ;; E
+(setq org-priority-default 68) ;; D
 
 #+end_src
 *** capture
@@ -2657,7 +2658,7 @@ In short, you will need 3 files:
 #+begin_src elisp
 (setup org
   (:when-loaded
-(setq org-refile-use-outline-path 'file)
+(setq org-refile-use-outline-path 'full-file-path)
 (setq org-outline-path-complete-in-steps nil)
 (setq org-refile-targets '((org-refile-files :regexp . "*")))
 ;; '(("action.org" :regexp . "\\(?:\\(?:Note\\|Task\\)s\\)")
@@ -2677,6 +2678,13 @@ See also `org-save-all-org-buffers'"
 (advice-add 'org-refile :after
             (lambda (&rest _)
               (gtd-save-org-buffers)))
+;; give refile a priority
+;; (defun my/org-set-priority-after-refile (&rest _)
+;;   "Prompt to set Org priority after refiling."
+;;   (org-priority))
+
+;; (advice-add 'org-refile :before #'my/org-set-priority-after-refile)
+
 ))
 #+end_src
 *** agenda
@@ -2693,21 +2701,25 @@ See also `org-save-all-org-buffers'"
     (concat (make-string (max 0 pad) ? ) title)))
 (defmacro nowis-create-agenda-command (key description tag)
   `(list ,key ,description
-         '((agenda ""
-                   ((org-agenda-skip-function
-                     '(org-agenda-skip-if nil '(todo done)))))
+         '(
            (tags-todo ,(concat "+week" tag)
                       ((org-agenda-overriding-header
                         (nowis-align-to-window-center "󰛨 Week's Target 󰛨\n"))
                        (org-agenda-sorting-strategy '(priority-down deadline-up))
                        (org-agenda-prefix-format "%-16:(org-get-parent-heading): [%-4e] ")))
+           (agenda ""
+                   ((org-agenda-overriding-header (nowis-align-to-window-center " Today's Target "))
+                    (org-agenda-span 'day)
+                    (org-agenda-skip-function
+                     '(org-agenda-skip-if nil '(todo done)))))
 
-           (tags-todo ,(concat "+journal-week" tag)
-                      ((org-agenda-overriding-header (nowis-align-to-window-center "Today's Target"))
-                       (org-agenda-sorting-strategy '(priority-down deadline-up))
-                       (org-agenda-prefix-format "%-16:(org-get-parent-heading): [%-4e] ")))
+           ;; (tags-todo ,(concat "+journal-week" tag)
+           ;;            ((org-agenda-overriding-header (nowis-align-to-window-center "Today's Target"))
+           ;;             (org-agenda-sorting-strategy '(priority-down deadline-up))
+           ;;             (org-agenda-prefix-format "%-16:(org-get-parent-heading): [%-4e] ")))
 
-           (tags-todo ,(concat "+action" tag) ((org-agenda-overriding-header (nowis-align-to-window-center "Soft Time Tasks"))
+
+           (tags-todo ,(concat "+action" tag) ((org-agenda-overriding-header (nowis-align-to-window-center "Soft Time"))
                                                (org-agenda-prefix-format "%-16:(org-get-parent-heading): [%-4e] ")
                                                (org-agenda-sorting-strategy '(priority-down timestamp-up))
                                                ))
@@ -2731,7 +2743,7 @@ See also `org-save-all-org-buffers'"
             (nowis-create-agenda-command "w" "Work" "+work")
             ))
 ;; agenda clockreport
-(setq org-agenda-start-with-clockreport-mode t
+(setq org-agenda-start-with-clockreport-mode nil
       org-agenda-clockreport-parameter-plist '(:link t :maxlevel 5 :properties ("Effort"))
       org-clock-out-remove-zero-time-clocks t)
 ;; agenda style
