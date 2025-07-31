@@ -125,6 +125,7 @@ I failed in love with denote, so previous *org-roam* configs were refiled into [
   - [[#esup][esup]]
   - [[#uniline][uniline]]
   - [[#excalidraw][excalidraw]]
+  - [[#manage-web-bookmarks][manage-web-bookmarks]]
 - [[#system-specific-config][system-specific-config]]
   - [[#windows-wslg][windows-wslg]]
   - [[#android][android]]
@@ -2837,9 +2838,12 @@ See also `org-save-all-org-buffers'"
 #+end_src
 ** org-inc
 #+begin_src elisp
-(setup org-inc)
-  (setq org-inc-directory (expand-file-name "org-inc/" org-directory))
-  (setq org-srs-item-confirm #'org-srs-item-confirm-command)
+(setup org-inc
+  (setq org-inc-directory (expand-file-name "org-inc/" org-directory)
+        org-srs-item-confirm #'org-srs-item-confirm-command)
+  (:with-map org-mode-map
+    (:bind "C-M-<return>" org-inc-continue
+           )))
 #+end_src
 ** insert from snipaste
 #+begin_src elisp
@@ -3107,6 +3111,7 @@ Simple distraction-free editing. I use darkroom instead of writeroom because it'
     ("p" "push doc" rsync-push-binary-files)
     ("F" "pull doc" rsync-pull-binary-files)]])
 #+end_src
+
 ** server
 #+begin_src elisp
 (setup server
@@ -3182,6 +3187,48 @@ ESUP - Emacs Start Up Profiler
     (when (derived-mode-p 'org-mode)
       (insert (format "[[file:%s]]" new-path)))))
 #+end_src
+** manage-web-bookmarks
+#+begin_src elisp
+(setq org-bookmarks-file (concat nowis-doc-emacs-dir "01-orgmode/xnotes/20250731T173729--bookmarks.org"))
+(defun my/add-bookmark ()
+  "add bookmark for url into org files"
+  (interactive)
+  (let ((url (read-string "URL: "))
+        (title (read-string "TiTle: "))
+        (timestamp (format-time-string "[%Y-%m-%d %a %H:%M]")))
+    (with-current-buffer (find-file-noselect org-bookmarks-file)
+      (goto-char (point-max))
+      (insert (format "\n* %s\n[[%s]]\n  added: %s\n" title url timestamp))
+      (save-buffer))))
+
+(defun my/consult-org-bookmarks ()
+  "A bookmark browser based on consult-org-heading, will return to origin place after opening url"
+  (interactive)
+  (let ((original-buffer (current-buffer))
+        (original-point (point)))
+    (find-file org-bookmarks-file)
+    (condition-case err
+        (progn
+          (consult-org-heading)
+          (let ((url (save-excursion
+                       (forward-line 1)
+                       (when (looking-at "\\[\\[\\([^]]+\\)\\]\\]")
+                         (match-string 1)))))
+            (when url
+              (if (not (featurep 'embark))
+                  (require 'embark))
+                (embark-open-externally url)))
+            (switch-to-buffer original-buffer)
+            (goto-char original-point))
+          (quit
+           (switch-to-buffer original-buffer)
+           (goto-char original-point))
+          (error
+           (switch-to-buffer original-buffer)
+           (goto-char original-point)
+           (signal (car err) (cdr err))))))
+#+end_src
+
 * system-specific-config
 ** windows-wslg
 These codes are used to solve copy & paste problems under wslg inside win10/win11
