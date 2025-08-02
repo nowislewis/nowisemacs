@@ -646,7 +646,10 @@ Maybe I should add a new state.
     ("l" "keep-lines" consult-keep-lines)
     ("s" "line" consult-line)]
    ["web search"
-    ("w" "webjump" webjump)]
+    ("w" "webjump" webjump)
+    ("a" "add bookmark" my/add-bookmark)
+    ("b" "browse bookmark" my/consult-org-bookmarks)
+    ]
    ])
 #+end_src
 *** apps
@@ -2778,10 +2781,12 @@ See also `org-save-all-org-buffers'"
   ;;   (require 'org-srs-embed))
   ;; (add-hook 'org-mode-hook #'org-srs-embed-overlay-mode)
   (:with-map org-mode-map
-    (:bind "<f5>"  org-srs-review-rate-easy
-           "<f6>"  org-srs-review-rate-good
-           "<f7>"  org-srs-review-rate-hard
-           "<f8>"  org-srs-review-rate-again))
+    (:bind
+     "<f4>" org-srs-item-confirm-command
+     "<f5>"  org-srs-review-rate-easy
+     "<f6>"  org-srs-review-rate-good
+     "<f7>"  org-srs-review-rate-hard
+     "<f8>"  org-srs-review-rate-again))
   (transient-define-prefix org-srs-transient-map()
     "Define transient-key map for org-fc functions"
     [
@@ -2813,6 +2818,10 @@ See also `org-save-all-org-buffers'"
     "Return a list of Denote files that have the \"srs\" tag."
     (if (not (featurep 'denote))
         (require 'denote))
+    (if (not (featurep 'org-srs))
+        (require 'org-srs))
+    (if (not (featurep 'org-inc))
+        (require 'org-inc))
     (let ((files (denote-directory-files))
           (result '()))
       (dolist (file files)
@@ -2827,15 +2836,17 @@ See also `org-save-all-org-buffers'"
     (let ((files (my/denote-find-files-with-srs-tag)))
       (dolist (file files)
         (with-current-buffer (find-file file)
+
           (message file)
           (when (derived-mode-p 'org-mode)
+            (when (local-variable-p 'org-srs-review-item)
+              (org-srs-review-end))
             (message (buffer-file-name))
             (org-srs-review-start (buffer-file-name)))
           )))
     )
-
   )
-#+end_src
+            #+end_src
 ** org-inc
 #+begin_src elisp
 (setup org-inc
