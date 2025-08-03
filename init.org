@@ -2061,7 +2061,7 @@ Disassemble C, C++ or FORTRAN code under cursor
         org-startup-indented t
         org-startup-with-inline-images nil
         org-startup-numerated nil
-        org-startup-folded 'content
+        org-startup-folded nil
         org-imenu-depth 8
         org-return-follows-link t
         org-id-link-to-org-use-id t ;; Create an ID if needed to make a link to the current entry.
@@ -2854,7 +2854,18 @@ See also `org-save-all-org-buffers'"
         org-srs-item-confirm #'org-srs-item-confirm-command)
   (:with-map org-mode-map
     (:bind "C-M-<return>" org-inc-continue
-           )))
+           ))
+  (:when-loaded
+    (defun my/m-z-action ()
+      "If region active, show message; else call original M-z."
+      (interactive)
+      (if (region-active-p)
+          (org-inc-extract)
+        (call-interactively #'zap-to-char)))
+    (global-set-key (kbd "M-z") #'my/m-z-action)
+    )
+  )
+
 #+end_src
 ** insert from snipaste
 #+begin_src elisp

@@ -162,6 +162,7 @@
 [submodule "lisp-fsrs"]
 	path = lib/lisp-fsrs
 	url = https://github.com/open-spaced-repetition/lisp-fsrs.git
+    build-step = borg-makeinfo
 [submodule "llama"]
 	path = lib/llama
 	url = https://github.com/tarsius/llama.git
@@ -219,6 +220,7 @@
 [submodule "org-inc"]
 	path = lib/org-inc
 	url = https://github.com/bohonghuang/org-inc.git
+    build-step = borg-makeinfo
 [submodule "org-present"]
 	path = lib/org-present
 	url = https://github.com/rlister/org-present.git
