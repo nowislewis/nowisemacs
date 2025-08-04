@@ -2709,7 +2709,7 @@ See also `org-save-all-org-buffers'"
            (tags-todo ,(concat "+week" tag)
                       ((org-agenda-overriding-header
                         (nowis-align-to-window-center "󰛨 Week's Target 󰛨\n"))
-                       (org-agenda-sorting-strategy '(priority-down deadline-up))
+                       (org-agenda-sorting-strategy '(todo-state-up priority-down timestamp-up))
                        (org-agenda-prefix-format "%-16:(org-get-parent-heading): [%-4e] ")))
            (agenda ""
                    ((org-agenda-overriding-header (nowis-align-to-window-center " Today's Target "))
@@ -2725,7 +2725,7 @@ See also `org-save-all-org-buffers'"
 
            (tags-todo ,(concat "+action" tag) ((org-agenda-overriding-header (nowis-align-to-window-center "Soft Time"))
                                                (org-agenda-prefix-format "%-16:(org-get-parent-heading): [%-4e] ")
-                                               (org-agenda-sorting-strategy '(priority-down timestamp-up))
+                                               (org-agenda-sorting-strategy '(todo-state-up priority-down timestamp-up))
                                                ))
            (tags-todo "inbox"
                       ((org-agenda-prefix-format "  %?-12t% s")
