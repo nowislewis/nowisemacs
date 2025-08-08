@@ -5,7 +5,20 @@
 
 #+begin_src dot :file ~/Documents/emacs/02-binary-git/binary-files/01-pictures/dot_pictures/`(format-time-string "%Y%m%d%H%M%S")`.png
 digraph {
-    node[shape=record]
+    rankdir=LR
+    node [
+        shape=record
+        style=filled
+        fillcolor="#E3EFFE"
+        color="#7EA8F6"
+        fontsize=12
+    ];
+    edge [
+        color="#B3C3F3"
+        arrowsize=0.8
+        penwidth=2
+        fontsize=11
+    ];
     subgraph cluster_a {
     }
     $1
