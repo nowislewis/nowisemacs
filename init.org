@@ -107,6 +107,7 @@ I failed in love with denote, so previous *org-roam* configs were refiled into [
   - [[#org-srs][org-srs]]
   - [[#org-inc][org-inc]]
   - [[#insert-from-snipaste][insert from snipaste]]
+  - [[#org-media-note][org-media-note]]
 - [[#english-翻译][english 翻译]]
 - [[#阅读][阅读]]
   - [[#pdf-tools][pdf-tools]]
@@ -2876,6 +2877,11 @@ See also `org-save-all-org-buffers'"
     (when (and file (file-exists-p file))
       ;; (insert (format "[[file:%s][%s]]" file (file-name-nondirectory file))))))
       (insert (format "[[file:%s]]" file)))))
+#+end_src
+** org-media-note
+#+begin_src elisp
+(setup org-media-note
+  (setq org-media-note-screenshot-image-dir (concat nowis-doc-emacs-dir "30-saved-binary/org-media-note")))
 #+end_src
 * english 翻译
 * 阅读

@@ -190,6 +190,9 @@
 [submodule "mini-echo"]
 	path = lib/mini-echo
 	url = https://github.com/liuyinz/mini-echo.el.git
+[submodule "mpv"]
+	path = lib/mpv
+	url = https://github.com/kljohann/mpv.el.git
 [submodule "nerd-icons"]
 	path = lib/nerd-icons
 	url = https://github.com/rainstormstudio/nerd-icons.el.git
@@ -221,6 +224,9 @@
 	path = lib/org-inc
 	url = https://github.com/bohonghuang/org-inc.git
     build-step = borg-makeinfo
+[submodule "org-media-note"]
+	path = lib/org-media-note
+	url = https://github.com/yuchen-lea/org-media-note.git
 [submodule "org-present"]
 	path = lib/org-present
 	url = https://github.com/rlister/org-present.git
