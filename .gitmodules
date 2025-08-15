@@ -80,9 +80,6 @@
 [submodule "dired-sidebar"]
 	path = lib/dired-sidebar
 	url = https://github.com/jojojames/dired-sidebar.git
-[submodule "disaster"]
-	path = lib/disaster
-	url = https://github.com/jart/disaster.git
 [submodule "eat"]
 	path = lib/eat
 	url = https://codeberg.org/akib/emacs-eat.git
@@ -156,6 +153,9 @@
 [submodule "inheritenv"]
 	path = lib/inheritenv
 	url = https://github.com/purcell/inheritenv.git
+[submodule "jinx"]
+	path = lib/jinx
+	url = https://github.com/minad/jinx.git
 [submodule "kv"]
 	path = lib/kv
 	url = https://github.com/nicferrier/emacs-kv.git

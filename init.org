@@ -46,7 +46,6 @@ I failed in love with denote, so previous *org-roam* configs were refiled into [
   - [[#long-line][long-line]]
   - [[#tramp][TRAMP]]
   - [[#automatically-clean-whitespace][Automatically clean whitespace]]
-  - [[#exec-path-from-shell][exec-path-from-shell]]
   - [[#vundo-for-undo-history][vundo for undo history]]
 - [[#search][Search]]
   - [[#isearch][isearch]]
@@ -1060,10 +1059,10 @@ diff-hl-mode highlights uncommitted changes on the left side of the window (area
 (setup autorevert
   (setq global-auto-revert-non-file-buffers t)
   (:defer
-   (global-auto-revert-mode t)))                  ; 当另一程序修改了文件时，让 Emacs 及时刷新 Buffer
+   (global-auto-revert-mode t))); 当另一程序修改了文件时，让 Emacs 及时刷新 Buffer
 
 (setup frame
-  (blink-cursor-mode -1)                  ;指针不闪动
+  (blink-cursor-mode -1) ;指针不闪动
   )
 
 (setup pixel-scroll
@@ -1098,8 +1097,6 @@ diff-hl-mode highlights uncommitted changes on the left side of the window (area
 ** no-littering
 #+begin_src elisp
 (setup no-littering
-  ;; (setq no-littering-var-directory (expand-file-name (concat user-emacs-directory "var/"))
-  ;;       no-littering-etc-directory (expand-file-name (concat user-emacs-directory "etc/")))
    (require 'no-littering)
   )
 #+end_src
@@ -1118,7 +1115,6 @@ diff-hl-mode highlights uncommitted changes on the left side of the window (area
 (setq-default fill-column 100)
 (setq word-wrap t)
 (setq word-wrap-by-category t)
-;; (add-hook 'org-mode-hook 'turn-on-auto-fill)
 #+end_src
 ** long-line
 #+begin_src elisp
@@ -1136,16 +1132,6 @@ diff-hl-mode highlights uncommitted changes on the left side of the window (area
 #+begin_src elisp
 (setup ws-butler
   (:hook-into text-mode prog-mode))
-#+end_src
-** exec-path-from-shell
-可以优化速度, 建议看一下官网的一篇文章
-#+begin_src elisp :tangle no
-(setup exec-path-from-shell
-  (:defer
-   (when (memq window-system '(mac ns x))
-     (setq exec-path-from-shell-arguments '("-l"))
-     (exec-path-from-shell-initialize)))
-  )
 #+end_src
 ** vundo for undo history
 #+name: vundo
@@ -1382,8 +1368,6 @@ Jump anywhere in the world
                                   ;; rime-predicate-after-ascii-char-p ;;任意英文字符后 ,enable this to use with <s
                                   rime-predicate-current-uppercase-letter-p ;; 将要输入的为大写字母时
                                   rime-predicate-space-after-cc-p ;;在中文字符且有空格之后
-                                  ;; for org-fc
-                                  ;; org-fc-review-flip-or-rate-mode-p
                                   )
         rime-show-candidate 'posframe
         rime-posframe-properties (list :internal-border-width 1
@@ -1470,9 +1454,6 @@ Jump anywhere in the world
     (defun tab-bar-select-tab-6th()
       (interactive)
       (tab-bar-select-tab 6))
-    (defun tab-bar-select-tab-7th()
-      (interactive)
-      (tab-bar-select-tab 7))
     )
   )
 (setup tab-line
@@ -1516,7 +1497,6 @@ Jump anywhere in the world
         ("4" "tab-bar-select-tab-4th" tab-bar-select-tab-4th)
         ("5" "tab-bar-select-tab-5th" tab-bar-select-tab-5th)
         ("6" "tab-bar-select-tab-6th" tab-bar-select-tab-6th)
-        ("7" "tab-bar-select-tab-7th" tab-bar-select-tab-7th)
         ]
        ]
       )
@@ -1587,12 +1567,6 @@ Jump anywhere in the world
             (require 'eat)
             (eat-reload)))
         (eat)))
-  (defun eat-toggle-insert-dir()
-    "Toggle eshell buffer."
-    (interactive)
-    (eat)
-    (eat--send-string "*eat*"
-                      (concat "cd " (file-name-directory (buffer-file-name)))))
   )
 #+end_src
 * git
@@ -1887,15 +1861,15 @@ borrowed from citre, now you can always jump-back use "M-," after any jump in th
         eglot-extend-to-xref t
         ;; eglot-workspace-configuration '((:python.analysis :useLibraryCodeForTypes t))
         eglot-workspace-configuration '(:basedpyright (:typeCheckingMode "off")
-                                        :basedpyright.analysis (:diagnosticSeverityOverrides (:reportUnusedCallResult "none")
-                                                                :inlayHints (:callArgumentNames :json-false)
-                                                                ))
+                                                      :basedpyright.analysis (:diagnosticSeverityOverrides (:reportUnusedCallResult "none")
+                                                                                                           :inlayHints (:callArgumentNames :json-false)
+                                                                                                           ))
         )
   (:autoload eglot-find-implementation)
   (add-hook 'prog-mode-hook (lambda ()
                               (unless (derived-mode-p 'emacs-lisp-mode 'lisp-mode 'makefile-mode 'snippet-mode)
                                 (eglot-ensure))))
-  ;; (add-hook 'org-mode-hook (lambda() (eglot-ensure)))
+  ;; (add-hook 'text-mode-hook (lambda() (eglot-ensure)))
 
   (:when-loaded
     ;; hightlight face
@@ -1910,6 +1884,8 @@ borrowed from citre, now you can always jump-back use "M-," after any jump in th
     ;; more languare server
     (add-to-list 'eglot-server-programs
                  '(graphviz-dot-mode . ("dot-language-server" "--stdio")))
+    ;; (add-to-list 'eglot-server-programs
+    ;;              '(text-mode . ("harper-ls" "--stdio")))
     )
   )
 (setup eldoc
@@ -1965,7 +1941,7 @@ Citre is an advanced Ctags (or actually, readtags) frontend for Emacs.
 #+end_src
 *** spell-check
 **** jinx
-#+begin_src elisp :tangle no
+#+begin_src elisp
 (setup jinx
   (dolist (hook '(text-mode-hook conf-mode-hook))
     (add-hook hook #'jinx-mode))
@@ -1974,32 +1950,6 @@ Citre is an advanced Ctags (or actually, readtags) frontend for Emacs.
     (add-to-list 'jinx-exclude-regexps '(t "\\cc"))
     (keymap-global-set "M-$" #'jinx-correct)
     (keymap-global-set "C-M-$" #'jinx-languages)))
-#+end_src
-**** harper
-#+begin_src elisp
-;; (with-eval-after-load 'eglot
-;;   (add-to-list 'eglot-server-programs
-;;                '(text-mode . ("harper-ls" "--stdio"))))
-;; (setq-default eglot-workspace-configuration
-;;               '(:harper-ls (:userDictPath ""
-;;                             :fileDictPath ""
-;;                             :linters (:SpellCheck t
-;;                                       :SpelledNumbers :json-false
-;;                                       :AnA t
-;;                                       :SentenceCapitalization t
-;;                                       :UnclosedQuotes t
-;;                                       :WrongQuotes :json-false
-;;                                       :LongSentences t
-;;                                       :RepeatedWords t
-;;                                       :Spaces t
-;;                                       :Matcher t
-;;                                       :CorrectNumberSuffix t)
-;;                             :codeActions (:ForceStable :json-false)
-;;                             :markdown (:IgnoreLinkTitle :json-false)
-;;                             :diagnosticSeverity "hint"
-;;                             :isolateEnglish :json-false
-;;                             :dialect "American"
-;;                             :maxFileLength 120000)))
 #+end_src
 *** debug
 **** gdb
@@ -2041,12 +1991,6 @@ Citre is an advanced Ctags (or actually, readtags) frontend for Emacs.
 (setup inheritenv)
 (setup language-id)
 (setup format-all)
-#+end_src
-*** disaster
-Disassemble C, C++ or FORTRAN code under cursor
-#+begin_src elisp
-(setup disaster
-  (setq disaster-objdump "objdump -d -M att -Sl --no-show-raw-insn"))
 #+end_src
 *** compile
 #+begin_src elisp
@@ -2385,16 +2329,6 @@ Comments:
             ("~" org-code verbatim)
             ("+" (:strike-through t))
             ))
-
-    ;; (dolist (face '((org-level-1 . 1.2)
-    ;;                 (org-level-2 . 1.2)
-    ;;                 (org-level-3 . 1.2)
-    ;;                 (org-level-4 . 1.2)
-    ;;                 (org-level-5 . 1.2)
-    ;;                 (org-level-6 . 1.2)
-    ;;                 (org-level-7 . 1.2)
-    ;;                 (org-level-8 . 1.1)))
-    ;;   (set-face-attribute (car face) nil :weight 'medium :height (cdr face)))
     ))
 #+end_src
 *** org beatury
@@ -2689,12 +2623,6 @@ See also `org-save-all-org-buffers'"
 (advice-add 'org-refile :after
             (lambda (&rest _)
               (gtd-save-org-buffers)))
-;; give refile a priority
-;; (defun my/org-set-priority-after-refile (&rest _)
-;;   "Prompt to set Org priority after refiling."
-;;   (org-priority))
-
-;; (advice-add 'org-refile :before #'my/org-set-priority-after-refile)
 
 ))
 #+end_src
@@ -2821,39 +2749,8 @@ See also `org-save-all-org-buffers'"
       (2 'my-org-fc-cloze-face t)
       (3 'shadow nil t)
       )))
-  (defun my/denote-find-files-with-srs-tag ()
-    "Return a list of Denote files that have the \"srs\" tag."
-    (if (not (featurep 'denote))
-        (require 'denote))
-    (if (not (featurep 'org-srs))
-        (require 'org-srs))
-    (if (not (featurep 'org-inc))
-        (require 'org-inc))
-    (let ((files (denote-directory-files))
-          (result '()))
-      (dolist (file files)
-        (let ((tags (denote-extract-keywords-from-path file)))
-          (when (member "srs" tags)
-            (push file result))))
-      (nreverse result)))
-
-  (defun my/denote-review-srs-files-batch ()
-    "依次在所有带 \"srs\" 标签的 Denote 文件运行 org-srs-review-start。"
-    (interactive)
-    (let ((files (my/denote-find-files-with-srs-tag)))
-      (dolist (file files)
-        (with-current-buffer (find-file file)
-
-          (message file)
-          (when (derived-mode-p 'org-mode)
-            (when (local-variable-p 'org-srs-review-item)
-              (org-srs-review-end))
-            (message (buffer-file-name))
-            (org-srs-review-start (buffer-file-name)))
-          )))
-    )
   )
-            #+end_src
+#+end_src
 ** org-inc
 #+begin_src elisp
 (setup org-inc
@@ -2981,9 +2878,9 @@ Simple distraction-free editing. I use darkroom instead of writeroom because it'
       :stream t
       :models '(claude-sonnet-4-20250514-v1:0 gemini/gemini-2.5-pro-preview-05-06 gemini-2.5-flash-preview-04-17))
     (gptel-make-gemini "Gemini" :key 'gptel-api-key :stream t)
-    (gptel-make-deepseek "DeepSeek"       ;Any name you want
-      :stream t                           ;for streaming responses
-      :key 'gptel-api-key)               ;can be a function that returns the key
+    (gptel-make-deepseek "DeepSeek"
+      :stream t
+      :key 'gptel-api-key)
     ))
 #+end_src
 *** gptel-aibo
@@ -3062,33 +2959,6 @@ Simple distraction-free editing. I use darkroom instead of writeroom because it'
         whisper--ffmpeg-input-format "pulse"
         )
   (:when-loaded
-    (if (string= "Arch" (getenv "WSL_DISTRO_NAME"))
-        (progn
-          (setq sense_bin "~/.emacs.d/.cache/SenseVoice.cpp/build/bin/sense-voice-main")
-          (setq sense_model (expand-file-name "~/.emacs.d/.cache/SenseVoice.cpp/sense-voice-small-fp32.gguf"))
-          (defun whisper--sensevoice-command (input-file)
-            `(,sense_bin
-              "-m" ,sense_model
-              "-t" "12"
-              "-l" "zh"
-              "-ng"
-              "-itn"
-              "--min_silence_duration_ms" "1000"
-              ,input-file))
-          (advice-add 'whisper-command :override #'whisper--sensevoice-command)
-          ;; scene voice can only use AC one
-          (defun whisper--record-command (output-file)
-            "Produces FFmpeg command to be run given location of OUTPUT-FILE."
-            `("ffmpeg"
-              ,@(unless whisper--ffmpeg-input-file
-                  (list "-f" whisper--ffmpeg-input-format))
-              "-i" ,(or whisper--ffmpeg-input-file whisper--ffmpeg-input-device)
-              ,@(when (and (not whisper--ffmpeg-input-file) whisper-recording-timeout)
-                  (list "-t" (number-to-string whisper-recording-timeout)))
-              "-ar" "16000"
-              "-ac" "1"
-              "-y" ,output-file))))
-
     ;; (defun whisper--ctranslate2-command (input-file)
     ;;   `("whisper-ctranslate2"
     ;;     ,@(when whisper-use-threads (list "--threads" (number-to-string whisper-use-threads)))
