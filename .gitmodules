@@ -33,6 +33,9 @@
 [submodule "citre"]
 	path = lib/citre
 	url = https://github.com/universal-ctags/citre.git
+[submodule "claude-code-ide"]
+	path = lib/claude-code-ide
+	url = https://github.com/manzaltu/claude-code-ide.el.git
 [submodule "cmake-mode"]
 	path = lib/cmake-mode
 	url = https://github.com/emacsmirror/cmake-mode.git

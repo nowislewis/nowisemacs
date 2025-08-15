@@ -2639,15 +2639,21 @@ In short, you will need 3 files:
 
 #+end_src
 *** capture
+:PROPERTIES:
+:ID:       20250813T141757_338345
+:END:
 #+begin_src elisp
 ;; Use full window for org-capture
 ;; (add-hook 'org-capture-mode-hook 'delete-other-windows)
 (setup org
   (:when-loaded
     (setq org-capture-templates
-          `(("i" "Inbox" entry  (file "gtd/inbox.org")
+          `(("i" "Inbox" entry  (file+datetree "gtd/inbox.org")
              ,(concat "* TODO %?\n"
                       "/Entered on/ %U"))
+            ("d" "Done" entry  (file+datetree "gtd/inbox.org")
+             ,(concat "* DONE %?\n"
+                      "CLOSED: %U"))
             ("m" "Meeting" entry  (file+headline "agenda.org" "Future")
              ,(concat "* %? :meeting:\n"
                       "<%<%Y-%m-%d %a %H:00>>"))
@@ -3033,6 +3039,15 @@ Simple distraction-free editing. I use darkroom instead of writeroom because it'
         )
   (:when-loaded
     (require 'gptel-integrations)
+    )
+  )
+#+end_src
+*** claude-code-ide
+#+begin_src elisp
+(setup claude-code-ide
+  (setq claude-code-ide-terminal-backend 'eat)
+  (:when-loaded
+    (claude-code-ide-emacs-tools-setup)
     )
   )
 #+end_src
