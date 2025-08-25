@@ -107,7 +107,6 @@ I failed in love with denote, so previous *org-roam* configs were refiled into [
   - [[#org-inc][org-inc]]
   - [[#insert-from-snipaste][insert from snipaste]]
   - [[#org-media-note][org-media-note]]
-- [[#english-翻译][english 翻译]]
 - [[#阅读][阅读]]
   - [[#pdf-tools][pdf-tools]]
   - [[#pdf-view-pagemark][pdf-view-pagemark]]
@@ -1358,18 +1357,35 @@ Jump anywhere in the world
 #+begin_src elisp
 (setq default-input-method "rime")
 (with-eval-after-load 'rime
-  (setq rime-disable-predicates '(meow-normal-mode-p
-                                  meow-motion-mode-p
-                                  meow-keypad-mode-p
-                                  rime-predicate-prog-in-code-p
-                                  rime-predicate-punctuation-line-begin-p ;;在行首要输入符号时
-                                  rime-predicate-after-alphabet-char-p ;;在英文字符串之后（必须为以字母开头的英文字符串）
-                                  rime-predicate-current-input-punctuation-p ;;当要输入的是符号时
-                                  ;; rime-predicate-after-ascii-char-p ;;任意英文字符后 ,enable this to use with <s
-                                  rime-predicate-current-uppercase-letter-p ;; 将要输入的为大写字母时
-                                  rime-predicate-space-after-cc-p ;;在中文字符且有空格之后
-                                  )
-        rime-show-candidate 'posframe
+  (defun my/rime-disable-predicates ()
+    (if (derived-mode-p 'eat-mode)
+        ;; 只在 eat buffer 下，禁用 predicates 约束，rime 全时可用
+        '(meow-normal-mode-p
+          meow-motion-mode-p
+          meow-keypad-mode-p
+          rime-predicate-after-alphabet-char-p
+          rime-predicate-current-input-punctuation-p
+          rime-predicate-current-uppercase-letter-p
+          rime-predicate-space-after-cc-p
+          )
+      ;; 其他 buffer 用你原来的 predicate 约束
+      '(meow-normal-mode-p
+        meow-motion-mode-p
+        meow-keypad-mode-p
+        rime-predicate-prog-in-code-p
+        rime-predicate-punctuation-line-begin-p ;;在行首要输入符号时
+        rime-predicate-after-alphabet-char-p ;;在英文字符串之后（必须为以字母开头的英文字符串）
+        rime-predicate-current-input-punctuation-p ;;当要输入的是符号时
+        ;; rime-predicate-after-ascii-char-p ;;任意英文字符后 ,enable this to use with <s
+        rime-predicate-current-uppercase-letter-p ;; 将要输入的为大写字母时
+        rime-predicate-space-after-cc-p ;;在中文字符且有空格之后
+        )))
+  (add-hook 'rime-mode-hook
+            (lambda ()
+              (setq-local rime-disable-predicates
+                          (funcall #'my/rime-disable-predicates))))
+
+  (setq rime-show-candidate 'posframe
         rime-posframe-properties (list :internal-border-width 1
                                        :font lewis-fixed-font
                                        )
@@ -1537,6 +1553,15 @@ Jump anywhere in the world
 #+end_src
 ** eat
 #+begin_src elisp
+(defun meomacs-eat-meow-setup()
+  (add-hook 'meow-normal-mode-hook 'eat-emacs-mode nil t)
+  (add-hook 'meow-insert-mode-hook 'eat-semi-char-mode nil t))
+(with-eval-after-load "meow"
+  (with-eval-after-load "eat"
+    (keymap-set eat-char-mode-map "C-S-v" 'eat-yank)
+    ;; (advice-add 'eat-semi-char-mode :after 'eat-emacs-mode)
+    (add-hook 'eat-mode-hook 'meomacs-eat-meow-setup)
+    ))
 (setup eat
   ;; fix char error on macos
   (when (eq system-type 'darwin)
@@ -2335,7 +2360,7 @@ Comments:
 #+begin_src elisp
 (with-eval-after-load 'org
   (setq org-hide-leading-stars t)
-  (let ((star-list '("󰯬" "󰯯" "󰯲" "󰯵" "󰯸" "󰯻")))
+  (let ((star-list '("󰯬" "󰯯" "󰯲" "󰯵" "󰯸" "󰯻" "󰯾" "󰰁" "󰰄" "󰰇" "󰰊")))
     (dotimes (i (length star-list))
       (font-lock-add-keywords
        'org-mode
@@ -2351,14 +2376,6 @@ Comments:
                                    ))
                            (prettify-symbols-mode)
                            ))
-;; (setup org-modern
-;;   (:load-after org)
-;;   (setq org-modern-star 'replace
-;;         org-modern-replace-stars '("󰯬" "󰯯" "󰯲" "󰯵" "󰯸" "󰯻")
-;;         org-modern-table t)
-;;   (:hook-into org-mode)
-;;   ;; (add-hook 'org-agenda-finalize-hook #'org-modern-agenda)
-;;   )
 #+end_src
 *** org-appear
 #+begin_src elisp
@@ -2573,9 +2590,6 @@ In short, you will need 3 files:
 
 #+end_src
 *** capture
-:PROPERTIES:
-:ID:       20250813T141757_338345
-:END:
 #+begin_src elisp
 ;; Use full window for org-capture
 ;; (add-hook 'org-capture-mode-hook 'delete-other-windows)
@@ -2651,13 +2665,6 @@ See also `org-save-all-org-buffers'"
                     (org-agenda-span 'day)
                     (org-agenda-skip-function
                      '(org-agenda-skip-if nil '(todo done)))))
-
-           ;; (tags-todo ,(concat "+journal-week" tag)
-           ;;            ((org-agenda-overriding-header (nowis-align-to-window-center "Today's Target"))
-           ;;             (org-agenda-sorting-strategy '(priority-down deadline-up))
-           ;;             (org-agenda-prefix-format "%-16:(org-get-parent-heading): [%-4e] ")))
-
-
            (tags-todo ,(concat "+action" tag) ((org-agenda-overriding-header (nowis-align-to-window-center "Soft Time"))
                                                (org-agenda-prefix-format "%-16:(org-get-parent-heading): [%-4e] ")
                                                (org-agenda-sorting-strategy '(todo-state-up priority-down timestamp-up))
@@ -2786,7 +2793,6 @@ See also `org-save-all-org-buffers'"
 (setup org-media-note
   (setq org-media-note-screenshot-image-dir (concat nowis-doc-emacs-dir "30-saved-binary/org-media-note")))
 #+end_src
-* english 翻译
 * 阅读
 ** pdf-tools
 #+begin_src elisp :tangle no
