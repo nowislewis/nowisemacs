@@ -39,6 +39,9 @@
 [submodule "cmake-mode"]
 	path = lib/cmake-mode
 	url = https://github.com/emacsmirror/cmake-mode.git
+[submodule "cond-let"]
+	path = lib/cond-let
+	url = https://github.com/tarsius/cond-let.git
 [submodule "consult"]
 	path = lib/consult
 	url = https://github.com/minad/consult.git

@@ -1598,6 +1598,8 @@ Jump anywhere in the world
 ** magit
 #+begin_src elisp
 (setup with-editor)
+(setup llama)
+(setup cond-let)
 (setup magit)
 #+end_src
 ** ediff
@@ -2543,29 +2545,13 @@ In short, you will need 3 files:
 
 (setup org
   (:when-loaded
-    (defun my/current-week-saturday ()
-      "Return the date string for this week's Saturday in YYYY-MM-DD format."
-      (let* ((now (current-time))
-             (dow (string-to-number (format-time-string "%u" now))) ;; 1=Mon ... 7=Sun
-             (offset (- 6 dow)) ;; 6为Sat, 1为Mon
-             (saturday (time-add now (days-to-time offset))))
-        saturday))
-    ;; (format-time-string "%Y-%m-%d" saturday)))
     (defun org-agenda-update-agenda-files ()
       "Update agenda file list together with refile list."
       (interactive)
       (let* ((gtd-dir (concat org-directory "/gtd"))
              (gtd-files (when (file-exists-p gtd-dir)
                           (directory-files-recursively gtd-dir "\\.org$")))
-             (journal-files
-              (progn
-                (unless (featurep 'denote-journal)
-                  (require 'denote-journal))
-                (let ((dates (list (current-time) (my/current-week-saturday)))) ;; add today and current saturday
-                  (apply #'append
-                         (delq nil
-                               (mapcar #'denote-journal--entry-today dates))))))) ;;remove nil
-        (setq org-agenda-files (append gtd-files journal-files)))
+        (setq org-agenda-files gtd-files ))
 
       (setq org-refile-files
             (cl-remove-if (lambda (file) (string-match-p "inbox.org$" file))
