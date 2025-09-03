@@ -172,6 +172,9 @@
 [submodule "llama"]
 	path = lib/llama
 	url = https://github.com/tarsius/llama.git
+[submodule "lsp-bridge"]
+	path = lib/lsp-bridge
+	url = https://github.com/manateelazycat/lsp-bridge.git
 [submodule "lua-mode"]
 	path = lib/lua-mode
 	url = https://github.com/immerrr/lua-mode.git

@@ -1818,7 +1818,7 @@ borrowed from citre, now you can always jump-back use "M-," after any jump in th
 *** Complete
 **** corfu related
 ***** corfu
-#+begin_src elisp
+#+begin_src elisp :tangle no
 (defun corfu-enable-in-minibuffer ()
   "Enable Corfu in the minibuffer."
   (when (local-variable-p 'completion-at-point-functions)
@@ -1874,13 +1874,13 @@ borrowed from citre, now you can always jump-back use "M-," after any jump in th
           (setq ispell-complete-word-dict (concat nowis-doc-emacs-dir "02-binary-git/binary-files/12-spell-dict/en_US.dict"))))))
 #+end_src
 ***** nerd-icons-corfu
-#+begin_src elisp
+#+begin_src elisp :tangle no
 (setup nerd-icons-corfu
   (add-to-list 'corfu-margin-formatters #'nerd-icons-corfu-formatter))
 #+end_src
 **** lsp mode
 ***** eglot
-#+begin_src elisp
+#+begin_src elisp :tangle no
 (setup project)
 (setq read-process-output-max (* 1024 1024))
 (setup eglot
@@ -1921,7 +1921,7 @@ borrowed from citre, now you can always jump-back use "M-," after any jump in th
 ;; (setq eldoc-echo-area-prefer-doc-buffer nil)
 #+end_src
 ***** eglot in org-src
-#+begin_src elisp
+#+begin_src elisp :tangle no
 (with-eval-after-load 'org
   (cl-defmacro lsp-org-babel-enable (lang)
     "Support LANG in org source code block."
@@ -1964,6 +1964,25 @@ Citre is an advanced Ctags (or actually, readtags) frontend for Emacs.
         citre-prompt-language-for-ctags-command t
         ;; citre-auto-enable-citre-mode-modes '(prog-mode)
         )
+  )
+#+end_src
+**** lsp-bridge
+#+begin_src elisp
+(setup lsp-bridge
+  (setq lsp-bridge-python-command (string-trim
+                                 (shell-command-to-string "pyenv which python3"))
+        lsp-bridge-enable-inlay-hint t
+        lsp-bridge-enable-org-babel t
+        lsp-bridge-enable-completion-in-minibuffer t
+   ;; remote
+        lsp-bridge-enable-with-tramp t
+        lsp-bridge-remote-python-command "python3"
+        lsp-bridge-remote-python-file "~/.emacs.d/lib/lsp-bridge/lsp_bridge.py"
+        lsp-bridge-remote-log "/tmp/lsp_bridge.log"
+        lsp-bridge-remote-start-automatically t
+        )
+
+  (global-lsp-bridge-mode)
   )
 #+end_src
 *** spell-check
