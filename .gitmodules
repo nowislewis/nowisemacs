@@ -103,7 +103,7 @@
 	url = https://github.com/oantolin/embark.git
 [submodule "engrave-faces"]
 	path = lib/engrave-faces
-	url = https://code.tecosaur.net/tec/engrave-faces.git
+	url = https://github.com/tecosaur/engrave-faces.git
 [submodule "esup"]
 	path = lib/esup
 	url = https://github.com/jschaf/esup.git
