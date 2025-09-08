@@ -107,6 +107,7 @@ I failed in love with denote, so previous *org-roam* configs were refiled into [
   - [[#org-inc][org-inc]]
   - [[#insert-from-snipaste][insert from snipaste]]
   - [[#org-media-note][org-media-note]]
+  - [[#org-sliced-images][org-sliced-images]]
 - [[#阅读][阅读]]
   - [[#pdf-tools][pdf-tools]]
   - [[#pdf-view-pagemark][pdf-view-pagemark]]
@@ -2779,6 +2780,12 @@ See also `org-save-all-org-buffers'"
 #+begin_src elisp
 (setup org-media-note
   (setq org-media-note-screenshot-image-dir (concat nowis-doc-emacs-dir "30-saved-binary/org-media-note")))
+#+end_src
+** org-sliced-images
+#+begin_src elisp
+(setup org-sliced-images
+  (:hook-into org-mode)
+  )
 #+end_src
 * 阅读
 ** pdf-tools

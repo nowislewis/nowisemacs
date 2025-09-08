@@ -236,6 +236,9 @@
 [submodule "org-present"]
 	path = lib/org-present
 	url = https://github.com/rlister/org-present.git
+[submodule "org-sliced-images"]
+	path = lib/org-sliced-images
+	url = https://github.com/jcfk/org-sliced-images.git
 [submodule "org-srs"]
 	path = lib/org-srs
 	url = https://github.com/bohonghuang/org-srs.git

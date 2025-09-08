@@ -2,5 +2,5 @@
 # name: org_mermaid
 # key: mermaid
 # --
-#+BEGIN_SRC mermaid :file ~/Documents/emacs/orgmode/PicturesForAll/mermaid_pictures/`(format-time-string "%Y%m%d%H%M%S")`.png
+#+BEGIN_SRC mermaid :file /tmp/`(format-time-string "%Y%m%d%H%M%S")`.png
 #+END_SRC

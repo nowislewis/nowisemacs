@@ -3,7 +3,7 @@
 # key: dot
 # --
 
-#+begin_src dot :file ~/Documents/emacs/02-binary-git/binary-files/01-pictures/dot_pictures/`(format-time-string "%Y%m%d%H%M%S")`.png
+#+begin_src dot :file /tmp/`(format-time-string "%Y%m%d%H%M%S")`.png
 digraph {
     rankdir=LR
     node [

@@ -2,7 +2,7 @@
 # name: org_plantuml
 # key: uml
 # --
-#+begin_src plantuml :file ~/Documents/emacs/02-binary-git/binary-files/01-pictures/plantuml_pictures/`(format-time-string "%Y%m%d%H%M%S")`.jpg :cmdline -charset UTF-8
+#+begin_src plantuml :file /tmp/`(format-time-string "%Y%m%d%H%M%S")`.jpg :cmdline -charset UTF-8
 title ${1}
 #+end_src
 $0
