@@ -136,8 +136,8 @@ I failed in love with denote, so previous *org-roam* configs were refiled into [
 #+begin_src elisp :tangle ~/.emacs.d/early-init.el
 ;; -*- lexical-binding: t; -*-
 ;; set gc according to EmacsConf 2023
-(setq gc-cons-threshold 8000000
-      gc-cons-percentage 0.2)
+;; (setq gc-cons-threshold 8000000
+;;       gc-cons-percentage 0.2)
 ;; Package initialize occurs automatically, before `user-init-file' is
 ;; loaded, but after `early-init-file'. We handle package
 ;; initialization, so we must prevent Emacs from doing it early!
@@ -1126,7 +1126,7 @@ diff-hl-mode highlights uncommitted changes on the left side of the window (area
 #+end_src
 ** TRAMP
 #+begin_src elisp
-(setq tramp-default-method "ssh")
+(setq tramp-default-method "rsync")
 #+end_src
 ** Automatically clean whitespace
 #+begin_src elisp
@@ -1208,12 +1208,13 @@ diff-hl-mode highlights uncommitted changes on the left side of the window (area
   (vertico-mode))
 #+end_src
 ** Orderless and pinyinlib
-#+name: orderless
 #+begin_src elisp
 (setup orderless
-  (setq completion-styles '(orderless)
+  (setq completion-styles '(orderless basic)
            completion-category-defaults nil
-           completion-category-overrides '((file (styles . (partial-completion)))))
+           completion-category-overrides '((file (styles partial-completion)))
+           completion-pcm-leading-wildcard t
+           )
   (:when-loaded
     (require 'pinyinlib)
     (defun completion--regex-pinyin (str)
@@ -1836,9 +1837,12 @@ borrowed from citre, now you can always jump-back use "M-," after any jump in th
         corfu-preview-current nil    ;; Disable current candidate preview
         corfu-auto-prefix 1
         corfu-auto-delay 0.05
-        corfu-scroll-margin 5)        ;; Use scroll margin
+        corfu-scroll-margin 5
+        )        ;; Use scroll margin
   (:with-map corfu-map
-    (:bind "<escape>" my-corfu-quit))
+    (:bind "<escape>" my-corfu-quit
+           "C-SPC" corfu-insert-separator
+           ))
 
   (defun my-corfu-quit()
     "when in corfu-map, quit corfu-selection and return to meow normal mode"
@@ -2035,6 +2039,7 @@ Citre is an advanced Ctags (or actually, readtags) frontend for Emacs.
         org-startup-with-inline-images nil
         org-startup-numerated nil
         org-startup-folded nil
+        org-hide-block-startup t
         org-imenu-depth 8
         org-return-follows-link t
         org-id-link-to-org-use-id t ;; Create an ID if needed to make a link to the current entry.
@@ -2584,10 +2589,10 @@ In short, you will need 3 files:
 (setup org
   (:when-loaded
     (setq org-capture-templates
-          `(("i" "Inbox" entry  (file+datetree "gtd/inbox.org")
+          `(("i" "Inbox" entry  (file+olp+datetree "gtd/inbox.org")
              ,(concat "* TODO %?\n"
                       "/Entered on/ %U"))
-            ("d" "Done" entry  (file+datetree "gtd/inbox.org")
+            ("d" "Done" entry  (file+olp+datetree "gtd/inbox.org")
              ,(concat "* DONE %?\n"
                       "CLOSED: %U"))
             ("m" "Meeting" entry  (file+headline "agenda.org" "Future")
@@ -2830,7 +2835,9 @@ See also `org-save-all-org-buffers'"
                             ("sachachua" "https://sachachua.com/blog/feed/")
                             ("karthinks" "https://karthinks.com/index.xml")
                             ("protesilaos" "https://protesilaos.com/codelog.xml")
-                            ("lazycat" "https://manateelazycat.github.io/feed.xml")))
+                            ("lazycat" "https://manateelazycat.github.io/feed.xml")
+                            ("zhihu" "https://plink.anyfeeder.com/zhihu/daily")
+                            ))
 #+end_src
 ** nov
 #+begin_src elisp
