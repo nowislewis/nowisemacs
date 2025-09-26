@@ -1126,7 +1126,7 @@ diff-hl-mode highlights uncommitted changes on the left side of the window (area
 #+end_src
 ** TRAMP
 #+begin_src elisp
-(setq tramp-default-method "rsync")
+;; (setq tramp-default-method "rsync")
 #+end_src
 ** Automatically clean whitespace
 #+begin_src elisp
@@ -1899,8 +1899,10 @@ borrowed from citre, now you can always jump-back use "M-," after any jump in th
         )
   (:autoload eglot-find-implementation)
   (add-hook 'prog-mode-hook (lambda ()
-                              (unless (derived-mode-p 'emacs-lisp-mode 'lisp-mode 'makefile-mode 'snippet-mode)
-                                (eglot-ensure))))
+                              (unless
+                                  (or (file-remote-p default-directory)
+                                      (derived-mode-p 'emacs-lisp-mode 'lisp-mode 'makefile-mode 'snippet-mode)
+                                      (eglot-ensure)))))
   ;; (add-hook 'text-mode-hook (lambda() (eglot-ensure)))
 
   (:when-loaded
