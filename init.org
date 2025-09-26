@@ -2241,7 +2241,7 @@ Citre is an advanced Ctags (or actually, readtags) frontend for Emacs.
     (setq org-preview-latex-default-process 'tectonic) ;; need to install tectonic and imagemagick
 
 
-    (plist-put org-format-latex-options :scale 2.0) ;; use a large preview for latex
+    (plist-put org-format-latex-options :scale 1.0) ;; use a large preview for latex
     ;; (setq org-preview-latex-default-process 'dvisvgm)
     ;; export and open word
     (add-to-list 'org-file-apps '("\\.docx\\'" . default))
@@ -2460,9 +2460,9 @@ Comments:
            ebib-index-window-size 25
            ebib-index-columns '(("Score" 2 t)
                                 ("Year" 6 t)
-                                ("Author/Editor" 40 t)
-                                ("Title" 100 t)
-                                ;; ("Entry Key" 40 t)
+                                ("Author/Editor" 10 t)
+                                ("Title" 80 t)
+                                ("abstract" 10 t)
                                 )
            ebib-reading-list-file (concat nowis-doc-emacs-dir "01-orgmode/xnotes/20230403T125743--ebib-reading-lists.org")
            ebib-use-timestamp t
@@ -2663,8 +2663,9 @@ See also `org-save-all-org-buffers'"
                                                (org-agenda-sorting-strategy '(todo-state-up priority-down timestamp-up))
                                                ))
            (tags-todo "inbox"
-                      ((org-agenda-prefix-format "  %?-12t% s")
-                       (org-agenda-overriding-header (nowis-align-to-window-center "Inbox"))))
+                      ((org-agenda-overriding-header (nowis-align-to-window-center "Inbox"))
+                       (org-agenda-prefix-format "%-16:(org-get-parent-heading): [%-4e] ")
+                       (org-agenda-sorting-strategy '(todo-state-up priority-down timestamp-up))))
 
            (tags ,(concat "CLOSED>=\"<today>\"" tag)
                  ((org-agenda-overriding-header (nowis-align-to-window-center "Completed today"))
@@ -2908,42 +2909,12 @@ Simple distraction-free editing. I use darkroom instead of writeroom because it'
         (keymap-set embark-general-map "?" #'gptel-quick))
   )
 #+end_src
-*** gptel-prompts
-#+begin_src elisp
-(setup gptel-prompts
-  (setq gptel-prompts-directory (concat nowis-doc-emacs-dir "99-gptel-prompts"))
-  (with-eval-after-load 'gptel
-  (when (file-exists-p gptel-prompts-directory)
-    (require 'gptel-prompts)
-    (gptel-prompts-update)
-    )))
-#+end_src
 *** macher
 #+begin_src elisp
 (setup macher
   (setq macher-action-buffer-ui 'org)
   (:when-loaded
     (macher-install)
-    )
-  )
-#+end_src
-*** mcp.el
-#+begin_src elisp
-(setup mcp
-  (setq mcp-hub-servers
-        `(("fetch" . (:command "uvx" :args ("mcp-server-fetch")))
-          ("claude-code" . (
-                            :command "uvx"
-                            :args ("--from",
-                                   "mcp-claude-code",
-                                   "claudecode",
-                                   "--allow-path",
-                                   "~/Documents/codes")
-                            ))
-          )
-        )
-  (:when-loaded
-    (require 'gptel-integrations)
     )
   )
 #+end_src
@@ -3154,7 +3125,7 @@ ESUP - Emacs Start Up Profiler
 * system-specific-config
 ** windows-wslg
 These codes are used to solve copy & paste problems under wslg inside win10/win11
-#+begin_src elisp 
+#+begin_src elisp
 ;; solve the problem of copying from windows to wslg
 (if (string= "Arch" (getenv "WSL_DISTRO_NAME"))
     (progn

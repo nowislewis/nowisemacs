@@ -128,9 +128,6 @@
 [submodule "gptel-aibo"]
 	path = lib/gptel-aibo
 	url = https://github.com/dolmens/gptel-aibo.git
-[submodule "gptel-prompts"]
-	path = lib/gptel-prompts
-	url = https://github.com/jwiegley/gptel-prompts.git
 [submodule "gptel-quick"]
 	path = lib/gptel-quick
 	url = https://github.com/karthink/gptel-quick.git
@@ -187,9 +184,6 @@
 [submodule "markdown-mode"]
 	path = lib/markdown-mode
 	url = https://github.com/jrblevin/markdown-mode.git
-[submodule "mcp"]
-	path = lib/mcp
-	url = https://github.com/lizqwerscott/mcp.el.git
 [submodule "meow"]
 	path = lib/meow
 	url = https://github.com/meow-edit/meow.git
