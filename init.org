@@ -2594,9 +2594,15 @@ In short, you will need 3 files:
           `(("i" "Inbox" entry  (file+olp+datetree "gtd/inbox.org")
              ,(concat "* TODO %?\n"
                       "/Entered on/ %U"))
-            ("d" "Done" entry  (file+olp+datetree "gtd/inbox.org")
+            ("d" "Done" entry (file+olp+datetree "gtd/inbox.org")
              ,(concat "* DONE %?\n"
-                      "CLOSED: %U"))
+                      "CLOSED: %U\n"
+                      ":LOGBOOK:\n"
+                      "CLOCK: [%<%Y-%m-%d %a %H:%M>]--[%<%Y-%m-%d %a %H:%M>] =>  \n"
+                      ":END:"))
+            ;; ("d" "Done" entry  (file+olp+datetree "gtd/inbox.org")
+            ;;  ,(concat "* DONE %?\n"
+            ;;           "CLOSED: %U"))
             ("m" "Meeting" entry  (file+headline "agenda.org" "Future")
              ,(concat "* %? :meeting:\n"
                       "<%<%Y-%m-%d %a %H:00>>"))
@@ -2612,28 +2618,28 @@ In short, you will need 3 files:
 #+begin_src elisp
 (setup org
   (:when-loaded
-(setq org-refile-use-outline-path 'full-file-path)
-(setq org-outline-path-complete-in-steps nil)
-(setq org-refile-targets '((org-refile-files :regexp . "*")))
-;; '(("action.org" :regexp . "\\(?:\\(?:Note\\|Task\\)s\\)")
-;;   ("incubate.org" :regexp . "\\(?:\\(?:Note\\|Task\\)s\\)")
-;; Save the corresponding buffers
-(defun gtd-save-org-buffers ()
-  "Save `org-agenda-files' buffers without user confirmation.
+    (setq org-refile-use-outline-path 'full-file-path)
+    (setq org-outline-path-complete-in-steps nil)
+    (setq org-refile-targets '((org-refile-files :regexp . "*")))
+    ;; '(("action.org" :regexp . "\\(?:\\(?:Note\\|Task\\)s\\)")
+    ;;   ("incubate.org" :regexp . "\\(?:\\(?:Note\\|Task\\)s\\)")
+    ;; Save the corresponding buffers
+    (defun gtd-save-org-buffers ()
+      "Save `org-agenda-files' buffers without user confirmation.
 See also `org-save-all-org-buffers'"
-  (interactive)
-  (message "Saving org-agenda-files buffers...")
-  (save-some-buffers t (lambda ()
-                         (when (member (buffer-file-name) org-agenda-files)
-                           t)))
-  (message "Saving org-agenda-files buffers... done"))
+      (interactive)
+      (message "Saving org-agenda-files buffers...")
+      (save-some-buffers t (lambda ()
+                             (when (member (buffer-file-name) org-agenda-files)
+                               t)))
+      (message "Saving org-agenda-files buffers... done"))
 
-;; Add it after refile
-(advice-add 'org-refile :after
-            (lambda (&rest _)
-              (gtd-save-org-buffers)))
+    ;; Add it after refile
+    (advice-add 'org-refile :after
+                (lambda (&rest _)
+                  (gtd-save-org-buffers)))
 
-))
+    ))
 #+end_src
 *** agenda
 #+begin_src elisp
