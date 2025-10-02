@@ -855,22 +855,23 @@ Maybe I should add a new state.
 *** modus-themes
 #+begin_src elisp
 (setup modus-themes
-  (setq modus-themes-common-palette-overrides
-      '((fg-heading-1 blue)
-        (fg-heading-2 fg-main)
-        (fg-heading-3 fg-main)
-        (fg-heading-4 fg-main)
-        (fg-heading-5 fg-main)
-        (fg-heading-6 fg-main)
-        (fg-heading-7 fg-main)
-        ))
+  (load-theme 'modus-vivendi t)
+  ;; (setq modus-themes-common-palette-overrides
+  ;;     '((fg-heading-1 blue)
+  ;;       (fg-heading-2 fg-main)
+  ;;       (fg-heading-3 fg-main)
+  ;;       (fg-heading-4 fg-main)
+  ;;       (fg-heading-5 fg-main)
+  ;;       (fg-heading-6 fg-main)
+  ;;       (fg-heading-7 fg-main)
+  ;;       ))
   )
 #+end_src
 *** ef-themes
 #+name: themes
 #+begin_src elisp
 (setup ef-themes)
-(load-theme 'ef-trio-dark t)
+;; (load-theme 'ef-trio-dark t)
 #+end_src
 ** line number
 #+name: line-number
@@ -1126,7 +1127,7 @@ diff-hl-mode highlights uncommitted changes on the left side of the window (area
 #+end_src
 ** TRAMP
 #+begin_src elisp
-;; (setq tramp-default-method "rsync")
+(setq tramp-default-method "ssh")
 #+end_src
 ** Automatically clean whitespace
 #+begin_src elisp
@@ -1279,8 +1280,7 @@ Popper is a minor-mode to tame the flood of ephemeral windows Emacs produces, wh
                                    youdao-dictionary-mode)
         popper-window-height 0.33
         )
-  (:global "M-`" popper-toggle ;; shadown tmm-menubar
-           "M-~" popper-cycle
+  (:global "M-~" popper-toggle
            "C-M-`" popper-toggle-type
            )
   (popper-mode +1)
@@ -1568,7 +1568,7 @@ Jump anywhere in the world
   ;; fix char error on macos
   (when (eq system-type 'darwin)
     (setq eat-term-name "xterm-256color"))
-  (:global "C-`" eat-toggle-window)
+  (:global "M-`" eat-toggle-window)
   (:when-loaded
     (add-to-list 'display-buffer-alist
                  '((lambda (buffer-or-name _)
@@ -1589,11 +1589,86 @@ Jump anywhere in the world
     (interactive)
     (if (get-buffer-window "*eat*")
         (delete-window (get-buffer-window "*eat*"))
-      (if (not (featurep 'eat))
-          (progn
-            (require 'eat)
-            (eat-reload)))
-        (eat)))
+      (progn
+        (if (not (featurep 'eat))
+            (progn
+              (require 'eat)
+              (eat-reload)))
+        (eat)
+        (eat-cycle)
+        ))
+    )
+
+  (defvar eat-cycle-keys '("M-1" "M-2" "M-3" "M-4" "M-5" "M-6" "M-7" "M-8" "M-9"))
+  (defvar eat-cycle-persist t)
+  (defvar eat-cycle--registry (make-hash-table :test 'equal))
+
+  (defun eat-cycle--get-buffers ()
+    (sort (seq-filter (lambda (b) (eq 'eat-mode (buffer-local-value 'major-mode b)))
+                      (buffer-list))
+          (lambda (a b) (string< (buffer-name a) (buffer-name b)))))
+
+  (defun eat-cycle--assign-slots (buffers)
+    (let ((slots (make-vector (length eat-cycle-keys) nil))
+          (live-names (mapcar #'buffer-name buffers)))
+
+      ;; Clean dead buffers from registry
+      (maphash (lambda (name slot)
+                 (unless (member name live-names)
+                   (remhash name eat-cycle--registry)))
+               eat-cycle--registry)
+
+      ;; Assign existing slots
+      (dolist (buf buffers)
+        (when-let ((slot (gethash (buffer-name buf) eat-cycle--registry)))
+          (when (< slot (length slots))
+            (aset slots slot buf))))
+
+      ;; Assign new buffers to free slots
+      (let ((next-slot 0))
+        (dolist (buf buffers)
+          (unless (gethash (buffer-name buf) eat-cycle--registry)
+            (while (and (< next-slot (length slots)) (aref slots next-slot))
+              (setq next-slot (1+ next-slot)))
+            (when (< next-slot (length slots))
+              (puthash (buffer-name buf) next-slot eat-cycle--registry)
+              (aset slots next-slot buf)
+              (setq next-slot (1+ next-slot))))))
+
+      ;; Return non-nil slots
+      (cl-loop for buf across slots
+               for i from 0
+               when buf collect (cons i buf))))
+
+;;;###autoload
+  (defun eat-cycle ()
+    (interactive)
+    (let* ((buffers (eat-cycle--get-buffers))
+           (slots (eat-cycle--assign-slots buffers)))
+      (cond
+       ((null buffers) (message "No eat buffers"))
+       ((= 1 (length buffers)) (switch-to-buffer (car buffers)))
+       (t (let ((current (current-buffer)))
+            (unless (memq current buffers)
+              (switch-to-buffer (cdar slots))
+              (setq current (cdar slots)))
+            ;; Show message
+            (message "Eat: %s"
+                     (mapconcat (lambda (slot)
+                                  (format "%s[%d:%s]"
+                                          (if (eq (cdr slot) current) "*" "")
+                                          (1+ (car slot))
+                                          (buffer-name (cdr slot))))
+                                slots " "))
+            ;; Set keymap
+            (set-transient-map
+             (let ((map (make-sparse-keymap)))
+               (dolist (slot slots)
+                 (define-key map (kbd (nth (car slot) eat-cycle-keys))
+                             (lambda () (interactive)
+                               (switch-to-buffer (cdr slot))
+                               (when eat-cycle-persist (eat-cycle)))))
+               map)))))))
   )
 #+end_src
 * git
