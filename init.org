@@ -1429,12 +1429,6 @@ Jump anywhere in the world
 #+begin_src elisp
 (setup dired-sidebar)
 #+end_src
-*** dired-async
-#+begin_src elisp
-(setup async
-  (with-eval-after-load 'dired
-    (dired-async-mode 1)))
-#+end_src
 ** structure browsing
 *** imenu-list
 #+begin_src elisp
@@ -2142,11 +2136,12 @@ Citre is an advanced Ctags (or actually, readtags) frontend for Emacs.
         org-habit-following-days 2
         system-time-locale "C" ;; ensure time format is always english
         ;; todo keywords
-        org-todo-keyword-faces (quote (("TODO" :foreground "red" :weight bold)
-                                       ("NEXT" :foreground "blue" :weight bold)
-                                       ("DONE" :foreground "forest green" :weight bold)
-                                       ("AXED" :foreground "light green" :weight bold)
-                                       ))
+        org-todo-keyword-faces '(("TODO"    :foreground "red"    :weight bold)
+                                 ("NEXT"    :foreground "deep sky blue" :weight bold)
+                                 ("WAIT"    :foreground "goldenrod"     :weight bold)
+                                 ("SMDY"    :foreground "medium purple" :weight bold)
+                                 ("DONE"    :foreground "forest green"  :weight bold)
+                                 ("AXED"    :foreground "gray55"        :weight bold))
         ;; save state changes into logbook
         org-log-state-notes-into-drawer t
         ;; plain list
@@ -2646,9 +2641,13 @@ In short, you will need 3 files:
 #+end_src
 *** todos
 #+begin_src elisp
+(setq org-enforce-todo-dependencies t
+      org-enforce-todo-checkbox-dependencies t
+      )
 (setq org-log-done 'note)
 (setq org-todo-keywords
-      '((sequence "TODO(t)" "NEXT(n)" "HOLD(h)" "|" "DONE(d)" "AXED(a)")))
+      '((sequence "TODO(t)" "NEXT(n)" "WAIT(w)" "SMDY(s)" "|" "AXED(a)" "DONE(d)")))
+
 (defun log-todo-next-creation-date (&rest ignore)
   "Log NEXT creation time in the property drawer under the key 'ACTIVATED'"
   (when (and (string= (org-get-todo-state) "NEXT")
@@ -2745,11 +2744,14 @@ See also `org-save-all-org-buffers'"
                                                (org-agenda-prefix-format "%-16:(org-get-parent-heading): [%-4e] ")
                                                (org-agenda-sorting-strategy '(todo-state-up priority-down timestamp-up))
                                                ))
-           (tags-todo "inbox"
+           (tags-todo "+TODO=\"NEXT\""
+                      ((org-agenda-overriding-header (nowis-align-to-window-center "NEXT"))
+                       (org-agenda-prefix-format "%-16:(org-get-parent-heading): [%-4e] ")
+                       (org-agenda-sorting-strategy '(todo-state-up priority-down timestamp-up))))
+           (tags-todo "inbox-TODO=\"NEXT\""
                       ((org-agenda-overriding-header (nowis-align-to-window-center "Inbox"))
                        (org-agenda-prefix-format "%-16:(org-get-parent-heading): [%-4e] ")
                        (org-agenda-sorting-strategy '(todo-state-up priority-down timestamp-up))))
-
            (tags ,(concat "CLOSED>=\"<today>\"" tag)
                  ((org-agenda-overriding-header (nowis-align-to-window-center "Completed today"))
                   (org-agenda-prefix-format "%-16:(org-get-parent-heading): [%-4e] ")
@@ -2853,7 +2855,6 @@ See also `org-save-all-org-buffers'"
     (global-set-key (kbd "M-z") #'my/m-z-action)
     )
   )
-
 #+end_src
 ** insert from snipaste
 #+begin_src elisp
