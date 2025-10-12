@@ -1,12 +1,18 @@
 [submodule "ace-window"]
 	path = lib/ace-window
 	url = https://github.com/abo-abo/ace-window.git
+[submodule "asm-blox"]
+	path = lib/asm-blox
+	url = https://github.com/zkry/asm-blox.git
 [submodule "avy"]
 	path = lib/avy
 	url = https://github.com/abo-abo/avy.git
 [submodule "beancount"]
 	path = lib/beancount
 	url = https://github.com/beancount/beancount-mode.git
+[submodule "blackjack"]
+	path = lib/blackjack
+	url = https://github.com/gdonald/blackjack-el.git
 [submodule "borg"]
 	path = lib/borg
 	url = https://github.com/emacscollective/borg.git
@@ -184,6 +190,9 @@
 [submodule "meow"]
 	path = lib/meow
 	url = https://github.com/meow-edit/meow.git
+[submodule "minesweeper"]
+	path = lib/minesweeper
+	url = https://github.com/calancha/Minesweeper.git
 [submodule "mini-echo"]
 	path = lib/mini-echo
 	url = https://github.com/liuyinz/mini-echo.el.git

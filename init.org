@@ -126,6 +126,10 @@ I failed in love with denote, so previous *org-roam* configs were refiled into [
   - [[#uniline][uniline]]
   - [[#excalidraw][excalidraw]]
   - [[#manage-web-bookmarks][manage-web-bookmarks]]
+- [[#games][games]]
+  - [[#minesweeper][minesweeper]]
+  - [[#asm-blox][asm-blox]]
+  - [[#blackjack][blackjack]]
 - [[#system-specific-config][system-specific-config]]
   - [[#windows-wslg][windows-wslg]]
   - [[#android][android]]
@@ -3205,7 +3209,15 @@ ESUP - Emacs Start Up Profiler
            (goto-char original-point)
            (signal (car err) (cdr err))))))
 #+end_src
-
+* games
+** minesweeper
+#+begin_src elisp
+(setup minesweeper
+  (setq gamegrid-user-score-file-directory (concat nowis-doc-emacs-dir "66-gamegrid-user-score"))
+  )
+#+end_src
+** asm-blox
+** blackjack
 * system-specific-config
 ** windows-wslg
 These codes are used to solve copy & paste problems under wslg inside win10/win11
