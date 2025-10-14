@@ -2744,14 +2744,14 @@ See also `org-save-all-org-buffers'"
                     (org-agenda-span 'day)
                     (org-agenda-skip-function
                      '(org-agenda-skip-if nil '(todo done)))))
-           (tags-todo ,(concat "+action" tag) ((org-agenda-overriding-header (nowis-align-to-window-center "Soft Time"))
-                                               (org-agenda-prefix-format "%-16:(org-get-parent-heading): [%-4e] ")
-                                               (org-agenda-sorting-strategy '(todo-state-up priority-down timestamp-up))
-                                               ))
            (tags-todo "+TODO=\"NEXT\""
                       ((org-agenda-overriding-header (nowis-align-to-window-center "NEXT"))
                        (org-agenda-prefix-format "%-16:(org-get-parent-heading): [%-4e] ")
                        (org-agenda-sorting-strategy '(todo-state-up priority-down timestamp-up))))
+           (tags-todo ,(concat "+action" tag) ((org-agenda-overriding-header (nowis-align-to-window-center "Soft Time"))
+                                               (org-agenda-prefix-format "%-16:(org-get-parent-heading): [%-4e] ")
+                                               (org-agenda-sorting-strategy '(todo-state-up priority-down timestamp-up))
+                                               ))
            (tags-todo "inbox-TODO=\"NEXT\""
                       ((org-agenda-overriding-header (nowis-align-to-window-center "Inbox"))
                        (org-agenda-prefix-format "%-16:(org-get-parent-heading): [%-4e] ")
@@ -2765,7 +2765,6 @@ See also `org-save-all-org-buffers'"
                   (org-agenda-prefix-format "%-16:(org-get-parent-heading): [%-4e] ")
                   ))
            )))
-
 
 (setq org-agenda-custom-commands
       (list (nowis-create-agenda-command "g" "GTD" "")
