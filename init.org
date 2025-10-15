@@ -2672,15 +2672,15 @@ In short, you will need 3 files:
           `(("i" "Inbox" entry  (file+olp+datetree "gtd/inbox.org")
              ,(concat "* TODO %?\n"
                       "/Entered on/ %U"))
-            ("d" "Done" entry (file+olp+datetree "gtd/inbox.org")
+            ("d" "Done without clock" entry (file+olp+datetree "gtd/inbox.org")
              ,(concat "* DONE %?\n"
                       "CLOSED: %U\n"
                       ":LOGBOOK:\n"
                       "CLOCK: [%<%Y-%m-%d %a %H:%M>]--[%<%Y-%m-%d %a %H:%M>] =>  \n"
                       ":END:"))
-            ;; ("d" "Done" entry  (file+olp+datetree "gtd/inbox.org")
-            ;;  ,(concat "* DONE %?\n"
-            ;;           "CLOSED: %U"))
+            ("D" "Done with clock" entry  (file+olp+datetree "gtd/inbox.org")
+             ,(concat "* DONE %?\n"
+                      "CLOSED: %U"))
             ("m" "Meeting" entry  (file+headline "agenda.org" "Future")
              ,(concat "* %? :meeting:\n"
                       "<%<%Y-%m-%d %a %H:00>>"))
