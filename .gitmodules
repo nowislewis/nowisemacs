@@ -1,9 +1,6 @@
 [submodule "ace-window"]
 	path = lib/ace-window
 	url = https://github.com/abo-abo/ace-window.git
-[submodule "asm-blox"]
-	path = lib/asm-blox
-	url = https://github.com/zkry/asm-blox.git
 [submodule "avy"]
 	path = lib/avy
 	url = https://github.com/abo-abo/avy.git
@@ -269,11 +266,6 @@
 [submodule "rainbow-delimiters"]
 	path = lib/rainbow-delimiters
 	url = https://github.com/Fanael/rainbow-delimiters.git
-[submodule "reader"]
-	path = lib/reader
-	url = https://codeberg.org/divyaranjan/emacs-reader.git
-    build-step = make all
-    build-step = borg-compile
 [submodule "rg"]
 	path = lib/rg
 	url = https://github.com/dajva/rg.el.git

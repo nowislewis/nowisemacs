@@ -128,7 +128,6 @@ I failed in love with denote, so previous *org-roam* configs were refiled into [
   - [[#manage-web-bookmarks][manage-web-bookmarks]]
 - [[#games][games]]
   - [[#minesweeper][minesweeper]]
-  - [[#asm-blox][asm-blox]]
   - [[#blackjack][blackjack]]
 - [[#system-specific-config][system-specific-config]]
   - [[#windows-wslg][windows-wslg]]
@@ -686,6 +685,11 @@ Maybe I should add a new state.
    ("d" "toggle-darkroom" darkroom-mode)
     ])
 #+end_src
+*** tui-support
+#+begin_src elisp
+(unless (display-graphic-p)
+  (xterm-mouse-mode 1))
+#+end_src
 ** meow leader keybindings
 #+name: meow-leader-keys
 #+begin_src elisp
@@ -735,7 +739,7 @@ Maybe I should add a new state.
  '("r r" . org-remark-remove)
  '("r d" . org-remark-delete)
  )
-#+END_SRC
+#+end_src
 ** which-key
 #+name: which-key
 #+begin_src elisp
@@ -948,6 +952,9 @@ diff-hl-mode highlights uncommitted changes on the left side of the window (area
   (setq mini-echo-separator "  ")
   (setq mini-echo-window-divider-args '(t 2 2))
   (setq mini-echo-update-interval 0.04)
+  (unless (display-graphic-p)
+    (setq mini-echo-right-padding 1)
+    )
   (mini-echo-mode -1)
   (:when-loaded
     (mini-echo-define-segment "org-clock"
@@ -1031,7 +1038,6 @@ diff-hl-mode highlights uncommitted changes on the left side of the window (area
 #+end_src
 * General Configuration
 ** simple
-#+name: simple
 #+begin_src elisp
 (setup simple
   ;; show line/column/filesize in modeline
@@ -1050,11 +1056,9 @@ diff-hl-mode highlights uncommitted changes on the left side of the window (area
                  'vterm-mode-hook
                  ))
     (add-hook hook (lambda () (visual-line-mode))))
-
   )
 #+end_src
 ** general builtin modes
-#+name: general-builtin-modes
 #+begin_src elisp
 (setup save-place
   (:defer
@@ -1070,10 +1074,9 @@ diff-hl-mode highlights uncommitted changes on the left side of the window (area
   (blink-cursor-mode -1) ;指针不闪动
   )
 
-(setup pixel-scroll
-  ;; 最近发现和 pdf-view-mode 工作不协调
-  (when (>= emacs-major-version 29)
-    (pixel-scroll-precision-mode t)))
+;; (setup pixel-scroll
+;;   (when (>= emacs-major-version 29)
+;;     (pixel-scroll-precision-mode t)))
 #+end_src
 ** repeat-mode
 #+begin_src elisp
@@ -1446,7 +1449,6 @@ Jump anywhere in the world
   )
 #+end_src
 ** tab-line and tab-bar
-#+name: tab-bar
 #+begin_src elisp
 (setup tab-bar
   (setq tab-bar-new-button-show nil
@@ -1479,7 +1481,6 @@ Jump anywhere in the world
   )
 #+end_src
 ** tabspaces
-#+name: tabspaces
 #+begin_src elisp
 (setup tabspaces
   (setq tabspaces-use-filtered-buffers-as-default t
@@ -2084,7 +2085,6 @@ Citre is an advanced Ctags (or actually, readtags) frontend for Emacs.
            "N" edebug-next-mode
   )))
 #+end_src
-
 *** Code toggle with hideshow, hideif
 #+begin_src elisp
 (setup hideshow
@@ -2910,7 +2910,7 @@ See also `org-save-all-org-buffers'"
   (:hook-into pdf-view-mode-hook))
 #+end_src
 ** reader
-#+begin_src elisp
+#+begin_src elisp :tangle no
 (setup reader
   (:when-loaded
     (require 'reader-saveplace)
@@ -3215,7 +3215,6 @@ ESUP - Emacs Start Up Profiler
   (setq gamegrid-user-score-file-directory (concat nowis-doc-emacs-dir "66-gamegrid-user-score"))
   )
 #+end_src
-** asm-blox
 ** blackjack
 * system-specific-config
 ** windows-wslg
