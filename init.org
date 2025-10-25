@@ -62,7 +62,6 @@ I failed in love with denote, so previous *org-roam* configs were refiled into [
   - [[#winner-mode][winner-mode]]
   - [[#popper][popper]]
   - [[#move][Move]]
-  - [[#burly][burly]]
 - [[#ibuffer][ibuffer]]
   - [[#ibuffer-1][ibuffer]]
 - [[#input][Input]]
@@ -745,8 +744,7 @@ Maybe I should add a new state.
 #+begin_src elisp
 (setup which-key
   (setq which-key-idle-delay 0.1)
-  (:defer
-   (which-key-mode))
+   (which-key-mode)
   )
 #+end_src
 ** electric
@@ -1061,14 +1059,12 @@ diff-hl-mode highlights uncommitted changes on the left side of the window (area
 ** general builtin modes
 #+begin_src elisp
 (setup save-place
-  (:defer
-   (save-place-mode))
+   (save-place-mode)
   )
 
 (setup autorevert
   (setq global-auto-revert-non-file-buffers t)
-  (:defer
-   (global-auto-revert-mode t))); 当另一程序修改了文件时，让 Emacs 及时刷新 Buffer
+  (global-auto-revert-mode t)); 当另一程序修改了文件时，让 Emacs 及时刷新 Buffer
 
 (setup frame
   (blink-cursor-mode -1) ;指针不闪动
@@ -1268,8 +1264,7 @@ should be check after reading the embark.el manual
 #+name: winner-mode
 #+begin_src elisp
 (setup winner
-  (:defer
-  (winner-mode t))
+  (winner-mode t)
   )
 #+end_src
 ** popper
@@ -1343,12 +1338,6 @@ Jump anywhere in the world
 (setq aw-keys '(?a ?s ?d ?f ?g ?h ?j ?k ?l)
       aw-scope 'frame
       )
-#+end_src
-** burly
-#+begin_src elisp
-(setup burly
-  (:defer
-   (burly-tabs-mode)))
 #+end_src
 * ibuffer
 ** ibuffer
@@ -1485,9 +1474,7 @@ Jump anywhere in the world
 (setup tabspaces
   (setq tabspaces-use-filtered-buffers-as-default t
         tabspaces-keymap-prefix nil)
-  (:defer
    (tabspaces-mode)
-   )
   (:when-loaded
     (transient-define-prefix tabspaces-leader-map()
       "Define tabspaces leader-key maps"
@@ -1538,8 +1525,8 @@ Jump anywhere in the world
 #+begin_src elisp
 (setup autoinsert
   (setq auto-insert-query t)
-  (:defer
-   (auto-insert-mode t))
+  ;; (:defer
+  ;;  (auto-insert-mode t))
   )
 #+end_src
 ** midnight
@@ -1883,9 +1870,8 @@ borrowed from citre, now you can always jump-back use "M-," after any jump in th
 (setup treesit-auto
   (setq treesit-auto-install t
         treesit-auto-langs '(python c cpp json org verilog cmake bash vhdl lua))
-  (:defer
    (if (treesit-available-p)
-       (require 'treesit-auto)))
+       (require 'treesit-auto))
   (:when-loaded
     (global-treesit-auto-mode)
     )
@@ -2520,8 +2506,10 @@ Comments:
 #+begin_src elisp
 (setup citar-denote
   (setq citar-denote-title-format "title")
-  (:defer
-  (citar-denote-mode)))
+  (with-eval-after-load 'citar
+    (citar-denote-mode)
+    )
+  )
 #+end_src
 *** ebib
 #+begin_src elisp
@@ -3095,11 +3083,10 @@ Simple distraction-free editing. I use darkroom instead of writeroom because it'
 ** server
 #+begin_src elisp
 (setup server
-  (:defer
    (progn
      (require 'server)
      (unless (server-running-p)
-       (server-start)))
+       (server-start))
    ))
 #+end_src
 ** macos-ocr
