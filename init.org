@@ -3008,8 +3008,12 @@ Simple distraction-free editing. I use darkroom instead of writeroom because it'
     )
   )
 #+end_src
-*** claude-code-ide
+*** eca
 #+begin_src elisp
+(setup eca)
+#+end_src
+*** claude-code-ide
+#+begin_src elisp :tangle no
 (setup websocket)
 (setup claude-code-ide
   (setq claude-code-ide-terminal-backend 'eat)
