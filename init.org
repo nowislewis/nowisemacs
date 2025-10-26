@@ -1006,7 +1006,7 @@ diff-hl-mode highlights uncommitted changes on the left side of the window (area
 *** hl-line
 #+begin_src elisp
 (setup hl-line
-  (:global "C-l" #'nowis-recenter)
+  (keymap-global-set "C-l" #'nowis-recenter)
   ;; Only highliht current buffer in current window
   (setq hl-line-sticky-flag nil
         global-hl-line-sticky-flag nil)
@@ -1181,7 +1181,7 @@ diff-hl-mode highlights uncommitted changes on the left side of the window (area
 #+name: consult
 #+begin_src elisp
 (setup consult
-  (:global "C-x b" consult-buffer)
+  (keymap-global-set "C-x b" #'consult-buffer)
   (setq register-preview-delay 0.1
            register-preview-function #'consult-register-format
            xref-show-xrefs-function #'consult-xref
@@ -1252,14 +1252,14 @@ should be check after reading the embark.el manual
   (:also-load embark-consult)
   (:autoload embark-toggle-highlight)
   (setq prefix-help-command #'embark-prefix-help-command)
-  (:global "C-S-a" embark-act))
+  (keymap-global-set "C-S-a" #'embark-act))
 
 (setup wgrep)
 #+end_src
 ** yasnippet
 #+begin_src elisp
 (setup yasnippet
-  (:global "M-*" yas-insert-snippet)
+  (keymap-global-set "M-*" #'yas-insert-snippet)
   (setq yas-snippet-dirs (list (concat nowis-config-useful-tools "snippets")))
   (yas-global-mode)
   )
@@ -1293,9 +1293,8 @@ Popper is a minor-mode to tame the flood of ephemeral windows Emacs produces, wh
                                    youdao-dictionary-mode)
         popper-window-height 0.33
         )
-  (:global "M-~" popper-toggle
-           "C-M-`" popper-toggle-type
-           )
+  (keymap-global-set "M-~" #'popper-toggle)
+  (keymap-global-set "C-M-`" #'popper-toggle-type)
   (popper-mode +1)
   (popper-echo-mode +1))
 #+end_src
@@ -1304,7 +1303,7 @@ Popper is a minor-mode to tame the flood of ephemeral windows Emacs produces, wh
 Jump anywhere in the world
 #+begin_src elisp
 (setup avy
-  (:global "M-j" avy-goto-char-timer)
+  (keymap-global-set "M-j" #'avy-goto-char-timer)
   ;; (setq avy-keys (number-sequence ?1 ?9))
   (:when-loaded
   (defun avy-action-embark (pt)
@@ -1338,14 +1337,14 @@ Jump anywhere in the world
      [("l" "right" windmove-right :transient t)
       ("L" "swap-right" windmove-swap-states-right :transient t)]
      ])
-  (:global "C-x O" #'windmove-transient-keybindings)
+  (keymap-global-set "C-x O" #'windmove-transient-keybindings)
   )
 
 #+end_src
 *** ace-window
 #+begin_src elisp
 (setup ace-window
-  (:global "M-o" ace-window))
+  (keymap-global-set "M-o" #'ace-window))
 (setq aw-keys '(?a ?s ?d ?f ?g ?h ?j ?k ?l)
       aw-scope 'frame
       )
@@ -1355,7 +1354,7 @@ Jump anywhere in the world
 #+name: ibuffer
 #+begin_src elisp
 (setup ibuffer
-  (:global [remap list-buffers] #'ibuffer))
+  (global-set-key [remap list-buffers] #'ibuffer))
 #+end_src
 * Input
 ** posframe
@@ -1566,7 +1565,7 @@ Jump anywhere in the world
   ;; fix char error on macos
   (when (eq system-type 'darwin)
     (setq eat-term-name "xterm-256color"))
-  (:global "M-`" eat-toggle-window)
+  (keymap-global-set "M-`" #'eat-toggle-window)
   (:when-loaded
     (add-to-list 'display-buffer-alist
                  '((lambda (buffer-or-name _)
@@ -1704,12 +1703,12 @@ Jump anywhere in the world
 #+begin_src elisp
 (setup elisp-refs)
 (setup helpful
-  (:global "C-h f" #'helpful-callable
-           "C-h v" #'helpful-variable
-           "C-h k" #'helpful-key
-           "C-c C-d" #'helpful-at-point
-           "C-h F" #'helpful-function
-           "C-h C" #'helpful-command))
+  (keymap-global-set "C-h f" #'helpful-callable)
+  (keymap-global-set "C-h v" #'helpful-variable)
+  (keymap-global-set "C-h k" #'helpful-key)
+  (keymap-global-set "C-c C-d" #'helpful-at-point)
+  (keymap-global-set "C-h F" #'helpful-function)
+  (keymap-global-set "C-h C" #'helpful-command))
 #+end_src
 **** elisp-demos
 #+begin_src elisp
@@ -2071,7 +2070,7 @@ Citre is an advanced Ctags (or actually, readtags) frontend for Emacs.
 #+begin_src elisp
 (setup dape
   (setq dape-buffer-window-arrangment 'right)
-  (:global "<f5>"  dape)
+  (keymap-global-set "<f5>"  #'dape)
   (:when-loaded
     (add-hook 'dape-repl-mode-hook (lambda()
                                      (corfu-mode -1)
@@ -2958,9 +2957,9 @@ Simple distraction-free editing. I use darkroom instead of writeroom because it'
         ;; gptel-model 'deepseek-v3
         gptel-model 'gpt-4.1
         )
-  (:global "M-p" gptel-send
-           "M-r" gptel-rewrite
-           "M-P" gptel)
+  (keymap-global-set "M-p" #'gptel-send)
+  (keymap-global-set "M-r" #'gptel-rewrite)
+  (keymap-global-set "M-P" #'gptel)
   (:when-loaded
     (setq-default gptel-backend (gptel-make-gh-copilot "Copilot"))
     (gptel-make-openai "chatanywhere"
@@ -2994,7 +2993,7 @@ Simple distraction-free editing. I use darkroom instead of writeroom because it'
 #+begin_src elisp
 (setup gptel-quick
     (setq gptel-quick-timeout 40)
-    (:global "M-l" gptel-quick)
+    (keymap-global-set "M-l" #'gptel-quick)
     (with-eval-after-load 'embark
         (keymap-set embark-general-map "?" #'gptel-quick))
   )
