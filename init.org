@@ -111,7 +111,6 @@ I failed in love with denote, so previous *org-roam* configs were refiled into [
 - [[#阅读][阅读]]
   - [[#pdf-tools][pdf-tools]]
   - [[#pdf-view-pagemark][pdf-view-pagemark]]
-  - [[#reader][reader]]
   - [[#newsticker][newsticker]]
   - [[#nov][nov]]
   - [[#darkroom][darkroom]]
@@ -1440,7 +1439,7 @@ Jump anywhere in the world
 *** imenu-list
 #+begin_src elisp
 (setup imenu-list
-  (:autoload himenu-list-smart-toggle)
+  (:autoload imenu-list-smart-toggle)
   (setq imenu-list-focus-after-activation nil
            imenu-list-auto-resize t
            imenu-list-position 'left
@@ -2912,14 +2911,6 @@ See also `org-save-all-org-buffers'"
 (setup pdf-view-pagemark
   (:hook-into pdf-view-mode-hook))
 #+end_src
-** reader
-#+begin_src elisp :tangle no
-(setup reader
-  (:when-loaded
-    (require 'reader-saveplace)
-    )
-  )
-#+end_src
 ** newsticker
 #+begin_src elisp
 (setq newsticker-url-list '(("Planet Emacslife" "https://planet.emacslife.com/atom.xml")
@@ -2999,28 +2990,9 @@ Simple distraction-free editing. I use darkroom instead of writeroom because it'
         (keymap-set embark-general-map "?" #'gptel-quick))
   )
 #+end_src
-*** macher
-#+begin_src elisp
-(setup macher
-  (setq macher-action-buffer-ui 'org)
-  (:when-loaded
-    (macher-install)
-    )
-  )
-#+end_src
 *** eca
 #+begin_src elisp
 (setup eca)
-#+end_src
-*** claude-code-ide
-#+begin_src elisp :tangle no
-(setup websocket)
-(setup claude-code-ide
-  (setq claude-code-ide-terminal-backend 'eat)
-  (:when-loaded
-    (claude-code-ide-emacs-tools-setup)
-    )
-  )
 #+end_src
 *** whisper
 #+begin_src elisp

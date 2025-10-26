@@ -169,9 +169,6 @@
 [submodule "lua-mode"]
 	path = lib/lua-mode
 	url = https://github.com/immerrr/lua-mode.git
-[submodule "macher"]
-	path = lib/macher
-	url = https://github.com/kmontag/macher.git
 [submodule "magit"]
 	path = lib/magit
 	url = https://github.com/magit/magit
