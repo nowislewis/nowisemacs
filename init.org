@@ -1121,7 +1121,7 @@ diff-hl-mode highlights uncommitted changes on the left side of the window (area
         recentf-exclude `("/tmp/" "/ssh:" ,(concat user-emacs-directory "lib/.*-autoloads\\.el\\'")))
   (add-to-list 'recentf-exclude no-littering-var-directory)
   (add-to-list 'recentf-exclude no-littering-etc-directory)
-  (with-idle-delay 4
+  (with-idle-delay 2
      (recentf-mode))
   )
 #+end_src
@@ -1261,7 +1261,8 @@ should be check after reading the embark.el manual
 (setup yasnippet
   (keymap-global-set "M-*" #'yas-insert-snippet)
   (setq yas-snippet-dirs (list (concat nowis-config-useful-tools "snippets")))
-  (yas-global-mode)
+  (with-idle-delay 2
+    (yas-global-mode))
   )
 #+end_src
 * Window Management
@@ -1484,7 +1485,7 @@ Jump anywhere in the world
 (setup tabspaces
   (setq tabspaces-use-filtered-buffers-as-default t
         tabspaces-keymap-prefix nil)
-(with-idle-delay 4
+(with-idle-delay 2
    (tabspaces-mode))
   (:when-loaded
     (transient-define-prefix tabspaces-leader-map()
