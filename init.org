@@ -10,6 +10,7 @@ I failed in love with denote, so previous *org-roam* configs were refiled into [
   - [[#set-vars][set vars]]
 - [[#package-management][Package Management]]
   - [[#setup][setup]]
+  - [[#other-macros][other macros]]
 - [[#keyboard-bindings][Keyboard Bindings]]
   - [[#meow][meow]]
   - [[#transient-and-related-leader-map][transient and related leader-map]]
@@ -304,6 +305,14 @@ emacs
   :repeatable t
   :signature '(FUNC ...))
 #+end_src
+** other macros
+#+begin_src elisp
+(defmacro with-idle-delay (secs &rest body)
+  "Emacs 启动并空闲 SECS 秒后执行 BODY，仅执行一次。"
+  `(run-with-idle-timer
+    ,secs nil
+    (lambda () ,@body)))
+#+end_src
 * Keyboard Bindings
 I used to be a vim(evil) user, but now I use meow to manage all my keys.
 ** meow
@@ -590,11 +599,6 @@ Maybe I should add a new state.
     ("j" "bookmark-jump" bookmark-jump)
     ("m" "bookmark-set" bookmark-set)
     ("M" "bookmark-delete" bookmark-delete)]
-   ["Burly"
-    ("w" "burly-bookmark-windows" burly-bookmark-windows)
-    ("f" "burly-bookmark-frames" burly-bookmark-frames)
-    ("o" "burly-open" burly-open-bookmark)
-    ]
    ]
   )
 #+end_src
@@ -921,7 +925,7 @@ diff-hl-mode highlights uncommitted changes on the left side of the window (area
     ))
 #+end_src
 ** emacs-dashboard
-#+begin_src elisp
+#+begin_src elisp :tangle no
 (setup dashboard
   (setq dashboard-items '((recents . 5)
                           (bookmarks . 5)
@@ -934,6 +938,12 @@ diff-hl-mode highlights uncommitted changes on the left side of the window (area
         dashboard-set-init-info t)
   (dashboard-setup-startup-hook)
   )
+#+end_src
+*** my-simple-start
+#+begin_src elisp
+   (add-hook 'emacs-startup-hook
+     (lambda ()
+       (message "Emacs loaded in %s" (emacs-init-time))))
 #+end_src
 ** mini-echo
 #+begin_src elisp
@@ -1107,11 +1117,12 @@ diff-hl-mode highlights uncommitted changes on the left side of the window (area
 ** recentf
 #+begin_src elisp
 (setup recentf
-   (setq recentf-max-saved-items 30
-         recentf-exclude `("/tmp/" "/ssh:" ,(concat user-emacs-directory "lib/.*-autoloads\\.el\\'")))
-   (add-to-list 'recentf-exclude no-littering-var-directory)
-   (add-to-list 'recentf-exclude no-littering-etc-directory)
-   (recentf-mode)
+  (setq recentf-max-saved-items 50
+        recentf-exclude `("/tmp/" "/ssh:" ,(concat user-emacs-directory "lib/.*-autoloads\\.el\\'")))
+  (add-to-list 'recentf-exclude no-littering-var-directory)
+  (add-to-list 'recentf-exclude no-littering-etc-directory)
+  (with-idle-delay 4
+     (recentf-mode))
   )
 #+end_src
 ** 自动换行
@@ -1474,7 +1485,8 @@ Jump anywhere in the world
 (setup tabspaces
   (setq tabspaces-use-filtered-buffers-as-default t
         tabspaces-keymap-prefix nil)
-   (tabspaces-mode)
+(with-idle-delay 4
+   (tabspaces-mode))
   (:when-loaded
     (transient-define-prefix tabspaces-leader-map()
       "Define tabspaces leader-key maps"
@@ -1685,6 +1697,9 @@ Jump anywhere in the world
 * Program
 ** Language
 *** elisp
+#+begin_src elisp
+(setq elisp-fontify-semantically t)
+#+end_src
 **** helpful
 #+begin_src elisp
 (setup elisp-refs)
@@ -2544,7 +2559,7 @@ Comments:
 #+begin_src elisp
 (setup denote
   (setq denote-directory (expand-file-name (concat nowis-doc-emacs-dir "01-orgmode/xnotes"))
-        denote-dired-directories (ffap-all-subdirs denote-directory)
+        ;; denote-dired-directories (ffap-all-subdirs denote-directory)
         denote-date-prompt-use-org-read-date t
         denote-modules '(project)
         denote-prompts '(title keywords signature template)
