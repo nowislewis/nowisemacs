@@ -1718,7 +1718,7 @@ Jump anywhere in the world
 *** graphviz-dot-mode
 #+begin_src elisp
 (setup graphviz-dot-mode
-  (:file-match "\\.dot\\'")
+  (:match-file "\\.dot\\'")
   (setq graphviz-dot-indent-width 4)
   (setq nowis-graphviz-current-num 0)
   (defun nowis-graphviz-symbol-with-label ()
@@ -1770,7 +1770,7 @@ This Emacs tool use plantuml to generate images for org, json, yaml files.
 Emacs major-mode to work with Beancount ledger files
 #+begin_src elisp
 (setup beancount
-  (:file-match "\\.beancount\\'"))
+  (:match-file "\\.beancount\\'"))
 #+end_src
 *** latex
 **** basic
@@ -2935,7 +2935,7 @@ See also `org-save-all-org-buffers'"
 (setup nov
   (:bind "]" nov-scroll-up
          "[" nov-scroll-down)
-  (:file-match "\\.epub\\'"))
+  (:match-file "\\.epub\\'"))
 #+end_src
 ** darkroom
 Simple distraction-free editing. I use darkroom instead of writeroom because it's more simple
@@ -2945,7 +2945,7 @@ Simple distraction-free editing. I use darkroom instead of writeroom because it'
 ** markdown-mode
 #+begin_src elisp
 (setup markdown-mode
-  (:file-match "\\.md\\'"))
+  (:match-file "\\.md\\'"))
 #+end_src
 * tools
 ** ai related
