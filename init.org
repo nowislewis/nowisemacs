@@ -2998,9 +2998,14 @@ Simple distraction-free editing. I use darkroom instead of writeroom because it'
         (keymap-set embark-general-map "?" #'gptel-quick))
   )
 #+end_src
-*** eca
+*** macher
 #+begin_src elisp
-(setup eca)
+(setup macher
+  (setq macher-action-buffer-ui 'org)
+  (with-eval-after-load 'gptel
+    (macher-install)
+    )
+  )
 #+end_src
 *** whisper
 #+begin_src elisp
