@@ -2972,6 +2972,14 @@ Simple distraction-free editing. I use darkroom instead of writeroom because it'
       :key 'gptel-api-key)
     ))
 #+end_src
+*** gptel-local-org-prompts
+#+begin_src elisp
+(setup gptel-local-org-prompts
+  (keymap-global-set "M-L" #'gptel-choose-org-prompt)
+  (setq gptel-local-org-prompts-directory (expand-file-name "13-gptel-prompts/" nowis-doc-emacs-dir)
+        gptel-local-org-prompts-preview-length 100)
+  )
+#+end_src
 *** gptel-aibo
 #+begin_src elisp
 (setup gptel-aibo
