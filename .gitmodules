@@ -125,6 +125,9 @@
 [submodule "gptel-aibo"]
 	path = lib/gptel-aibo
 	url = https://github.com/dolmens/gptel-aibo.git
+[submodule "gptel-prompts"]
+	path = lib/gptel-prompts
+	url = https://github.com/jwiegley/gptel-prompts.git
 [submodule "gptel-quick"]
 	path = lib/gptel-quick
 	url = https://github.com/karthink/gptel-quick.git

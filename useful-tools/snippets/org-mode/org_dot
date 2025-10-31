@@ -1,6 +1,6 @@
 # -*- mode: snippet -*-
 # name: org_dot
-# key: dot
+# key: org_dot
 # --
 
 #+begin_src dot :file /tmp/`(format-time-string "%Y%m%d%H%M%S")`.png

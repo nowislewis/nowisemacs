@@ -1,6 +1,6 @@
 # -*- mode: snippet -*-
 # name: org_mermaid
-# key: mermaid
+# key: org_mermaid
 # --
 #+BEGIN_SRC mermaid :file /tmp/`(format-time-string "%Y%m%d%H%M%S")`.png
 #+END_SRC

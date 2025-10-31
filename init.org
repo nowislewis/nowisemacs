@@ -3070,7 +3070,6 @@ Simple distraction-free editing. I use darkroom instead of writeroom because it'
     ("p" "push doc" rsync-push-binary-files)
     ("F" "pull doc" rsync-pull-binary-files)]])
 #+end_src
-
 ** server
 #+begin_src elisp
 (setup server

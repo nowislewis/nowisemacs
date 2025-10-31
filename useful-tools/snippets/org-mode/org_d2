@@ -1,6 +1,6 @@
 # -*- mode: snippet -*-
 # name: org_d2
-# key: d2
+# key: org_d2
 # --
 #+begin_src d2 :file /tmp/`(format-time-string "%Y%m%d%H%M%S")`.svg  :flags -l elk -t 101 -s
 $1
