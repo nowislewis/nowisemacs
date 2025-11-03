@@ -30,6 +30,9 @@
 [submodule "citre"]
 	path = lib/citre
 	url = https://github.com/universal-ctags/citre.git
+[submodule "clipetty"]
+	path = lib/clipetty
+	url = https://github.com/spudlyo/clipetty.git
 [submodule "cmake-mode"]
 	path = lib/cmake-mode
 	url = https://github.com/emacsmirror/cmake-mode.git
@@ -77,6 +80,9 @@
 [submodule "dired-sidebar"]
 	path = lib/dired-sidebar
 	url = https://github.com/jojojames/dired-sidebar.git
+[submodule "dracula"]
+	path = lib/dracula
+	url = https://github.com/dracula/emacs.git
 [submodule "eat"]
 	path = lib/eat
 	url = https://codeberg.org/akib/emacs-eat.git

@@ -690,7 +690,17 @@ Maybe I should add a new state.
 *** tui-support
 #+begin_src elisp
 (unless (display-graphic-p)
-  (xterm-mouse-mode 1))
+  (xterm-mouse-mode 1)
+  )
+#+end_src
+**** clipetty
+#+begin_src elisp
+(setup clipetty
+  (unless (display-graphic-p)
+    (require 'clipetty)
+    (global-clipetty-mode)
+    )
+  )
 #+end_src
 ** meow leader keybindings
 #+name: meow-leader-keys
