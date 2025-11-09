@@ -21,15 +21,15 @@ function pull() {
         # checkout then reset, output appended
         git checkout main >/dev/null 2>&1 || git checkout master >/dev/null 2>&1
         # git reset --hard >>"$log_file" 2>&1
-        pull_output=$(git -c color.ui=always pull 2>&1)
+        pull_output=$(git -c color.ui=always pull --rebase 2>&1)
         new_commit=$(git rev-parse HEAD)
         if [[ "$pull_output" != "Already up to date." ]]; then
             echo -e "$pull_output" >>"$log_file"
         fi
         # Only show log if HEAD moved
-        if [[ "$last_commit" != "$new_commit" ]]; then
-            git log $last_commit...$new_commit --no-merges --color --graph --date=format:'%Y-%m-%d %H:%M:%S' --pretty=format:'%C(red)%h%Creset -%C(green)(%cd) %C(yellow)%d%C(blue)  %Creset%s %C(bold blue)<%an>%Creset' --abbrev-commit >>"$log_file"
-        fi
+        # if [[ "$last_commit" != "$new_commit" ]]; then
+        git log $last_commit...$new_commit --no-merges --color --graph --date=format:'%Y-%m-%d %H:%M:%S' --pretty=format:'%C(red)%h%Creset -%C(green)(%cd) %C(yellow)%d%C(blue)  %Creset%s %C(bold blue)<%an>%Creset' --abbrev-commit >>"$log_file"
+        # fi
         echo $'\n' >>"$log_file"
     )
 }
