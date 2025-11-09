@@ -2771,7 +2771,7 @@ See also `org-save-all-org-buffers'"
                        (org-agenda-prefix-format "%-20:(org-get-parent-heading): [%-4e] ")
                        (org-agenda-sorting-strategy '(todo-state-up priority-down timestamp-up))
                        ))
-           (tags-todo "inbox-TODO=\"NEXT\""
+           (tags-todo "inbox-TODO=\"NEXT\"-PRIORITY=\"E\""
                       ((org-agenda-overriding-header (nowis-align-to-window-center "Inbox"))
                        (org-agenda-skip-function #'my-org-agenda-skip-blocked)
                        (org-agenda-prefix-format "%-20:(org-get-parent-heading): [%-4e] ")
@@ -2780,6 +2780,11 @@ See also `org-save-all-org-buffers'"
            ;;                                     (org-agenda-prefix-format "%-20:(org-get-parent-heading): [%-4e] ")
            ;;                                     (org-agenda-sorting-strategy '(todo-state-up priority-down timestamp-up))
            ;;                                     ))
+           (tags-todo "inbox-TODO=\"NEXT\"+PRIORITY=\"E\""
+                      ((org-agenda-overriding-header (nowis-align-to-window-center "Low Priority"))
+                       (org-agenda-skip-function #'my-org-agenda-skip-blocked)
+                       (org-agenda-prefix-format "%-20:(org-get-parent-heading): [%-4e] ")
+                       (org-agenda-sorting-strategy '(todo-state-up priority-down timestamp-up))))
            (tags-todo "inbox-TODO=\"NEXT\""
                       ((org-agenda-overriding-header (nowis-align-to-window-center "Blocked"))
                        (org-agenda-skip-function #'my-org-agenda-skip-unblocked)
