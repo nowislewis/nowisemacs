@@ -3033,7 +3033,7 @@ Simple distraction-free editing. I use darkroom instead of writeroom because it'
   )
 #+end_src
 *** macher
-#+begin_src elisp
+#+begin_src elisp :tangle no
 (setup macher
   (setq macher-action-buffer-ui 'org)
   (with-eval-after-load 'gptel
