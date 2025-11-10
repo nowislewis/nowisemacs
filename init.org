@@ -105,7 +105,7 @@ I failed in love with denote, so previous *org-roam* configs were refiled into [
   - [[#agendagtd][agenda/gtd]]
   - [[#org-srs][org-srs]]
   - [[#org-inc][org-inc]]
-  - [[#insert-from-snipaste][insert from snipaste]]
+  - [[#insert-from-clipboard][insert from clipboard]]
   - [[#org-media-note][org-media-note]]
   - [[#org-sliced-images][org-sliced-images]]
 - [[#阅读][阅读]]
@@ -2895,15 +2895,49 @@ See also `org-save-all-org-buffers'"
     )
   )
 #+end_src
-** insert from snipaste
+** insert from clipboard
 #+begin_src elisp
-(defun insert-file-from-snipaste ()
-  "Prompt user to select a file from snipaste files and insert it into the current Org buffer."
-  (interactive)
-  (let ((file (read-file-name "Select a file from Downloads: " (concat nowis-doc-emacs-dir "02-binary-git/binary-files/01-pictures/snipaste/"))))
-    (when (and file (file-exists-p file))
-      ;; (insert (format "[[file:%s][%s]]" file (file-name-nondirectory file))))))
-      (insert (format "[[file:%s]]" file)))))
+(setup org
+  (:when-loaded
+    (defcustom my/org-yank-image-filename-function
+      (lambda () (format-time-string "screenshot_%Y%m%d_%H%M%S.png"))
+      "A function to generate screenshot name"
+      :type 'function
+      :group 'org)
+
+    (defun my/org-yank-image-from-clipboard-wsl ()
+      "paste from wsl"
+      ;; (interactive)
+      (require 'org-attach)
+      (let* ((attach-dir (org-attach-dir t))
+             (filename (funcall my/org-yank-image-filename-function))
+             (filepath (expand-file-name filename attach-dir))
+             (wsl-path (string-trim
+                        (shell-command-to-string
+                         (format "wslpath -w '%s'" filepath)))))
+        (if (= 0 (call-process "powershell.exe" nil nil nil
+                               "-Command"
+                               (format "(Get-Clipboard -Format image).Save('%s')" wsl-path)))
+            (progn
+              (insert (format "[[attachment:%s]]" filename))
+              (org-display-inline-images)
+              (message "Image saved to attachment: %s" filepath))
+          (error "Failed to save image from clipboard"))))
+
+    (defun my/org-yank-image-from-clipboard-native ()
+      "use the default yank-media"
+      (yank-media))
+
+    (defun my/org-yank-image-from-clipboard ()
+      "paste pictures from powershell when using wsl, others use yank-media"
+      (interactive)
+      (if (string= "Arch" (getenv "WSL_DISTRO_NAME"))
+          (my/org-yank-image-from-clipboard-wsl)
+        (my/org-yank-image-from-clipboard-native)))
+    (:with-map org-mode-map
+      (:bind "M-<f1>" my/org-yank-image-from-clipboard)
+      )
+    ))
 #+end_src
 ** org-media-note
 #+begin_src elisp
