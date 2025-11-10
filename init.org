@@ -2163,7 +2163,7 @@ Citre is an advanced Ctags (or actually, readtags) frontend for Emacs.
         ;; plain list
         org-list-demote-modify-bullet '(("+" . "-") ("-" . "+") ("*" . "+"))
         ;; attach
-        org-yank-image-save-method (concat nowis-doc-emacs-dir "02-binary-git/binary-files/01-pictures/org_download_images")
+        org-yank-image-save-method (concat nowis-doc-emacs-dir "30-saved-binary/01-pictures/01-org_attachs")
         )
   (:when-loaded
     (require 'org-tempo) ;; so that <s is useful
