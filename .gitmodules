@@ -7,9 +7,6 @@
 [submodule "beancount"]
 	path = lib/beancount
 	url = https://github.com/beancount/beancount-mode.git
-[submodule "blackjack"]
-	path = lib/blackjack
-	url = https://github.com/gdonald/blackjack-el.git
 [submodule "borg"]
 	path = lib/borg
 	url = https://github.com/emacscollective/borg.git
@@ -89,9 +86,6 @@
 [submodule "ebib"]
 	path = lib/ebib
 	url = https://github.com/joostkremers/ebib.git
-[submodule "eca"]
-	path = lib/eca
-	url = https://github.com/editor-code-assistant/eca-emacs.git
 [submodule "el-themes"]
 	path = lib/el-themes
 	url = https://github.com/protesilaos/ef-themes.git
