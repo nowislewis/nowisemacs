@@ -1228,7 +1228,9 @@ diff-hl-mode highlights uncommitted changes on the left side of the window (area
 (setq vertico-cycle t)
 (setup vertico
   (:with-map vertico-map
-    (:bind [backspace] vertico-directory-delete-char))
+    (:bind [backspace] vertico-directory-delete-char
+           "DEL" vertico-directory-delete-char
+           ))
   (vertico-mode))
 #+end_src
 ** Orderless and pinyinlib
@@ -2991,13 +2993,13 @@ Simple distraction-free editing. I use darkroom instead of writeroom because it'
       :header (lambda () `(("Authorization" . ,(concat "Bearer " (gptel--get-api-key)))))
       :key 'gptel-api-key
       :stream t
-      :models '(gpt-4o-mini deepseek-r1 deepseek-v3 claude-3-7-sonnet-20250219))
+      :models '(gpt-5 deepseek-v3.1-250821 claude-haiku-4-5-20251001))
     (gptel-make-openai "momenta"
       :host "llm-gateway.momenta.works"
       :header (lambda () `(("Authorization" . ,(concat "Bearer " (gptel--get-api-key)))))
       :key 'gptel-api-key
       :stream t
-      :models '(claude-sonnet-4-20250514-v1:0 gemini/gemini-2.5-pro-preview-05-06 gemini-2.5-flash-preview-04-17))
+      :models '(claude-sonnet-4.5 claude-haiku-4.5 gemini-2.5-pro))
     (gptel-make-gemini "Gemini" :key 'gptel-api-key :stream t)
     (gptel-make-deepseek "DeepSeek"
       :stream t
