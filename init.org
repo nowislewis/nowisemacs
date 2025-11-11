@@ -887,13 +887,11 @@ Maybe I should add a new state.
   )
 #+end_src
 *** ef-themes
-#+name: themes
 #+begin_src elisp
 (setup ef-themes)
 ;; (load-theme 'ef-trio-dark t)
 #+end_src
 ** line number
-#+name: line-number
 #+begin_src elisp
 (setq line-number-display-limit large-file-warning-threshold)
 ;; only enable line number in some modes, borrowed from lazycat-emacs
@@ -1158,7 +1156,6 @@ diff-hl-mode highlights uncommitted changes on the left side of the window (area
   (:hook-into text-mode prog-mode))
 #+end_src
 ** vundo for undo history
-#+name: vundo
 #+begin_src elisp
 (setup vundo
   (:bind "l" vundo-forward
@@ -1187,7 +1184,6 @@ diff-hl-mode highlights uncommitted changes on the left side of the window (area
 #+end_src
 ** Consult Commands
 *** consult
-#+name: consult
 #+begin_src elisp
 (setup consult
   (keymap-global-set "C-x b" #'consult-buffer)
@@ -3066,25 +3062,13 @@ Simple distraction-free editing. I use darkroom instead of writeroom because it'
 #+begin_src elisp
 (setup gptel-quick
   (setq gptel-quick-timeout 40
+        gptel-quick-system-message (lambda (count)
+                                     (format "用小于%d 个字的中文解释." count))
         )
   (keymap-global-set "M-l" #'gptel-quick)
   (with-eval-after-load 'embark
     (keymap-set embark-general-map "?" #'gptel-quick))
-  (:when-loaded
-    (setq gptel-quick-system-message (lambda (count)
-                                       (format "用小于%d 个字解释." count))
-          )
-    )
-  )
-#+end_src
-*** macher
-#+begin_src elisp :tangle no
-(setup macher
-  (setq macher-action-buffer-ui 'org)
-  (with-eval-after-load 'gptel
-    (macher-install)
-    )
-  )
+)
 #+end_src
 *** whisper
 #+begin_src elisp
