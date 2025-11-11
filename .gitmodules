@@ -227,6 +227,11 @@
 [submodule "org-media-note"]
 	path = lib/org-media-note
 	url = https://github.com/yuchen-lea/org-media-note.git
+[submodule "org-noter"]
+	path = lib/org-noter
+	url = https://github.com/org-noter/org-noter.git
+    load-path = .
+    load-path = modules
 [submodule "org-present"]
 	path = lib/org-present
 	url = https://github.com/rlister/org-present.git

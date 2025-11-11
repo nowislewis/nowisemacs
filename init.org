@@ -108,6 +108,7 @@ I failed in love with denote, so previous *org-roam* configs were refiled into [
   - [[#insert-from-clipboard][insert from clipboard]]
   - [[#org-media-note][org-media-note]]
   - [[#org-sliced-images][org-sliced-images]]
+  - [[#org-noter][org-noter]]
 - [[#阅读][阅读]]
   - [[#pdf-tools][pdf-tools]]
   - [[#pdf-view-pagemark][pdf-view-pagemark]]
@@ -866,7 +867,7 @@ Maybe I should add a new state.
 ** variable-pitch
 #+begin_src elisp
 (defun dynamic-change-line-spacing( &optional ARG)
-  (if line-spacing (setq-local line-spacing nil) (setq-local line-spacing 0.3)))
+  (if line-spacing (setq-local line-spacing nil) (setq-local line-spacing 0.5)))
 (advice-add 'variable-pitch-mode :after #'dynamic-change-line-spacing)
 #+end_src
 ** Theme
@@ -1729,7 +1730,7 @@ Jump anywhere in the world
 *** graphviz-dot-mode
 #+begin_src elisp
 (setup graphviz-dot-mode
-  (:match-file "\\.dot\\'")
+  (add-to-list 'auto-mode-alist '("\\.dot\\'" . graphviz-dot-mode))
   (setq graphviz-dot-indent-width 4)
   (setq nowis-graphviz-current-num 0)
   (defun nowis-graphviz-symbol-with-label ()
@@ -2949,6 +2950,10 @@ See also `org-save-all-org-buffers'"
   (:hook-into org-mode)
   )
 #+end_src
+** org-noter
+#+begin_src elisp
+(setup org-noter)
+#+end_src
 * 阅读
 ** pdf-tools
 #+begin_src elisp :tangle no
@@ -2993,8 +2998,9 @@ See also `org-save-all-org-buffers'"
 (setup esxml) ;; <- (setup kv)
 (setup nov
   (:bind "]" nov-scroll-up
-         "[" nov-scroll-down)
-  (:match-file "\\.epub\\'"))
+         "[" nov-scroll-down))
+(add-to-list 'auto-mode-alist '("\\.epub\\'" . nov-mode))
+
 #+end_src
 ** darkroom
 Simple distraction-free editing. I use darkroom instead of writeroom because it's more simple
@@ -3059,10 +3065,16 @@ Simple distraction-free editing. I use darkroom instead of writeroom because it'
 *** gptel-quick
 #+begin_src elisp
 (setup gptel-quick
-    (setq gptel-quick-timeout 40)
-    (keymap-global-set "M-l" #'gptel-quick)
-    (with-eval-after-load 'embark
-        (keymap-set embark-general-map "?" #'gptel-quick))
+  (setq gptel-quick-timeout 40
+        )
+  (keymap-global-set "M-l" #'gptel-quick)
+  (with-eval-after-load 'embark
+    (keymap-set embark-general-map "?" #'gptel-quick))
+  (:when-loaded
+    (setq gptel-quick-system-message (lambda (count)
+                                       (format "用小于%d 个字解释." count))
+          )
+    )
   )
 #+end_src
 *** macher
