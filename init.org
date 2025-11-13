@@ -3041,6 +3041,14 @@ Simple distraction-free editing. I use darkroom instead of writeroom because it'
       :key 'gptel-api-key)
     ))
 #+end_src
+*** gptel-agent
+#+begin_src elisp
+(setup gptel-agent
+  (:when-loaded
+    (gptel-agent-update)
+    )
+  )
+#+end_src
 *** gptel-local-org-prompts
 #+begin_src elisp
 (setup gptel-local-org-prompts

@@ -119,6 +119,9 @@
 [submodule "gptel"]
 	path = lib/gptel
 	url = https://github.com/karthink/gptel.git
+[submodule "gptel-agent"]
+	path = lib/gptel-agent
+	url = https://github.com/karthink/gptel-agent.git
 [submodule "gptel-aibo"]
 	path = lib/gptel-aibo
 	url = https://github.com/dolmens/gptel-aibo.git
@@ -314,6 +317,9 @@
 [submodule "ws-butler"]
 	path = lib/ws-butler
 	url = https://github.com/lewang/ws-butler.git
+[submodule "yaml"]
+	path = lib/yaml
+	url = https://github.com/zkry/yaml.el.git
 [submodule "yasnippet"]
 	path = lib/yasnippet
 	url = https://github.com/joaotavora/yasnippet.git
