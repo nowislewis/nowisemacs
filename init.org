@@ -1408,7 +1408,9 @@ Jump anywhere in the world
         rime-user-data-dir "~/Documents/rime/"
         rime-share-data-dir "~/Documents/rime/"
         rime-inline-ascii-trigger 'shift-r
-        ))
+        )
+  (add-hook 'kill-emacs-hook #'rime-lib-finalize)
+  )
 (when (eq system-type 'darwin)
   (setq
    ;; rime-emacs-module-header-root "/Applications/Emacs.app/Contents/Resources/include/" ;; use build-emacs
@@ -3045,6 +3047,7 @@ Simple distraction-free editing. I use darkroom instead of writeroom because it'
 #+begin_src elisp
 (setup gptel-agent
   (:when-loaded
+    (require 'nowis-gptel-tools)
     (gptel-agent-update)
     )
   )
@@ -3063,7 +3066,7 @@ Simple distraction-free editing. I use darkroom instead of writeroom because it'
   (:when-loaded
     (define-key gptel-aibo-mode-map
                 (kbd "M-p") #'gptel-aibo-send)
-    (define-key prog-mode-map (kbd "C-c i") #'gptel-aibo-summon)
+      (keymap-global-set "M-c" #'gptel-aibo-summon)
     ))
 #+end_src
 *** gptel-quick

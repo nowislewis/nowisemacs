@@ -211,6 +211,9 @@
 [submodule "nov"]
 	path = lib/nov
 	url = https://depp.brause.cc/nov.el.git
+[submodule "nowis-gptel-tools"]
+	path = lib/nowis-gptel-tools
+	url = https://github.com/nowislewis/nowis-gptel-tools.git
 [submodule "orderless"]
 	path = lib/orderless
 	url = https://github.com/oantolin/orderless.git
