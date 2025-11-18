@@ -83,6 +83,9 @@
 [submodule "ebib"]
 	path = lib/ebib
 	url = https://github.com/joostkremers/ebib.git
+[submodule "eca"]
+	path = lib/eca
+	url = https://github.com/editor-code-assistant/eca-emacs.git
 [submodule "el-themes"]
 	path = lib/el-themes
 	url = https://github.com/protesilaos/ef-themes.git
