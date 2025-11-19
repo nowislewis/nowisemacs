@@ -3039,9 +3039,14 @@ Simple distraction-free editing. I use darkroom instead of writeroom because it'
 #+begin_src elisp
 (setup gptel-agent
   (:when-loaded
-    (require 'nowis-gptel-tools)
     (gptel-agent-update)
     )
+  )
+#+end_src
+*** nowis-gptel-tools
+#+begin_src elisp
+(setup nowis-gptel-tools
+  (:load-after gptel)
   )
 #+end_src
 *** gptel-local-org-prompts
