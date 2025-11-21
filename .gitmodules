@@ -223,6 +223,9 @@
 [submodule "org-elp"]
 	path = lib/org-elp
 	url = https://github.com/guanyilun/org-elp.git
+[submodule "org-graphviz-mindmap"]
+	path = lib/org-graphviz-mindmap
+	url = git@github.com:nowislewis/org-graphviz-mindmap.git
 [submodule "org-inc"]
 	path = lib/org-inc
 	url = https://github.com/bohonghuang/org-inc.git
