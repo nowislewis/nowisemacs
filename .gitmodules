@@ -230,6 +230,9 @@
 	path = lib/org-inc
 	url = https://github.com/bohonghuang/org-inc.git
     build-step = borg-makeinfo
+[submodule "org-ladder"]
+	path = lib/org-ladder
+	url = https://github.com/nowislewis/org-ladder.git
 [submodule "org-media-note"]
 	path = lib/org-media-note
 	url = https://github.com/yuchen-lea/org-media-note.git

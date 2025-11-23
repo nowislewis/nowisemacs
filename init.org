@@ -109,6 +109,7 @@ I failed in love with denote, so previous *org-roam* configs were refiled into [
   - [[#org-media-note][org-media-note]]
   - [[#org-sliced-images][org-sliced-images]]
   - [[#org-noter][org-noter]]
+  - [[#org-graphviz-mindmap][org-graphviz-mindmap]]
 - [[#阅读][阅读]]
   - [[#pdf-tools][pdf-tools]]
   - [[#pdf-view-pagemark][pdf-view-pagemark]]
@@ -624,6 +625,15 @@ Maybe I should add a new state.
     ]
    ["review cards"
     ("s" "org-srs" org-srs-transient-map)
+    ]
+   ["graph"
+    ("g" "org-graphviz-mindmap" org-graphviz-mindmap-create)
+    ]
+   ["ladder"
+    ("l c" "display current" org-ladder-display-current-status)
+    ("l d" "show detailed" org-ladder-show-detailed-status)
+    ("l f" "force update" org-ladder-force-refresh)
+    ("l h" "history" org-ladder-show-history-review)
     ]
    ]
   )
@@ -2943,6 +2953,10 @@ See also `org-save-all-org-buffers'"
 ** org-noter
 #+begin_src elisp
 (setup org-noter)
+#+end_src
+** org-graphviz-mindmap
+#+begin_src elisp
+(setup org-graphviz-mindmap)
 #+end_src
 * 阅读
 ** pdf-tools
