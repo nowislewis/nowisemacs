@@ -1916,6 +1916,7 @@ borrowed from citre, now you can always jump-back use "M-," after any jump in th
     (corfu-mode 1)))
 (add-hook 'minibuffer-setup-hook #'corfu-enable-in-minibuffer)
 
+(setq text-mode-ispell-word-completion nil)
 (setup corfu
   (setq corfu-cycle t                ;; Enable cycling for `corfu-next/previous'
         corfu-auto t                 ;; Enable auto completion
@@ -1951,6 +1952,7 @@ borrowed from citre, now you can always jump-back use "M-," after any jump in th
   ;; (add-to-list 'completion-at-point-functions #'cape-dabbrev)
   (add-to-list 'completion-at-point-functions #'cape-dabbrev-min-2)
   (add-to-list 'completion-at-point-functions #'cape-elisp-block)
+  (add-to-list 'completion-at-point-functions #'cape-dict)
   (add-to-list 'completion-at-point-functions #'cape-file)
   )
 
@@ -2592,6 +2594,32 @@ Comments:
                           "* Diary\n\n"))
           ))
   )
+#+end_src
+*** denote-sort
+#+begin_src elisp
+(defun my-denote--split-luhman-sig (signature)
+  "Split numbers and letters in Luhmann-style SIGNATURE string."
+  (replace-regexp-in-string
+   "\\([a-zA-Z]?\\)\\([0-9]\\)" "\\1=\\2"
+   (replace-regexp-in-string
+    "\\([0-9]?\\)\\([a-zA-Z]\\)" "\\1=\\2"
+    signature)))
+
+(defun my-denote--pad-sig (signature)
+  "Create a new signature with padded spaces for all components"
+  (combine-and-quote-strings
+   (mapcar
+    (lambda (x)
+      (string-pad x 5 32 t))
+    (split-string (my-denote--split-luhman-sig signature) "=" t))
+   "="))
+
+(defun my-denote-sort-for-signatures (sig1 sig2)
+  "Return non-nil if SIG1 is smaller that SIG2.
+Perform the comparison with `string<'."
+  (string< (my-denote--pad-sig sig1) (my-denote--pad-sig sig2)))
+;; Change the sorting function only when we sort by signature.
+(setq denote-sort-signature-comparison-function #'my-denote-sort-for-signatures)
 #+end_src
 *** denote-journal
 #+begin_src elisp
