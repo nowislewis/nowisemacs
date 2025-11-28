@@ -103,7 +103,7 @@ code), you should run =make init-build=. You can also just use =make= to config 
 That't to say, after installation, there are only things you need to remember for everyday use:
 1. =borg-assimilate= for install packages, and =borg-remove= for remove packages.
 2. =make update= for updates. After update, run =git add .= to add all updates, and =make build= to get them compiled.
-3. =make init-build=  if you only changed the =init.org= file.
+3. =make init-org=  if you only changed the =init.org= file.
 4. If you modify a local package under lib such as =foo=, run =make lib/foo= to recompile only that package.
 
 *It's suggested to read the [[https://emacsmirror.net/manual/borg/][borg]] for more details*.

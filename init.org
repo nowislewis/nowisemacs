@@ -942,7 +942,7 @@ diff-hl-mode highlights uncommitted changes on the left side of the window (area
     ))
 #+end_src
 ** emacs-dashboard
-#+begin_src elisp :tangle no
+#+begin_src elisp
 (setup dashboard
   (setq dashboard-items '((recents . 5)
                           (bookmarks . 5)
@@ -3124,7 +3124,8 @@ Simple distraction-free editing. I use darkroom instead of writeroom because it'
 #+begin_src elisp
 (setup whisper
   (setq whisper-language "auto"
-        whisper-model "large-v3-turbo"
+        whisper-model "base"
+        whisper-quantize nil
         whisper-translate nil
         whisper-use-threads (- (num-processors) 1)
         whisper--ffmpeg-input-device "default"
