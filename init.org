@@ -2065,8 +2065,8 @@ Citre is an advanced Ctags (or actually, readtags) frontend for Emacs.
 **** jinx
 #+begin_src elisp
 (setup jinx
-  (dolist (hook '(text-mode-hook conf-mode-hook))
-    (add-hook hook #'jinx-mode))
+  ;; (dolist (hook '(text-mode-hook conf-mode-hook))
+  ;;   (add-hook hook #'jinx-mode))
   (:when-loaded
     (setq jinx-languages "en_US")
     (add-to-list 'jinx-exclude-regexps '(t "\\cc"))
