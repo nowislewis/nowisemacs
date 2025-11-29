@@ -110,6 +110,7 @@ I failed in love with denote, so previous *org-roam* configs were refiled into [
   - [[#org-sliced-images][org-sliced-images]]
   - [[#org-noter][org-noter]]
   - [[#org-graphviz-mindmap][org-graphviz-mindmap]]
+  - [[#org-ladder][org-ladder]]
 - [[#阅读][阅读]]
   - [[#pdf-tools][pdf-tools]]
   - [[#pdf-view-pagemark][pdf-view-pagemark]]
@@ -2985,6 +2986,15 @@ See also `org-save-all-org-buffers'"
 ** org-graphviz-mindmap
 #+begin_src elisp
 (setup org-graphviz-mindmap)
+#+end_src
+** org-ladder
+#+begin_src elisp
+(setup org-ladder
+  (let* ((gtd-dir (expand-file-name "gtd" org-directory))
+         (gtd-files (when (file-directory-p gtd-dir)
+                      (directory-files-recursively gtd-dir ".*"))))
+    (setq org-ladder-files gtd-files))
+  )
 #+end_src
 * 阅读
 ** pdf-tools
