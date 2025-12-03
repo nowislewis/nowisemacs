@@ -804,6 +804,7 @@ Maybe I should add a new state.
 
 ;; fixed font
 (setq lewis-fixed-font (cl-loop for font in '(
+                                              "JetBrains Maple Mono"
                                               "Maple Mono NF CN"
                                               "Maple Mono SC NF"
                                               "Unifont"
@@ -3061,12 +3062,14 @@ Simple distraction-free editing. I use darkroom instead of writeroom because it'
 (setup gptel
   (setq gptel-default-mode 'org-mode
         gptel-crowdsourced-prompts-file (concat nowis-doc-emacs-dir "09-scripts/chatgpt.csv")
+        gptel-highlight-methods '(face)
         ;; gptel-model 'deepseek-v3
         gptel-model 'gpt-4.1
         )
   (keymap-global-set "M-p" #'gptel-send)
   (keymap-global-set "M-r" #'gptel-rewrite)
   (keymap-global-set "M-P" #'gptel)
+  (:hook gptel-highlight-mode)
   (:when-loaded
     (setq-default gptel-backend (gptel-make-gh-copilot "Copilot"))
     (gptel-make-openai "chatanywhere"
@@ -3080,7 +3083,7 @@ Simple distraction-free editing. I use darkroom instead of writeroom because it'
       :header (lambda () `(("Authorization" . ,(concat "Bearer " (gptel--get-api-key)))))
       :key 'gptel-api-key
       :stream t
-      :models '(claude-sonnet-4.5 claude-haiku-4.5 minimax-m2))
+      :models '(claude-sonnet-4.5 claude-haiku-4.5 minimax-m2 gemini-3-pro deepseek-v3.2))
     (gptel-make-gemini "Gemini" :key 'gptel-api-key :stream t)
     (gptel-make-deepseek "DeepSeek"
       :stream t
