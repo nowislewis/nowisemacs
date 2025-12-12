@@ -1137,7 +1137,7 @@ diff-hl-mode highlights uncommitted changes on the left side of the window (area
 ** recentf
 #+begin_src elisp
 (setup recentf
-  (setq recentf-max-saved-items 50
+  (setq recentf-max-saved-items 100
         recentf-exclude `("/tmp/" "/ssh:" ,(concat user-emacs-directory "lib/.*-autoloads\\.el\\'")))
   (add-to-list 'recentf-exclude no-littering-var-directory)
   (add-to-list 'recentf-exclude no-littering-etc-directory)
@@ -1225,6 +1225,13 @@ diff-hl-mode highlights uncommitted changes on the left side of the window (area
   (interactive)
   (let ((current-prefix-arg '(-1)))
     (call-interactively 'consult-fd)))
+#+end_src
+*** consult-dir
+#+begin_src elisp
+(setup consult-dir
+  (define-key global-map (kbd "C-x C-d") #'consult-dir)
+  (define-key minibuffer-local-completion-map (kbd "C-x C-d") #'consult-dir)
+  )
 #+end_src
 ** rg.el
 #+begin_src elisp
@@ -3269,6 +3276,12 @@ Simple distraction-free editing. I use darkroom instead of writeroom because it'
 
     ;; (advice-add 'whisper-command :override #'whisper--ctranslate2-command)
     )
+  )
+#+end_src
+*** eca
+#+begin_src elisp
+(setup eca
+  (setq eca-server-download-method 'curl)
   )
 #+end_src
 ** webjump
