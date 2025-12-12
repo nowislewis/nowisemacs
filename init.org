@@ -1692,114 +1692,114 @@ Jump anywhere in the world
 #+end_src
 ** vterm
 #+begin_src elisp
-(defun meomacs-vterm-meow-setup()
-  (add-hook 'meow-normal-mode-hook 'vterm-copy-mode nil t)
-  (add-hook 'meow-insert-mode-hook (lambda () (vterm-copy-mode -1)) nil t))
+  (defun meomacs-vterm-meow-setup()
+    (add-hook 'meow-normal-mode-hook 'vterm-copy-mode nil t)
+    (add-hook 'meow-insert-mode-hook (lambda () (vterm-copy-mode -1)) nil t))
 
-(with-eval-after-load "meow"
-  (with-eval-after-load "vterm"
-    (keymap-set vterm-mode-map "C-S-v" 'vterm-yank)
-    (add-hook 'vterm-mode-hook 'meomacs-vterm-meow-setup)))
+  (with-eval-after-load "meow"
+    (with-eval-after-load "vterm"
+      (keymap-set vterm-mode-map "C-S-v" 'vterm-yank)
+      (define-key vterm-mode-map (kbd "C-\\") nil)
+      (add-hook 'vterm-mode-hook 'meomacs-vterm-meow-setup)))
 
-(setup vterm
-  ;; (when (eq system-type 'darwin)
-  ;;   (setq vterm-shell "zsh"))
+  (setup vterm
+    ;; (when (eq system-type 'darwin)
+    ;;   (setq vterm-shell "zsh"))
 
-  (keymap-global-set "M-`" #'vterm-toggle-window)
-  (define-key vterm-mode-map (kbd "C-\\") nil)
+    (keymap-global-set "M-`" #'vterm-toggle-window)
 
-  (:when-loaded
-    (add-to-list 'display-buffer-alist
-                 '((lambda (buffer-or-name _)
-                     (let ((buffer (get-buffer buffer-or-name)))
-                       (with-current-buffer buffer
-                         (or (equal major-mode 'vterm-mode)
-                             (string-prefix-p "*vterm" (buffer-name buffer))))))
-                   (display-buffer-reuse-window display-buffer-at-bottom)
-                   (reusable-frames . visible)
-                   (window-height . 0.3))))
+    (:when-loaded
+      (add-to-list 'display-buffer-alist
+                   '((lambda (buffer-or-name _)
+                       (let ((buffer (get-buffer buffer-or-name)))
+                         (with-current-buffer buffer
+                           (or (equal major-mode 'vterm-mode)
+                               (string-prefix-p "*vterm" (buffer-name buffer))))))
+                     (display-buffer-reuse-window display-buffer-at-bottom)
+                     (reusable-frames . visible)
+                     (window-height . 0.3))))
 
-  (defun vterm-toggle-window()
-    "Toggle vterm buffer window."
-    (interactive)
-    (let ((vterm-win (seq-find (lambda (w)
-                                 (eq 'vterm-mode (buffer-local-value 'major-mode (window-buffer w))))
-                               (window-list))))
-      (if vterm-win
-          (delete-window vterm-win)
-        (if-let ((buf (car (vterm-cycle--get-buffers))))
-            (progn (pop-to-buffer buf) (vterm-cycle))
-          (unless (featurep 'vterm) (require 'vterm))
-          (vterm)
-          (vterm-cycle)))))
+    (defun vterm-toggle-window()
+      "Toggle vterm buffer window."
+      (interactive)
+      (let ((vterm-win (seq-find (lambda (w)
+                                   (eq 'vterm-mode (buffer-local-value 'major-mode (window-buffer w))))
+                                 (window-list))))
+        (if vterm-win
+            (delete-window vterm-win)
+          (if-let ((buf (car (vterm-cycle--get-buffers))))
+              (progn (pop-to-buffer buf) (vterm-cycle))
+            (unless (featurep 'vterm) (require 'vterm))
+            (vterm)
+            (vterm-cycle)))))
 
-  (defvar vterm-cycle-keys '("M-1" "M-2" "M-3" "M-4" "M-5" "M-6" "M-7" "M-8" "M-9"))
-  (defvar vterm-cycle--slots (make-hash-table :test 'equal)
-    "Maps buffer-name -> slot-number for persistent assignment.")
+    (defvar vterm-cycle-keys '("M-1" "M-2" "M-3" "M-4" "M-5" "M-6" "M-7" "M-8" "M-9"))
+    (defvar vterm-cycle--slots (make-hash-table :test 'equal)
+      "Maps buffer-name -> slot-number for persistent assignment.")
 
-  (defun vterm-cycle--get-buffers ()
-    "Return live vterm buffers sorted by assigned slot."
-    (let ((bufs (seq-filter (lambda (b)
-                              (and (buffer-live-p b)
-                                   (eq 'vterm-mode (buffer-local-value 'major-mode b))))
-                            (buffer-list))))
-      ;; Clean dead buffers from registry
-      (maphash (lambda (name _)
-                 (unless (get-buffer name)
-                   (remhash name vterm-cycle--slots)))
-               vterm-cycle--slots)
-      ;; Sort by slot number
-      (sort bufs (lambda (a b)
-                   (< (or (gethash (buffer-name a) vterm-cycle--slots) 999)
-                      (or (gethash (buffer-name b) vterm-cycle--slots) 999))))))
+    (defun vterm-cycle--get-buffers ()
+      "Return live vterm buffers sorted by assigned slot."
+      (let ((bufs (seq-filter (lambda (b)
+                                (and (buffer-live-p b)
+                                     (eq 'vterm-mode (buffer-local-value 'major-mode b))))
+                              (buffer-list))))
+        ;; Clean dead buffers from registry
+        (maphash (lambda (name _)
+                   (unless (get-buffer name)
+                     (remhash name vterm-cycle--slots)))
+                 vterm-cycle--slots)
+        ;; Sort by slot number
+        (sort bufs (lambda (a b)
+                     (< (or (gethash (buffer-name a) vterm-cycle--slots) 999)
+                        (or (gethash (buffer-name b) vterm-cycle--slots) 999))))))
 
-  (defun vterm-cycle--ensure-slot (buffer)
-    "Ensure buffer has a slot assigned, return (slot . buffer)."
-    (let* ((name (buffer-name buffer))
-           (slot (gethash name vterm-cycle--slots)))
-      (unless slot
-        ;; Find first free slot
-        (let ((used (hash-table-values vterm-cycle--slots)))
-          (setq slot (cl-loop for i from 0 below (length vterm-cycle-keys)
-                              unless (memq i used) return i)))
-        (when slot (puthash name slot vterm-cycle--slots)))
-      (when slot (cons slot buffer))))
+    (defun vterm-cycle--ensure-slot (buffer)
+      "Ensure buffer has a slot assigned, return (slot . buffer)."
+      (let* ((name (buffer-name buffer))
+             (slot (gethash name vterm-cycle--slots)))
+        (unless slot
+          ;; Find first free slot
+          (let ((used (hash-table-values vterm-cycle--slots)))
+            (setq slot (cl-loop for i from 0 below (length vterm-cycle-keys)
+                                unless (memq i used) return i)))
+          (when slot (puthash name slot vterm-cycle--slots)))
+        (when slot (cons slot buffer))))
 
-;;;###autoload
-  (defun vterm-cycle ()
-    "Cycle through vterm buffers with persistent slot numbers."
-    (interactive)
-    (let* ((buffers (vterm-cycle--get-buffers))
-           (slots (delq nil (mapcar #'vterm-cycle--ensure-slot buffers)))
-           (current (current-buffer)))
-      (cond
-       ((null buffers) (message "No vterm buffers"))
-       ((= 1 (length buffers)) (switch-to-buffer (car buffers)))
-       (t
-        (unless (memq current (mapcar #'cdr slots))
-          (switch-to-buffer (cdar slots)))
-        ;; Show slots
-        (message "Vterm: %s"
-                 (mapconcat (lambda (s)
-                              (let ((idx (1+ (car s)))
-                                    (buf (cdr s)))
-                                (if (eq buf (current-buffer))
-                                    (propertize (format "[%d:%s]" idx (buffer-name buf))
-                                                'face '(:foreground "green" :weight bold))
-                                  (format " %d:%s " idx (buffer-name buf)))))
-                            slots " "))
-        ;; Setup transient map
-        (set-transient-map
-         (let ((map (make-sparse-keymap)))
-           (dolist (s slots)
-             (let* ((slot-idx (car s))
-                    (target-buf (cdr s)))
-               (define-key map (kbd (nth slot-idx vterm-cycle-keys))
-                           `(lambda ()
-                              (interactive)
-                              (switch-to-buffer ,target-buf)
-                              (vterm-cycle)))))
-           map)))))))
+  ;;;###autoload
+    (defun vterm-cycle ()
+      "Cycle through vterm buffers with persistent slot numbers."
+      (interactive)
+      (let* ((buffers (vterm-cycle--get-buffers))
+             (slots (delq nil (mapcar #'vterm-cycle--ensure-slot buffers)))
+             (current (current-buffer)))
+        (cond
+         ((null buffers) (message "No vterm buffers"))
+         ((= 1 (length buffers)) (switch-to-buffer (car buffers)))
+         (t
+          (unless (memq current (mapcar #'cdr slots))
+            (switch-to-buffer (cdar slots)))
+          ;; Show slots
+          (message "Vterm: %s"
+                   (mapconcat (lambda (s)
+                                (let ((idx (1+ (car s)))
+                                      (buf (cdr s)))
+                                  (if (eq buf (current-buffer))
+                                      (propertize (format "[%d:%s]" idx (buffer-name buf))
+                                                  'face '(:foreground "green" :weight bold))
+                                    (format " %d:%s " idx (buffer-name buf)))))
+                              slots " "))
+          ;; Setup transient map
+          (set-transient-map
+           (let ((map (make-sparse-keymap)))
+             (dolist (s slots)
+               (let* ((slot-idx (car s))
+                      (target-buf (cdr s)))
+                 (define-key map (kbd (nth slot-idx vterm-cycle-keys))
+                             `(lambda ()
+                                (interactive)
+                                (switch-to-buffer ,target-buf)
+                                (vterm-cycle)))))
+             map)))))))
 #+end_src
 * git
 ** magit
