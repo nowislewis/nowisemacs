@@ -10,6 +10,9 @@
 [submodule "borg"]
 	path = lib/borg
 	url = https://github.com/emacscollective/borg.git
+[submodule "breadcrumb"]
+	path = lib/breadcrumb
+	url = https://github.com/joaotavora/breadcrumb.git
 [submodule "cape"]
 	path = lib/cape
 	url = https://github.com/minad/cape.git

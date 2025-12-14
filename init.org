@@ -1171,6 +1171,10 @@ diff-hl-mode highlights uncommitted changes on the left side of the window (area
 ** vundo for undo history
 #+begin_src elisp
 (setup vundo
+  (setq undo-limit (* 64 1024 1024)
+        undo-strong-limit (* 96 1024 1024)
+        undo-outer-limit (* 960 1024 1024)
+        )
   (:bind "l" vundo-forward
          "h" vundo-backward
          "j" vundo-next
@@ -1703,9 +1707,6 @@ Jump anywhere in the world
       (add-hook 'vterm-mode-hook 'meomacs-vterm-meow-setup)))
 
   (setup vterm
-    ;; (when (eq system-type 'darwin)
-    ;;   (setq vterm-shell "zsh"))
-
     (keymap-global-set "M-`" #'vterm-toggle-window)
 
     (:when-loaded
@@ -2004,6 +2005,16 @@ borrowed from citre, now you can always jump-back use "M-," after any jump in th
 #+begin_src elisp
 (setup indent-bars
   (:hook-into prog-mode)
+  )
+#+end_src
+**** breadcrumb
+#+begin_src elisp
+(setup breadcrumb
+  (setq breadcrumb-idle-time 2
+        breadcrumb-imenu-crumb-separator "  "
+        breadcrumb-imenu-max-length 0.6
+        )
+  (breadcrumb-mode)
   )
 #+end_src
 *** treesit tools
