@@ -3000,6 +3000,7 @@ See also `org-save-all-org-buffers'"
   ;; (with-eval-after-load 'org
   ;;   (require 'org-srs-embed))
   ;; (add-hook 'org-mode-hook #'org-srs-embed-overlay-mode)
+  (add-hook 'org-mode-hook #'org-cloze-overlay-mode)
   (:with-map org-mode-map
     (:bind
      "<f4>" org-srs-item-confirm-command
@@ -3022,18 +3023,34 @@ See also `org-save-all-org-buffers'"
       ("u" "update cloze" org-srs-item-cloze-update)
       ]])
   ;; font lock for cloze
-  (defface my-org-fc-cloze-face
-    '((t (:weight bold :underline t :foreground "pale violet red")))
-    "A custom face with bold weight and a underline.")
+  (defun org-cloze-fontify (limit)
+    "Fontify cloze markup up to LIMIT."
+    (while (re-search-forward "{{\\([0-9a-z]+\\)}{\\([^}]+\\)}}" limit t)
+      (add-text-properties (match-beginning 0) (match-beginning 2)
+                           '(invisible org-cloze font-lock-multiline t))
+      (put-text-property (match-beginning 0) (1+ (match-beginning 0))
+                         'display "{")
+      (add-text-properties (match-beginning 2) (match-end 2)
+                           '(face my-org-emphasis-bold font-lock-multiline t))
+      (add-text-properties (match-end 2) (match-end 0)
+                           '(invisible org-cloze font-lock-multiline t))
+      (put-text-property (match-end 2) (1+ (match-end 2))
+                         'display "}")
+      (add-text-properties (1- (match-end 0)) (match-end 0)
+                           '(rear-nonsticky (invisible display)))))
 
-  (font-lock-add-keywords
-   'org-mode
-   '((
-      "\\({{[\\0-9a-z]+}{\\)\\([^}]+\\)\\(.*?}}\\)"
-      (1 'shadow nil t)
-      (2 'my-org-fc-cloze-face t)
-      (3 'shadow nil t)
-      )))
+  (define-minor-mode org-cloze-overlay-mode
+    "Toggle org-cloze-overlay-mode."
+    :lighter " Cloze"
+    (if org-cloze-overlay-mode
+        (progn
+          (add-to-invisibility-spec 'org-cloze)
+          (font-lock-add-keywords nil '((org-cloze-fontify)))
+          (font-lock-flush))
+      (progn
+        (remove-from-invisibility-spec 'org-cloze)
+        (font-lock-remove-keywords nil '((org-cloze-fontify)))
+        (font-lock-flush))))
   )
 #+end_src
 ** org-inc
