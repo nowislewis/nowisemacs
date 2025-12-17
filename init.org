@@ -1235,7 +1235,27 @@ diff-hl-mode highlights uncommitted changes on the left side of the window (area
 (setup consult-dir
   (define-key global-map (kbd "C-x C-d") #'consult-dir)
   (define-key minibuffer-local-completion-map (kbd "C-x C-d") #'consult-dir)
-  )
+  (:when-loaded
+
+    ;; add support for zoxide
+    (setq consult-dir-default-command #'consult-dir-dired)
+
+    (defun consult-dir--zoxide-dirs ()
+      "Return list of zoxide dirs."
+      (split-string (shell-command-to-string "zoxide query -l") "\n" t))
+
+    (defvar consult-dir--source-zoxide
+      `(:name "zoxide"
+              :narrow ?z
+              :category file
+              :face consult-file
+              :history file-name-history
+              :enabled ,(lambda () (executable-find "zoxide"))
+              :items ,#'consult-dir--zoxide-dirs)
+      "zoxide directory source for `consult-dir'.")
+
+    (add-to-list 'consult-dir-sources 'consult-dir--source-zoxide t)
+    ))
 #+end_src
 ** rg.el
 #+begin_src elisp
