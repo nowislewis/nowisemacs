@@ -2935,6 +2935,14 @@ See also `org-save-all-org-buffers'"
   (unless (org-entry-blocked-p)
     (or (outline-next-heading) (point-max))))
 
+;; 定义统一的 prefix format
+(defvar nowis-agenda-prefix-format-basic "%-20:(org-get-parent-heading): [%-4e] "
+  "Basic agenda prefix format.")
+
+(defvar nowis-agenda-prefix-format-enhanced
+  "%-20:(org-get-parent-heading): [%-4e] [%3(or (org-entry-get nil \"value\") \"\")] [%4(if (and (org-entry-get nil \"value\") (org-entry-get nil \"Effort\")) (format \"%.2f\" (/ (string-to-number (org-entry-get nil \"value\")) (org-duration-to-minutes (org-entry-get nil \"Effort\")))) \"\")] "
+  "Enhanced agenda prefix format with value and effort/value ratio.")
+
 (defmacro nowis-create-agenda-command (key description tag)
   `(list ,key ,description
          '(
@@ -2942,7 +2950,7 @@ See also `org-save-all-org-buffers'"
                       ((org-agenda-overriding-header
                         (nowis-align-to-window-center "󰛨 Week's Target 󰛨\n"))
                        (org-agenda-sorting-strategy '(todo-state-up priority-down timestamp-up))
-                       (org-agenda-prefix-format "%-20:(org-get-parent-heading): [%-4e] ")))
+                       (org-agenda-prefix-format nowis-agenda-prefix-format-enhanced)))
            (agenda ""
                    ((org-agenda-overriding-header (nowis-align-to-window-center " Today's Target "))
                     (org-agenda-span 'day)
@@ -2950,13 +2958,13 @@ See also `org-save-all-org-buffers'"
                      '(org-agenda-skip-if nil '(todo done)))))
            (tags-todo "+TODO=\"NEXT\""
                       ((org-agenda-overriding-header (nowis-align-to-window-center "NEXT"))
-                       (org-agenda-prefix-format "%-20:(org-get-parent-heading): [%-4e] ")
+                       (org-agenda-prefix-format nowis-agenda-prefix-format-enhanced)
                        (org-agenda-sorting-strategy '(todo-state-up priority-down timestamp-up))
                        ))
            (tags-todo "inbox-TODO=\"NEXT\"-PRIORITY=\"E\""
                       ((org-agenda-overriding-header (nowis-align-to-window-center "Inbox"))
                        (org-agenda-skip-function #'my-org-agenda-skip-blocked)
-                       (org-agenda-prefix-format "%-20:(org-get-parent-heading): [%-4e] ")
+                       (org-agenda-prefix-format nowis-agenda-prefix-format-enhanced)
                        (org-agenda-sorting-strategy '(todo-state-up priority-down timestamp-up))))
            ;; (tags-todo ,(concat "+action" tag) ((org-agenda-overriding-header (nowis-align-to-window-center "Soft Time"))
            ;;                                     (org-agenda-prefix-format "%-20:(org-get-parent-heading): [%-4e] ")
@@ -2965,20 +2973,20 @@ See also `org-save-all-org-buffers'"
            (tags-todo "inbox-TODO=\"NEXT\"+PRIORITY=\"E\""
                       ((org-agenda-overriding-header (nowis-align-to-window-center "Low Priority"))
                        (org-agenda-skip-function #'my-org-agenda-skip-blocked)
-                       (org-agenda-prefix-format "%-20:(org-get-parent-heading): [%-4e] ")
+                       (org-agenda-prefix-format nowis-agenda-prefix-format-enhanced)
                        (org-agenda-sorting-strategy '(todo-state-up priority-down timestamp-up))))
            (tags-todo "inbox-TODO=\"NEXT\""
                       ((org-agenda-overriding-header (nowis-align-to-window-center "Blocked"))
                        (org-agenda-skip-function #'my-org-agenda-skip-unblocked)
-                       (org-agenda-prefix-format "%-20:(org-get-parent-heading): [%-4e] ")
+                       (org-agenda-prefix-format nowis-agenda-prefix-format-basic)
                        (org-agenda-sorting-strategy '(todo-state-up priority-down timestamp-up))))
            (tags ,(concat "CLOSED>=\"<today>\"" tag)
                  ((org-agenda-overriding-header (nowis-align-to-window-center "Completed today"))
-                  (org-agenda-prefix-format "%-20:(org-get-parent-heading): [%-4e] ")
+                  (org-agenda-prefix-format nowis-agenda-prefix-format-basic)
                   ))
            (tags ,(concat "CLOSED>=\"<-1w>\"" tag)
                  ((org-agenda-overriding-header (nowis-align-to-window-center "Completed last 7 days"))
-                  (org-agenda-prefix-format "%-20:(org-get-parent-heading): [%-4e] ")
+                  (org-agenda-prefix-format nowis-agenda-prefix-format-basic)
                   ))
            )))
 
