@@ -1,6 +1,12 @@
 [submodule "ace-window"]
 	path = lib/ace-window
 	url = https://github.com/abo-abo/ace-window.git
+[submodule "acp"]
+	path = lib/acp
+	url = https://github.com/xenodium/acp.el.git
+[submodule "agent-shell"]
+	path = lib/agent-shell
+	url = https://github.com/xenodium/agent-shell.git
 [submodule "avy"]
 	path = lib/avy
 	url = https://github.com/abo-abo/avy.git
@@ -89,9 +95,6 @@
 [submodule "ebib"]
 	path = lib/ebib
 	url = https://github.com/joostkremers/ebib.git
-[submodule "eca"]
-	path = lib/eca
-	url = https://github.com/editor-code-assistant/eca-emacs.git
 [submodule "el-themes"]
 	path = lib/el-themes
 	url = https://github.com/protesilaos/ef-themes.git
@@ -245,11 +248,6 @@
 [submodule "org-media-note"]
 	path = lib/org-media-note
 	url = https://github.com/yuchen-lea/org-media-note.git
-[submodule "org-noter"]
-	path = lib/org-noter
-	url = https://github.com/org-noter/org-noter.git
-    load-path = .
-    load-path = modules
 [submodule "org-present"]
 	path = lib/org-present
 	url = https://github.com/rlister/org-present.git
@@ -298,6 +296,9 @@
 [submodule "setup"]
 	path = lib/setup
 	url = https://github.com/emacsmirror/setup.git
+[submodule "shell-maker"]
+	path = lib/shell-maker
+	url = https://github.com/xenodium/shell-maker.git
 [submodule "tabspaces"]
 	path = lib/tabspaces
 	url = https://github.com/mclear-tools/tabspaces.git

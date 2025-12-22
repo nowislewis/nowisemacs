@@ -109,7 +109,6 @@ I failed in love with denote, so previous *org-roam* configs were refiled into [
   - [[#insert-from-clipboard][insert from clipboard]]
   - [[#org-media-note][org-media-note]]
   - [[#org-sliced-images][org-sliced-images]]
-  - [[#org-noter][org-noter]]
   - [[#org-graphviz-mindmap][org-graphviz-mindmap]]
   - [[#org-ladder][org-ladder]]
 - [[#阅读][阅读]]
@@ -805,8 +804,8 @@ Maybe I should add a new state.
 
 ;; fixed font
 (setq lewis-fixed-font (cl-loop for font in '(
-                                              "JetBrains Maple Mono"
                                               "Maple Mono NF CN"
+                                              "JetBrains Maple Mono"
                                               "Maple Mono SC NF"
                                               "Unifont"
                                               ;; "InconsolataGo QiHei NF"
@@ -3155,10 +3154,6 @@ See also `org-save-all-org-buffers'"
   (:hook-into org-mode)
   )
 #+end_src
-** org-noter
-#+begin_src elisp
-(setup org-noter)
-#+end_src
 ** org-graphviz-mindmap
 #+begin_src elisp
 (setup org-graphviz-mindmap)
@@ -3335,10 +3330,16 @@ Simple distraction-free editing. I use darkroom instead of writeroom because it'
   )
 #+end_src
 *** eca
-#+begin_src elisp
+#+begin_src elisp :tangle no
 (setup eca
   (setq eca-server-download-method 'curl)
   )
+#+end_src
+*** agent-shell
+#+begin_src elisp
+(setup acp)
+(setup shell-maker)
+(setup agent-shell)
 #+end_src
 ** webjump
 #+begin_src elisp
