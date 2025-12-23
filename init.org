@@ -140,8 +140,8 @@ I failed in love with denote, so previous *org-roam* configs were refiled into [
 #+begin_src elisp :tangle ~/.emacs.d/early-init.el
 ;; -*- lexical-binding: t; -*-
 ;; set gc according to EmacsConf 2023
-;; (setq gc-cons-threshold 8000000
-;;       gc-cons-percentage 0.2)
+(setq gc-cons-threshold 8000000
+      gc-cons-percentage 0.2)
 ;; Package initialize occurs automatically, before `user-init-file' is
 ;; loaded, but after `early-init-file'. We handle package
 ;; initialization, so we must prevent Emacs from doing it early!
@@ -3330,16 +3330,10 @@ Simple distraction-free editing. I use darkroom instead of writeroom because it'
   )
 #+end_src
 *** eca
-#+begin_src elisp :tangle no
+#+begin_src elisp
 (setup eca
   (setq eca-server-download-method 'curl)
   )
-#+end_src
-*** agent-shell
-#+begin_src elisp
-(setup acp)
-(setup shell-maker)
-(setup agent-shell)
 #+end_src
 ** webjump
 #+begin_src elisp
