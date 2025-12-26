@@ -3103,7 +3103,12 @@ See also `org-save-all-org-buffers'"
 ** doc-capture
 #+begin_src elisp
 (setup doc-capture
+  (:autoload doc-capture-process)
   (setq doc-capture-org-directory (concat org-inc-directory "doc-capture/"))
+  (:when-loaded
+    (require' doc-capture-org-inc-integration)
+    )
+
   )
 #+end_src
 ** insert from clipboard
