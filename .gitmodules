@@ -83,6 +83,9 @@
 [submodule "dired-sidebar"]
 	path = lib/dired-sidebar
 	url = https://github.com/jojojames/dired-sidebar.git
+[submodule "doc-capture"]
+	path = lib/doc-capture
+	url = https://github.com/nowislewis/doc-capture.git
 [submodule "dracula"]
 	path = lib/dracula
 	url = https://github.com/dracula/emacs.git

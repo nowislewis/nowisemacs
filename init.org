@@ -106,6 +106,7 @@ I failed in love with denote, so previous *org-roam* configs were refiled into [
   - [[#agendagtd][agenda/gtd]]
   - [[#org-srs][org-srs]]
   - [[#org-inc][org-inc]]
+  - [[#doc-capture][doc-capture]]
   - [[#insert-from-clipboard][insert from clipboard]]
   - [[#org-media-note][org-media-note]]
   - [[#org-sliced-images][org-sliced-images]]
@@ -3097,6 +3098,12 @@ See also `org-save-all-org-buffers'"
         (call-interactively #'zap-to-char)))
     (global-set-key (kbd "M-z") #'my/m-z-action)
     )
+  )
+#+end_src
+** doc-capture
+#+begin_src elisp
+(setup doc-capture
+  (setq doc-capture-org-directory (concat org-inc-directory "doc-capture/"))
   )
 #+end_src
 ** insert from clipboard
