@@ -245,9 +245,6 @@
 [submodule "org-ladder"]
 	path = lib/org-ladder
 	url = https://github.com/nowislewis/org-ladder.git
-[submodule "org-media-note"]
-	path = lib/org-media-note
-	url = https://github.com/yuchen-lea/org-media-note.git
 [submodule "org-present"]
 	path = lib/org-present
 	url = https://github.com/rlister/org-present.git

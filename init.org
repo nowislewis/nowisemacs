@@ -108,7 +108,6 @@ I failed in love with denote, so previous *org-roam* configs were refiled into [
   - [[#org-inc][org-inc]]
   - [[#doc-capture][doc-capture]]
   - [[#insert-from-clipboard][insert from clipboard]]
-  - [[#org-media-note][org-media-note]]
   - [[#org-sliced-images][org-sliced-images]]
   - [[#org-graphviz-mindmap][org-graphviz-mindmap]]
   - [[#org-ladder][org-ladder]]
@@ -129,6 +128,7 @@ I failed in love with denote, so previous *org-roam* configs were refiled into [
   - [[#uniline][uniline]]
   - [[#excalidraw][excalidraw]]
   - [[#manage-web-bookmarks][manage-web-bookmarks]]
+  - [[#eww][eww]]
 - [[#games][games]]
   - [[#minesweeper][minesweeper]]
 - [[#system-specific-config][system-specific-config]]
@@ -3179,11 +3179,6 @@ See also `org-save-all-org-buffers'"
       )
     ))
 #+end_src
-** org-media-note
-#+begin_src elisp
-(setup org-media-note
-  (setq org-media-note-screenshot-image-dir (concat nowis-doc-emacs-dir "30-saved-binary/org-media-note")))
-#+end_src
 ** org-sliced-images
 #+begin_src elisp
 (setup org-sliced-images
@@ -3538,6 +3533,12 @@ ESUP - Emacs Start Up Profiler
            (switch-to-buffer original-buffer)
            (goto-char original-point)
            (signal (car err) (cdr err))))))
+#+end_src
+** eww
+#+begin_src elisp
+(setup eww
+  (setq eww-search-prefix "https://www.bing.com/search?q=")
+  )
 #+end_src
 * games
 ** minesweeper
