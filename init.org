@@ -1306,6 +1306,14 @@ should be check after reading the embark.el manual
   (keymap-global-set "C-S-a" #'embark-act))
 
 (setup wgrep)
+
+;; open pdf with zathura
+(defun my/open-with-zathura (file)
+  "Open FILE with zathura."
+  (start-process "zathura" nil "zathura" file))
+
+(with-eval-after-load 'embark
+  (define-key embark-file-map (kbd "z") #'my/open-with-zathura))
 #+end_src
 ** yasnippet
 #+begin_src elisp
@@ -2862,29 +2870,45 @@ In short, you will need 3 files:
 ;; (add-hook 'org-capture-mode-hook 'delete-other-windows)
 (setup org
   (:when-loaded
+
+;;; 辅助函数
+    (defvar doc-capture-org-inc--title "helo"
+      "临时存储标题")
+
+    (defvar doc-capture-org-inc--content "content"
+      "临时存储内容")
+
+    (defun doc-capture-org-inc-get-title ()
+      "获取标题"
+      doc-capture-org-inc--title)
+
+    (defun doc-capture-org-inc-get-content ()
+      "获取内容"
+      doc-capture-org-inc--content)
+    (defcustom doc-capture-org-inc-file (expand-file-name "~/org-inc.org")
+      "org-inc 数据库文件路径"
+      :type 'file
+      :group 'doc-capture)
+
+
     (setq org-capture-templates
           `(("i" "Inbox" entry  (file+olp+datetree "gtd/inbox.org")
              ,(concat "* TODO %?\n"
                       "/Entered on/ %U"))
             ("d" "Done without clock" entry (file+olp+datetree "gtd/inbox.org")
              ,(concat "* DONE %?\n"
-                      "CLOSED: %U\n"
-                      ":LOGBOOK:\n"
-                      "CLOCK: [%<%Y-%m-%d %a %H:%M>]--[%<%Y-%m-%d %a %H:%M>] =>  \n"
-                      ":END:"))
-            ("D" "Done with clock" entry  (file+olp+datetree "gtd/inbox.org")
-             ,(concat "* DONE %?\n"
                       "CLOSED: %U"))
-            ("m" "Meeting" entry  (file+headline "agenda.org" "Future")
-             ,(concat "* %? :meeting:\n"
-                      "<%<%Y-%m-%d %a %H:00>>"))
-            ("n" "Note" entry  (file "notes.org")
-             ,(concat "* Note (%a)\n"
-                      "/Entered on/ %U\n" "\n" "%?"))
-            ("@" "Inbox [mu4e]" entry (file "inbox.org")
-             ,(concat "* TODO Reply to \"%a\" %?\n"
-                      "/Entered on/ %U")))))
-  )
+            ("t" "org-inc topic"
+             entry (file ,doc-capture-org-inc-file)
+             "* %(doc-capture-org-inc-get-title)\n%(doc-capture-org-inc-get-content)"
+             :immediate-finish t
+             ;; :jump-to-captured t
+             :hook ,(lambda ()
+                                (if (not (featurep 'org-inc))
+                                    (require 'org-inc))
+                                  (unless (org-id-get)
+                                    (org-id-get-create))
+                                  (org-srs-item-new 'topic)))))))
 #+end_src
 *** refile
 #+begin_src elisp
@@ -3256,20 +3280,22 @@ Simple distraction-free editing. I use darkroom instead of writeroom because it'
     (setq-default gptel-backend (gptel-make-gh-copilot "Copilot"))
     (gptel-make-openai "chatanywhere"
       :host "api.chatanywhere.tech"
-      :header (lambda () `(("Authorization" . ,(concat "Bearer " (gptel--get-api-key)))))
+      ;; :header (lambda () `(("Authorization" . ,(concat "Bearer " (gptel--get-api-key)))))
       :key 'gptel-api-key
       :stream t
       :models '(gpt-5 deepseek-v3.1-250821 claude-haiku-4-5-20251001))
-    (gptel-make-openai "momenta"
+    (gptel-make-anthropic "momenta"
       :host "llm-gateway.momenta.works"
-      :header (lambda () `(("Authorization" . ,(concat "Bearer " (gptel--get-api-key)))))
       :key 'gptel-api-key
       :stream t
       :models '(claude-sonnet-4.5 claude-haiku-4.5 minimax-m2 gemini-3-pro deepseek-v3.2))
     (gptel-make-gemini "Gemini" :key 'gptel-api-key :stream t)
-    (gptel-make-deepseek "DeepSeek"
+    (gptel-make-anthropic "DeepSeek"
+      :host "api.deepseek.com/anthropic"
+      :key 'gptel-api-key
       :stream t
-      :key 'gptel-api-key)
+      :models '(deepseek-chat deepseek-reasoner)
+      )
     ))
 #+end_src
 *** gptel-agent
