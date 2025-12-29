@@ -113,9 +113,6 @@
 [submodule "esup"]
 	path = lib/esup
 	url = https://github.com/jschaf/esup.git
-[submodule "esxml"]
-	path = lib/esxml
-	url = https://github.com/tali713/esxml.git
 [submodule "f"]
 	path = lib/f
 	url = https://github.com/rejeep/f.el.git
@@ -220,9 +217,6 @@
 [submodule "no-littering"]
 	path = lib/no-littering
 	url = https://github.com/emacscollective/no-littering.git
-[submodule "nov"]
-	path = lib/nov
-	url = https://depp.brause.cc/nov.el.git
 [submodule "nowis-gptel-tools"]
 	path = lib/nowis-gptel-tools
 	url = https://github.com/nowislewis/nowis-gptel-tools.git

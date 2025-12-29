@@ -2870,40 +2870,18 @@ In short, you will need 3 files:
 ;; (add-hook 'org-capture-mode-hook 'delete-other-windows)
 (setup org
   (:when-loaded
-
-;;; 辅助函数
-    (defvar doc-capture-org-inc--title "helo"
-      "临时存储标题")
-
-    (defvar doc-capture-org-inc--content "content"
-      "临时存储内容")
-
-    (defun doc-capture-org-inc-get-title ()
-      "获取标题"
-      doc-capture-org-inc--title)
-
-    (defun doc-capture-org-inc-get-content ()
-      "获取内容"
-      doc-capture-org-inc--content)
-    (defcustom doc-capture-org-inc-file (expand-file-name "~/org-inc.org")
-      "org-inc 数据库文件路径"
-      :type 'file
-      :group 'doc-capture)
-
-
     (setq org-capture-templates
           `(("i" "Inbox" entry  (file+olp+datetree "gtd/inbox.org")
              ,(concat "* TODO %?\n"
-                      "/Entered on/ %U"))
+                      "/Entered on/ %U")
+             )
             ("d" "Done without clock" entry (file+olp+datetree "gtd/inbox.org")
              ,(concat "* DONE %?\n"
                       "CLOSED: %U"))
-            ("t" "org-inc topic"
-             entry (file ,doc-capture-org-inc-file)
-             "* %(doc-capture-org-inc-get-title)\n%(doc-capture-org-inc-get-content)"
-             :immediate-finish t
-             ;; :jump-to-captured t
-             :hook ,(lambda ()
+            ("t" "org-inc topic" entry (file ,(concat org-inc-directory "20251201T112101--incubate.org"))
+             ,(concat "* TODO %?\n"
+                      "/Entered on/ %U")
+             :before-finalize ,(lambda ()
                                 (if (not (featurep 'org-inc))
                                     (require 'org-inc))
                                   (unless (org-id-get)
@@ -3238,7 +3216,7 @@ See also `org-save-all-org-buffers'"
                             ))
 #+end_src
 ** nov
-#+begin_src elisp
+#+begin_src elisp :tangle no
 (setup esxml) ;; <- (setup kv)
 (setup nov
   (:bind "]" nov-scroll-up
