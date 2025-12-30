@@ -3275,14 +3275,14 @@ Simple distraction-free editing. I use darkroom instead of writeroom because it'
 #+begin_src elisp
 (setup gptel-agent
   (:when-loaded
-    (gptel-agent-update)
+    (add-to-list 'gptel-agent-dirs (concat nowis-doc-emacs-dir "131-gptel-presets/"))
+    (mapc (lambda (agent)
+            (let ((agent-name (car agent)))
+              (unless (member agent-name '("gptel-agent" "gptel-plan"))
+                (apply #'gptel-make-preset agent))))
+          (gptel-agent-update))
+
     )
-  )
-#+end_src
-*** nowis-gptel-tools
-#+begin_src elisp
-(setup nowis-gptel-tools
-  (:load-after gptel)
   )
 #+end_src
 *** gptel-local-org-prompts
