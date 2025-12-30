@@ -180,6 +180,10 @@ I failed in love with denote, so previous *org-roam* configs were refiled into [
 #+begin_src elisp
 ;; -*- lexical-binding: t; -*-
 ;; basic modes
+
+;; turn off native-comp
+(setq native-comp-speed -1)
+
 (setq use-short-answers t)
 (setq confirm-kill-emacs 'y-or-n-p)
 (setq ring-bell-function 'ignore)       ;关闭烦人的出错时的提示声
