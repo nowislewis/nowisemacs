@@ -181,8 +181,9 @@ I failed in love with denote, so previous *org-roam* configs were refiled into [
 ;; -*- lexical-binding: t; -*-
 ;; basic modes
 
-;; turn off native-comp
-(setq native-comp-speed -1)
+;; turn off native-comp on macos
+(if (eq system-type 'darwin)
+    (setq native-comp-speed -1))
 
 (setq use-short-answers t)
 (setq confirm-kill-emacs 'y-or-n-p)
@@ -3279,7 +3280,10 @@ Simple distraction-free editing. I use darkroom instead of writeroom because it'
 #+begin_src elisp
 (setup gptel-agent
   (:when-loaded
-    (add-to-list 'gptel-agent-dirs (concat nowis-doc-emacs-dir "131-gptel-presets/"))
+    (let ((preset-dir (concat nowis-doc-emacs-dir "131-gptel-presets/")))
+      (when (file-directory-p preset-dir)
+        (add-to-list 'gptel-agent-dirs preset-dir)))
+
     (mapc (lambda (agent)
             (let ((agent-name (car agent)))
               (unless (member agent-name '("gptel-agent" "gptel-plan"))
