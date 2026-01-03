@@ -275,7 +275,7 @@ emacs
 (defvar nowis-doc-emacs-dir (file-truename "~/Documents/emacs/"))
 (defvar nowis-gtd-dir (concat nowis-doc-emacs-dir "01-orgmode/xnotes/gtd"))
 (defvar nowis-bib-dir (concat nowis-doc-emacs-dir "03-bibliography/"))
-(defvar nowis-bib-pdf-dir (concat nowis-doc-emacs-dir "02-binary-git/binary-files/02-searchable/01-papers-markable/"))
+(defvar nowis-bib-pdf-dir (concat nowis-doc-emacs-dir "02-binary-git/searchable"))
 #+end_src
 * Package Management
 ** setup
@@ -2673,7 +2673,9 @@ Comments:
            bibtex-autokey-titleword-length 15
            bibtex-autokey-titlewords 10
            bibtex-autokey-titleword-ignore ;; I took "On" out of this
-           '("A" "An" "The" "Eine?" "Der" "Die" "Das")))
+           '("A" "An" "The" "Eine?" "Der" "Die" "Das")
+           bibtex-dialect 'biblatex
+           ))
 
 (defun do.refs/get-db-file-list ()
   "Get the list of all the bib files containing my bib database."
@@ -2698,7 +2700,7 @@ Comments:
 *** citar-denote
 #+begin_src elisp
 (setup citar-denote
-  (setq citar-denote-title-format "title")
+  (setq citar-denote-title-format "author-year-title")
   (with-eval-after-load 'citar
     (citar-denote-mode)
     )
@@ -2812,7 +2814,7 @@ Perform the comparison with `string<'."
 #+begin_src elisp
 (defun project-find-searchable-dir-files ()
   (interactive)
-  (dired (concat nowis-doc-emacs-dir "02-binary-git/binary-files/02-searchable"))
+  (dired (concat nowis-doc-emacs-dir "02-binary-git/searchable"))
   (project-find-file t))
 (defun project-find-gtd-dir-files ()
   (interactive)
@@ -3048,7 +3050,6 @@ See also `org-save-all-org-buffers'"
     [
      ["review"
       ("s" "start current" org-srs-review-start)
-      ("S" "start all" my/denote-review-srs-files-batch)
       ("q" "quit" org-srs-review-quit)
       ]
      ["create"
@@ -3435,7 +3436,7 @@ ESUP - Emacs Start Up Profiler
 ** uniline
 #+begin_src elisp
 (setup uniline
-  (:bind "M-i" #'uniline-launch-interface)
+  (define-key uniline-mode-map (kbd "M-i") #'uniline-launch-interface)
   )
 (setup uniline-transient
   (:autoload uniline-mode uniline-launch-interface)
