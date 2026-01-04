@@ -629,6 +629,7 @@ Maybe I should add a new state.
    ["bibtex"
     ("e" "ebib" ebib)
     ("b" "citar-open" citar-open)
+    ("u" "update denote with bibtex" denote-bibtex-update-reference)
     ]
    ["review cards"
     ("s" "org-srs" org-srs-transient-map)
@@ -720,7 +721,6 @@ Maybe I should add a new state.
   )
 #+end_src
 ** meow leader keybindings
-#+name: meow-leader-keys
 #+begin_src elisp
 ;; default
 (meow-leader-define-key
@@ -770,7 +770,6 @@ Maybe I should add a new state.
  )
 #+end_src
 ** which-key
-#+name: which-key
 #+begin_src elisp
 (setup which-key
   (setq which-key-idle-delay 0.1)
@@ -797,7 +796,6 @@ Maybe I should add a new state.
 #+end_src
 * UI
 ** font
-#+name: font
 #+begin_src elisp
 (defun font-installed-p (font-name)
   "Check if font with FONT-NAME is available."
@@ -2667,15 +2665,20 @@ Comments:
 #+begin_src elisp
 (setup bibtex
   (setq bibtex-autokey-year-length 4
-           bibtex-autokey-titleword-separator "_"
-           bibtex-autokey-name-year-separator "_"
-           bibtex-autokey-year-title-separator "_"
-           bibtex-autokey-titleword-length 15
-           bibtex-autokey-titlewords 10
-           bibtex-autokey-titleword-ignore ;; I took "On" out of this
-           '("A" "An" "The" "Eine?" "Der" "Die" "Das")
-           bibtex-dialect 'biblatex
-           ))
+        bibtex-autokey-titleword-separator "_"
+        bibtex-autokey-name-year-separator "_"
+        bibtex-autokey-year-title-separator "_"
+        bibtex-autokey-titleword-length 15
+        bibtex-autokey-titlewords 10
+        bibtex-autokey-titleword-ignore ;; I took "On" out of this
+        '("A" "An" "The" "Eine?" "Der" "Die" "Das")
+        bibtex-dialect 'biblatex
+        )
+  (with-eval-after-load 'bibtex
+    (add-to-list 'bibtex-biblatex-field-alist
+                 '("keywords" "Keywords or phrases")))
+
+  )
 
 (defun do.refs/get-db-file-list ()
   "Get the list of all the bib files containing my bib database."
@@ -2683,6 +2686,32 @@ Comments:
       (directory-files-recursively nowis-bib-dir "\\.bib\\'" t)
     nil))
 #+end_src
+*** parse-bibtex-into-denote
+#+begin_src elisp
+(defun denote-bibtex-update-reference ()
+  (interactive)
+  (save-excursion
+    (goto-char (point-min))
+    (when (re-search-forward "^#\\+begin_src bibtex\n@\\w+{\\([^,]+\\)" nil t)
+      (let ((key (match-string 1)))
+        (goto-char (point-min))
+        (if (re-search-forward "^#\\+title:" nil t)
+            (progn
+              (beginning-of-line)
+              (kill-line)
+              (insert (format "#+title:      %s" key))))
+        (if (re-search-forward "^#\\+reference:" nil t)
+            (progn
+              (beginning-of-line)
+              (kill-line)
+              (insert (format "#+reference:  %s" key)))
+          (goto-char (point-min))
+          (when (re-search-forward "^#\\+identifier:" nil t)
+            (end-of-line)
+            (insert (format "\n#+reference:  %s" key))))
+        (message "已更新 reference: %s" key)))))
+#+end_src
+
 *** citar
 #+begin_src elisp
 (setup parsebib)
@@ -3246,7 +3275,7 @@ Simple distraction-free editing. I use darkroom instead of writeroom because it'
 #+begin_src elisp
 (setup gptel
   (setq gptel-default-mode 'org-mode
-        gptel-crowdsourced-prompts-file (concat nowis-doc-emacs-dir "09-scripts/chatgpt.csv")
+        ;; gptel-crowdsourced-prompts-file (concat nowis-doc-emacs-dir "09-scripts/chatgpt.csv")
         gptel-highlight-methods '(face)
         ;; gptel-model 'deepseek-v3
         gptel-model 'gpt-4.1
@@ -3267,7 +3296,7 @@ Simple distraction-free editing. I use darkroom instead of writeroom because it'
       :host "llm-gateway.momenta.works"
       :key 'gptel-api-key
       :stream t
-      :models '(claude-sonnet-4.5 claude-haiku-4.5 minimax-m2 gemini-3-pro deepseek-v3.2))
+      :models '(claude-sonnet-4.5 claude-haiku-4.5 minimax-m2.1 gpt-5.2 gemini-3-pro deepseek-v3.2))
     (gptel-make-gemini "Gemini" :key 'gptel-api-key :stream t)
     (gptel-make-anthropic "DeepSeek"
       :host "api.deepseek.com/anthropic"
@@ -3436,8 +3465,9 @@ ESUP - Emacs Start Up Profiler
 ** uniline
 #+begin_src elisp
 (setup uniline
+  (:when-loaded
   (define-key uniline-mode-map (kbd "M-i") #'uniline-launch-interface)
-  )
+  ))
 (setup uniline-transient
   (:autoload uniline-mode uniline-launch-interface)
   )
