@@ -204,12 +204,9 @@ I failed in love with denote, so previous *org-roam* configs were refiled into [
 ** load-path
 #+NAME: load-path
 #+begin_src elisp
-(add-to-list 'load-path (expand-file-name "lib/borg" user-emacs-directory))
-(require 'borg)
-(setq borg-rewrite-urls-alist
-      '(("git@github.com:" . "https://github.com/")
-        ("git@gitlab.com:" . "https://gitlab.com/")))
-(borg-initialize)
+(add-to-list 'load-path (expand-file-name "lisp" user-emacs-directory))
+(require 'batch-build-pkgs)
+(batch-build-pkgs-initialize)
 #+end_src
 ** drop out
 The following content is not enabled yet, because I want to minimize unnecessary settings as much as possible
@@ -1967,6 +1964,7 @@ Emacs major-mode to work with Beancount ledger files
 *** scheme
 #+begin_src elisp
 (setup geiser)
+ (add-to-list 'load-path (expand-file-name "lib/geiser/elisp" user-emacs-directory))
 (setup geiser-guile)
 #+end_src
 *** common lisp slime
@@ -3292,7 +3290,7 @@ Simple distraction-free editing. I use darkroom instead of writeroom because it'
       :key 'gptel-api-key
       :stream t
       :models '(gpt-5 deepseek-v3.1-250821 claude-haiku-4-5-20251001))
-    (gptel-make-anthropic "momenta"
+    (gptel-make-openai "momenta"
       :host "llm-gateway.momenta.works"
       :key 'gptel-api-key
       :stream t
@@ -3304,6 +3302,12 @@ Simple distraction-free editing. I use darkroom instead of writeroom because it'
       :stream t
       :models '(deepseek-chat deepseek-reasoner)
       )
+    (defface gptel-response-highlight
+      '((((background light) (min-colors 88)) :background "linen" :extend t)
+        (((background dark)  (min-colors 88)) :background "gray22" :extend t)
+        (t :inherit mode-line))
+      :group 'gptel)
+
     ))
 #+end_src
 *** gptel-agent

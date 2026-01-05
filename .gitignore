@@ -9,3 +9,5 @@
 !modules/
 init-config.el
 !init-minimal.el
+!lisp
+*.elc

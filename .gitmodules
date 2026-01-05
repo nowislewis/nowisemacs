@@ -7,9 +7,6 @@
 [submodule "beancount"]
 	path = lib/beancount
 	url = https://github.com/beancount/beancount-mode.git
-[submodule "borg"]
-	path = lib/borg
-	url = https://github.com/emacscollective/borg.git
 [submodule "breadcrumb"]
 	path = lib/breadcrumb
 	url = https://github.com/joaotavora/breadcrumb.git
