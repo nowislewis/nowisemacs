@@ -5,17 +5,19 @@ LIB_DIR := lib
 LISP_DIR := lisp
 PACKAGES := $(notdir $(wildcard $(LIB_DIR)/*))
 
-.PHONY: help build autoloads compile init-build clean init update
+.PHONY: help build native autoloads compile init-build clean init update
 
 help:
 	@echo "Simple Package Manager"
 	@echo ""
 	@echo "Available targets:"
-	@echo "  make build            - Build all packages (use -j8 for parallel)"
-	@echo "  make -j8 build        - Parallel build with 8 jobs (faster)"
+	@echo "  make build            - Build all packages (byte-compile)"
+	@echo "  make -j8 build        - Parallel build with 8 jobs (byte-compile)"
+	@echo "  make native           - Native-compile all packages (slower)"
+	@echo "  make -j8 native       - Parallel native-compile (slower)"
 	@echo "  make init-build       - Generate init.el from init.org"
 	@echo "  make lib/PACKAGE      - Build a single package"
-	@echo "  make clean            - Remove all .elc files and autoloads"
+	@echo "  make clean            - Remove all .elc/.eln files and autoloads"
 	@echo "  make init             - Initialize/update git submodules"
 	@echo "  make update           - Update all submodules to latest commit"
 	@echo ""
@@ -37,6 +39,16 @@ compile-%:
 		-l batch-build-pkgs \
 		--eval "(batch-build-pkgs-batch-compile-single \"$*\")"
 
+# Native compilation variant
+compile-native: autoloads $(addprefix compile-native-, $(PACKAGES))
+
+compile-native-%:
+	@$(EMACS) -Q --batch \
+		-L $(LISP_DIR) \
+		-l batch-build-pkgs \
+		--eval "(setq batch-build-pkgs-use-native-compile t)" \
+		--eval "(batch-build-pkgs-batch-compile-single \"$*\")"
+
 # Generate init.el from init.org
 init-build:
 	@if [ -f init.org ]; then \
@@ -49,12 +61,19 @@ init-build:
 		echo "init.org not found, skipping..."; \
 	fi
 
-# Main build target
+# Main build target (byte-compile)
 build: compile
 	@echo ""
 	@$(MAKE) init-build
 	@echo ""
 	@echo "Build complete!"
+
+# Native compile target
+native: compile-native
+	@echo ""
+	@$(MAKE) init-build
+	@echo ""
+	@echo "Native compilation complete!"
 
 lib/%: .FORCE
 	@echo "Building package: $*"
@@ -69,6 +88,7 @@ lib/%: .FORCE
 clean:
 	@echo "Cleaning compiled files..."
 	@find $(LIB_DIR) -name "*.elc" -type f -delete -print
+	@find $(LIB_DIR) -name "*.eln" -type f -delete -print 2>/dev/null || true
 	@find $(LIB_DIR) -name "*-autoloads.el" -type f -delete -print
 	@echo "Clean complete!"
 

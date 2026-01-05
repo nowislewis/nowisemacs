@@ -92,11 +92,22 @@ Adds each package to load-path and loads each package's autoloads file."
        nil  ; no excludes
        nil)))) ; no extra-data
 
+(defvar batch-build-pkgs-use-native-compile nil
+  "Whether to use native compilation instead of byte compilation.")
+
 (defun batch-build-pkgs--compile-package (pkg-dir)
   "Compile all Elisp files in PKG-DIR."
-  (let ((byte-compile-warnings '(not free-vars unresolved)))
-    (dolist (file (batch-build-pkgs--collect-el-files pkg-dir))
-      (byte-compile-file file))))
+  (let ((byte-compile-warnings '(not free-vars unresolved))
+        (files (batch-build-pkgs--collect-el-files pkg-dir)))
+    (if batch-build-pkgs-use-native-compile
+        ;; Native compilation
+        (progn
+          (require 'comp)
+          (dolist (file files)
+            (native-compile file)))
+      ;; Byte compilation
+      (dolist (file files)
+        (byte-compile-file file)))))
 
 (defun batch-build-pkgs--setup-load-path-all ()
   "Add all packages and their whitelisted subdirectories to load-path."
