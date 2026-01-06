@@ -3302,14 +3302,12 @@ Simple distraction-free editing. I use darkroom instead of writeroom because it'
       :stream t
       :models '(deepseek-chat deepseek-reasoner)
       )
-    (defface gptel-response-highlight
-      '((((background light) (min-colors 88)) :background "linen" :extend t)
-        (((background dark)  (min-colors 88)) :background "gray22" :extend t)
-        (t :inherit mode-line))
-      :group 'gptel)
+    (custom-set-faces
+     '(gptel-response-highlight ((((background dark) (min-colors 88)) :background "gray22" :extend t))))
 
     ))
 #+end_src
+
 *** gptel-agent
 #+begin_src elisp
 (setup gptel-agent

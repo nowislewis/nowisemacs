@@ -330,3 +330,12 @@
 [submodule "ztree"]
 	path = lib/ztree
 	url = https://codeberg.org/fourier/ztree.git
+[submodule "lib/agent-shell"]
+	path = lib/agent-shell
+	url = https://github.com/xenodium/agent-shell.git
+[submodule "lib/shell-maker"]
+	path = lib/shell-maker
+	url = https://github.com/xenodium/shell-maker.git
+[submodule "lib/acp"]
+	path = lib/acp
+	url = https://github.com/xenodium/acp.el.git
