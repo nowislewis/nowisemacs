@@ -94,7 +94,7 @@ clean:
 
 init:
 	@echo "Initializing git submodules..."
-	@git submodule update --init --jobs 8
+	@git submodule update --init --jobs 16
 	@git submodule foreach git reset --hard
 	@echo "Init complete!"
 
