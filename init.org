@@ -106,6 +106,7 @@ I failed in love with denote, so previous *org-roam* configs were refiled into [
   - [[#agendagtd][agenda/gtd]]
   - [[#org-srs][org-srs]]
   - [[#org-inc][org-inc]]
+  - [[#inline-anki][inline-anki]]
   - [[#doc-capture][doc-capture]]
   - [[#insert-from-clipboard][insert from clipboard]]
   - [[#org-sliced-images][org-sliced-images]]
@@ -2658,6 +2659,8 @@ Comments:
                            (setq prettify-symbols-alist
                                  '(("#+begin_src" . ?)
                                    ("#+end_src" . ?)
+                                   ("#+BEGIN_SRC" . ?)
+                                   ("#+END_SRC" . ?)
                                    ))
                            (prettify-symbols-mode)
                            ))
@@ -3089,8 +3092,7 @@ See also `org-save-all-org-buffers'"
 (setup org-srs
   ;; (with-eval-after-load 'org
   ;;   (require 'org-srs-embed))
-  ;; (add-hook 'org-mode-hook #'org-srs-embed-overlay-mode)
-  (add-hook 'org-mode-hook #'org-cloze-overlay-mode)
+  ;; (add-hook 'org-mode-hook #'org-cloze-overlay-mode)
   (:with-map org-mode-map
     (:bind
      "<f4>" org-srs-item-confirm-command
@@ -3160,6 +3162,38 @@ See also `org-save-all-org-buffers'"
     (global-set-key (kbd "M-z") #'my/m-z-action)
     )
   )
+#+end_src
+** inline-anki
+#+begin_src elisp
+(setup request)
+(setup asyncloop)
+(setup inline-anki
+(defvar-local org-inline-anki-overlays nil)
+
+(defun org-inline-anki-overlay-update ()
+  "Update all inline anki overlays."
+  (mapc #'delete-overlay org-inline-anki-overlays)
+  (setq org-inline-anki-overlays nil)
+  (when org-inline-anki-overlay-mode
+    (save-excursion
+      (goto-char (point-min))
+      (while (re-search-forward "@\\^{\\([0-9]+\\)}" nil t)
+        (let ((ov (make-overlay (match-beginning 0) (match-end 0))))
+          (overlay-put ov 'display
+                       (propertize " 󰯂" 'face '(:foreground "#98C379" :weight bold)))
+          (push ov org-inline-anki-overlays))))))
+
+(define-minor-mode org-inline-anki-overlay-mode
+  "Toggle @^{timestamp} beautification for inline anki."
+  :lighter " 󰯂"
+  (org-inline-anki-overlay-update)
+  (if org-inline-anki-overlay-mode
+      (add-hook 'after-save-hook #'org-inline-anki-overlay-update nil t)
+    (remove-hook 'after-save-hook #'org-inline-anki-overlay-update t)))
+
+      (add-hook 'org-mode-hook #'org-inline-anki-overlay-mode)
+
+    )
 #+end_src
 ** doc-capture
 #+begin_src elisp

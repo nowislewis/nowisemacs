@@ -333,3 +333,12 @@
 [submodule "lib/eat"]
 	path = lib/eat
 	url = https://codeberg.org/akib/emacs-eat.git
+[submodule "lib/inline-anki"]
+	path = lib/inline-anki
+	url = https://github.com/meedstrom/inline-anki.git
+[submodule "lib/asyncloop"]
+	path = lib/asyncloop
+	url = https://github.com/meedstrom/asyncloop.git
+[submodule "lib/request"]
+	path = lib/request
+	url = https://github.com/tkf/emacs-request.git
