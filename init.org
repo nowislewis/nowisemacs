@@ -2942,7 +2942,7 @@ In short, you will need 3 files:
              ,(concat "* DONE %?\n"
                       "CLOSED: %U"))
             ("t" "org-inc topic" entry (file ,(concat org-inc-directory "20251201T112101--incubate.org"))
-             ,(concat "* TODO %?\n"
+             ,(concat "* %?\n"
                       "/Entered on/ %U")
              :before-finalize ,(lambda ()
                                 (if (not (featurep 'org-inc))
@@ -3090,16 +3090,8 @@ See also `org-save-all-org-buffers'"
 #+begin_src elisp
 (setup lisp-fsrs)
 (setup org-srs
-  ;; (with-eval-after-load 'org
-  ;;   (require 'org-srs-embed))
-  ;; (add-hook 'org-mode-hook #'org-cloze-overlay-mode)
-  (:with-map org-mode-map
-    (:bind
-     "<f4>" org-srs-item-confirm-command
-     "<f5>"  org-srs-review-rate-easy
-     "<f6>"  org-srs-review-rate-good
-     "<f7>"  org-srs-review-rate-hard
-     "<f8>"  org-srs-review-rate-again))
+  (add-hook 'org-mode-hook #'org-cloze-overlay-mode)
+  ;; (add-hook 'org-mode-hook #'org-inc-overlay-mode)
   (transient-define-prefix org-srs-transient-map()
     "Define transient-key map for org-fc functions"
     [
@@ -3113,35 +3105,26 @@ See also `org-save-all-org-buffers'"
       ("C" "uncloze" org-srs-item-uncloze-dwim)
       ("u" "update cloze" org-srs-item-cloze-update)
       ]])
-  ;; font lock for cloze
-  (defun org-cloze-fontify (limit)
-    "Fontify cloze markup up to LIMIT."
-    (while (re-search-forward "{{\\([0-9a-z]+\\)}{\\([^}]+\\)}}" limit t)
-      (add-text-properties (match-beginning 0) (match-beginning 2)
-                           '(invisible org-cloze font-lock-multiline t))
-      (put-text-property (match-beginning 0) (1+ (match-beginning 0))
-                         'display "{")
-      (add-text-properties (match-beginning 2) (match-end 2)
-                           '(face my-org-emphasis-bold font-lock-multiline t))
-      (add-text-properties (match-end 2) (match-end 0)
-                           '(invisible org-cloze font-lock-multiline t))
-      (put-text-property (match-end 2) (1+ (match-end 2))
-                         'display "}")
-      (add-text-properties (1- (match-end 0)) (match-end 0)
-                           '(rear-nonsticky (invisible display)))))
 
-  (define-minor-mode org-cloze-overlay-mode
-    "Toggle org-cloze-overlay-mode."
-    :lighter " Cloze"
-    (if org-cloze-overlay-mode
-        (progn
-          (add-to-invisibility-spec 'org-cloze)
-          (font-lock-add-keywords nil '((org-cloze-fontify)))
-          (font-lock-flush))
+ (defun org-cloze-fontify (limit)
+  "Fontify cloze markup up to LIMIT."
+  (let (found)
+    (while (re-search-forward "{{\\([0-9a-z]+\\)}{\\([^}]+\\)}}" limit t)
+      (add-text-properties (match-beginning 0) (match-beginning 2) '(invisible t))
+      (add-text-properties (match-beginning 2) (match-end 2) '(face (:foreground "gold1")))
+      (add-text-properties (match-end 2) (match-end 0) '(invisible t))
+      (setq found t))
+    found))
+ (define-minor-mode org-cloze-overlay-mode
+  "Toggle org-cloze-overlay-mode."
+  :lighter " Cloze"
+  (if org-cloze-overlay-mode
       (progn
-        (remove-from-invisibility-spec 'org-cloze)
-        (font-lock-remove-keywords nil '((org-cloze-fontify)))
-        (font-lock-flush))))
+        (font-lock-add-keywords nil '((org-cloze-fontify . 0)) t)
+        (font-lock-flush))
+    (font-lock-remove-keywords nil '((org-cloze-fontify . 0)))
+    (font-lock-flush)))
+
   )
 #+end_src
 ** org-inc
@@ -3150,8 +3133,7 @@ See also `org-save-all-org-buffers'"
   (setq org-inc-directory (expand-file-name "org-inc/" org-directory)
         org-srs-item-confirm #'org-srs-item-confirm-command)
   (:with-map org-mode-map
-    (:bind "C-M-<return>" org-inc-continue
-           ))
+    (:bind "C-M-<return>" org-inc-continue))
   (:when-loaded
     (defun my/m-z-action ()
       "If region active, show message; else call original M-z."
@@ -3191,7 +3173,7 @@ See also `org-save-all-org-buffers'"
       (add-hook 'after-save-hook #'org-inline-anki-overlay-update nil t)
     (remove-hook 'after-save-hook #'org-inline-anki-overlay-update t)))
 
-      (add-hook 'org-mode-hook #'org-inline-anki-overlay-mode)
+      ;; (add-hook 'org-mode-hook #'org-inline-anki-overlay-mode)
 
     )
 #+end_src
