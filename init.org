@@ -3091,7 +3091,6 @@ See also `org-save-all-org-buffers'"
 (setup lisp-fsrs)
 (setup org-srs
   (add-hook 'org-mode-hook #'org-cloze-overlay-mode)
-  ;; (add-hook 'org-mode-hook #'org-inc-overlay-mode)
   (transient-define-prefix org-srs-transient-map()
     "Define transient-key map for org-fc functions"
     [
@@ -3130,11 +3129,16 @@ See also `org-save-all-org-buffers'"
 ** org-inc
 #+begin_src elisp
 (setup org-inc
+  (:autoload org-inc-continue)
   (setq org-inc-directory (expand-file-name "org-inc/" org-directory)
         org-srs-item-confirm #'org-srs-item-confirm-command)
   (:with-map org-mode-map
-    (:bind "C-M-<return>" org-inc-continue))
+    (:bind "C-M-<return>" org-inc-continue
+           "<f4>" org-inc-continue
+           ))
   (:when-loaded
+    (add-hook 'org-mode-hook #'org-inc-overlay-mode)
+
     (defun my/m-z-action ()
       "If region active, show message; else call original M-z."
       (interactive)
