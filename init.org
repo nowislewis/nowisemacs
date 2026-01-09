@@ -54,6 +54,8 @@ I failed in love with denote, so previous *org-roam* configs were refiled into [
   - [[#rgel][rg.el]]
 - [[#补全][补全]]
   - [[#completions-with-vertico][Completions with Vertico]]
+  - [[#icomplete][icomplete]]
+  - [[#flex][flex]]
   - [[#orderless-and-pinyinlib][Orderless and pinyinlib]]
   - [[#marginalia][Marginalia]]
   - [[#embark][embark]]
@@ -1274,14 +1276,39 @@ diff-hl-mode highlights uncommitted changes on the left side of the window (area
            ))
   (vertico-mode))
 #+end_src
+** icomplete
+#+begin_src elisp :tangle no
+(setup icomplete
+  (setq icomplete-scroll t
+        icomplete-hide-common-prefix nil
+        icomplete-show-matches-on-no-input t
+        icomplete-prospects-height 1
+        icomplete-separator " "
+        )
+  (icomplete-vertical-mode)
+
+  (:when-loaded
+    (keymap-set icomplete-minibuffer-map "TAB" #'icomplete-force-complete)
+    (keymap-set icomplete-minibuffer-map "DEL" #'icomplete-fido-backward-updir)
+    (keymap-set icomplete-minibuffer-map "RET" #'icomplete-force-complete-and-exit)
+    ;; (keymap-set icomplete-minibuffer-map "C-s" #'icomplete-forward-completions)
+    ;; (keymap-set icomplete-minibuffer-map "C-r" #'icomplete-backward-completions)
+    ))
+#+end_src
+** flex
+#+begin_src elisp :tangle no
+(setq completion-styles '(basic partial-completion flex)
+      completion-cycling t
+      )
+#+end_src
 ** Orderless and pinyinlib
 #+begin_src elisp
 (setup orderless
   (setq completion-styles '(orderless basic)
-           completion-category-defaults nil
-           completion-category-overrides '((file (styles partial-completion)))
-           completion-pcm-leading-wildcard t
-           )
+        completion-category-defaults nil
+        completion-category-overrides '((file (styles partial-completion)))
+        completion-pcm-leading-wildcard t
+        )
   (:when-loaded
     (require 'pinyinlib)
     (defun completion--regex-pinyin (str)
