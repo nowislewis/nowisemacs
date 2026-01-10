@@ -78,12 +78,12 @@ generate =.el= configuration files before the first startup
    1. (optional) =make native= -j8 ;; if you build emacs with native-comp, use this command to build all packages ahead-of-time.
 5. =emacs= ;; Launch emacs, the download, installation and configuration of packages will be done automatically.
 
-*** Add packages
-1. Add a new submodule to the =lib= directory.
-2. Run =make lib/package=.
+ *** Add packages
+ 1. =M-x capsule-add-package= and enter the git URL (or manually add git submodule to =lib= directory).
+ 2. Run =make lib/package= to build.
 
-*** Remove packages
-1. Remove the submodule from the =.gitmodules= file and the =lib= directory.
+ *** Remove packages
+ 1. =M-x capsule-remove-package= and select the package (or manually remove from =.gitmodules= and =lib= directory).
 
 *** Update packages
 1. =make update= ;; get all packages update latest
@@ -101,12 +101,12 @@ code), you should run =make init-build=. You can also just use =make= to config 
 =~/.emacs.d/init.el= and =early-init.el=. Nowisemacs use this method to guarantee the =init.el= will not be changed by mistake
 =custom-group= or something else.
 
-*** Everyday use(a summary)
-That't to say, after installation, there are only things you need to remember for everyday use:
-1. Manually manage packages with git submodules (=git submodule add URL lib/package-name=).
-2. =make update= for updates. After update, run =make -j8 build= to recompile.
-3. =make init-org= if you only changed the =init.org= file.
-4. If you modify a local package under lib such as =foo=, run =make lib/foo= to recompile only that package.
+ *** Everyday use(a summary)
+ That't to say, after installation, there are only things you need to remember for everyday use:
+ 1. =M-x capsule-add-package= / =M-x capsule-remove-package= for package management.
+ 2. =make update= for updates. After update, run =make -j8 build= to recompile.
+ 3. =make init-org= if you only changed the =init.org= file.
+ 4. If you modify a local package under lib such as =foo=, run =make lib/foo= to recompile only that package.
 
 *Package management is done via git submodules directly. Use =make -j8 build= for parallel compilation (faster).*
 *** Some explanation about package configurations/setup.el

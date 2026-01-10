@@ -27,8 +27,8 @@ autoloads:
 	@echo "==== Generating all autoloads ===="
 	@$(EMACS) -Q --batch \
 		-L $(LISP_DIR) \
-		-l batch-build-pkgs \
-		--eval "(batch-build-pkgs-batch-autoloads)"
+		-l capsule \
+		--eval "(capsule-batch-autoloads)"
 
 # Phase 2: Compile all packages (can be parallel with -j)
 compile: autoloads $(addprefix compile-, $(PACKAGES))
@@ -36,8 +36,8 @@ compile: autoloads $(addprefix compile-, $(PACKAGES))
 compile-%:
 	@$(EMACS) -Q --batch \
 		-L $(LISP_DIR) \
-		-l batch-build-pkgs \
-		--eval "(batch-build-pkgs-batch-compile-single \"$*\")"
+		-l capsule \
+		--eval "(capsule-batch-compile-single \"$*\")"
 
 # Native compilation variant
 compile-native: autoloads $(addprefix compile-native-, $(PACKAGES))
@@ -45,9 +45,9 @@ compile-native: autoloads $(addprefix compile-native-, $(PACKAGES))
 compile-native-%:
 	@$(EMACS) -Q --batch \
 		-L $(LISP_DIR) \
-		-l batch-build-pkgs \
-		--eval "(setq batch-build-pkgs-use-native-compile t)" \
-		--eval "(batch-build-pkgs-batch-compile-single \"$*\")"
+		-l capsule \
+		--eval "(setq capsule-use-native-compile t)" \
+		--eval "(capsule-batch-compile-single \"$*\")"
 
 # Generate init.el from init.org
 init-build:
@@ -57,6 +57,14 @@ init-build:
 			--eval "(require 'org)" \
 			--eval "(org-babel-tangle-file \"init.org\")"; \
 		echo "init.el generated!"; \
+		echo "==== Byte-compiling init.el ===="; \
+		$(EMACS) --batch \
+			-L $(LISP_DIR) \
+			--eval "(require 'capsule)" \
+			--eval "(capsule-initialize)" \
+			--eval "(setq byte-compile-warnings '(not free-vars))" \
+			--eval "(byte-compile-file \"init.el\")"; \
+		echo "init.el compiled!"; \
 	else \
 		echo "init.org not found, skipping..."; \
 	fi
@@ -79,8 +87,8 @@ lib/%: .FORCE
 	@echo "Building package: $*"
 	@$(EMACS) -Q --batch \
 		-L $(LISP_DIR) \
-		-l batch-build-pkgs \
-		--eval "(batch-build-pkgs-batch-build-single \"$*\")"
+		-l capsule \
+		--eval "(capsule-batch-build-single \"$*\")"
 	@echo "Build complete for $*!"
 
 .FORCE:

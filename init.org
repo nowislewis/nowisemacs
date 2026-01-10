@@ -132,6 +132,7 @@ I failed in love with denote, so previous *org-roam* configs were refiled into [
   - [[#excalidraw][excalidraw]]
   - [[#manage-web-bookmarks][manage-web-bookmarks]]
   - [[#eww][eww]]
+  - [[#life-calendar][life-calendar]]
 - [[#games][games]]
   - [[#minesweeper][minesweeper]]
 - [[#system-specific-config][system-specific-config]]
@@ -208,8 +209,8 @@ I failed in love with denote, so previous *org-roam* configs were refiled into [
 #+NAME: load-path
 #+begin_src elisp
 (add-to-list 'load-path (expand-file-name "lisp" user-emacs-directory))
-(require 'batch-build-pkgs)
-(batch-build-pkgs-initialize)
+(require 'capsule)
+(capsule-initialize)
 #+end_src
 ** drop out
 The following content is not enabled yet, because I want to minimize unnecessary settings as much as possible
@@ -2703,6 +2704,10 @@ Comments:
 (setup org-visual-outline
   (add-hook 'org-mode-hook #'org-visual-indent-mode))
 #+end_src
+*** org-side-tree
+#+begin_src elisp
+(setup org-side-tree)
+#+end_src
 ** ox-hugo
 #+begin_src elisp
 (setup tomelr)
@@ -3177,7 +3182,7 @@ See also `org-save-all-org-buffers'"
   )
 #+end_src
 ** inline-anki
-#+begin_src elisp
+#+begin_src elisp :tangle no
 (setup request)
 (setup asyncloop)
 (setup inline-anki
@@ -3631,6 +3636,10 @@ ESUP - Emacs Start Up Profiler
 (setup eww
   (setq eww-search-prefix "https://www.bing.com/search?q=")
   )
+#+end_src
+** life-calendar
+#+begin_src elisp
+(setup life-calendar)
 #+end_src
 * games
 ** minesweeper

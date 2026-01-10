@@ -321,24 +321,12 @@
 [submodule "ztree"]
 	path = lib/ztree
 	url = https://codeberg.org/fourier/ztree.git
-[submodule "lib/agent-shell"]
-	path = lib/agent-shell
-	url = https://github.com/xenodium/agent-shell.git
-[submodule "lib/shell-maker"]
-	path = lib/shell-maker
-	url = https://github.com/xenodium/shell-maker.git
-[submodule "lib/acp"]
-	path = lib/acp
-	url = https://github.com/xenodium/acp.el.git
 [submodule "lib/eat"]
 	path = lib/eat
 	url = https://codeberg.org/akib/emacs-eat.git
-[submodule "lib/inline-anki"]
-	path = lib/inline-anki
-	url = https://github.com/meedstrom/inline-anki.git
-[submodule "lib/asyncloop"]
-	path = lib/asyncloop
-	url = https://github.com/meedstrom/asyncloop.git
-[submodule "lib/request"]
-	path = lib/request
-	url = https://github.com/tkf/emacs-request.git
+[submodule "lib/emacs-life-calendar"]
+	path = lib/emacs-life-calendar
+	url = https://github.com/vshender/emacs-life-calendar.git
+[submodule "lib/org-side-tree"]
+	path = lib/org-side-tree
+	url = https://github.com/localauthor/org-side-tree.git
