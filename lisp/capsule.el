@@ -178,12 +178,15 @@ NAME is optional package name (defaults to git repo name).
 Adds as git submodule, generates autoloads, and compiles."
   (interactive "sPackage git URL: ")
   (let* ((default-directory user-emacs-directory)
-         (pkg-name (or name
-                       (and (string-match "/\\([^/]+\\)\\.git\\'" url)
-                            (match-string 1 url))
-                       (and (string-match "/\\([^/]+\\)/?\\'" url)
-                            (match-string 1 url))
-                       (read-string "Package name: ")))
+         (parsed-name (or name
+                          (and (string-match "/\\([^/]+\\)\\.git\\'" url)
+                               (match-string 1 url))
+                          (and (string-match "/\\([^/]+\\)/?\\'" url)
+                               (match-string 1 url))))
+         (pkg-name (if parsed-name
+                       (read-string (format "Package name (default %s): " parsed-name)
+                                    nil nil parsed-name)
+                     (read-string "Package name: ")))
          (pkg-path (format "lib/%s" pkg-name)))
     (unless (yes-or-no-p (format "Add package '%s' from %s? " pkg-name url))
       (user-error "Cancelled"))

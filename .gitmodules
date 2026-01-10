@@ -324,6 +324,6 @@
 [submodule "lib/emacs-life-calendar"]
 	path = lib/emacs-life-calendar
 	url = https://github.com/vshender/emacs-life-calendar.git
-[submodule "lib/setup.el"]
-	path = lib/setup.el
+[submodule "lib/setup"]
+	path = lib/setup
 	url = https://codeberg.org/pkal/setup.el.git
