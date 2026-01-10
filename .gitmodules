@@ -275,9 +275,6 @@
 [submodule "s"]
 	path = lib/s
 	url = https://github.com/magnars/s.el.git
-[submodule "setup"]
-	path = lib/setup
-	url = https://github.com/emacsmirror/setup.git
 [submodule "tabspaces"]
 	path = lib/tabspaces
 	url = https://github.com/mclear-tools/tabspaces.git
@@ -330,3 +327,6 @@
 [submodule "lib/org-side-tree"]
 	path = lib/org-side-tree
 	url = https://github.com/localauthor/org-side-tree.git
+[submodule "lib/setup.el"]
+	path = lib/setup.el
+	url = https://codeberg.org/pkal/setup.el.git

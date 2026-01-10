@@ -41,7 +41,7 @@ Adds each package to load-path and loads each package's autoloads file."
           (cl-incf count))))
     ;; Add all collected directories to load-path at once (in reverse order)
     (setq load-path (nconc (nreverse new-load-path) load-path))
-    (message "Batch-Build-Pkgs: Initialized %d packages" count)))
+    (message "Capsule: Initialized %d packages" count)))
 
 ;;; Build-time: Batch functions (called from Makefile)
 

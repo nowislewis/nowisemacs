@@ -290,28 +290,6 @@ emacs
                             ,features)))
   :documentation "Delay loading the feature until a certain amount of idle time has passed."
   :repeatable t)
-(setup-define :load-after
-  (lambda (features &rest body)
-    (let ((body `(progn
-                   (require ',(setup-get 'feature))
-                   ,@body)))
-      (dolist (feature (if (listp features)
-                           (nreverse features)
-                         (list features)))
-        (setq body `(with-eval-after-load ',feature ,body)))
-      body))
-  :documentation "Load the current feature after FEATURES."
-  :indent 1)
-(setup-define :autoload
-  (lambda (func)
-    (let ((fn (if (memq (car-safe func) '(quote function))
-                  (cadr func)
-                func)))
-      `(unless (fboundp (quote ,fn))
-         (autoload (function ,fn) ,(symbol-name (setup-get 'feature)) nil t))))
-  :documentation "Autoload COMMAND if not already bound."
-  :repeatable t
-  :signature '(FUNC ...))
 #+end_src
 ** other macros
 #+begin_src elisp
@@ -1330,7 +1308,7 @@ should be check after reading the embark.el manual
 
 (setup embark
   (:also-load embark-consult)
-  (:autoload embark-toggle-highlight)
+  (:autoload-this #'embark-toggle-highlight)
   (setq prefix-help-command #'embark-prefix-help-command)
   (keymap-global-set "C-S-a" #'embark-act))
 
@@ -1530,7 +1508,7 @@ Jump anywhere in the world
 *** imenu-list
 #+begin_src elisp
 (setup imenu-list
-  (:autoload imenu-list-smart-toggle)
+  (:autoload-this #'imenu-list-smart-toggle)
   (setq imenu-list-focus-after-activation nil
            imenu-list-auto-resize t
            imenu-list-position 'left
@@ -2033,7 +2011,9 @@ Emacs major-mode to work with Beancount ledger files
                              ((executable-find "rg") 'ripgrep)
                              (t 'grep))
         xref-history-storage #'xref-window-local-history)
-  (:autoload xref-push-marker-stack)) ;; autoload this command for jump-back
+  ;; (:autoload-this #'xref-push-marker-stack nil t)
+  (require 'xref)
+  ) ;; autoload this command for jump-back
 #+end_src
 **** xref jump back
 borrowed from citre, now you can always jump-back use "M-," after any jump in the list.
@@ -2046,7 +2026,6 @@ borrowed from citre, now you can always jump-back use "M-," after any jump in th
                 consult-line
                 consult-find
                 find-file
-                blink-search
                 citre-jump
                 consult-goto-line
                 isearch-forward))
@@ -2157,10 +2136,8 @@ borrowed from citre, now you can always jump-back use "M-," after any jump in th
   ;; (add-hook 'minibuffer-setup-hook #'corfu-enable-always-in-minibuffer 1)
   )
 (setup corfu-popupinfo
-  (:load-after corfu)
   (setq corfu-popupinfo-delay '(0.5 . 0.5))
-  (:when-loaded
-    (corfu-popupinfo-mode)))
+  (:hook-into corfu))
 
 (setup cape
   ;; don't let dabbrev take over all things
@@ -2201,7 +2178,7 @@ borrowed from citre, now you can always jump-back use "M-," after any jump in th
                                                                                                            :inlayHints (:callArgumentNames :json-false)
                                                                                                            ))
         )
-  (:autoload eglot-find-implementation)
+  (:autoload-this #'eglot-find-implementation)
   (add-hook 'prog-mode-hook (lambda ()
                               (unless
                                   (or (file-remote-p default-directory)
@@ -2696,7 +2673,6 @@ Comments:
 *** org-appear
 #+begin_src elisp
 (setup org-appear
-  (:load-after org)
   (:hook-into org-mode))
 #+end_src
 *** org-visual-outline
@@ -3161,7 +3137,7 @@ See also `org-save-all-org-buffers'"
 ** org-inc
 #+begin_src elisp
 (setup org-inc
-  (:autoload org-inc-continue)
+  (:autoload-this #'org-inc-continue)
   (setq org-inc-directory (expand-file-name "org-inc/" org-directory)
         org-srs-item-confirm #'org-srs-item-confirm-command)
   (:with-map org-mode-map
@@ -3216,7 +3192,7 @@ See also `org-save-all-org-buffers'"
 ** doc-capture
 #+begin_src elisp
 (setup doc-capture
-  (:autoload doc-capture-process)
+  (:autoload-this #'doc-capture-process)
   (setq doc-capture-org-directory (concat org-inc-directory "doc-capture/"))
   (:when-loaded
     (require' doc-capture-org-inc-integration)
@@ -3549,7 +3525,8 @@ ESUP - Emacs Start Up Profiler
   (define-key uniline-mode-map (kbd "M-i") #'uniline-launch-interface)
   ))
 (setup uniline-transient
-  (:autoload uniline-mode uniline-launch-interface)
+  (:autoload-this #'uniline-mode)
+  (:autoload-this #'uniline-launch-interface)
   )
 #+end_src
 ** excalidraw
