@@ -57,14 +57,6 @@ init-build:
 			--eval "(require 'org)" \
 			--eval "(org-babel-tangle-file \"init.org\")"; \
 		echo "init.el generated!"; \
-		echo "==== Byte-compiling init.el ===="; \
-		$(EMACS) --batch \
-			-L $(LISP_DIR) \
-			--eval "(require 'capsule)" \
-			--eval "(capsule-initialize)" \
-			--eval "(setq byte-compile-warnings '(not free-vars))" \
-			--eval "(byte-compile-file \"init.el\")"; \
-		echo "init.el compiled!"; \
 	else \
 		echo "init.org not found, skipping..."; \
 	fi

@@ -280,7 +280,6 @@ emacs
 #+end_src
 * Package Management
 ** setup
-#+NAME: setup
 #+begin_src elisp
 (require 'setup)
 (setup-define :defer
@@ -290,6 +289,17 @@ emacs
                             ,features)))
   :documentation "Delay loading the feature until a certain amount of idle time has passed."
   :repeatable t)
+
+(setup-define :autoload
+  (lambda (func)
+    (let ((fn (if (memq (car-safe func) '(quote function))
+                  (cadr func)
+                func)))
+      `(unless (fboundp (quote ,fn))
+         (autoload (function ,fn) ,(symbol-name (setup-get 'feature)) nil t))))
+  :documentation "Autoload COMMAND if not already bound."
+  :repeatable t
+  :signature '(FUNC ...))
 #+end_src
 ** other macros
 #+begin_src elisp
@@ -1308,7 +1318,7 @@ should be check after reading the embark.el manual
 
 (setup embark
   (:also-load embark-consult)
-  (:autoload-this #'embark-toggle-highlight)
+  (:autoload embark-toggle-highlight)
   (setq prefix-help-command #'embark-prefix-help-command)
   (keymap-global-set "C-S-a" #'embark-act))
 
@@ -1508,7 +1518,7 @@ Jump anywhere in the world
 *** imenu-list
 #+begin_src elisp
 (setup imenu-list
-  (:autoload-this #'imenu-list-smart-toggle)
+  (:autoload imenu-list-smart-toggle)
   (setq imenu-list-focus-after-activation nil
            imenu-list-auto-resize t
            imenu-list-position 'left
@@ -2011,7 +2021,7 @@ Emacs major-mode to work with Beancount ledger files
                              ((executable-find "rg") 'ripgrep)
                              (t 'grep))
         xref-history-storage #'xref-window-local-history)
-  ;; (:autoload-this #'xref-push-marker-stack nil t)
+  ;; (:autoload xref-push-marker-stack nil t)
   (require 'xref)
   ) ;; autoload this command for jump-back
 #+end_src
@@ -2178,7 +2188,7 @@ borrowed from citre, now you can always jump-back use "M-," after any jump in th
                                                                                                            :inlayHints (:callArgumentNames :json-false)
                                                                                                            ))
         )
-  (:autoload-this #'eglot-find-implementation)
+  (:autoload eglot-find-implementation)
   (add-hook 'prog-mode-hook (lambda ()
                               (unless
                                   (or (file-remote-p default-directory)
@@ -3133,7 +3143,7 @@ See also `org-save-all-org-buffers'"
 ** org-inc
 #+begin_src elisp
 (setup org-inc
-  (:autoload-this #'org-inc-continue)
+  (:autoload org-inc-continue)
   (setq org-inc-directory (expand-file-name "org-inc/" org-directory)
         org-srs-item-confirm #'org-srs-item-confirm-command)
   (:with-map org-mode-map
@@ -3188,7 +3198,7 @@ See also `org-save-all-org-buffers'"
 ** doc-capture
 #+begin_src elisp
 (setup doc-capture
-  (:autoload-this #'doc-capture-process)
+  (:autoload doc-capture-process)
   (setq doc-capture-org-directory (concat org-inc-directory "doc-capture/"))
   (:when-loaded
     (require' doc-capture-org-inc-integration)
@@ -3521,8 +3531,8 @@ ESUP - Emacs Start Up Profiler
   (define-key uniline-mode-map (kbd "M-i") #'uniline-launch-interface)
   ))
 (setup uniline-transient
-  (:autoload-this #'uniline-mode)
-  (:autoload-this #'uniline-launch-interface)
+  (:autoload uniline-mode)
+  (:autoload uniline-launch-interface)
   )
 #+end_src
 ** excalidraw
@@ -3613,7 +3623,7 @@ ESUP - Emacs Start Up Profiler
 ** life-calendar
 #+begin_src elisp
 (setup life-calendar
-  (:autoload-this #'life-calendar)
+  (:autoload life-calendar)
   (setq life-calendar-years 65)
   )
 #+end_src
