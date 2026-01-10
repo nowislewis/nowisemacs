@@ -2413,7 +2413,7 @@ Citre is an advanced Ctags (or actually, readtags) frontend for Emacs.
   "Toggle the display of the Org outline sidebar."
   (interactive)
   (let* ((sidebar-buffer-name (concat "*Outline: " (buffer-name) "*"))
-         (window-width (/ (frame-width) 3))) ; Set width to one-third of the screen width
+         (window-width (/ (frame-width) 4))) ; Set width to one-third of the screen width
     ;; Check if the sidebar buffer exists
     (if (get-buffer sidebar-buffer-name)
         ;; If it exists, close the sidebar
@@ -2424,7 +2424,7 @@ Citre is an advanced Ctags (or actually, readtags) frontend for Emacs.
       ;; If it doesn't exist, create and display the sidebar
       (let ((sidebar-buf (make-indirect-buffer (current-buffer) sidebar-buffer-name 'clone)))
         (with-current-buffer sidebar-buf
-          (org-num-mode 1)       ; Enable heading numbers
+          ;; (org-num-mode 1)       ; Enable heading numbers
           (org-cycle-content)         ; Fold all content, showing only headings
           (setq buffer-read-only t) ; Set to read-only to prevent accidental edits
           (setq truncate-lines t) ; Disable line wrapping
@@ -2679,10 +2679,6 @@ Comments:
 #+begin_src elisp
 (setup org-visual-outline
   (add-hook 'org-mode-hook #'org-visual-indent-mode))
-#+end_src
-*** org-side-tree
-#+begin_src elisp
-(setup org-side-tree)
 #+end_src
 ** ox-hugo
 #+begin_src elisp
@@ -3616,7 +3612,10 @@ ESUP - Emacs Start Up Profiler
 #+end_src
 ** life-calendar
 #+begin_src elisp
-(setup life-calendar)
+(setup life-calendar
+  (:autoload-this #'life-calendar)
+  (setq life-calendar-years 65)
+  )
 #+end_src
 * games
 ** minesweeper
