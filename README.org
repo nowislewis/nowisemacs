@@ -73,19 +73,17 @@ generate =.el= configuration files before the first startup
 **** Nowisemacs
 1. =mv ~/.emacs.d ~/.emacs.d.back= ;; Backup your original configuration
 2. =git clone https://github.com/nowislewis/nowisemacs ~/.emacs.d= ;; Download nowisemacs
-3. =cd ~/.emacs.d=
-4. =git submodule update --init --recursive= ;; download all packages
-5. =make -j8 build= ;; build all packages
-6. (optional) =make native= ;; if you build emacs with native-comp, use this command to build all packages ahead-of-time.
-7. =emacs= ;; Launch emacs, the download, installation and configuration of packages will be done automatically.
+3. =cd ~/.emacs.d & make init= ;; download all packages
+4. =make -j8 build= ;; build all packages
+   1. (optional) =make native= -j8 ;; if you build emacs with native-comp, use this command to build all packages ahead-of-time.
+5. =emacs= ;; Launch emacs, the download, installation and configuration of packages will be done automatically.
 
 *** Add packages
 1. Add a new submodule to the =lib= directory.
-2. Run =make -j8 build=.
+2. Run =make lib/package=.
 
 *** Remove packages
 1. Remove the submodule from the =.gitmodules= file and the =lib= directory.
-2. Run =make -j8 build=.
 
 *** Update packages
 1. =make update= ;; get all packages update latest
