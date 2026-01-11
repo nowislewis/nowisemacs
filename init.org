@@ -2750,7 +2750,10 @@ Comments:
           (when (re-search-forward "^#\\+identifier:" nil t)
             (end-of-line)
             (insert (format "\n#+reference:  %s" key))))
-        (message "已更新 reference: %s" key)))))
+        (message "已更新 reference: %s" key)
+        ;; use denote to rename current file
+        (denote-rename-file-using-front-matter (buffer-file-name))
+        ))))
 #+end_src
 
 *** citar
