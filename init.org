@@ -466,7 +466,7 @@ Maybe I should add a new state.
                           '("@" . meow-end-or-call-kmacro)
                           '("#" . embark-toggle-highlight)
                           '("^" . meow-join)
-                          '("*" . embark-next-symbol)
+                          '("*" . surround-region-with-char)
                           '("/" . isearch-forward))
   (defun meow-vim-append ()
     "Like vim, move to the end of selection, switch to INSERT state."
@@ -491,6 +491,18 @@ Maybe I should add a new state.
     (interactive)
     (if meow-motion-mode (meow-normal-mode) (meow-motion-mode)))
   (global-set-key (kbd "M-\\") #'toggle-between-meow-normal-motion)
+
+  (defun surround-region-with-char (char)
+    "用指定字符包围选中区域"
+    (interactive "c输入包围字符: ")
+    (when (use-region-p)
+      (let ((start (region-beginning))
+            (end (region-end)))
+        (save-excursion
+          (goto-char end)
+          (insert char)
+          (goto-char start)
+          (insert char)))))
   )
 #+end_src
 

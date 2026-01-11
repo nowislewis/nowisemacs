@@ -327,3 +327,6 @@
 [submodule "lib/setup"]
 	path = lib/setup
 	url = https://codeberg.org/pkal/setup.el.git
+[submodule "lib/denote-org"]
+	path = lib/denote-org
+	url = https://github.com/protesilaos/denote-org.git
