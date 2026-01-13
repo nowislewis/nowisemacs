@@ -1,3 +1,5 @@
+#!/bin/bash
+
 log_dir=/tmp/git_update_logs
 rm -rf $log_dir
 mkdir -p $log_dir
