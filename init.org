@@ -2078,9 +2078,6 @@ borrowed from citre, now you can always jump-back use "M-," after any jump in th
 #+end_src
 *** treesit tools
 **** treesit
-:PROPERTIES:
-:ID:       20260107T220351_269522
-:END:
 #+begin_src elisp
 (setup treesit
   (setq treesit-font-lock-level 4)
@@ -2119,7 +2116,6 @@ borrowed from citre, now you can always jump-back use "M-," after any jump in th
     )
   )
 #+end_src
-
 *** Complete
 **** corfu related
 ***** corfu
@@ -3350,8 +3346,7 @@ Simple distraction-free editing. I use darkroom instead of writeroom because it'
   (setq gptel-default-mode 'org-mode
         ;; gptel-crowdsourced-prompts-file (concat nowis-doc-emacs-dir "09-scripts/chatgpt.csv")
         gptel-highlight-methods '(face)
-        ;; gptel-model 'deepseek-v3
-        gptel-model 'gpt-4.1
+        gptel-model 'deepseek-chat
         )
   (keymap-global-set "M-p" #'gptel-send)
   (keymap-global-set "M-r" #'gptel-rewrite)
@@ -3380,9 +3375,35 @@ Simple distraction-free editing. I use darkroom instead of writeroom because it'
     (custom-set-faces
      '(gptel-response-highlight ((((background dark) (min-colors 88)) :background "gray22" :extend t))))
 
-    ))
-#+end_src
+    ;; ┌──────────┐
+    ;; │ autosave │
+    ;; └──────────┘
 
+    (defvar my/gpt-save-directory
+      "~/.emacs.d/gpt-saves/"
+      "Directory for auto-saving GPT buffers")
+
+    (defun my/gpt-save-on-kill-buffer ()
+      (when (and (bound-and-true-p gptel-mode)
+                 (buffer-modified-p))
+        (if buffer-file-name
+            (save-buffer)
+          (let* ((ts   (format-time-string "%Y%m%dT%H%M%S"))
+                 (dir  (file-name-as-directory my/gpt-save-directory))
+                 (fn   (expand-file-name (format "gpt-%s.org" ts) dir)))
+            (unless (file-directory-p dir)
+              (make-directory dir t))
+            (write-file fn)))))
+
+    (add-hook 'gptel-mode-hook
+              (lambda ()
+                (add-hook 'kill-buffer-hook
+                          #'my/gpt-save-on-kill-buffer
+                          nil  ; append
+                          t))) ; make buffer-local
+    )
+  )
+#+end_src
 *** gptel-agent
 #+begin_src elisp
 (setup gptel-agent
@@ -3396,7 +3417,6 @@ Simple distraction-free editing. I use darkroom instead of writeroom because it'
               (unless (member agent-name '("gptel-agent" "gptel-plan"))
                 (apply #'gptel-make-preset agent))))
           (gptel-agent-update))
-
     )
   )
 #+end_src
@@ -3453,12 +3473,6 @@ Simple distraction-free editing. I use darkroom instead of writeroom because it'
 
     ;; (advice-add 'whisper-command :override #'whisper--ctranslate2-command)
     )
-  )
-#+end_src
-*** eca
-#+begin_src elisp
-(setup eca
-  (setq eca-server-download-method 'curl)
   )
 #+end_src
 *** agent-shell
