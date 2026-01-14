@@ -3461,6 +3461,12 @@ Simple distraction-free editing. I use darkroom instead of writeroom because it'
   (setq eca-server-download-method 'curl)
   )
 #+end_src
+*** agent-shell
+#+begin_src elisp
+(setup acp)
+(setup shell-marker)
+(setup agent-shell)
+#+end_src
 ** webjump
 #+begin_src elisp
 (setup webjump

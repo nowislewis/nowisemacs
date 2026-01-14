@@ -192,7 +192,7 @@ Adds as git submodule, generates autoloads, and compiles."
       (user-error "Cancelled"))
     ;; Add submodule
     (message "Adding git submodule...")
-    (shell-command (format "git submodule add %s %s" url pkg-path))
+    (shell-command (format "git submodule add --force %s %s" url pkg-path))
     (shell-command "git submodule update --init --recursive")
     ;; Build package
     (let ((pkg-dir (expand-file-name pkg-path user-emacs-directory)))
