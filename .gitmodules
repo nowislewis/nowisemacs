@@ -131,9 +131,6 @@
 [submodule "gptel-local-org-prompts"]
 	path = lib/gptel-local-org-prompts
 	url = https://github.com/nowislewis/gptel-local-org-prompts.git
-[submodule "gptel-quick"]
-	path = lib/gptel-quick
-	url = https://github.com/karthink/gptel-quick.git
 [submodule "graphviz-dot-mode"]
 	path = lib/graphviz-dot-mode
 	url = https://github.com/ppareit/graphviz-dot-mode.git
@@ -339,3 +336,6 @@
 [submodule "lib/shell-maker"]
 	path = lib/shell-maker
 	url = https://github.com/xenodium/shell-maker.git
+[submodule "lib/reader"]
+	path = lib/reader
+	url = https://codeberg.org/divyaranjan/emacs-reader.git

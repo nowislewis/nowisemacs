@@ -3346,25 +3346,25 @@ Simple distraction-free editing. I use darkroom instead of writeroom because it'
   (setq gptel-default-mode 'org-mode
         ;; gptel-crowdsourced-prompts-file (concat nowis-doc-emacs-dir "09-scripts/chatgpt.csv")
         gptel-highlight-methods '(face)
-        gptel-model 'deepseek-chat
+        gptel-model 'claude-sonnet-4.5
         )
   (keymap-global-set "M-p" #'gptel-send)
   (keymap-global-set "M-r" #'gptel-rewrite)
   (keymap-global-set "M-P" #'gptel)
   (:hook gptel-highlight-mode)
   (:when-loaded
-    (setq-default gptel-backend (gptel-make-gh-copilot "Copilot"))
+    (setq-default gptel-backend
+                  (gptel-make-openai "momenta"
+                    :host "llm-gateway.momenta.works"
+                    :key 'gptel-api-key
+                    :stream t
+                    :models '(claude-sonnet-4.5 claude-haiku-4.5 minimax-m2.1 gpt-5.2 gemini-3-pro)))
     (gptel-make-openai "chatanywhere"
       :host "api.chatanywhere.tech"
       ;; :header (lambda () `(("Authorization" . ,(concat "Bearer " (gptel--get-api-key)))))
       :key 'gptel-api-key
       :stream t
       :models '(gpt-5 deepseek-v3.1-250821 claude-haiku-4-5-20251001))
-    (gptel-make-openai "momenta"
-      :host "llm-gateway.momenta.works"
-      :key 'gptel-api-key
-      :stream t
-      :models '(claude-sonnet-4.5 claude-haiku-4.5 minimax-m2.1 gpt-5.2 gemini-3-pro deepseek-v3.2))
     (gptel-make-gemini "Gemini" :key 'gptel-api-key :stream t)
     (gptel-make-anthropic "DeepSeek"
       :host "api.deepseek.com/anthropic"
@@ -3372,6 +3372,8 @@ Simple distraction-free editing. I use darkroom instead of writeroom because it'
       :stream t
       :models '(deepseek-chat deepseek-reasoner)
       )
+    (gptel-make-gh-copilot "Copilot")
+
     (custom-set-faces
      '(gptel-response-highlight ((((background dark) (min-colors 88)) :background "gray22" :extend t))))
 
@@ -3437,17 +3439,14 @@ Simple distraction-free editing. I use darkroom instead of writeroom because it'
       (keymap-global-set "M-c" #'gptel-aibo-summon)
     ))
 #+end_src
-*** gptel-quick
+*** gptel-quick-with-prompt
 #+begin_src elisp
-(setup gptel-quick
-  (setq gptel-quick-timeout 40
-        gptel-quick-system-message (lambda (count)
-                                     (format "用小于%d 个字的中文解释." count))
-        )
-  (keymap-global-set "M-l" #'gptel-quick)
+(setup gptel-quick-with-prompt
+  (:autoload gptel-quick-with-prompt)
+  (keymap-global-set "M-" #'gptel-quick-with-prompt)
   (with-eval-after-load 'embark
-    (keymap-set embark-general-map "?" #'gptel-quick))
-)
+    (keymap-set embark-general-map "?" #'gptel-quick-with-prompt))
+  )
 #+end_src
 *** whisper
 #+begin_src elisp
