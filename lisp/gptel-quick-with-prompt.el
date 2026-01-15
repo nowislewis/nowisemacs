@@ -24,21 +24,6 @@
   :type 'string
   :group 'gptel)
 
-(defun gptel-quick-prompt--callback (response info)
-  "Callback function to handle RESPONSE from gptel.
-INFO contains additional context information."
-  (pcase response
-    ('nil (message "gptel-quick request failed with error: %s" (plist-get info :status)))
-    ((pred stringp)
-     (with-current-buffer (get-buffer-create gptel-quick-prompt-buffer-name)
-       (let ((inhibit-read-only t))
-         (erase-buffer)
-         ;; Convert markdown to org format
-         (insert (gptel--convert-markdown->org response))
-         (org-mode)
-         (goto-char (point-min)))
-       (display-buffer (current-buffer))))))
-
 ;;;###autoload
 (defun gptel-quick-with-prompt (prompt)
   "Send selected region with PROMPT to gptel, output to org buffer.
@@ -53,25 +38,20 @@ When called interactively, prompt for input with `gptel-quick-default-prompt' as
    (list (read-string "Prompt: " gptel-quick-default-prompt)))
   (let* ((text (if (use-region-p)
                    (buffer-substring-no-properties (region-beginning) (region-end))
-                 (buffer-substring-no-properties (point-min) (point-max))))
-         (output-buffer (get-buffer-create gptel-quick-prompt-buffer-name))
-         (gptel-use-curl t)           ; Disable curl, similar to gptel-quick
-         (gptel-use-tools))         ; Disable tool usage
+                 (buffer-substring-no-properties (point-min) (point-max)))))
     
-    ;; Initialize the output buffer
-    (with-current-buffer output-buffer
-      (let ((inhibit-read-only t))
-        (erase-buffer)
-        (org-mode)
-        (insert "Waiting for response...\n")))
-    
-    ;; Show the output buffer
-    (display-buffer output-buffer)
-    
-    ;; Send request
-    (gptel-request text
-      :system prompt
-      :callback #'gptel-quick-prompt--callback)))
+    ;; Prepare output buffer and send request
+    (with-current-buffer (get-buffer-create gptel-quick-prompt-buffer-name)
+      (erase-buffer)
+      (org-mode)
+      (display-buffer (current-buffer))
+      
+      ;; Use gptel's default callback for stream support
+      (gptel-request text
+        :buffer (current-buffer)
+        :position (point-marker)
+        :system prompt
+        :stream gptel-stream))))
 
 (provide 'gptel-quick-with-prompt)
 ;;; gptel-quick-with-prompt.el ends here
