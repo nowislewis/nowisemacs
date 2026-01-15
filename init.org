@@ -3443,7 +3443,7 @@ Simple distraction-free editing. I use darkroom instead of writeroom because it'
 #+begin_src elisp
 (setup gptel-quick-with-prompt
   (:autoload gptel-quick-with-prompt)
-  (keymap-global-set "M-" #'gptel-quick-with-prompt)
+  (keymap-global-set "M-l" #'gptel-quick-with-prompt)
   (with-eval-after-load 'embark
     (keymap-set embark-general-map "?" #'gptel-quick-with-prompt))
   )
