@@ -117,6 +117,7 @@ I failed in love with denote, so previous *org-roam* configs were refiled into [
 - [[#阅读][阅读]]
   - [[#pdf-tools][pdf-tools]]
   - [[#pdf-view-pagemark][pdf-view-pagemark]]
+  - [[#reader][reader]]
   - [[#newsticker][newsticker]]
   - [[#nov][nov]]
   - [[#darkroom][darkroom]]
@@ -3308,6 +3309,10 @@ See also `org-save-all-org-buffers'"
 #+begin_src elisp :tangle no
 (setup pdf-view-pagemark
   (:hook-into pdf-view-mode-hook))
+#+end_src
+** reader
+#+begin_src elisp
+(setup reader)
 #+end_src
 ** newsticker
 #+begin_src elisp

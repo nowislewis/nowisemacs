@@ -33,20 +33,18 @@ autoloads:
 # Phase 2: Compile all packages (can be parallel with -j)
 compile: autoloads $(addprefix compile-, $(PACKAGES))
 
+# Native compilation variant
+compile-native: autoloads $(addprefix native-, $(PACKAGES))
+
+# Native compilation rule (must be defined before compile-% to take precedence)
+native-%:
+	@$(EMACS) -Q --batch -L $(LISP_DIR) -l capsule \
+		--eval "(setq capsule-use-native-compile t)" --eval "(capsule-batch-compile-single \"$*\")"
+
 compile-%:
 	@$(EMACS) -Q --batch \
 		-L $(LISP_DIR) \
 		-l capsule \
-		--eval "(capsule-batch-compile-single \"$*\")"
-
-# Native compilation variant
-compile-native: autoloads $(addprefix compile-native-, $(PACKAGES))
-
-compile-native-%:
-	@$(EMACS) -Q --batch \
-		-L $(LISP_DIR) \
-		-l capsule \
-		--eval "(setq capsule-use-native-compile t)" \
 		--eval "(capsule-batch-compile-single \"$*\")"
 
 # Generate init.el from init.org
