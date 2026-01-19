@@ -12,6 +12,10 @@
 (defvar capsule-compile-directories '("elisp" "lisp" "extensions")
   "Whitelist of subdirectories to compile and load.")
 
+(defvar capsule-skip-autoloads-packages '("reader")
+  "List of package names to skip when generating autoloads.
+Each element should be a package name (string) as it appears in lib/ directory.")
+
 ;;; Runtime: Initialize packages
 
 ;;;###autoload
@@ -128,8 +132,11 @@ This function is meant to be called from Emacs --batch mode."
   (let ((pkg-dirs (cl-remove-if-not #'file-directory-p
                                     (directory-files capsule-drones-directory t "^[^.]"))))
     (dolist (pkg-dir pkg-dirs)
-      (message "\n--- [%s] ---\n" (file-name-nondirectory pkg-dir))
-      (capsule--generate-autoloads pkg-dir))))
+      (let ((pkg-name (file-name-nondirectory pkg-dir)))
+        (if (member pkg-name capsule-skip-autoloads-packages)
+            (message "\n--- [%s] (skipped) ---\n" pkg-name)
+          (message "\n--- [%s] ---\n" pkg-name)
+          (capsule--generate-autoloads pkg-dir))))))
 
 (defun capsule-batch-compile-single (package)
   "Compile a single PACKAGE (used for parallel build).
