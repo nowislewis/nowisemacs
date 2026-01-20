@@ -345,3 +345,6 @@
 [submodule "lib/tramp-rpc"]
 	path = lib/tramp-rpc
 	url = https://github.com/ArthurHeymans/emacs-tramp-rpc.git
+[submodule "lib/org-tidy"]
+	path = lib/org-tidy
+	url = https://github.com/jxq0/org-tidy.git

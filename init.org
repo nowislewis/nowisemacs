@@ -2703,6 +2703,10 @@ Comments:
 (setup org-visual-outline
   (add-hook 'org-mode-hook #'org-visual-indent-mode))
 #+end_src
+*** org-tidy
+#+begin_src elisp
+(add-hook 'org-mode-hook #'org-tidy-mode)
+#+end_src
 ** ox-hugo
 #+begin_src elisp
 (setup tomelr)
