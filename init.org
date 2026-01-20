@@ -272,12 +272,12 @@ emacs
    modified latter, and they should have nice naming specifications for convenience search.
 
 #+begin_src elisp
-(defvar nowis-config-file (expand-file-name "init.org" user-emacs-directory))
-(defvar nowis-config-useful-tools (expand-file-name "useful-tools/" user-emacs-directory))
-(defvar nowis-doc-emacs-dir (file-truename "~/Documents/emacs/"))
-(defvar nowis-gtd-dir (concat nowis-doc-emacs-dir "01-orgmode/xnotes/gtd"))
-(defvar nowis-bib-dir (concat nowis-doc-emacs-dir "03-bibliography/"))
-(defvar nowis-bib-pdf-dir (concat nowis-doc-emacs-dir "02-binary-git/searchable"))
+(defvar nowis/config-file (expand-file-name "init.org" user-emacs-directory))
+(defvar nowis/config-useful-tools (expand-file-name "useful-tools/" user-emacs-directory))
+(defvar nowis/doc-emacs-dir (file-truename "~/Documents/emacs/"))
+(defvar nowis/gtd-dir (concat nowis/doc-emacs-dir "01-orgmode/xnotes/gtd"))
+(defvar nowis/bib-dir (concat nowis/doc-emacs-dir "03-bibliography/"))
+(defvar nowis/bib-pdf-dir (concat nowis/doc-emacs-dir "02-binary-git/searchable"))
 #+end_src
 * Package Management
 ** setup
@@ -450,7 +450,7 @@ Maybe I should add a new state.
                           '(")" . forward-sentence)
                           '("{" . backward-paragraph)
                           '("}" . forward-paragraph)
-                          '("]" . nowis-graphviz-symbol-with-label)
+                          '("]" . nowis/graphviz-symbol-with-label)
                           ;; '("]" . (lambda()
                           ;;           (interactive)
                           ;;           (meow-bounds-of-thing ?\")))
@@ -560,10 +560,10 @@ Maybe I should add a new state.
   [["config"
     ("p" "personal emacs config" (lambda()
                                    (interactive)
-                                   (find-file nowis-config-file)))
+                                   (find-file nowis/config-file)))
     ("e" "emacs documents" (lambda()
                              (interactive)
-                             (find-file nowis-doc-emacs-dir)))
+                             (find-file nowis/doc-emacs-dir)))
     ("d" "dot files" (lambda()
                        (interactive)
                        (find-file "~/dotfiles")))
@@ -578,7 +578,7 @@ Maybe I should add a new state.
   [
    ["Imenu"
     ("l" "Imenu list smart toggle" imenu-list-smart-toggle)
-    ("o" "org mode sidebar" nowis-org-toggle-sidebar)
+    ("o" "org mode sidebar" nowis/org-toggle-sidebar)
     ;; ("L" "Boxy imenu" boxy-imenu)
     ]
    ["gptel"
@@ -586,7 +586,6 @@ Maybe I should add a new state.
     ("i" "gptel-aibo-summon/insert" gptel-aibo-summon)
     ("r" "gptel-rewrite" gptel-rewrite)
     ("f" "gptel-file-add" gptel-add-file)
-    ("q" "gptel-quick" gptel-quick)
     ]
    ])
 #+end_src
@@ -684,7 +683,9 @@ Maybe I should add a new state.
   [["agenda"
     ("a" "org-agenda" org-agenda)
     ("c" "capture" org-capture)
-    ("A" "archive" nowis-org-archive-subtree)
+    ("A" "archive" nowis/org-archive-subtree)
+    ("p" "planning today" nowis/goto-or-capture-daily-plan)
+    ("s" "summary today" nowis/goto-or-capture-daily-summary)
     ]
 
     ["shell"
@@ -856,7 +857,7 @@ Maybe I should add a new state.
                                  return font))
 
 ;; mayby I should remove all this font-seting and use only default font
-(defun nowis-setup-fonts()
+(defun nowis/setup-fonts()
   "Setup fonts."
   (when (display-graphic-p)
     ;; Set default font
@@ -880,7 +881,7 @@ Maybe I should add a new state.
     )
   )
 
-(nowis-setup-fonts)
+(nowis/setup-fonts)
 #+end_src
 ** variable-pitch
 #+begin_src elisp
@@ -959,7 +960,7 @@ diff-hl-mode highlights uncommitted changes on the left side of the window (area
         dashboard-set-heading-icons t
         dashboard-set-file-icons t
         dashboard-center-content t
-        dashboard-startup-banner (concat nowis-config-useful-tools "banner.txt")
+        dashboard-startup-banner (concat nowis/config-useful-tools "banner.txt")
         dashboard-set-init-info t)
   (dashboard-setup-startup-hook)
   )
@@ -1031,7 +1032,7 @@ diff-hl-mode highlights uncommitted changes on the left side of the window (area
 *** hl-line
 #+begin_src elisp
 (setup hl-line
-  (keymap-global-set "C-l" #'nowis-recenter)
+  (keymap-global-set "C-l" #'nowis/recenter)
   ;; Only highliht current buffer in current window
   (setq hl-line-sticky-flag nil
         global-hl-line-sticky-flag nil)
@@ -1049,7 +1050,7 @@ diff-hl-mode highlights uncommitted changes on the left side of the window (area
     (add-hook 'post-command-hook #'my/global-hl-line-highlight-debounce)
 
     ))
-  (defun nowis-recenter ()
+  (defun nowis/recenter ()
     (interactive)
     (call-interactively 'recenter)
     (pulsar-pulse-line))
@@ -1228,7 +1229,7 @@ diff-hl-mode highlights uncommitted changes on the left side of the window (area
 
 (defun lewis/ripgrep-search-notes()
   (interactive)
-  (consult-ripgrep (concat nowis-doc-emacs-dir "01-orgmode")))
+  (consult-ripgrep (concat nowis/doc-emacs-dir "01-orgmode")))
 
 (defun lewis/find-file-other-dir()
   (interactive)
@@ -1349,7 +1350,7 @@ should be check after reading the embark.el manual
 #+begin_src elisp
 (setup yasnippet
   (keymap-global-set "M-*" #'yas-insert-snippet)
-  (setq yas-snippet-dirs (list (concat nowis-config-useful-tools "snippets")))
+  (setq yas-snippet-dirs (list (concat nowis/config-useful-tools "snippets")))
   (with-idle-delay 2
     (yas-global-mode))
   )
@@ -1411,7 +1412,7 @@ Jump anywhere in the world
 #+end_src
 *** bookmark
 #+begin_src elisp
-(setq bookmark-default-file (concat nowis-doc-emacs-dir "bookmarks"))
+(setq bookmark-default-file (concat nowis/doc-emacs-dir "bookmarks"))
 #+end_src
 *** windmove
 #+begin_src elisp
@@ -1912,20 +1913,20 @@ Jump anywhere in the world
 (setup graphviz-dot-mode
   (add-to-list 'auto-mode-alist '("\\.dot\\'" . graphviz-dot-mode))
   (setq graphviz-dot-indent-width 4)
-  (setq nowis-graphviz-current-num 0)
-  (defun nowis-graphviz-symbol-with-label ()
+  (setq nowis/graphviz-current-num 0)
+  (defun nowis/graphviz-symbol-with-label ()
     "Wrap the current symbol with [label=\"symbol\"]."
     (interactive)
     (let ((symbol (thing-at-point 'symbol)))
       (when symbol
         (delete-region (beginning-of-thing 'symbol) (end-of-thing 'symbol))
-        (insert (format "%s [label=\"%s\"]" nowis-graphviz-current-num symbol))
-        (setq nowis-graphviz-current-num (1+ nowis-graphviz-current-num))
+        (insert (format "%s [label=\"%s\"]" nowis/graphviz-current-num symbol))
+        (setq nowis/graphviz-current-num (1+ nowis/graphviz-current-num))
         )))
-  (defun nowis-graphviz-reset-number ()
+  (defun nowis/graphviz-reset-number ()
     "Reset number to 0"
     (interactive)
-    (setq nowis-graphviz-current-num 0))
+    (setq nowis/graphviz-current-num 0))
     )
 #+end_src
 *** plantuml
@@ -2176,7 +2177,7 @@ borrowed from citre, now you can always jump-back use "M-," after any jump in th
     ;; if not find ispell-dict, use cape as default
     (if (null ispell-alternate-dictionary)
         (progn
-          (setq ispell-complete-word-dict (concat nowis-doc-emacs-dir "02-binary-git/binary-files/12-spell-dict/en_US.dict"))))))
+          (setq ispell-complete-word-dict (concat nowis/doc-emacs-dir "02-binary-git/binary-files/12-spell-dict/en_US.dict"))))))
 #+end_src
 ***** nerd-icons-corfu
 #+begin_src elisp
@@ -2358,7 +2359,7 @@ Citre is an advanced Ctags (or actually, readtags) frontend for Emacs.
         org-plantuml-jar-path plantuml-jar-path
         org-special-ctrl-a/e t
         ;; org-id
-        org-attach-id-dir (concat nowis-doc-emacs-dir "01-orgmode/org-attach")
+        org-attach-id-dir (concat nowis/doc-emacs-dir "01-orgmode/org-attach")
         org-id-method 'ts
         org-id-ts-format "%Y%m%dT%H%M%S_%6N"
 
@@ -2377,7 +2378,7 @@ Citre is an advanced Ctags (or actually, readtags) frontend for Emacs.
         ;; plain list
         org-list-demote-modify-bullet '(("+" . "-") ("-" . "+") ("*" . "+"))
         ;; attach
-        org-yank-image-save-method (concat nowis-doc-emacs-dir "30-saved-binary/01-pictures/01-org_attachs")
+        org-yank-image-save-method (concat nowis/doc-emacs-dir "30-saved-binary/01-pictures/01-org_attachs")
         )
   (:when-loaded
     (require 'org-tempo) ;; so that <s is useful
@@ -2412,7 +2413,7 @@ Citre is an advanced Ctags (or actually, readtags) frontend for Emacs.
     (advice-add 'org-babel-execute-src-block :before #'my/org-babel-execute-src-block )
     ;; didn't redisplay for now
     ;; (add-hook 'org-babel-after-execute-hook 'org-redisplay-inline-images)
-    (defun nowis-open-generated-image ()
+    (defun nowis/open-generated-image ()
       "Open the image file generated by org-babel in a new window."
       (when (org-in-src-block-p)  ; Check if inside a code block
         (let* ((info (org-babel-get-src-block-info)))  ; Get code block info
@@ -2423,12 +2424,12 @@ Citre is an advanced Ctags (or actually, readtags) frontend for Emacs.
                   (display-buffer buffer '(display-buffer-pop-up-window))  ; Display the buffer in a new window
                   (with-current-buffer buffer
                     (image-mode)))))))))  ; Enable image mode for the buffer
-      (add-hook 'org-babel-after-execute-hook 'nowis-open-generated-image)
+      (add-hook 'org-babel-after-execute-hook 'nowis/open-generated-image)
       ))
 #+end_src
 ** org-sidebar
 #+begin_src elisp
-(defun nowis-org-toggle-sidebar()
+(defun nowis/org-toggle-sidebar()
   "Toggle the display of the Org outline sidebar."
   (interactive)
   (let* ((sidebar-buffer-name (concat "*Outline: " (buffer-name) "*"))
@@ -2685,6 +2686,9 @@ Comments:
                                    ("#+end_src" . ?)
                                    ("#+BEGIN_SRC" . ?)
                                    ("#+END_SRC" . ?)
+                                   ("TODO" . ?T)
+                                   ("NEXT" . ?N)
+                                   ("DONE" . ?D)
                                    ))
                            (prettify-symbols-mode)
                            ))
@@ -2732,8 +2736,8 @@ Comments:
 
 (defun do.refs/get-db-file-list ()
   "Get the list of all the bib files containing my bib database."
-  (if (file-exists-p nowis-bib-dir)
-      (directory-files-recursively nowis-bib-dir "\\.bib\\'" t)
+  (if (file-exists-p nowis/bib-dir)
+      (directory-files-recursively nowis/bib-dir "\\.bib\\'" t)
     nil))
 #+end_src
 *** parse-bibtex-into-denote
@@ -2774,7 +2778,7 @@ Comments:
            org-cite-insert-processor 'citar
            org-cite-follow-processor 'citar
            org-cite-activate-processor 'citar
-           citar-library-paths (list nowis-bib-pdf-dir)
+           citar-library-paths (list nowis/bib-pdf-dir)
            citar-bibliography org-cite-global-bibliography
            ;; org-cite-export-processors '((t . (csl "modern-language-association.csl")))
            ))
@@ -2792,8 +2796,8 @@ Comments:
 #+begin_src elisp
 (setup ebib
   (setq ebib-preload-bib-files org-cite-global-bibliography
-           ebib-file-search-dirs (list nowis-bib-pdf-dir)
-           ebib-bib-search-dirs (list nowis-bib-dir)
+           ebib-file-search-dirs (list nowis/bib-pdf-dir)
+           ebib-bib-search-dirs (list nowis/bib-dir)
            ebib-default-directory 'first-bib-dir
            ebib-file-associations '(("pdf")
                                     ("ps" . "gv")
@@ -2805,7 +2809,7 @@ Comments:
                                 ("Title" 80 t)
                                 ("abstract" 10 t)
                                 )
-           ebib-reading-list-file (concat nowis-doc-emacs-dir "01-orgmode/xnotes/20230403T125743--ebib-reading-lists.org")
+           ebib-reading-list-file (concat nowis/doc-emacs-dir "01-orgmode/xnotes/20230403T125743--ebib-reading-lists.org")
            ebib-use-timestamp t
            ebib-bibtex-dialect 'biblatex
            ebib-create-backups nil
@@ -2820,7 +2824,7 @@ Comments:
 *** denote
 #+begin_src elisp
 (setup denote
-  (setq denote-directory (expand-file-name (concat nowis-doc-emacs-dir "01-orgmode/xnotes"))
+  (setq denote-directory (expand-file-name (concat nowis/doc-emacs-dir "01-orgmode/xnotes"))
         ;; denote-dired-directories (ffap-all-subdirs denote-directory)
         denote-date-prompt-use-org-read-date t
         denote-modules '(project)
@@ -2894,11 +2898,11 @@ Perform the comparison with `string<'."
 #+begin_src elisp
 (defun project-find-searchable-dir-files ()
   (interactive)
-  (dired (concat nowis-doc-emacs-dir "02-binary-git/searchable"))
+  (dired (concat nowis/doc-emacs-dir "02-binary-git/searchable"))
   (project-find-file t))
 (defun project-find-gtd-dir-files ()
   (interactive)
-  (dired nowis-gtd-dir)
+  (dired nowis/gtd-dir)
   (project-find-file t))
 #+end_src
 ** agenda/gtd
@@ -2958,7 +2962,20 @@ In short, you will need 3 files:
 (setup org
   (:when-loaded
     (setq org-capture-templates
-          `(("i" "Inbox" entry  (file+olp+datetree "gtd/inbox.org")
+          `(
+            ("p" "Plan" entry (file+olp+datetree "gtd/inbox.org")
+             ,(concat "* Daily Plan\n"
+                      ":PROPERTIES:\n"
+                      ":ENTRY_TYPE: plan\n"
+                      ":CREATED: %U\n"
+                      ":END:\n%?"))
+            ("s" "Summary" entry (file+olp+datetree "gtd/inbox.org")
+             ,(concat "* Daily Summary\n"
+                      ":PROPERTIES:\n"
+                      ":ENTRY_TYPE: summary\n"
+                      ":CREATED: %U\n"
+                      ":END:\n%?"))
+            ("i" "Inbox" entry  (file+olp+datetree "gtd/inbox.org")
              ,(concat "* TODO [#C] %?\n"
                       ":PROPERTIES:\n:CREATED: %U\n:END:\n")
              )
@@ -2968,11 +2985,46 @@ In short, you will need 3 files:
             ("t" "org-inc topic" entry (file ,(concat org-inc-directory "20251201T112101--incubate.org"))
              ,(concat "* %?\n" ":PROPERTIES:\n:CREATED: %U\n:END:\n")
              :before-finalize ,(lambda ()
-                                (if (not (featurep 'org-inc))
-                                    (require 'org-inc))
-                                  (unless (org-id-get)
-                                    (org-id-get-create))
-                                  (org-srs-item-new 'topic)))))))
+                                 (if (not (featurep 'org-inc))
+                                     (require 'org-inc))
+                                 (unless (org-id-get)
+                                   (org-id-get-create))
+                                 (org-srs-item-new 'topic)))
+            ))))
+(defun nowis/goto-or-capture-daily-entry (entry-type capture-key)
+  "通用函数: 跳转或创建每日条目"
+  (let* ((file (expand-file-name "gtd/inbox.org" org-directory))
+         (today-regexp (format-time-string "\\*\\{3,\\} %Y-%m-%d %a"))
+         found-pos)
+
+    (with-current-buffer (find-file-noselect file)
+      (save-excursion
+        (goto-char (point-min))
+        (when (re-search-forward today-regexp nil t)
+          (let ((tree-end (save-excursion (org-end-of-subtree t t))))
+            (while (and (not found-pos)
+                       (re-search-forward "^\\*\\{4,\\}" tree-end t))
+              (when (string= (org-entry-get nil "ENTRY_TYPE") entry-type)
+                (setq found-pos (match-beginning 0))))))))
+
+    (if found-pos
+        (progn
+          (find-file file)
+          (goto-char found-pos)
+          (org-show-context)
+          (org-reveal)
+          (recenter))
+      (org-capture nil capture-key))))
+
+(defun nowis/goto-or-capture-daily-plan ()
+  "智能跳转或创建今日计划"
+  (interactive)
+  (nowis/goto-or-capture-daily-entry "plan" "p"))
+
+(defun nowis/goto-or-capture-daily-summary ()
+  "智能跳转或创建今日总结"
+  (interactive)
+  (nowis/goto-or-capture-daily-entry "summary" "s"))
 #+end_src
 *** refile
 #+begin_src elisp
@@ -3008,7 +3060,7 @@ See also `org-save-all-org-buffers'"
     (when (org-up-heading-safe)
       (let ((parent (org-get-heading 'no-tags 'no-todo 'no-priority 'no-comment)))
         (truncate-string-to-width parent 20 nil ?\s)))))
-(defun nowis-align-to-window-center(text)
+(defun nowis/align-to-window-center(text)
   (let* ((title text)
          (width (window-width (get-buffer-window)))
          (pad (/ (1+ (- width (string-width title))) 2)))
@@ -3024,63 +3076,63 @@ See also `org-save-all-org-buffers'"
     (or (outline-next-heading) (point-max))))
 
 ;; 定义统一的 prefix format
-(defvar nowis-agenda-prefix-format-basic "%-20:(org-get-parent-heading): [%-4e] "
+(defvar nowis/agenda-prefix-format-basic "%-20:(org-get-parent-heading): [%-4e] "
   "Basic agenda prefix format.")
 
-(defvar nowis-agenda-prefix-format-enhanced
+(defvar nowis/agenda-prefix-format-enhanced
   "%-20:(org-get-parent-heading): [%-4e] [%3(or (org-entry-get nil \"value\") \"\")] [%4(if (and (org-entry-get nil \"value\") (org-entry-get nil \"Effort\")) (format \"%.2f\" (/ (string-to-number (org-entry-get nil \"value\")) (org-duration-to-minutes (org-entry-get nil \"Effort\")))) \"\")] "
   "Enhanced agenda prefix format with value and effort/value ratio.")
 
-(defmacro nowis-create-agenda-command (key description tag)
+(defmacro nowis/create-agenda-command (key description tag)
   `(list ,key ,description
          '(
            (tags-todo ,(concat "+week" tag)
                       ((org-agenda-overriding-header
-                        (nowis-align-to-window-center "󰛨 Week's Target 󰛨\n"))
+                        (nowis/align-to-window-center "󰛨 Week's Target 󰛨\n"))
                        (org-agenda-sorting-strategy '(todo-state-up priority-down timestamp-up))
-                       (org-agenda-prefix-format nowis-agenda-prefix-format-enhanced)))
+                       (org-agenda-prefix-format nowis/agenda-prefix-format-enhanced)))
            (agenda ""
-                   ((org-agenda-overriding-header (nowis-align-to-window-center " Today's Target "))
+                   ((org-agenda-overriding-header (nowis/align-to-window-center " Today's Target "))
                     (org-agenda-span 'day)
                     (org-agenda-skip-function
                      '(org-agenda-skip-if nil '(todo done)))))
            (tags-todo "+TODO=\"NEXT\""
-                      ((org-agenda-overriding-header (nowis-align-to-window-center "NEXT"))
-                       (org-agenda-prefix-format nowis-agenda-prefix-format-enhanced)
+                      ((org-agenda-overriding-header (nowis/align-to-window-center "NEXT"))
+                       (org-agenda-prefix-format nowis/agenda-prefix-format-enhanced)
                        (org-agenda-sorting-strategy '(todo-state-up priority-down timestamp-up))
                        ))
            (tags-todo "inbox-TODO=\"NEXT\"-PRIORITY=\"E\""
-                      ((org-agenda-overriding-header (nowis-align-to-window-center "Inbox"))
+                      ((org-agenda-overriding-header (nowis/align-to-window-center "Inbox"))
                        (org-agenda-skip-function #'my-org-agenda-skip-blocked)
-                       (org-agenda-prefix-format nowis-agenda-prefix-format-enhanced)
+                       (org-agenda-prefix-format nowis/agenda-prefix-format-enhanced)
                        (org-agenda-sorting-strategy '(todo-state-up priority-down timestamp-up))))
-           ;; (tags-todo ,(concat "+action" tag) ((org-agenda-overriding-header (nowis-align-to-window-center "Soft Time"))
+           ;; (tags-todo ,(concat "+action" tag) ((org-agenda-overriding-header (nowis/align-to-window-center "Soft Time"))
            ;;                                     (org-agenda-prefix-format "%-20:(org-get-parent-heading): [%-4e] ")
            ;;                                     (org-agenda-sorting-strategy '(todo-state-up priority-down timestamp-up))
            ;;                                     ))
            (tags-todo "inbox-TODO=\"NEXT\"+PRIORITY=\"E\""
-                      ((org-agenda-overriding-header (nowis-align-to-window-center "Low Priority"))
+                      ((org-agenda-overriding-header (nowis/align-to-window-center "Low Priority"))
                        (org-agenda-skip-function #'my-org-agenda-skip-blocked)
-                       (org-agenda-prefix-format nowis-agenda-prefix-format-enhanced)
+                       (org-agenda-prefix-format nowis/agenda-prefix-format-enhanced)
                        (org-agenda-sorting-strategy '(todo-state-up priority-down timestamp-up))))
            (tags-todo "inbox-TODO=\"NEXT\""
-                      ((org-agenda-overriding-header (nowis-align-to-window-center "Blocked"))
+                      ((org-agenda-overriding-header (nowis/align-to-window-center "Blocked"))
                        (org-agenda-skip-function #'my-org-agenda-skip-unblocked)
-                       (org-agenda-prefix-format nowis-agenda-prefix-format-basic)
+                       (org-agenda-prefix-format nowis/agenda-prefix-format-basic)
                        (org-agenda-sorting-strategy '(todo-state-up priority-down timestamp-up))))
            (tags ,(concat "CLOSED>=\"<today>\"" tag)
-                 ((org-agenda-overriding-header (nowis-align-to-window-center "Completed today"))
-                  (org-agenda-prefix-format nowis-agenda-prefix-format-basic)
+                 ((org-agenda-overriding-header (nowis/align-to-window-center "Completed today"))
+                  (org-agenda-prefix-format nowis/agenda-prefix-format-basic)
                   ))
            (tags ,(concat "CLOSED>=\"<-1w>\"" tag)
-                 ((org-agenda-overriding-header (nowis-align-to-window-center "Completed last 7 days"))
-                  (org-agenda-prefix-format nowis-agenda-prefix-format-basic)
+                 ((org-agenda-overriding-header (nowis/align-to-window-center "Completed last 7 days"))
+                  (org-agenda-prefix-format nowis/agenda-prefix-format-basic)
                   ))
            )))
 
 (setq org-agenda-custom-commands
-      (list (nowis-create-agenda-command "g" "GTD" "")
-            (nowis-create-agenda-command "w" "Work" "+work")
+      (list (nowis/create-agenda-command "g" "GTD" "")
+            (nowis/create-agenda-command "w" "Work" "+work")
             ))
 ;; agenda clockreport
 (setq org-agenda-start-with-clockreport-mode nil
@@ -3091,18 +3143,18 @@ See also `org-save-all-org-buffers'"
 #+end_src
 *** archive
 #+begin_src elisp
-(defun nowis-get-closed-time-or-current-time ()
+(defun nowis/get-closed-time-or-current-time ()
   "Get the CLOSED time of the current subtree or use the current time if not available."
   (let ((closed-time (org-entry-get (point) "CLOSED")))
     (if closed-time
         (org-time-string-to-time closed-time)
       (current-time))))
 
-(defun nowis-org-archive-subtree ()
+(defun nowis/org-archive-subtree ()
   "Archive the current subtree to a corresponding archive file based on the task's completion date."
   (interactive)
   (let* ((current-file (buffer-file-name))
-         (completed-time (nowis-get-closed-time-or-current-time))
+         (completed-time (nowis/get-closed-time-or-current-time))
          (archive-file (concat "gtd_archive_" (format-time-string "%Y" completed-time)
                                "::datetree/")))
     (setq org-archive-location archive-file)
@@ -3346,7 +3398,7 @@ Simple distraction-free editing. I use darkroom instead of writeroom because it'
 #+begin_src elisp
 (setup gptel
   (setq gptel-default-mode 'org-mode
-        ;; gptel-crowdsourced-prompts-file (concat nowis-doc-emacs-dir "09-scripts/chatgpt.csv")
+        ;; gptel-crowdsourced-prompts-file (concat nowis/doc-emacs-dir "09-scripts/chatgpt.csv")
         gptel-highlight-methods '(face)
         gptel-model 'claude-sonnet-4.5
         )
@@ -3412,7 +3464,7 @@ Simple distraction-free editing. I use darkroom instead of writeroom because it'
 #+begin_src elisp
 (setup gptel-agent
   (:when-loaded
-    (let ((preset-dir (concat nowis-doc-emacs-dir "131-gptel-presets/")))
+    (let ((preset-dir (concat nowis/doc-emacs-dir "131-gptel-presets/")))
       (when (file-directory-p preset-dir)
         (add-to-list 'gptel-agent-dirs preset-dir)))
 
@@ -3428,7 +3480,7 @@ Simple distraction-free editing. I use darkroom instead of writeroom because it'
 #+begin_src elisp
 (setup gptel-local-org-prompts
   (keymap-global-set "M-L" #'gptel-choose-org-prompt)
-  (setq gptel-local-org-prompts-directory (expand-file-name "13-gptel-prompts/" nowis-doc-emacs-dir)
+  (setq gptel-local-org-prompts-directory (expand-file-name "13-gptel-prompts/" nowis/doc-emacs-dir)
         gptel-local-org-prompts-preview-length 100)
   )
 #+end_src
@@ -3611,7 +3663,7 @@ ESUP - Emacs Start Up Profiler
 #+end_src
 ** manage-web-bookmarks
 #+begin_src elisp
-(setq org-bookmarks-file (concat nowis-doc-emacs-dir "01-orgmode/xnotes/20250731T173729--bookmarks.org"))
+(setq org-bookmarks-file (concat nowis/doc-emacs-dir "01-orgmode/xnotes/20250731T173729--bookmarks.org"))
 (defun my/add-bookmark ()
   "add bookmark for url into org files"
   (interactive)
@@ -3667,7 +3719,7 @@ ESUP - Emacs Start Up Profiler
 ** minesweeper
 #+begin_src elisp
 (setup minesweeper
-  (setq gamegrid-user-score-file-directory (concat nowis-doc-emacs-dir "66-gamegrid-user-score"))
+  (setq gamegrid-user-score-file-directory (concat nowis/doc-emacs-dir "66-gamegrid-user-score"))
   )
 #+end_src
 * system-specific-config
