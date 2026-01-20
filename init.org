@@ -2829,11 +2829,9 @@ Comments:
         )
   ;; (add-hook 'dired-mode-hook #'denote-dired-mode-in-directories)
   (setq denote-templates
-        `((essence . ,(concat "* 本质思考\n"
-                              "** 事物的根本属性\n"
-                              "** 问题的根源\n"
-                              "** 现象背后的底层逻辑\n"
-                              "* notes\n"))
+        `((journal . ,(concat "* A\n"
+                              "* B\n"
+                              "* C\n"))
           (action . ,(concat "* Destination\n\n"
                              "* Roadmap\n\n"
                              "* Action\n\n"
@@ -2961,15 +2959,14 @@ In short, you will need 3 files:
   (:when-loaded
     (setq org-capture-templates
           `(("i" "Inbox" entry  (file+olp+datetree "gtd/inbox.org")
-             ,(concat "* TODO %?\n"
-                      "/Entered on/ %U")
+             ,(concat "* TODO [#C] %?\n"
+                      ":PROPERTIES:\n:CREATED: %U\n:END:\n")
              )
             ("d" "Done without clock" entry (file+olp+datetree "gtd/inbox.org")
              ,(concat "* DONE %?\n"
                       "CLOSED: %U"))
             ("t" "org-inc topic" entry (file ,(concat org-inc-directory "20251201T112101--incubate.org"))
-             ,(concat "* %?\n"
-                      "/Entered on/ %U")
+             ,(concat "* %?\n" ":PROPERTIES:\n:CREATED: %U\n:END:\n")
              :before-finalize ,(lambda ()
                                 (if (not (featurep 'org-inc))
                                     (require 'org-inc))
