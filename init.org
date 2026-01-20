@@ -117,6 +117,7 @@ I failed in love with denote, so previous *org-roam* configs were refiled into [
 - [[#阅读][阅读]]
   - [[#pdf-tools][pdf-tools]]
   - [[#pdf-view-pagemark][pdf-view-pagemark]]
+  - [[#pdf-to-org-mode][pdf-to-org-mode]]
   - [[#reader][reader]]
   - [[#newsticker][newsticker]]
   - [[#nov][nov]]
@@ -619,7 +620,7 @@ Maybe I should add a new state.
     ("r j" "denote-journal" denote-journal-new-or-existing-entry)
     ("r s" "find-all-searchable" project-find-searchable-dir-files)
     ("r c" "calendar" calendar)
-    ("r w" "week-target" my/denote-journal-this-week-major-tasks)
+    ("r w" "week-target" nowis/denote-journal-this-week-major-tasks)
     ("r g" "project-find-gtd-dir-files" project-find-gtd-dir-files)
     ("r e" "find excalidraw" (lambda ()
                                (interactive)
@@ -671,8 +672,8 @@ Maybe I should add a new state.
     ("s" "line" consult-line)]
    ["web search"
     ("w" "webjump" webjump)
-    ("a" "add bookmark" my/add-bookmark)
-    ("b" "browse bookmark" my/consult-org-bookmarks)
+    ("a" "add bookmark" nowis/add-bookmark)
+    ("b" "browse bookmark" nowis/consult-org-bookmarks)
     ]
    ])
 #+end_src
@@ -1039,15 +1040,15 @@ diff-hl-mode highlights uncommitted changes on the left side of the window (area
   (global-hl-line-mode)
   (:when-loaded
     ;; update only 0.05 timer
-    (defvar my/global-hl-line-timer nil)
+    (defvar nowis/global-hl-line-timer nil)
 
-    (defun my/global-hl-line-highlight-debounce ()
-      (when my/global-hl-line-timer
-        (cancel-timer my/global-hl-line-timer))
-      (setq my/global-hl-line-timer
+    (defun nowis/global-hl-line-highlight-debounce ()
+      (when nowis/global-hl-line-timer
+        (cancel-timer nowis/global-hl-line-timer))
+      (setq nowis/global-hl-line-timer
             (run-with-idle-timer 0.05 nil #'global-hl-line-highlight)))
     (remove-hook 'post-command-hook #'global-hl-line-highlight)
-    (add-hook 'post-command-hook #'my/global-hl-line-highlight-debounce)
+    (add-hook 'post-command-hook #'nowis/global-hl-line-highlight-debounce)
 
     ))
   (defun nowis/recenter ()
@@ -1339,12 +1340,12 @@ should be check after reading the embark.el manual
 (setup wgrep)
 
 ;; open pdf with zathura
-(defun my/open-with-zathura (file)
+(defun nowis/open-with-zathura (file)
   "Open FILE with zathura."
   (start-process "zathura" nil "zathura" file))
 
 (with-eval-after-load 'embark
-  (define-key embark-file-map (kbd "z") #'my/open-with-zathura))
+  (define-key embark-file-map (kbd "z") #'nowis/open-with-zathura))
 #+end_src
 ** yasnippet
 #+begin_src elisp
@@ -1456,7 +1457,7 @@ Jump anywhere in the world
 #+begin_src elisp
 (setq default-input-method "rime")
 (with-eval-after-load 'rime
-  (defun my/rime-disable-predicates ()
+  (defun nowis/rime-disable-predicates ()
     (if (derived-mode-p 'eat-mode)
         ;; 只在 eat buffer 下，禁用 predicates 约束，rime 全时可用
         '(meow-normal-mode-p
@@ -1482,7 +1483,7 @@ Jump anywhere in the world
   (add-hook 'rime-mode-hook
             (lambda ()
               (setq-local rime-disable-predicates
-                          (funcall #'my/rime-disable-predicates))))
+                          (funcall #'nowis/rime-disable-predicates))))
 
   (setq rime-show-candidate 'posframe
         rime-posframe-properties (list :internal-border-width 1
@@ -2395,7 +2396,7 @@ Citre is an advanced Ctags (or actually, readtags) frontend for Emacs.
     ;; org-src-lang-modes
     (add-to-list 'org-src-lang-modes '("dot" . graphviz-dot))
     ;; dynamic load org-src modules to accelerate speed
-    (defun my/org-babel-execute-src-block (&optional _arg info _params)
+    (defun nowis/org-babel-execute-src-block (&optional _arg info _params)
       "Load language if needed"
       (let* ((lang (format "%s" (nth 0 info)))
              (sym (cond ((member (downcase lang) '("c" "cpp" "c++")) 'C)
@@ -2410,7 +2411,7 @@ Citre is an advanced Ctags (or actually, readtags) frontend for Emacs.
             (file-missing
              (setq-default org-babel-load-languages backup-languages)
              err)))))
-    (advice-add 'org-babel-execute-src-block :before #'my/org-babel-execute-src-block )
+    (advice-add 'org-babel-execute-src-block :before #'nowis/org-babel-execute-src-block )
     ;; didn't redisplay for now
     ;; (add-hook 'org-babel-after-execute-hook 'org-redisplay-inline-images)
     (defun nowis/open-generated-image ()
@@ -2578,7 +2579,7 @@ Comments:
 (setup org-clock
   (setq org-clock-mode-line-entry 'current)
   (:when-loaded
-    (defun my/org-show-reminder ()
+    (defun nowis/org-show-reminder ()
       "Function to show a reminder buffer."
       (let ((buf (get-buffer-create "*Org Clock Reminder*"))
             (messages
@@ -2597,7 +2598,7 @@ Comments:
           )))
 
     (add-hook 'org-timer-set-hook #'org-clock-in)
-    (add-hook 'org-timer-done-hook #'my/org-show-reminder)
+    (add-hook 'org-timer-done-hook #'nowis/org-show-reminder)
     (add-hook 'org-timer-done-hook #'org-clock-out)
     ))
 #+end_src
@@ -2881,10 +2882,10 @@ Perform the comparison with `string<'."
 (setup denote-journal
   (setq denote-journal-title-format "%Y_%m_%d_%a_%j")
   (add-hook 'calendar-mode-hook #'denote-journal-calendar-mode)
-  (defun my/denote-journal-this-week-major-tasks ()
+  (defun nowis/denote-journal-this-week-major-tasks ()
     "Open this week's Saturday journal and jump to or insert '本周重点任务' headline."
     (interactive)
-    (let ((date (my/current-week-saturday)))
+    (let ((date (nowis/current-week-saturday)))
       (denote-journal-new-or-existing-entry date)
       (goto-char (point-min))
       (unless (re-search-forward "^\\*+ 本周重点任务" nil t)
@@ -3218,13 +3219,13 @@ See also `org-save-all-org-buffers'"
   (:when-loaded
     (add-hook 'org-mode-hook #'org-inc-overlay-mode)
 
-    (defun my/m-z-action ()
+    (defun nowis/m-z-action ()
       "If region active, show message; else call original M-z."
       (interactive)
       (if (region-active-p)
           (org-inc-extract)
         (call-interactively #'zap-to-char)))
-    (global-set-key (kbd "M-z") #'my/m-z-action)
+    (global-set-key (kbd "M-z") #'nowis/m-z-action)
     )
   )
 #+end_src
@@ -3275,18 +3276,18 @@ See also `org-save-all-org-buffers'"
 #+begin_src elisp
 (setup org
   (:when-loaded
-    (defcustom my/org-yank-image-filename-function
+    (defcustom nowis/org-yank-image-filename-function
       (lambda () (format-time-string "screenshot_%Y%m%d_%H%M%S.png"))
       "A function to generate screenshot name"
       :type 'function
       :group 'org)
 
-    (defun my/org-yank-image-from-clipboard-wsl ()
+    (defun nowis/org-yank-image-from-clipboard-wsl ()
       "paste from wsl"
       ;; (interactive)
       (require 'org-attach)
       (let* ((attach-dir (org-attach-dir t))
-             (filename (funcall my/org-yank-image-filename-function))
+             (filename (funcall nowis/org-yank-image-filename-function))
              (filepath (expand-file-name filename attach-dir))
              (wsl-path (string-trim
                         (shell-command-to-string
@@ -3300,18 +3301,18 @@ See also `org-save-all-org-buffers'"
               (message "Image saved to attachment: %s" filepath))
           (error "Failed to save image from clipboard"))))
 
-    (defun my/org-yank-image-from-clipboard-native ()
+    (defun nowis/org-yank-image-from-clipboard-native ()
       "use the default yank-media"
       (yank-media))
 
-    (defun my/org-yank-image-from-clipboard ()
+    (defun nowis/org-yank-image-from-clipboard ()
       "paste pictures from powershell when using wsl, others use yank-media"
       (interactive)
       (if (string= "Arch" (getenv "WSL_DISTRO_NAME"))
-          (my/org-yank-image-from-clipboard-wsl)
-        (my/org-yank-image-from-clipboard-native)))
+          (nowis/org-yank-image-from-clipboard-wsl)
+        (nowis/org-yank-image-from-clipboard-native)))
     (:with-map org-mode-map
-      (:bind "M-<f1>" my/org-yank-image-from-clipboard)
+      (:bind "M-<f1>" nowis/org-yank-image-from-clipboard)
       )
     ))
 #+end_src
@@ -3362,6 +3363,16 @@ See also `org-save-all-org-buffers'"
 #+begin_src elisp :tangle no
 (setup pdf-view-pagemark
   (:hook-into pdf-view-mode-hook))
+#+end_src
+** pdf-to-org-mode
+#+begin_src elisp
+(defun nowis/pdf-to-org ()
+  "convert PDF to org-mode use mutool and pandoc"
+  (interactive)
+  (let ((pdf (buffer-file-name))
+        (org (concat (file-name-sans-extension (buffer-file-name)) ".org")))
+    (shell-command (format "mutool draw -F xhtml %s | pandoc -f html -t org -o %s" pdf org))
+    (find-file org)))
 #+end_src
 ** reader
 #+begin_src elisp
@@ -3439,17 +3450,17 @@ Simple distraction-free editing. I use darkroom instead of writeroom because it'
     ;; │ autosave │
     ;; └──────────┘
 
-    (defvar my/gpt-save-directory
+    (defvar nowis/gpt-save-directory
       "~/.emacs.d/gpt-saves/"
       "Directory for auto-saving GPT buffers")
 
-    (defun my/gpt-save-on-kill-buffer ()
+    (defun nowis/gpt-save-on-kill-buffer ()
       (when (and (bound-and-true-p gptel-mode)
                  (buffer-modified-p))
         (if buffer-file-name
             (save-buffer)
           (let* ((ts   (format-time-string "%Y%m%dT%H%M%S"))
-                 (dir  (file-name-as-directory my/gpt-save-directory))
+                 (dir  (file-name-as-directory nowis/gpt-save-directory))
                  (fn   (expand-file-name (format "gpt-%s.org" ts) dir)))
             (unless (file-directory-p dir)
               (make-directory dir t))
@@ -3458,7 +3469,7 @@ Simple distraction-free editing. I use darkroom instead of writeroom because it'
     (add-hook 'gptel-mode-hook
               (lambda ()
                 (add-hook 'kill-buffer-hook
-                          #'my/gpt-save-on-kill-buffer
+                          #'nowis/gpt-save-on-kill-buffer
                           nil  ; append
                           t))) ; make buffer-local
     )
@@ -3489,6 +3500,9 @@ Simple distraction-free editing. I use darkroom instead of writeroom because it'
   )
 #+end_src
 *** gptel-aibo
+:PROPERTIES:
+:ID:       20260120T232406_670024
+:END:
 #+begin_src elisp
 (setup gptel-aibo
   (:when-loaded
@@ -3600,12 +3614,12 @@ Simple distraction-free editing. I use darkroom instead of writeroom because it'
 #+end_src
 ** macos-ocr
 #+begin_src elisp
-(defun my/siri-ocr ()
+(defun nowis/siri-ocr ()
     (interactive)
     (shell-command "shortcuts run \"OCR Selected Area\"")
     (do-applescript "tell application id \"org.gnu.Emacs\" to activate")
   )
-(keymap-global-set "C-c M-o" #'my/siri-ocr)
+(keymap-global-set "C-c M-o" #'nowis/siri-ocr)
 #+end_src
 ** esup
 ESUP - Emacs Start Up Profiler
@@ -3668,7 +3682,7 @@ ESUP - Emacs Start Up Profiler
 ** manage-web-bookmarks
 #+begin_src elisp
 (setq org-bookmarks-file (concat nowis/doc-emacs-dir "01-orgmode/xnotes/20250731T173729--bookmarks.org"))
-(defun my/add-bookmark ()
+(defun nowis/add-bookmark ()
   "add bookmark for url into org files"
   (interactive)
   (let ((url (read-string "URL: "))
@@ -3679,7 +3693,7 @@ ESUP - Emacs Start Up Profiler
       (insert (format "\n* %s\n[[%s]]\n  added: %s\n" title url timestamp))
       (save-buffer))))
 
-(defun my/consult-org-bookmarks ()
+(defun nowis/consult-org-bookmarks ()
   "A bookmark browser based on consult-org-heading, will return to origin place after opening url"
   (interactive)
   (let ((original-buffer (current-buffer))
