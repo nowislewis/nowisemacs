@@ -2841,11 +2841,9 @@ Comments:
         `((journal . ,(concat "* A\n"
                               "* B\n"
                               "* C\n"))
-          (action . ,(concat "* Destination\n\n"
-                             "* Roadmap\n\n"
-                             "* Action\n\n"
-                             "* Warnings\n\n"
-                             "* Links\n\n"))
+          (bib . ,(concat "#+begin_src bibtex\n"
+                           "#+end_src\n"
+                           "* notes"))
           (gtd . ,(concat "* Important\n\n"
                           "* Diary\n\n"))
           ))
