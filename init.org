@@ -3477,6 +3477,30 @@ Simple distraction-free editing. I use darkroom instead of writeroom because it'
                           #'nowis/gpt-save-on-kill-buffer
                           nil  ; append
                           t))) ; make buffer-local
+    ;; ┌─────────┐
+    ;; │ presets │
+    ;; └─────────┘
+
+  (defun nowis/gptel-windows-on-frame ()
+    "Return all windows on frame that aren't gptel chat buffers."
+    (delq (and-let* ((current-buf (window-buffer (selected-window)))
+                     ((buffer-local-value 'gptel-mode current-buf)))
+            (selected-window))
+          (window-list)))
+
+  (gptel-make-preset 'visible-buffers
+    :description "Include the full text of all buffers visible in the frame."
+    :context
+    '(:eval (mapcar #'window-buffer (nowis/gptel-windows-on-frame))))
+
+  (gptel-make-preset 'visible-text
+    :description "Include visible text from all windows in the frame."
+    :context
+    '(:eval (mapcar (lambda (win) ;; Create (<buffer> :bounds ((start . end)))
+                      `(,(window-buffer win)
+                        :bounds ((,(window-start win) . ,(window-end win)))))
+                    (nowis/gptel-windows-on-frame))))
+
     )
   )
 #+end_src
@@ -3493,7 +3517,56 @@ Simple distraction-free editing. I use darkroom instead of writeroom because it'
               (unless (member agent-name '("gptel-agent" "gptel-plan"))
                 (apply #'gptel-make-preset agent))))
           (gptel-agent-update))
+
+    ;; customize dangerous commands
+    (eval-when-compile
+      (require 'cl-lib)
+      (require 'gptel-request))
+
+    (defcustom gptel-bash-dangerous-commands
+      '("rm" "rmdir" "mv" "dd" "mkfs" "fdisk" "parted"
+        "chmod" "chown" "chgrp"
+        "sudo" "su"
+        "kill" "killall" "pkill"
+        "systemctl" "service" "reboot" "shutdown" "halt" "poweroff"
+        "iptables" "ufw" "firewall-cmd"
+        "apt" "apt-get" "yum" "dnf" "pacman" "brew"
+        "curl" "wget" "git" "svn" "mktemp")
+      "List of dangerous Bash commands that require user confirmation."
+      :type '(repeat string)
+      :group 'gptel)
+
+    (defun gptel-bash-extract-main-command (command)
+      "Extract the main command name from COMMAND (ignoring arguments, pipes, redirections, etc.)."
+      (when (and command (stringp command) (not (string-empty-p command)))
+        (let* ((cmd (string-trim command))
+               (cmd (replace-regexp-in-string "#.*$" "" cmd))
+               (cmd (car (split-string cmd "[|;&<>]\\|&&\\|||" t "[ \t\n]+")))
+               (words (split-string cmd nil t)))
+          (when words
+            (file-name-nondirectory (car words))))))
+
+    (defun gptel-bash-confirm-filter (command)
+      "Check if COMMAND requires confirmation (i.e., is dangerous)."
+      (when-let ((main-cmd (gptel-bash-extract-main-command command)))
+        (member main-cmd gptel-bash-dangerous-commands)))
+
+   (defun gptel-bash-apply-filter ()
+      "将 Bash 命令过滤器应用到 gptel-agent 的 Bash tool。"
+      (interactive)
+      (if-let* ((bash-tool (gptel-get-tool "Bash")))
+          (progn
+            (setf (gptel-tool-confirm bash-tool) #'gptel-bash-confirm-filter)
+            (message "✓ Applied smart confirmation filter to Bash tool"))
+        (user-error "Bash tool not found. Make sure gptel-agent-tools is loaded")))
+    (gptel-bash-apply-filter)
     )
+  (defun gptel-simple-agent ()
+    "Start a `gptel-simple-agent' session."
+    (interactive)
+    (require 'gptel-agent)
+    (gptel-agent default-directory "gptel-simple-agent"))
+
   )
 #+end_src
 *** gptel-local-org-prompts
