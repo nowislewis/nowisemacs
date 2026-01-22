@@ -2279,8 +2279,13 @@ Citre is an advanced Ctags (or actually, readtags) frontend for Emacs.
 **** jinx
 #+begin_src elisp
 (setup jinx
-  ;; (dolist (hook '(text-mode-hook conf-mode-hook))
-  ;;   (add-hook hook #'jinx-mode))
+(defun check-enchant-available ()
+  "Check if enchant is available on the system."
+  (executable-find "enchant-2"))
+
+(when (check-enchant-available)
+  (dolist (hook '(text-mode-hook conf-mode-hook))
+    (add-hook hook #'jinx-mode)))
   (:when-loaded
     (setq jinx-languages "en_US")
     (add-to-list 'jinx-exclude-regexps '(t "\\cc"))
@@ -2934,7 +2939,9 @@ In short, you will need 3 files:
 
       (setq org-refile-files
             (cl-remove-if (lambda (file) (string-match-p "inbox.org$" file))
-                          org-agenda-files))))
+                          org-agenda-files))
+      (add-to-list 'org-refile-files (expand-file-name (concat org-directory "/org-inc/20251201T112101--incubate.org")))
+      ))
     (org-agenda-update-agenda-files)
     ))
 
@@ -2978,7 +2985,7 @@ In short, you will need 3 files:
                       ":ENTRY_TYPE: summary\n"
                       ":CREATED: %U\n"
                       ":END:\n%?"))
-            ("i" "Inbox" entry  (file+olp+datetree "gtd/inbox.org")
+            ("i" "Inbox" entry  (file "gtd/inbox.org")
              ,(concat "* TODO [#C] %?\n"
                       ":PROPERTIES:\n:CREATED: %U\n:END:\n")
              )
