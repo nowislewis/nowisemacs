@@ -14,22 +14,21 @@
   "Live paragraph translation overlay."
   :group 'gptel)
 
-(defcustom gptel-overlay-translate-delay 1.0
-  "Idle time in seconds before translating current paragraph."
-  :type 'number
-  :group 'gptel-overlay-translate)
-
-(defcustom gptel-overlay-translate-prompt "Translate to English:\n\n%s"
+(defcustom gptel-overlay-translate-prompt "Translate into Chinese, answer with only results. if the paragraph is code snippet, then just write a brief explaination without origin codes\n\n%s"
   "Prompt template for translation. %s will be replaced with paragraph text."
   :type 'string
   :group 'gptel-overlay-translate)
 
-(defcustom gptel-overlay-translate-face '(:foreground "cyan" :background "#2d2d2d")
+(defcustom gptel-overlay-translate-face 'shadow
   "Face for translation overlay text."
   :type '(plist)
   :group 'gptel-overlay-translate)
 
 ;;; Internal variables
+
+;; List of overlays for the current buffer
+(defvar-local gptel-overlay-translate--overlays nil
+  "List of all translation overlays in this buffer.")
 
 (defvar-local gptel-overlay-translate--overlay nil
   "Overlay displaying the translation.")
@@ -42,25 +41,32 @@
 
 ;;; Functions
 
-(defun gptel-overlay-translate--paragraph-bounds ()
-  "Return current paragraph bounds as (START . END)."
-  (save-excursion
-    (cons (progn (backward-paragraph) (point))
-          (progn (forward-paragraph) (point)))))
+(defun gptel-overlay-translate--all-paragraph-bounds ()
+  "Return a list of (start . end) cons for all paragraphs in buffer."
+  (let (result)
+    (save-excursion
+      (goto-char (point-min))
+      (while (not (eobp))
+        (let ((start (progn (skip-chars-forward "\n \t") (point)))
+              (end (progn (forward-paragraph) (point))))
+          (when (> end start)
+            (push (cons start end) result))
+          (forward-line 1)))
+      (nreverse result))))
 
 (defun gptel-overlay-translate--clear ()
-  "Remove translation overlay."
-  (when (overlayp gptel-overlay-translate--overlay)
-    (delete-overlay gptel-overlay-translate--overlay)
-    (setq gptel-overlay-translate--overlay nil)))
+  "Clear all translation overlays in the buffer."
+  (when gptel-overlay-translate--overlays
+    (mapc #'delete-overlay gptel-overlay-translate--overlays)
+    (setq gptel-overlay-translate--overlays nil)))
 
-(defun gptel-overlay-translate--show (text pos)
-  "Show translation TEXT at position POS."
-  (gptel-overlay-translate--clear)
-  (setq gptel-overlay-translate--overlay (make-overlay pos pos))
-  (overlay-put gptel-overlay-translate--overlay 'before-string
-               (propertize (concat text "\n\n")
-                           'face gptel-overlay-translate-face)))
+(defun gptel-overlay-translate--show (text start end)
+  "Show translation TEXT as overlay below paragraph from START to END."
+  (let ((ov (make-overlay start end)))
+    (overlay-put ov 'after-string
+                 (propertize (concat "\n" text "\n")
+                             'face gptel-overlay-translate-face))
+    (push ov gptel-overlay-translate--overlays)))
 
 (defun gptel-overlay-translate--translate ()
   "Translate current paragraph if it changed."
@@ -72,7 +78,8 @@
         (let ((text (string-trim
                      (buffer-substring-no-properties (car bounds) (cdr bounds))))
               (buf (current-buffer))
-              (pos (car bounds)))
+              (start (car bounds))
+              (end (cdr bounds)))
           (when (> (length text) 0)
             (gptel-request
              (format gptel-overlay-translate-prompt text)
@@ -82,22 +89,38 @@
                           (buffer-live-p buf))
                  (with-current-buffer buf
                    (when gptel-overlay-translate-mode
-                     (gptel-overlay-translate--show response pos))))))))))))
+                     (gptel-overlay-translate--show response start end))))))))))))
 
-;;; Minor mode
+;;; Main batch translation logic
+(defun gptel-overlay-translate--translate-buffer ()
+  "Translate all paragraphs in the buffer and show overlays."
+  (gptel-overlay-translate--clear)
+  (dolist (bounds (gptel-overlay-translate--all-paragraph-bounds))
+    (let ((text (string-trim (buffer-substring-no-properties (car bounds) (cdr bounds))))
+          (start (car bounds))
+          (end (cdr bounds)))
+      (when (> (length text) 0)
+        (gptel-request
+         (format gptel-overlay-translate-prompt text)
+         :callback
+         (let ((start-marker (copy-marker start))
+               (end-marker (copy-marker end)))
+           (lambda (response _info)
+             (when (and (stringp response)
+                        (buffer-live-p (marker-buffer start-marker)))
+               (with-current-buffer (marker-buffer start-marker)
+                 (when gptel-overlay-translate-mode
+                   (gptel-overlay-translate--show response start-marker end-marker)))))))))))
 
 ;;;###autoload
 (define-minor-mode gptel-overlay-translate-mode
-  "Show live translation overlay for current paragraph."
-  :lighter " Tr"
+  "Automatically translate all paragraphs in this buffer as overlays.\n
+Toggle to re-trigger translation."
+  :lighter " GPTTr"
   :group 'gptel-overlay-translate
   (if gptel-overlay-translate-mode
-      (unless gptel-overlay-translate--timer
-        (setq gptel-overlay-translate--timer
-              (run-with-idle-timer gptel-overlay-translate-delay t
-                                   #'gptel-overlay-translate--translate)))
-    (gptel-overlay-translate--clear)
-    (setq gptel-overlay-translate--last-bounds nil)))
+      (gptel-overlay-translate--translate-buffer)
+    (gptel-overlay-translate--clear)))
 
 (provide 'gptel-overlay-translate)
 ;;; gptel-overlay-translate.el ends here

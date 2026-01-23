@@ -3432,7 +3432,7 @@ Simple distraction-free editing. I use darkroom instead of writeroom because it'
                     :host "llm-gateway.momenta.works"
                     :key 'gptel-api-key
                     :stream t
-                    :models '(claude-sonnet-4.5 claude-haiku-4.5 minimax-m2.1 gpt-5.2 gemini-3-pro)))
+                    :models '(claude-sonnet-4.5 claude-haiku-4.5 minimax-m2.1 gpt-5.2 gemini-3-pro qwen3-coder-plus)))
     (gptel-make-openai "chatanywhere"
       :host "api.chatanywhere.tech"
       ;; :header (lambda () `(("Authorization" . ,(concat "Bearer " (gptel--get-api-key)))))
@@ -3623,12 +3623,6 @@ Simple distraction-free editing. I use darkroom instead of writeroom because it'
     ;; (advice-add 'whisper-command :override #'whisper--ctranslate2-command)
     )
   )
-#+end_src
-*** agent-shell
-#+begin_src elisp
-(setup acp)
-(setup shell-marker)
-(setup agent-shell)
 #+end_src
 ** webjump
 #+begin_src elisp
