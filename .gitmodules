@@ -333,3 +333,6 @@
 [submodule "lib/tramp-rpc"]
 	path = lib/tramp-rpc
 	url = https://github.com/ArthurHeymans/emacs-tramp-rpc.git
+[submodule "lib/consult-omni"]
+	path = lib/consult-omni
+	url = https://github.com/armindarvish/consult-omni.git

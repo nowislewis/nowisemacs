@@ -686,13 +686,10 @@ Maybe I should add a new state.
                    (org-occur "^[ \t]*\\*+ +\\(TODO\\|NEXT\\)\\>")))
     ]
 
-   ["shell"
-    ;; ("i" "toggle-insert-cd" eat-toggle-insert-dir)
+   ["life"
+    ("l" "life" life-calendar)
     ]
    ["others"
-    ;; ("t" "org-pomodoro" org-pomodoro)
-    ;; ("l" "app-launcher-run-app" app-launcher-run-app)
-    ;; ("e" "elfeed" my-elfeed)
     ("r" "restart emacs" restart-emacs)
     ("w" "whisper" whisper-run)
     ]
@@ -1256,6 +1253,16 @@ diff-hl-mode highlights uncommitted changes on the left side of the window (area
     ))
 #+end_src
 *** consult-omni
+#+begin_src elisp
+(setup consult-omni
+  (:when-loaded
+    (require 'consult-omni-embark)
+    (require 'consult-omni-sources)
+    (setq consult-omni-sources-modules-to-load '(consult-omni-google consult-omni-bing))
+    (consult-omni-sources-load-modules)
+    )
+  )
+#+end_src
 ** rg.el
 #+begin_src elisp
 (setup rg)
@@ -2684,11 +2691,16 @@ Comments:
                                    ("#+end_src" . ?)
                                    ("#+BEGIN_SRC" . ?)
                                    ("#+END_SRC" . ?)
+                                   ("#+begin_tool" . ?󱁤)
+                                   ("#+end_tool" . ?)
+                                   ("#+begin_quote" . ?󱀢)
+                                   ("#+end_quote" . ?)
                                    ("TODO" . ?T)
                                    ("NEXT" . ?N)
                                    ("DONE" . ?D)
                                    (":PROPERTIES:" . ?)
                                    (":SRSITEMS:" . ?)
+                                   (":END:" . ?)
                                    ))
                            (prettify-symbols-mode)
                            ))
