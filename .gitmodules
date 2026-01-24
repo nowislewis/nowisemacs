@@ -327,24 +327,9 @@
 [submodule "lib/denote-org"]
 	path = lib/denote-org
 	url = https://github.com/protesilaos/denote-org.git
-[submodule "lib/agent-shell"]
-	path = lib/agent-shell
-	url = https://github.com/xenodium/agent-shell.git
-[submodule "lib/acp"]
-	path = lib/acp
-	url = https://github.com/xenodium/acp.el.git
-[submodule "lib/shell-maker"]
-	path = lib/shell-maker
-	url = https://github.com/xenodium/shell-maker.git
 [submodule "lib/reader"]
 	path = lib/reader
 	url = https://codeberg.org/divyaranjan/emacs-reader.git
-[submodule "lib/eca"]
-	path = lib/eca
-	url = https://github.com/editor-code-assistant/eca-emacs.git
 [submodule "lib/tramp-rpc"]
 	path = lib/tramp-rpc
 	url = https://github.com/ArthurHeymans/emacs-tramp-rpc.git
-[submodule "lib/org-tidy"]
-	path = lib/org-tidy
-	url = https://github.com/jxq0/org-tidy.git
