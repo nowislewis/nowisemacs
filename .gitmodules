@@ -336,3 +336,6 @@
 [submodule "lib/consult-omni"]
 	path = lib/consult-omni
 	url = https://github.com/armindarvish/consult-omni.git
+[submodule "lib/pi-coding-agent"]
+	path = lib/pi-coding-agent
+	url = https://github.com/dnouri/pi-coding-agent.git

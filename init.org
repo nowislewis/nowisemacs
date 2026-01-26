@@ -3219,6 +3219,8 @@ See also `org-save-all-org-buffers'"
      ["review"
       ("r" "continue" nowis/org-inc-continue-interactive :transient t)
       ("c" "create" org-inc-create)
+      ("a" "abort" org-inc-abort)
+      ("p" "postpone" org-inc-postpone)
       ]
      ["rate"
       ("1" "easy" org-srs-review-rate-easy :transient t)
@@ -3433,6 +3435,7 @@ Simple distraction-free editing. I use darkroom instead of writeroom because it'
         ;; gptel-crowdsourced-prompts-file (concat nowis/doc-emacs-dir "09-scripts/chatgpt.csv")
         gptel-highlight-methods '(face)
         gptel-model 'claude-sonnet-4.5
+        ;; gptel-max-tokens
         )
   (keymap-global-set "M-p" #'gptel-send)
   (keymap-global-set "M-r" #'gptel-rewrite)
@@ -3444,7 +3447,7 @@ Simple distraction-free editing. I use darkroom instead of writeroom because it'
                     :host "llm-gateway.momenta.works"
                     :key 'gptel-api-key
                     :stream t
-                    :models '(claude-sonnet-4.5 claude-haiku-4.5 minimax-m2.1 gpt-5.2 gemini-3-pro qwen3-coder-plus)))
+                    :models '(claude-sonnet-4.5 claude-haiku-4.5 minimax-m2.1 gpt-5.2 gemini-3-pro qwen3-coder-plus deepseek-v3.2)))
     (gptel-make-openai "chatanywhere"
       :host "api.chatanywhere.tech"
       ;; :header (lambda () `(("Authorization" . ,(concat "Bearer " (gptel--get-api-key)))))
