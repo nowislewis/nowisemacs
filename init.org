@@ -249,7 +249,6 @@ I use the following file paths to manage all the files in Nowisemacs:
 #+begin_example
 emacs
 ├── 01-orgmode
-│   ├── org-remark
 │   └── xnotes
 ├── 02-binary-git/binary-files
 │   ├── 01-pictures
@@ -583,8 +582,6 @@ Maybe I should add a new state.
     ;; ("L" "Boxy imenu" boxy-imenu)
     ]
    ["gptel"
-    ("a" "aibo" gptel-aibo)
-    ("i" "gptel-aibo-summon/insert" gptel-aibo-summon)
     ("r" "gptel-rewrite" gptel-rewrite)
     ("f" "gptel-file-add" gptel-add-file)
     ]
@@ -632,9 +629,6 @@ Maybe I should add a new state.
     ("e" "ebib" ebib)
     ("b" "citar-open" citar-open)
     ("u" "update denote with bibtex" denote-bibtex-update-reference)
-    ]
-   ["review cards"
-    ("s" "org-srs" org-srs-transient-map)
     ]
    ["graph"
     ("g" "org-graphviz-mindmap" org-graphviz-mindmap-create)
@@ -687,19 +681,19 @@ Maybe I should add a new state.
     ("A" "archive" nowis/org-archive-subtree)
     ("p" "planning today" nowis/goto-or-capture-daily-plan)
     ("s" "summary today" nowis/goto-or-capture-daily-summary)
+    ("o" "occur" (lambda ()
+                   (interactive)
+                   (org-occur "^[ \t]*\\*+ +\\(TODO\\|NEXT\\)\\>")))
     ]
 
-    ["shell"
-     ;; ("i" "toggle-insert-cd" eat-toggle-insert-dir)
-     ]
-    ["others"
-     ;; ("t" "org-pomodoro" org-pomodoro)
-     ;; ("l" "app-launcher-run-app" app-launcher-run-app)
-     ;; ("e" "elfeed" my-elfeed)
-     ("r" "restart emacs" restart-emacs)
-     ("w" "whisper" whisper-run)
-     ]
-    ])
+   ["life"
+    ("l" "life" life-calendar)
+    ]
+   ["others"
+    ("r" "restart emacs" restart-emacs)
+    ("w" "whisper" whisper-run)
+    ]
+   ])
 #+end_src
 *** ui
 #+begin_src elisp
@@ -763,14 +757,8 @@ Maybe I should add a new state.
  '("t" . toggle-leader-map)
  ;; '("d" . dictionary-leader-map)
 
- ;; remark
- '("r m" . org-remark-mark)
- '("r l" . org-remark-mark-line) ; new in v1.3
- '("r o" . org-remark-open)
- '("r ]" . org-remark-view-next)
- '("r [" . org-remark-view-prev)
- '("r r" . org-remark-remove)
- '("r d" . org-remark-delete)
+ ;; org-srs review
+ '("r" . org-srs-transient-map)
  )
 #+end_src
 ** which-key
@@ -829,10 +817,10 @@ Maybe I should add a new state.
 ;; variable font
 (setq lewis-variable-font (cl-loop for font in '(
                                                  "IBM Plex Sans SC"
+                                                 "LXGW WenKai"
                                                  "Noto Sans CJK SC"
                                                  "Times"
                                                  "Helvetica"
-                                                 "LXGW WenKai"
                                                  "Maple UI"
                                                  ;; "Source Han Sans SC VF"
                                                  "Arial"
@@ -1263,6 +1251,17 @@ diff-hl-mode highlights uncommitted changes on the left side of the window (area
 
     (add-to-list 'consult-dir-sources 'consult-dir--source-zoxide t)
     ))
+#+end_src
+*** consult-omni
+#+begin_src elisp
+(setup consult-omni
+  (:when-loaded
+    (require 'consult-omni-embark)
+    (require 'consult-omni-sources)
+    (setq consult-omni-sources-modules-to-load '(consult-omni-google consult-omni-bing))
+    (consult-omni-sources-load-modules)
+    )
+  )
 #+end_src
 ** rg.el
 #+begin_src elisp
@@ -2692,9 +2691,16 @@ Comments:
                                    ("#+end_src" . ?)
                                    ("#+BEGIN_SRC" . ?)
                                    ("#+END_SRC" . ?)
+                                   ("#+begin_tool" . ?󱁤)
+                                   ("#+end_tool" . ?)
+                                   ("#+begin_quote" . ?󱀢)
+                                   ("#+end_quote" . ?)
                                    ("TODO" . ?T)
                                    ("NEXT" . ?N)
                                    ("DONE" . ?D)
+                                   (":PROPERTIES:" . ?)
+                                   (":SRSITEMS:" . ?)
+                                   (":END:" . ?)
                                    ))
                            (prettify-symbols-mode)
                            ))
@@ -2708,10 +2714,6 @@ Comments:
 #+begin_src elisp
 (setup org-visual-outline
   (add-hook 'org-mode-hook #'org-visual-indent-mode))
-#+end_src
-*** org-tidy
-#+begin_src elisp
-(add-hook 'org-mode-hook #'org-tidy-mode)
 #+end_src
 ** ox-hugo
 #+begin_src elisp
@@ -3176,19 +3178,6 @@ See also `org-save-all-org-buffers'"
 (setup lisp-fsrs)
 (setup org-srs
   (add-hook 'org-mode-hook #'org-cloze-overlay-mode)
-  (transient-define-prefix org-srs-transient-map()
-    "Define transient-key map for org-fc functions"
-    [
-     ["review"
-      ("s" "start current" org-srs-review-start)
-      ("q" "quit" org-srs-review-quit)
-      ]
-     ["create"
-      ("n" "new create" org-srs-item-create)
-      ("c" "cloze" org-srs-item-cloze-dwim)
-      ("C" "uncloze" org-srs-item-uncloze-dwim)
-      ("u" "update cloze" org-srs-item-cloze-update)
-      ]])
 
  (defun org-cloze-fontify (limit)
   "Fontify cloze markup up to LIMIT."
@@ -3209,12 +3198,35 @@ See also `org-save-all-org-buffers'"
     (font-lock-remove-keywords nil '((org-cloze-fontify . 0)))
     (font-lock-flush)))
 
+ (:when-loaded
+   (org-srs-ui-mode +1)
+   )
   )
 #+end_src
 ** org-inc
 #+begin_src elisp
 (setup org-inc
   (:autoload org-inc-continue)
+  (:autoload org-inc-create)
+  (defun nowis/org-inc-continue-interactive ()
+    "Call org-inc-continue interactively."
+    (interactive)
+    (call-interactively 'org-inc-continue))
+
+  (transient-define-prefix org-srs-transient-map()
+    "Define transient-key map for org-fc functions"
+    [
+     ["review"
+      ("r" "continue" nowis/org-inc-continue-interactive :transient t)
+      ("c" "create" org-inc-create)
+      ]
+     ["rate"
+      ("1" "easy" org-srs-review-rate-easy :transient t)
+      ("2" "good" org-srs-review-rate-good :transient t)
+      ("3" "hard" org-srs-review-rate-hard :transient t)
+      ("4" "again" org-srs-review-rate-again :transient t)
+      ]])
+
   (setq org-inc-directory (expand-file-name "org-inc/" org-directory)
         org-srs-item-confirm #'org-srs-item-confirm-command)
   (:with-map org-mode-map

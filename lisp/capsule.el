@@ -9,7 +9,7 @@
   (expand-file-name "lib/" user-emacs-directory)
   "Directory containing package subdirectories.")
 
-(defvar capsule-compile-directories '("elisp" "lisp" "extensions")
+(defvar capsule-compile-directories '("elisp" "lisp" "extensions" "sources")
   "Whitelist of subdirectories to compile and load.")
 
 (defvar capsule-skip-autoloads-packages '("reader")
