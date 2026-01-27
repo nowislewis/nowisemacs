@@ -3465,6 +3465,10 @@ Simple distraction-free editing. I use darkroom instead of writeroom because it'
 
     (custom-set-faces
      '(gptel-response-highlight ((((background dark) (min-colors 88)) :background "gray22" :extend t))))
+    ;; ┌─────┐
+    ;; │ mcp │
+    ;; └─────┘
+    (require 'gptel-integrations)
 
     ;; ┌──────────┐
     ;; │ autosave │
@@ -3496,25 +3500,25 @@ Simple distraction-free editing. I use darkroom instead of writeroom because it'
     ;; │ presets │
     ;; └─────────┘
 
-  (defun nowis/gptel-windows-on-frame ()
-    "Return all windows on frame that aren't gptel chat buffers."
-    (delq (and-let* ((current-buf (window-buffer (selected-window)))
-                     ((buffer-local-value 'gptel-mode current-buf)))
-            (selected-window))
-          (window-list)))
+    (defun nowis/gptel-windows-on-frame ()
+      "Return all windows on frame that aren't gptel chat buffers."
+      (delq (and-let* ((current-buf (window-buffer (selected-window)))
+                       ((buffer-local-value 'gptel-mode current-buf)))
+              (selected-window))
+            (window-list)))
 
-  (gptel-make-preset 'visible-buffers
-    :description "Include the full text of all buffers visible in the frame."
-    :context
-    '(:eval (mapcar #'window-buffer (nowis/gptel-windows-on-frame))))
+    (gptel-make-preset 'visible-buffers
+      :description "Include the full text of all buffers visible in the frame."
+      :context
+      '(:eval (mapcar #'window-buffer (nowis/gptel-windows-on-frame))))
 
-  (gptel-make-preset 'visible-text
-    :description "Include visible text from all windows in the frame."
-    :context
-    '(:eval (mapcar (lambda (win) ;; Create (<buffer> :bounds ((start . end)))
-                      `(,(window-buffer win)
-                        :bounds ((,(window-start win) . ,(window-end win)))))
-                    (nowis/gptel-windows-on-frame))))
+    (gptel-make-preset 'visible-text
+      :description "Include visible text from all windows in the frame."
+      :context
+      '(:eval (mapcar (lambda (win) ;; Create (<buffer> :bounds ((start . end)))
+                        `(,(window-buffer win)
+                          :bounds ((,(window-start win) . ,(window-end win)))))
+                      (nowis/gptel-windows-on-frame))))
 
     )
   )
@@ -3611,6 +3615,15 @@ Simple distraction-free editing. I use darkroom instead of writeroom because it'
   (keymap-global-set "M-l" #'gptel-quick-with-prompt)
   (with-eval-after-load 'embark
     (keymap-set embark-general-map "?" #'gptel-quick-with-prompt))
+  )
+#+end_src
+*** mcp
+#+begin_src elisp
+(setup mcp
+  (setq mcp-hub-servers
+        '(("drawio" . (:command "npx"
+                                :args ("@next-ai-drawio/mcp-server@latest")))
+        ))
   )
 #+end_src
 *** whisper

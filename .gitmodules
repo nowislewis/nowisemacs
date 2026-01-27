@@ -339,3 +339,6 @@
 [submodule "lib/pi-coding-agent"]
 	path = lib/pi-coding-agent
 	url = https://github.com/dnouri/pi-coding-agent.git
+[submodule "lib/mcp"]
+	path = lib/mcp
+	url = https://github.com/lizqwerscott/mcp.el.git
