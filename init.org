@@ -3652,6 +3652,10 @@ Simple distraction-free editing. I use darkroom instead of writeroom because it'
     )
   )
 #+end_src
+*** eca
+#+begin_src elisp
+(setup eca)
+#+end_src
 ** webjump
 #+begin_src elisp
 (setup webjump
