@@ -156,9 +156,6 @@
 [submodule "jinx"]
 	path = lib/jinx
 	url = https://github.com/minad/jinx.git
-[submodule "kv"]
-	path = lib/kv
-	url = https://github.com/nicferrier/emacs-kv.git
 [submodule "language-id"]
 	path = lib/language-id
 	url = https://github.com/lassik/emacs-language-id.git

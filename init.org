@@ -17,6 +17,7 @@ I failed in love with denote, so previous *org-roam* configs were refiled into [
   - [[#meow-leader-keybindings][meow leader keybindings]]
   - [[#which-key][which-key]]
   - [[#electric][electric]]
+  - [[#smart-bind][smart-bind]]
 - [[#package-library][Package Library]]
   - [[#dash][dash]]
   - [[#s][s]]
@@ -145,7 +146,7 @@ I failed in love with denote, so previous *org-roam* configs were refiled into [
 ** UI speed up
 #+NAME: ui-speed-up
 #+begin_src elisp :tangle ~/.emacs.d/early-init.el
-;; -*- lexical-binding: t; -*-
+;;; -*- lexical-binding: t; -*-
 ;; set gc according to EmacsConf 2023
 (setq gc-cons-threshold 8000000
       gc-cons-percentage 0.2)
@@ -184,7 +185,7 @@ I failed in love with denote, so previous *org-roam* configs were refiled into [
 ** basic modes
 #+NAME: basic-modes
 #+begin_src elisp
-;; -*- lexical-binding: t; -*-
+;;; -*- lexical-binding: t; -*-
 ;; basic modes
 
 ;; turn off native-comp on macos
@@ -266,7 +267,7 @@ emacs
 └── 09-scripts
 #+end_example
 1. All files and folders except =02-binary-git/binary-files= are managed under git control, and =binary-file= is managed under =rsync= or =restic=.
-2. =01-orgmode= stores .org files, where =org-remark= is used to store remark notes, =xnote= is the default directory of =Denote= .
+2. =01-orgmode= stores .org files, where =xnote= is the default directory of =Denote= .
 3. =02-binary-git/binary-files=, as its name, storing binary-fils. For example, =02-searchable= is used store the PDF of the literature
    and daily MS Office files, the meaning of searchable means that all files under this folder maybe searched or
    modified latter, and they should have nice naming specifications for convenience search.
@@ -772,6 +773,21 @@ Maybe I should add a new state.
 #+begin_src elisp
 (setup elec-pair
   (electric-pair-mode))
+#+end_src
+** smart-bind
+#+begin_src elisp
+    (defun nowis/smart-bind (key condition-fn new-fn &optional keymap)
+      "Bind KEY to NEW-FN when CONDITION-FN is true, otherwise use original binding."
+      (let* ((map (or keymap global-map))
+             (original-binding (lookup-key map (kbd key))))
+        (define-key map (kbd key)
+                    (lambda ()
+                      (interactive)
+                      (if (funcall condition-fn)
+                          (call-interactively new-fn)
+                        (if original-binding
+                            (call-interactively original-binding)
+                          (message "No original binding for %s" key)))))))
 #+end_src
 * Package Library
 ** dash
@@ -2685,6 +2701,19 @@ Comments:
                (compose-region (match-beginning 1) (match-end 1)
                                ,(nth i star-list))))))))
     ))
+;; ┌───────────────┐
+;; │ prettify-mode │
+;; └───────────────┘
+
+(defun my/org-prettify-compose-p (start end match)
+  "Custom compose predicate for org-mode.
+Always allow composition for org-mode keywords, regardless of context."
+  (cond
+   ((string-prefix-p "#+" match) t)
+   ((string-prefix-p ":" match) t)
+   (t (prettify-symbols-default-compose-p start end match))))
+
+
 (add-hook 'org-mode-hook (lambda()
                            (setq prettify-symbols-alist
                                  '(("#+begin_src" . ?)
@@ -2700,8 +2729,10 @@ Comments:
                                    ("DONE" . ?D)
                                    (":PROPERTIES:" . ?)
                                    (":SRSITEMS:" . ?)
+                                   (":LOGBOOK:" . ?)
                                    (":END:" . ?)
                                    ))
+                           (setq prettify-symbols-compose-predicate #'my/org-prettify-compose-p)
                            (prettify-symbols-mode)
                            ))
 #+end_src
@@ -3238,16 +3269,11 @@ See also `org-save-all-org-buffers'"
   (:when-loaded
     (add-hook 'org-mode-hook #'org-inc-overlay-mode)
 
-    (defun nowis/m-z-action ()
-      "If region active, show message; else call original M-z."
-      (interactive)
-      (if (region-active-p)
-          (org-inc-extract)
-        (call-interactively #'zap-to-char)))
-    (global-set-key (kbd "M-z") #'nowis/m-z-action)
+    (nowis/smart-bind "M-z" #'region-active-p #'org-inc-extract)
+    (nowis/smart-bind "M-c" #'region-active-p #'org-srs-item-cloze-dwim)
     )
   )
-#+end_src
+    #+end_src
 ** inline-anki
 #+begin_src elisp :tangle no
 (setup request)
@@ -3409,7 +3435,8 @@ See also `org-save-all-org-buffers'"
 #+end_src
 ** nov
 #+begin_src elisp :tangle no
-(setup esxml) ;; <- (setup kv)
+(setup kv)
+(setup esxml)
 (setup nov
   (:bind "]" nov-scroll-up
          "[" nov-scroll-down))
