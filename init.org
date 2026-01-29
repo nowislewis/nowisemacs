@@ -54,6 +54,7 @@ I failed in love with denote, so previous *org-roam* configs were refiled into [
   - [[#consult-commands][Consult Commands]]
   - [[#rgel][rg.el]]
 - [[#补全][补全]]
+  - [[#default-completion-comfigurations][default completion comfigurations]]
   - [[#completions-with-vertico][Completions with Vertico]]
   - [[#icomplete][icomplete]]
   - [[#flex][flex]]
@@ -204,7 +205,6 @@ I failed in love with denote, so previous *org-roam* configs were refiled into [
 (setq scroll-step 0
       scroll-conservatively 10000)
 (setq redisplay-skip-fontification-on-input t)
-(setq completions-detailed t) ;;useful in emacs 28
 (setq use-dialog-box nil)               ;never pop dialog
 (setq mouse-yank-at-point t)            ;粘贴于光标处,而不是鼠标指针处
 #+end_src
@@ -1284,6 +1284,12 @@ diff-hl-mode highlights uncommitted changes on the left side of the window (area
 (setup rg)
 #+end_src
 * 补全
+** default completion comfigurations
+#+begin_src elisp
+(setq completions-detailed t) ;;useful in emacs 28
+(setq completions-group t)
+(setq completions-sort 'historical)
+#+end_src
 ** Completions with Vertico
 #+name: vertico
 #+begin_src elisp
@@ -1458,7 +1464,6 @@ Jump anywhere in the world
 #+end_src
 * ibuffer
 ** ibuffer
-#+name: ibuffer
 #+begin_src elisp
 (setup ibuffer
   (global-set-key [remap list-buffers] #'ibuffer))
