@@ -678,13 +678,16 @@ Maybe I should add a new state.
   "Define leader-key map for apps functions"
   [["agenda"
     ("a" "org-agenda" org-agenda)
-    ("c" "capture" org-capture)
     ("A" "archive" nowis/org-archive-subtree)
-    ("p" "planning today" nowis/goto-or-capture-daily-plan)
-    ("s" "summary today" nowis/goto-or-capture-daily-summary)
     ("o" "occur" (lambda ()
                    (interactive)
                    (org-occur "^[ \t]*\\*+ +\\(TODO\\|NEXT\\)\\>")))
+    ]
+   ["capture"
+    ("c" "capture" org-capture)
+    ("e" "extract topic" org-inc-topic-capture-from-clipboard)
+    ("p" "planning today" nowis/goto-or-capture-daily-plan)
+    ("s" "summary today" nowis/goto-or-capture-daily-summary)
     ]
 
    ["life"
@@ -3009,6 +3012,28 @@ In short, you will need 3 files:
 ;; (add-hook 'org-capture-mode-hook 'delete-other-windows)
 (setup org
   (:when-loaded
+    (defvar nowis/org-inc-topic-capture-file-path
+      (concat org-inc-directory "20251201T112101--incubate.org")
+      "topic capture file")
+
+    (defun nowis/org-inc-topic-capture-file ()
+      "Return the target file for topic capture.
+If there is a prefix argument, prompt the user to select a file and save it for future use;
+otherwise use the saved file."
+      (if current-prefix-arg
+          (let ((selected-file
+                 (read-file-name "Choose target topic capture file: "
+                                 org-inc-directory
+                                 nil
+                                 t
+                                 nil
+                                 (lambda (name)
+                                   (string-match-p "\\.org$" name)))))
+            (setq nowis/org-inc-topic-capture-file-path selected-file)
+            (message "topic capture file is set to: %s" selected-file)
+            selected-file)
+        nowis/org-inc-topic-capture-file-path))
+
     (setq org-capture-templates
           `(
             ("p" "Plan" entry (file+olp+datetree "gtd/inbox.org")
@@ -3030,15 +3055,24 @@ In short, you will need 3 files:
             ("d" "Done without clock" entry (file+olp+datetree "gtd/inbox.org")
              ,(concat "* DONE %?\n"
                       "CLOSED: %U"))
-            ("t" "org-inc topic" entry (file ,(concat org-inc-directory "20251201T112101--incubate.org"))
-             ,(concat "* %?\n" ":PROPERTIES:\n:CREATED: %U\n:END:\n")
+            ("t" "org-inc topic" entry (file nowis/org-inc-topic-capture-file)
+             ,(concat "** topic card\n" ":PROPERTIES:\n:CREATED: %U\n:END:\n%?")
              :before-finalize ,(lambda ()
                                  (if (not (featurep 'org-inc))
                                      (require 'org-inc))
                                  (unless (org-id-get)
                                    (org-id-get-create))
                                  (org-srs-item-new 'topic)))
-            ))))
+            )))
+  (defun org-inc-topic-capture-from-clipboard (&optional arg)
+    "Create a topic capture from clipboard contents.
+When called with prefix argument, prompt to select target file."
+    (interactive "P")
+    (let ((current-prefix-arg arg)
+          (clipboard-content (current-kill 0)))
+      (org-capture nil "t")
+      (insert clipboard-content)))
+  )
 (defun nowis/goto-or-capture-daily-entry (entry-type capture-key)
   "通用函数: 跳转或创建每日条目"
   (let* ((file (expand-file-name "gtd/inbox.org" org-directory))
@@ -3051,7 +3085,7 @@ In short, you will need 3 files:
         (when (re-search-forward today-regexp nil t)
           (let ((tree-end (save-excursion (org-end-of-subtree t t))))
             (while (and (not found-pos)
-                       (re-search-forward "^\\*\\{4,\\}" tree-end t))
+                        (re-search-forward "^\\*\\{4,\\}" tree-end t))
               (when (string= (org-entry-get nil "ENTRY_TYPE") entry-type)
                 (setq found-pos (match-beginning 0))))))))
 
