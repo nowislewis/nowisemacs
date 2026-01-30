@@ -835,7 +835,7 @@ Maybe I should add a new state.
                                 return font))
 ;; variable font
 (setq lewis-variable-font (cl-loop for font in '(
-                                                 "IBM Plex Sans SC"
+                                                 "IBM Plex Sans"
                                                  "LXGW WenKai"
                                                  "Noto Sans CJK SC"
                                                  "Times"
@@ -3020,12 +3020,15 @@ otherwise use the saved file."
             )))
   (defun org-inc-topic-capture-from-clipboard (&optional arg)
     "Create a topic capture from clipboard contents.
+If region is active, use region text instead.
 When called with prefix argument, prompt to select target file."
     (interactive "P")
-    (let ((current-prefix-arg arg)
-          (clipboard-content (current-kill 0)))
+    (let* ((current-prefix-arg arg)
+           (content (if (use-region-p)
+                        (buffer-substring-no-properties (region-beginning) (region-end))
+                      (current-kill 0))))
       (org-capture nil "t")
-      (insert clipboard-content)))
+      (insert content)))
   )
 (defun nowis/goto-or-capture-daily-entry (entry-type capture-key)
   "通用函数: 跳转或创建每日条目"
