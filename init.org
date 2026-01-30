@@ -1695,87 +1695,40 @@ Jump anywhere in the world
     (add-to-list 'eat-semi-char-non-bound-keys [?\e ?o])
     (eat-update-semi-char-mode-map)))
 
-  (defun eat-toggle-window()
-    "Toggle eat buffer window."
-    (interactive)
-    (let ((eat-win (seq-find (lambda (w)
-                               (eq 'eat-mode (buffer-local-value 'major-mode (window-buffer w))))
-                             (window-list))))
-      (if eat-win
-          (delete-window eat-win)
-        (if-let ((buf (car (eat-cycle--get-buffers))))
-            (progn (pop-to-buffer buf) (eat-cycle))
+(defun eat-toggle-window(&optional choose-buffer)
+  "Toggle eat buffer window.
+With prefix argument CHOOSE-BUFFER, prompt for buffer name."
+  (interactive "P")
+  (let ((eat-win (seq-find (lambda (w)
+                             (eq 'eat-mode (buffer-local-value 'major-mode (window-buffer w))))
+                           (window-list))))
+    (if eat-win
+        (delete-window eat-win)
+      (if choose-buffer
+          ;; prompt to choosing buffer
+          (let* ((existing-bufs (mapcar #'buffer-name (eat--get-buffers)))
+                 (buf-name (completing-read "Choose eat buffer: "
+                                            existing-bufs
+                                            nil nil))
+                 (buf (get-buffer buf-name)))
+            (if buf
+                (pop-to-buffer buf)
+              ;; create new eat buffer
+              (unless (featurep 'eat) (require 'eat) (eat-reload))
+              (let ((eat-buffer-name buf-name))
+                (eat))))
+        ;; without prefix
+        (if-let ((buf (car (eat--get-buffers))))
+            (pop-to-buffer buf)
           (unless (featurep 'eat) (require 'eat) (eat-reload))
-          (eat)
-          (eat-cycle)))))
+          (eat))))))
 
-  (defvar eat-cycle-keys '("M-1" "M-2" "M-3" "M-4" "M-5" "M-6" "M-7" "M-8" "M-9"))
-  (defvar eat-cycle--slots (make-hash-table :test 'equal)
-    "Maps buffer-name -> slot-number for persistent assignment.")
-
-  (defun eat-cycle--get-buffers ()
-    "Return live eat buffers sorted by assigned slot."
-    (let ((bufs (seq-filter (lambda (b)
-                              (and (buffer-live-p b)
-                                   (eq 'eat-mode (buffer-local-value 'major-mode b))))
-                            (buffer-list))))
-      ;; Clean dead buffers from registry
-      (maphash (lambda (name _)
-                 (unless (get-buffer name)
-                   (remhash name eat-cycle--slots)))
-               eat-cycle--slots)
-      ;; Sort by slot number
-      (sort bufs (lambda (a b)
-                   (< (or (gethash (buffer-name a) eat-cycle--slots) 999)
-                      (or (gethash (buffer-name b) eat-cycle--slots) 999))))))
-
-  (defun eat-cycle--ensure-slot (buffer)
-    "Ensure buffer has a slot assigned, return (slot . buffer)."
-    (let* ((name (buffer-name buffer))
-           (slot (gethash name eat-cycle--slots)))
-      (unless slot
-        ;; Find first free slot
-        (let ((used (hash-table-values eat-cycle--slots)))
-          (setq slot (cl-loop for i from 0 below (length eat-cycle-keys)
-                              unless (memq i used) return i)))
-        (when slot (puthash name slot eat-cycle--slots)))
-      (when slot (cons slot buffer))))
-
-;;;###autoload
-  (defun eat-cycle ()
-    "Cycle through eat buffers with persistent slot numbers."
-    (interactive)
-    (let* ((buffers (eat-cycle--get-buffers))
-           (slots (delq nil (mapcar #'eat-cycle--ensure-slot buffers)))
-           (current (current-buffer)))
-      (cond
-       ((null buffers) (message "No eat buffers"))
-       ((= 1 (length buffers)) (switch-to-buffer (car buffers)))
-       (t
-        (unless (memq current (mapcar #'cdr slots))
-          (switch-to-buffer (cdar slots)))
-        ;; Show slots
-        (message "Eat: %s"
-                 (mapconcat (lambda (s)
-                              (let ((idx (1+ (car s)))
-                                    (buf (cdr s)))
-                                (if (eq buf (current-buffer))
-                                    (propertize (format "[%d:%s]" idx (buffer-name buf))
-                                                'face '(:foreground "green" :weight bold))
-                                  (format " %d:%s " idx (buffer-name buf)))))
-                            slots " "))
-        ;; Setup transient map
-        (set-transient-map
-         (let ((map (make-sparse-keymap)))
-           (dolist (s slots)
-             (let* ((slot-idx (car s))
-                    (target-buf (cdr s)))  ; 使用 let* 正确捕获变量
-               (define-key map (kbd (nth slot-idx eat-cycle-keys))
-                           `(lambda ()
-                              (interactive)
-                              (switch-to-buffer ,target-buf)
-                              (eat-cycle)))))
-           map))))))
+(defun eat--get-buffers ()
+  "Return live eat buffers."
+  (seq-filter (lambda (b)
+                (and (buffer-live-p b)
+                     (eq 'eat-mode (buffer-local-value 'major-mode b))))
+              (buffer-list)))
 #+end_src
 ** vterm
 #+begin_src elisp :tangle no
