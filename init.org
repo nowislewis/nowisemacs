@@ -2711,8 +2711,9 @@ Always allow composition for org-mode keywords, regardless of context."
 #+begin_src elisp
 (setup tomelr)
 (setup ox-hugo
+  (setq org-hugo-section "posts")
   (with-eval-after-load 'ox
-  (require 'ox-hugo)))
+    (require 'ox-hugo)))
 #+end_src
 ** org-present
 #+begin_src elisp
