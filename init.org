@@ -3863,7 +3863,7 @@ ESUP - Emacs Start Up Profiler
 * games
 ** minesweeper
 #+begin_src elisp
-(setup minesweeper
+(setup mines
   (setq gamegrid-user-score-file-directory (concat nowis/doc-emacs-dir "66-gamegrid-user-score"))
   )
 #+end_src

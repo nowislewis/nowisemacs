@@ -65,7 +65,11 @@
   (let ((ov (make-overlay start end)))
     (overlay-put ov 'after-string
                  (propertize (concat "\n" text "\n")
-                             'face gptel-overlay-translate-face))
+                             'face gptel-overlay-translate-face
+                             ;; Allow Emacs to visually wrap long/multi-line
+                             ;; overlay text.
+                             'line-prefix ""
+                             'wrap-prefix ""))
     (push ov gptel-overlay-translate--overlays)))
 
 (defun gptel-overlay-translate--translate ()
