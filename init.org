@@ -3247,7 +3247,9 @@ See also `org-save-all-org-buffers'"
       ("r" "continue" nowis/org-inc-continue-interactive :transient t)
       ("c" "create" org-inc-create)
       ("a" "abort" org-inc-abort)
-      ("p" "postpone" org-inc-postpone)
+      ("d" "dismiss" org-inc-dismiss)
+      ("p" "Priority" org-inc-priority)
+      ("P" "postpone" org-inc-postpone)
       ]
      ["rate"
       ("1" "easy" org-srs-review-rate-easy :transient t)

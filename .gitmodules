@@ -339,3 +339,6 @@
 [submodule "lib/eca"]
 	path = lib/eca
 	url = https://github.com/editor-code-assistant/eca-emacs.git
+[submodule "lib/kdl-mode"]
+	path = lib/kdl-mode
+	url = https://github.com/taquangtrung/emacs-kdl-mode.git
