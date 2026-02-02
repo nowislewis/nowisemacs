@@ -2844,6 +2844,8 @@ Always allow composition for org-mode keywords, regardless of context."
           (bib . ,(concat "#+begin_src bibtex\n"
                            "#+end_src\n"
                            "* notes"))
+          (have_or_want . ,(concat "* 我有的\n"
+                           "* 我要的"))
           (gtd . ,(concat "* Important\n\n"
                           "* Diary\n\n"))
           ))
@@ -3469,6 +3471,7 @@ Simple distraction-free editing. I use darkroom instead of writeroom because it'
   (keymap-global-set "M-p" #'gptel-send)
   (keymap-global-set "M-r" #'gptel-rewrite)
   (keymap-global-set "M-P" #'gptel)
+  (keymap-global-set "C-M-p" #'gptel-abort)
   (:hook gptel-highlight-mode)
   (:when-loaded
     (setq-default gptel-backend
@@ -3856,9 +3859,8 @@ ESUP - Emacs Start Up Profiler
 ** eww
 #+begin_src elisp
 (setup eww
-  (setq eww-search-prefix "https://www.bing.com/search?q=")
-;; (setq browse-url-browser-function #'eww-browse-url)
-  )
+  ;; (setq eww-search-prefix "https://www.bing.com/search?q=")
+)
 #+end_src
 ** life-calendar
 #+begin_src elisp
