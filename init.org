@@ -3023,11 +3023,15 @@ otherwise use the saved file."
 If region is active, use region text instead.
 When called with prefix argument, prompt to select target file."
     (interactive "P")
-    (let* ((current-prefix-arg arg)
-           (content (if (use-region-p)
-                        (buffer-substring-no-properties (region-beginning) (region-end))
-                      (current-kill 0))))
-      (org-capture nil "t")
+  (let* ((current-prefix-arg arg)
+         (content (if (use-region-p)
+                      (buffer-substring-no-properties
+                       (region-beginning) (region-end))
+                    (or (and (fboundp 'gui-get-selection)
+                             (gui-get-selection 'CLIPBOARD 'STRING))
+                        (current-kill 0 t)   ;; t: 不报错，空则 nil
+                        ""))))
+    (org-capture nil "t")
       (insert content)))
   )
 (defun nowis/goto-or-capture-daily-entry (entry-type capture-key)
@@ -3853,6 +3857,7 @@ ESUP - Emacs Start Up Profiler
 #+begin_src elisp
 (setup eww
   (setq eww-search-prefix "https://www.bing.com/search?q=")
+;; (setq browse-url-browser-function #'eww-browse-url)
   )
 #+end_src
 ** life-calendar
