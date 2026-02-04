@@ -695,7 +695,8 @@ Maybe I should add a new state.
     ]
    ["others"
     ("r" "restart emacs" restart-emacs)
-    ("w" "whisper" whisper-run)
+    ;; ("w" "whisper" whisper-run)
+    ("w" "whisper" whisper-api-record-dwim)
     ]
    ])
 #+end_src
@@ -3615,6 +3616,18 @@ Simple distraction-free editing. I use darkroom instead of writeroom because it'
 
     ;; (advice-add 'whisper-command :override #'whisper--ctranslate2-command)
     )
+  )
+#+end_src
+*** whisper-api
+#+begin_src elisp
+(setup whisper-api
+  (:autoload whisper-api-record-dwim)
+  (setq whisper-api-base-url "https://api.chatanywhere.tech/v1/audio/transcriptions"
+        whisper-api-model "gpt-4o-mini-transcribe"
+        whisper-api-max-recording-seconds 600
+        )
+  (if (eq system-type 'darwin)
+      (setq whisper-api-ffmpeg-command "ffmpeg -y -t %d -f avfoundation -i \":1\" -ar 16000 %s"))
   )
 #+end_src
 *** eca
