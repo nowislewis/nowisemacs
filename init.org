@@ -3262,7 +3262,7 @@ See also `org-save-all-org-buffers'"
     (font-lock-flush)))
 
  (:when-loaded
-   (org-srs-ui-mode +1)
+   ;; (org-srs-ui-mode +1)
    )
   )
 #+end_src
@@ -3574,6 +3574,11 @@ Simple distraction-free editing. I use darkroom instead of writeroom because it'
       :context
       '(:eval (mapcar #'window-buffer (nowis/gptel-windows-on-frame))))
 
+    (gptel-make-preset 'summary
+     :description "summary current content"
+     :system "总结所有内容, 只输出一个简短的标题, 没有任何其他内容"
+      )
+
     (gptel-make-preset 'visible-text
       :description "Include visible text from all windows in the frame."
       :context
@@ -3586,108 +3591,6 @@ Simple distraction-free editing. I use darkroom instead of writeroom because it'
   )
 #+end_src
 *** gptel-agent
-#+begin_src elisp
-(setup gptel-agent
-  (:when-loaded
-    (let ((preset-dir (concat nowis/doc-emacs-dir "131-gptel-presets/")))
-      (when (file-directory-p preset-dir)
-        (add-to-list 'gptel-agent-dirs preset-dir)))
-
-    (mapc (lambda (agent)
-            (let ((agent-name (car agent)))
-              (unless (member agent-name '("gptel-agent" "gptel-plan"))
-                (apply #'gptel-make-preset agent))))
-          (gptel-agent-update))
-
-    ;; customize dangerous commands
-    (eval-when-compile
-      (require 'cl-lib)
-      (require 'gptel-request))
-
-    (defcustom gptel-bash-dangerous-commands
-      '("rm" "rmdir" "mv" "dd" "mkfs" "fdisk" "parted"
-        "chmod" "chown" "chgrp"
-        "sudo" "su"
-        "kill" "killall" "pkill"
-        "systemctl" "service" "reboot" "shutdown" "halt" "poweroff"
-        "iptables" "ufw" "firewall-cmd"
-        "apt" "apt-get" "yum" "dnf" "pacman" "brew"
-        "curl" "wget" "git" "svn" "mktemp")
-      "List of dangerous Bash commands that require user confirmation."
-      :type '(repeat string)
-      :group 'gptel)
-
-    (defun gptel-bash-extract-main-command (command)
-      "Extract the main command name from COMMAND (ignoring arguments, pipes, redirections, etc.)."
-      (when (and command (stringp command) (not (string-empty-p command)))
-        (let* ((cmd (string-trim command))
-               (cmd (replace-regexp-in-string "#.*$" "" cmd))
-               (cmd (car (split-string cmd "[|;&<>]\\|&&\\|||" t "[ \t\n]+")))
-               (words (split-string cmd nil t)))
-          (when words
-            (file-name-nondirectory (car words))))))
-
-    (defun gptel-bash-confirm-filter (command)
-      "Check if COMMAND requires confirmation (i.e., is dangerous)."
-      (when-let ((main-cmd (gptel-bash-extract-main-command command)))
-        (member main-cmd gptel-bash-dangerous-commands)))
-
-   (defun gptel-bash-apply-filter ()
-      "将 Bash 命令过滤器应用到 gptel-agent 的 Bash tool。"
-      (interactive)
-      (if-let* ((bash-tool (gptel-get-tool "Bash")))
-          (progn
-            (setf (gptel-tool-confirm bash-tool) #'gptel-bash-confirm-filter)
-            (message "✓ Applied smart confirmation filter to Bash tool"))
-        (user-error "Bash tool not found. Make sure gptel-agent-tools is loaded")))
-    (gptel-bash-apply-filter)
-    )
-  (defun gptel-simple-agent ()
-    "Start a `gptel-simple-agent' session."
-    (interactive)
-    (require 'gptel-agent)
-    (gptel-agent default-directory "gptel-simple-agent"))
-
-  )
-#+end_src
-*** gptel-local-org-prompts
-#+begin_src elisp
-(setup gptel-local-org-prompts
-  (keymap-global-set "M-L" #'gptel-choose-org-prompt)
-  (setq gptel-local-org-prompts-directory (expand-file-name "13-gptel-prompts/" nowis/doc-emacs-dir)
-        gptel-local-org-prompts-preview-length 100)
-  )
-#+end_src
-*** gptel-aibo
-:PROPERTIES:
-:ID:       20260120T232406_670024
-:END:
-#+begin_src elisp
-(setup gptel-aibo
-  (:when-loaded
-    (define-key gptel-aibo-mode-map
-                (kbd "M-p") #'gptel-aibo-send)
-      (keymap-global-set "M-c" #'gptel-aibo-summon)
-    ))
-#+end_src
-*** gptel-quick-with-prompt
-#+begin_src elisp
-(setup gptel-quick-with-prompt
-  (:autoload gptel-quick-with-prompt)
-  (keymap-global-set "M-l" #'gptel-quick-with-prompt)
-  (with-eval-after-load 'embark
-    (keymap-set embark-general-map "?" #'gptel-quick-with-prompt))
-  )
-#+end_src
-*** mcp
-#+begin_src elisp
-(setup mcp
-  (setq mcp-hub-servers
-        '(("drawio" . (:command "npx"
-                                :args ("@next-ai-drawio/mcp-server@latest")))
-        ))
-  )
-#+end_src
 *** whisper
 #+begin_src elisp
 (setup whisper
