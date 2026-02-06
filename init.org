@@ -6,7 +6,6 @@ I failed in love with denote, so previous *org-roam* configs were refiled into [
   - [[#ui-speed-up][UI speed up]]
   - [[#basic-modes][basic modes]]
   - [[#load-path][load-path]]
-  - [[#drop-out][drop out]]
   - [[#set-vars][set vars]]
 - [[#package-management][Package Management]]
   - [[#setup][setup]]
@@ -84,7 +83,6 @@ I failed in love with denote, so previous *org-roam* configs were refiled into [
 - [[#shell][shell]]
   - [[#eshell][eshell]]
   - [[#eat][eat]]
-  - [[#vterm][vterm]]
 - [[#git][git]]
   - [[#magit][magit]]
   - [[#ediff][ediff]]
@@ -94,8 +92,6 @@ I failed in love with denote, so previous *org-roam* configs were refiled into [
 - [[#org-mode][Org Mode]]
   - [[#org-mode-1][org-mode]]
   - [[#org-src][org-src]]
-  - [[#org-sidebar][org-sidebar]]
-  - [[#org-zotero-parser][org-zotero-parser]]
   - [[#org-oxlatexwordmarkdown][org-ox,latex,word,markdown]]
   - [[#org-clock][org-clock]]
   - [[#org-timer][org-timer]]
@@ -110,16 +106,12 @@ I failed in love with denote, so previous *org-roam* configs were refiled into [
   - [[#agendagtd][agenda/gtd]]
   - [[#org-srs][org-srs]]
   - [[#org-inc][org-inc]]
-  - [[#inline-anki][inline-anki]]
   - [[#doc-capture][doc-capture]]
   - [[#insert-from-clipboard][insert from clipboard]]
   - [[#org-sliced-images][org-sliced-images]]
   - [[#org-graphviz-mindmap][org-graphviz-mindmap]]
   - [[#org-ladder][org-ladder]]
 - [[#阅读][阅读]]
-  - [[#pdf-tools][pdf-tools]]
-  - [[#pdf-view-pagemark][pdf-view-pagemark]]
-  - [[#pdf-to-org-mode][pdf-to-org-mode]]
   - [[#reader][reader]]
   - [[#newsticker][newsticker]]
   - [[#nov][nov]]
@@ -128,7 +120,6 @@ I failed in love with denote, so previous *org-roam* configs were refiled into [
 - [[#tools][tools]]
   - [[#ai-related][ai related]]
   - [[#webjump][webjump]]
-  - [[#backup-scripts][backup scripts]]
   - [[#server][server]]
   - [[#macos-ocr][macos-ocr]]
   - [[#esup][esup]]
@@ -214,36 +205,6 @@ I failed in love with denote, so previous *org-roam* configs were refiled into [
 (add-to-list 'load-path (expand-file-name "lisp" user-emacs-directory))
 (require 'capsule)
 (capsule-initialize)
-#+end_src
-** drop out
-The following content is not enabled yet, because I want to minimize unnecessary settings as much as possible
-#+begin_src elisp :tangle no
-;; Restore emacs session.
-(setq initial-buffer-choice t)
-(run-with-timer 1 nil #'(lambda () (bury-buffer)))
-;; 增加IO性能
-(setq process-adaptive-read-buffering nil)
-(setq read-process-output-max (* 1024 1024))
-
-(global-subword-mode 1)                 ;Word移动支持 FooBar 的格式
-(setq initial-scratch-message "") ;关闭启动空白buffer, 这个buffer会干扰session恢复
-(setq-default comment-style 'indent)    ;设定自动缩进的注释风格
-(setq default-major-mode 'text-mode)    ;设置默认地主模式为TEXT模式
-(setq split-width-threshold nil)        ;分屏的时候使用上下分屏
-(setq inhibit-compacting-font-caches t) ;使用字体缓存，避免卡顿
-(setq confirm-kill-processes nil)       ;退出自动杀掉进程
-(setq async-bytecomp-allowed-packages nil) ;避免magit报错
-(setq profiler-report-cpu-line-format ;让 profiler-report 第一列宽一点
-      '((100 left)
-        (24 right ((19 right)
-                   (5 right)))))
-(setq profiler-report-memory-line-format
-      '((100 left)
-        (19 right ((14 right profiler-format-number)
-                   (5 right)))))
-
-;; (add-hook 'find-file-hook 'highlight-parentheses-mode t) ;增强的括号高亮
-(setq ad-redefinition-action 'accept)   ;不要烦人的 redefine warning
 #+end_src
 ** set vars
 I use the following file paths to manage all the files in Nowisemacs:
@@ -451,7 +412,7 @@ Maybe I should add a new state.
                           '(")" . forward-sentence)
                           '("{" . backward-paragraph)
                           '("}" . forward-paragraph)
-                          '("]" . nowis/graphviz-symbol-with-label)
+                          ;; '("]" . nowis/graphviz-symbol-with-label)
                           ;; '("]" . (lambda()
                           ;;           (interactive)
                           ;;           (meow-bounds-of-thing ?\")))
@@ -579,7 +540,7 @@ Maybe I should add a new state.
   [
    ["Imenu"
     ("l" "Imenu list smart toggle" imenu-list-smart-toggle)
-    ("o" "org mode sidebar" nowis/org-toggle-sidebar)
+    ;; ("o" "org mode sidebar" nowis/org-toggle-sidebar)
     ;; ("L" "Boxy imenu" boxy-imenu)
     ]
    ["gptel"
@@ -849,8 +810,7 @@ Maybe I should add a new state.
                                    return font))
 
 ;; chinese font
-(setq lewis-chinese-font (cl-loop for font in '(
-                                                "Maple Mono SC NF"
+(setq lewis-chinese-font (cl-loop for font in '("Maple Mono SC NF"
                                                 "Unifont"
                                                 "Sarasa Mono SC Nerd"
                                                 "Microsoft Yahei")
@@ -903,15 +863,6 @@ Maybe I should add a new state.
 #+begin_src elisp
 (setup modus-themes
   (load-theme 'modus-vivendi t)
-  ;; (setq modus-themes-common-palette-overrides
-  ;;     '((fg-heading-1 blue)
-  ;;       (fg-heading-2 fg-main)
-  ;;       (fg-heading-3 fg-main)
-  ;;       (fg-heading-4 fg-main)
-  ;;       (fg-heading-5 fg-main)
-  ;;       (fg-heading-6 fg-main)
-  ;;       (fg-heading-7 fg-main)
-  ;;       ))
   )
 #+end_src
 *** ef-themes
@@ -1220,12 +1171,10 @@ diff-hl-mode highlights uncommitted changes on the left side of the window (area
 (setup consult
   (keymap-global-set "C-x b" #'consult-buffer)
   (setq register-preview-delay 0.1
-           register-preview-function #'consult-register-format
-           xref-show-xrefs-function #'consult-xref
-           xref-show-definitions-function #'consult-xref
-           consult-project-root-function #'(lambda ()
-                                           (when-let (project (project-current))
-                                             (car (project-roots project)))))
+        register-preview-function #'consult-register-format
+        xref-show-xrefs-function #'consult-xref
+        xref-show-definitions-function #'consult-xref
+        )
   (:with-map minibuffer-local-map
     (:bind "C-r" consult-history)))
 #+end_src
@@ -1389,11 +1338,9 @@ should be check after reading the embark.el manual
   )
 #+end_src
 ** winner-mode
-#+name: winner-mode
 #+begin_src elisp
 (setup winner
-  (winner-mode t)
-  )
+  (winner-mode t))
 #+end_src
 ** popper
 Popper is a minor-mode to tame the flood of ephemeral windows Emacs produces, while still keeping them within arm’s reach.
@@ -1465,24 +1412,7 @@ Jump anywhere in the world
 (setq aw-keys '(?a ?s ?d ?f ?g ?h ?j ?k ?l)
       aw-scope 'frame
       )
-(defun ace-window-one-command ()
-  (interactive)
-  (let ((win (aw-select " ACE")))
-    (when (windowp win)
-      (with-selected-window win
-        (let* ((command (key-binding
-                         (read-key-sequence
-                          (format "Run in %s..." (buffer-name)))))
-               (this-command command))
-          (call-interactively command))))))
-  ;; (keymap-global-set "M-O" #'ace-window-one-command)
 (defun ace-window-prefix ()
-  "Use `ace-window' to display the buffer of the next command.
-The next buffer is the buffer displayed by the next command invoked
-immediately after this command (ignoring reading from the minibuffer).
-Creates a new window before displaying the buffer.
-When `switch-to-buffer-obey-display-actions' is non-nil,
-`switch-to-buffer' commands are also supported."
   (interactive)
   (display-buffer-override-next-command
    (lambda (buffer _)
@@ -1541,8 +1471,7 @@ When `switch-to-buffer-obey-display-actions' is non-nil,
 
   (setq rime-show-candidate 'posframe
         rime-posframe-properties (list :internal-border-width 1
-                                       :font lewis-fixed-font
-                                       )
+                                       :font lewis-fixed-font)
         rime-user-data-dir "~/Documents/rime/"
         rime-share-data-dir "~/Documents/rime/"
         rime-inline-ascii-trigger 'shift-r
@@ -1551,8 +1480,8 @@ When `switch-to-buffer-obey-display-actions' is non-nil,
   )
 (when (eq system-type 'darwin)
   (setq
-   ;; rime-emacs-module-header-root "/Applications/Emacs.app/Contents/Resources/include/" ;; use build-emacs
-   rime-emacs-module-header-root "/opt/homebrew/opt/emacs-plus@31/include" ;;use emacs-plus
+   rime-emacs-module-header-root "/Applications/Emacs.app/Contents/Resources/include/" ;; use build-emacs
+   ;; rime-emacs-module-header-root "/opt/homebrew/opt/emacs-plus@31/include" ;;use emacs-plus
    rime-librime-root "~/Downloads/librime/dist"
    ))
 #+end_src
@@ -1600,26 +1529,6 @@ When `switch-to-buffer-obey-display-actions' is non-nil,
 (setup tab-bar
   (setq tab-bar-new-button-show nil
         tab-bar-close-button-show nil)
-  (:when-loaded
-    (defun tab-bar-select-tab-1st()
-      (interactive)
-      (tab-bar-select-tab 1))
-    (defun tab-bar-select-tab-2nd()
-      (interactive)
-      (tab-bar-select-tab 2))
-    (defun tab-bar-select-tab-3rd()
-      (interactive)
-      (tab-bar-select-tab 3))
-    (defun tab-bar-select-tab-4th()
-      (interactive)
-      (tab-bar-select-tab 4))
-    (defun tab-bar-select-tab-5th()
-      (interactive)
-      (tab-bar-select-tab 5))
-    (defun tab-bar-select-tab-6th()
-      (interactive)
-      (tab-bar-select-tab 6))
-    )
   )
 (setup tab-line
   (setq tab-line-new-button-show nil
@@ -1652,14 +1561,6 @@ When `switch-to-buffer-obey-display-actions' is non-nil,
         ("n" "tab-bar-switch-to-next-tab" tab-bar-switch-to-next-tab)
         ("p" "tab-bar-switch-to-prev-tab" tab-bar-switch-to-prev-tab)
         ("l" "tab-bar-switch-to-last-tab" tab-bar-switch-to-last-tab)
-        ]
-       ["Switch tab bar by index"
-        ("1" "tab-bar-select-tab-1st" tab-bar-select-tab-1st)
-        ("2" "tab-bar-select-tab-2nd" tab-bar-select-tab-2nd)
-        ("3" "tab-bar-select-tab-3rd" tab-bar-select-tab-3rd)
-        ("4" "tab-bar-select-tab-4th" tab-bar-select-tab-4th)
-        ("5" "tab-bar-select-tab-5th" tab-bar-select-tab-5th)
-        ("6" "tab-bar-select-tab-6th" tab-bar-select-tab-6th)
         ]
        ]
       )
@@ -1761,114 +1662,6 @@ With prefix argument CHOOSE-BUFFER, prompt for buffer name."
                      (eq 'eat-mode (buffer-local-value 'major-mode b))))
               (buffer-list)))
 #+end_src
-** vterm
-#+begin_src elisp :tangle no
-  (defun meomacs-vterm-meow-setup()
-    (add-hook 'meow-normal-mode-hook 'vterm-copy-mode nil t)
-    (add-hook 'meow-insert-mode-hook (lambda () (vterm-copy-mode -1)) nil t))
-
-  (with-eval-after-load "meow"
-    (with-eval-after-load "vterm"
-      (keymap-set vterm-mode-map "C-S-v" 'vterm-yank)
-      (define-key vterm-mode-map (kbd "C-\\") nil)
-      (add-hook 'vterm-mode-hook 'meomacs-vterm-meow-setup)))
-
-  (setup vterm
-    (keymap-global-set "M-`" #'vterm-toggle-window)
-
-    (:when-loaded
-      (add-to-list 'display-buffer-alist
-                   '((lambda (buffer-or-name _)
-                       (let ((buffer (get-buffer buffer-or-name)))
-                         (with-current-buffer buffer
-                           (or (equal major-mode 'vterm-mode)
-                               (string-prefix-p "*vterm" (buffer-name buffer))))))
-                     (display-buffer-reuse-window display-buffer-at-bottom)
-                     (reusable-frames . visible)
-                     (window-height . 0.3))))
-
-    (defun vterm-toggle-window()
-      "Toggle vterm buffer window."
-      (interactive)
-      (let ((vterm-win (seq-find (lambda (w)
-                                   (eq 'vterm-mode (buffer-local-value 'major-mode (window-buffer w))))
-                                 (window-list))))
-        (if vterm-win
-            (delete-window vterm-win)
-          (if-let ((buf (car (vterm-cycle--get-buffers))))
-              (progn (pop-to-buffer buf) (vterm-cycle))
-            (unless (featurep 'vterm) (require 'vterm))
-            (vterm)
-            (vterm-cycle)))))
-
-    (defvar vterm-cycle-keys '("M-1" "M-2" "M-3" "M-4" "M-5" "M-6" "M-7" "M-8" "M-9"))
-    (defvar vterm-cycle--slots (make-hash-table :test 'equal)
-      "Maps buffer-name -> slot-number for persistent assignment.")
-
-    (defun vterm-cycle--get-buffers ()
-      "Return live vterm buffers sorted by assigned slot."
-      (let ((bufs (seq-filter (lambda (b)
-                                (and (buffer-live-p b)
-                                     (eq 'vterm-mode (buffer-local-value 'major-mode b))))
-                              (buffer-list))))
-        ;; Clean dead buffers from registry
-        (maphash (lambda (name _)
-                   (unless (get-buffer name)
-                     (remhash name vterm-cycle--slots)))
-                 vterm-cycle--slots)
-        ;; Sort by slot number
-        (sort bufs (lambda (a b)
-                     (< (or (gethash (buffer-name a) vterm-cycle--slots) 999)
-                        (or (gethash (buffer-name b) vterm-cycle--slots) 999))))))
-
-    (defun vterm-cycle--ensure-slot (buffer)
-      "Ensure buffer has a slot assigned, return (slot . buffer)."
-      (let* ((name (buffer-name buffer))
-             (slot (gethash name vterm-cycle--slots)))
-        (unless slot
-          ;; Find first free slot
-          (let ((used (hash-table-values vterm-cycle--slots)))
-            (setq slot (cl-loop for i from 0 below (length vterm-cycle-keys)
-                                unless (memq i used) return i)))
-          (when slot (puthash name slot vterm-cycle--slots)))
-        (when slot (cons slot buffer))))
-
-  ;;;###autoload
-    (defun vterm-cycle ()
-      "Cycle through vterm buffers with persistent slot numbers."
-      (interactive)
-      (let* ((buffers (vterm-cycle--get-buffers))
-             (slots (delq nil (mapcar #'vterm-cycle--ensure-slot buffers)))
-             (current (current-buffer)))
-        (cond
-         ((null buffers) (message "No vterm buffers"))
-         ((= 1 (length buffers)) (switch-to-buffer (car buffers)))
-         (t
-          (unless (memq current (mapcar #'cdr slots))
-            (switch-to-buffer (cdar slots)))
-          ;; Show slots
-          (message "Vterm: %s"
-                   (mapconcat (lambda (s)
-                                (let ((idx (1+ (car s)))
-                                      (buf (cdr s)))
-                                  (if (eq buf (current-buffer))
-                                      (propertize (format "[%d:%s]" idx (buffer-name buf))
-                                                  'face '(:foreground "green" :weight bold))
-                                    (format " %d:%s " idx (buffer-name buf)))))
-                              slots " "))
-          ;; Setup transient map
-          (set-transient-map
-           (let ((map (make-sparse-keymap)))
-             (dolist (s slots)
-               (let* ((slot-idx (car s))
-                      (target-buf (cdr s)))
-                 (define-key map (kbd (nth slot-idx vterm-cycle-keys))
-                             `(lambda ()
-                                (interactive)
-                                (switch-to-buffer ,target-buf)
-                                (vterm-cycle)))))
-             map)))))))
-#+end_src
 * git
 ** magit
 #+begin_src elisp
@@ -1921,20 +1714,6 @@ With prefix argument CHOOSE-BUFFER, prompt for buffer name."
 (setup graphviz-dot-mode
   (add-to-list 'auto-mode-alist '("\\.dot\\'" . graphviz-dot-mode))
   (setq graphviz-dot-indent-width 4)
-  (setq nowis/graphviz-current-num 0)
-  (defun nowis/graphviz-symbol-with-label ()
-    "Wrap the current symbol with [label=\"symbol\"]."
-    (interactive)
-    (let ((symbol (thing-at-point 'symbol)))
-      (when symbol
-        (delete-region (beginning-of-thing 'symbol) (end-of-thing 'symbol))
-        (insert (format "%s [label=\"%s\"]" nowis/graphviz-current-num symbol))
-        (setq nowis/graphviz-current-num (1+ nowis/graphviz-current-num))
-        )))
-  (defun nowis/graphviz-reset-number ()
-    "Reset number to 0"
-    (interactive)
-    (setq nowis/graphviz-current-num 0))
     )
 #+end_src
 *** plantuml
@@ -1979,11 +1758,6 @@ Emacs major-mode to work with Beancount ledger files
 ;;  (setup auctex)
 (setup cdlatex)
 #+end_src
-**** org-elp
-#+begin_src elisp
-(setup org-elp
-  (setq org-elp-idle-time 1))
-#+end_src
 *** python
 **** python
 #+begin_src elisp
@@ -2003,13 +1777,8 @@ Emacs major-mode to work with Beancount ledger files
 *** scheme
 #+begin_src elisp
 (setup geiser)
- (add-to-list 'load-path (expand-file-name "lib/geiser/elisp" user-emacs-directory))
+(add-to-list 'load-path (expand-file-name "lib/geiser/elisp" user-emacs-directory))
 (setup geiser-guile)
-#+end_src
-*** common lisp slime
-#+begin_src elisp :tangle no
-(setup slime
-  (setq inferior-lisp-program "sbcl"))
 #+end_src
 *** cc-mode
 #+begin_src emacs-lisp
@@ -2161,7 +1930,6 @@ borrowed from citre, now you can always jump-back use "M-," after any jump in th
     (meow-insert-exit))
 
   (global-corfu-mode)
-  ;; (add-hook 'minibuffer-setup-hook #'corfu-enable-always-in-minibuffer 1)
   )
 (setup corfu-popupinfo
   (setq corfu-popupinfo-delay '(0.5 . 0.5))
@@ -2201,10 +1969,6 @@ borrowed from citre, now you can always jump-back use "M-," after any jump in th
   (setq eglot-events-buffer-config'(:size 20000 :format full)
         eglot-extend-to-xref t
         ;; eglot-workspace-configuration '((:python.analysis :useLibraryCodeForTypes t))
-        eglot-workspace-configuration '(:basedpyright (:typeCheckingMode "off")
-                                                      :basedpyright.analysis (:diagnosticSeverityOverrides (:reportUnusedCallResult "none")
-                                                                                                           :inlayHints (:callArgumentNames :json-false)
-                                                                                                           ))
         )
   (:autoload eglot-find-implementation)
   (add-hook 'prog-mode-hook (lambda ()
@@ -2212,7 +1976,6 @@ borrowed from citre, now you can always jump-back use "M-," after any jump in th
                                   (or (file-remote-p default-directory)
                                       (derived-mode-p 'emacs-lisp-mode 'lisp-mode 'makefile-mode 'snippet-mode)
                                       (eglot-ensure)))))
-  ;; (add-hook 'text-mode-hook (lambda() (eglot-ensure)))
 
   (:when-loaded
     ;; hightlight face
@@ -2227,8 +1990,6 @@ borrowed from citre, now you can always jump-back use "M-," after any jump in th
     ;; more languare server
     (add-to-list 'eglot-server-programs
                  '(graphviz-dot-mode . ("dot-language-server" "--stdio")))
-    ;; (add-to-list 'eglot-server-programs
-    ;;              '(text-mode . ("harper-ls" "--stdio")))
     )
   )
 (setup eldoc
@@ -2303,8 +2064,7 @@ Citre is an advanced Ctags (or actually, readtags) frontend for Emacs.
 **** gdb
 #+begin_src elisp
 (setup gdb-mi
-  (setq gdb-restore-window-configuration-after-quit t)
-  )
+  (setq gdb-restore-window-configuration-after-quit t))
 #+end_src
 **** dape
 #+begin_src elisp
@@ -2440,72 +2200,6 @@ Citre is an advanced Ctags (or actually, readtags) frontend for Emacs.
       (add-hook 'org-babel-after-execute-hook 'nowis/open-generated-image)
       ))
 #+end_src
-** org-sidebar
-#+begin_src elisp
-(defun nowis/org-toggle-sidebar()
-  "Toggle the display of the Org outline sidebar."
-  (interactive)
-  (let* ((sidebar-buffer-name (concat "*Outline: " (buffer-name) "*"))
-         (window-width (/ (frame-width) 4))) ; Set width to one-third of the screen width
-    ;; Check if the sidebar buffer exists
-    (if (get-buffer sidebar-buffer-name)
-        ;; If it exists, close the sidebar
-        (progn
-          (delete-window (get-buffer-window sidebar-buffer-name))
-          (kill-buffer sidebar-buffer-name)
-          (message "Outline sidebar closed!"))
-      ;; If it doesn't exist, create and display the sidebar
-      (let ((sidebar-buf (make-indirect-buffer (current-buffer) sidebar-buffer-name 'clone)))
-        (with-current-buffer sidebar-buf
-          ;; (org-num-mode 1)       ; Enable heading numbers
-          (org-cycle-content)         ; Fold all content, showing only headings
-          (setq buffer-read-only t) ; Set to read-only to prevent accidental edits
-          (setq truncate-lines t) ; Disable line wrapping
-          (set-window-dedicated-p (get-buffer-window sidebar-buf) t)) ; Mark as a dedicated window
-        ;; Display the sidebar on the left, with a width of one-third of the screen
-        (display-buffer-in-side-window
-         sidebar-buf
-         `((side . left) (window-width . ,window-width)))
-        (message "Outline sidebar displayed!")))))
-#+end_src
-** org-zotero-parser
-#+begin_src elisp
-(setup org
-  (:when-loaded
-        ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-    ;; for zotero annotations parser
-    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-    (defun org-zotero-open (path)
-      (browse-url (format "zotero:%s" path)))
-    (org-link-set-parameters "zotero" :follow #'org-zotero-open)
-
-    (defun parser-zotero-annotation-to-org-mode()
-      (interactive)
-      (while (re-search-forward "“\\([.]*\n*.*\\)” (\\[\\(.*\\)\\](zotero://selec.*)) (.*(\\(zotero.*\\)))" nil t)
-        (let ((begin (match-beginning 1))
-              (end (match-end 3))
-              (note (match-string 1))
-              (title (match-string 2))
-              (location (match-string 3))
-              )
-          (delete-region (1- begin) (+ 2 end)) ;; full region
-          (insert (format "** %s\n%s" title note))
-          (org-set-property "zotero" location)
-          (org-set-property "ref" title)
-
-          ;; for anki
-          (org-set-tags "wait_for_cloze") ;; for article
-          ;; (org-set-property "ANKI_DECK" "Default::2") ;; default with 0.9 mem rate
-          ;; (org-set-property "ANKI_NOTE_TYPE" "Cloze")
-
-          ;; for org-srs
-          (if (not (featurep 'org-srs))
-              (require 'org-srs))
-          (org-srs-item-new-normal)
-          )))
-    )
-  )
-#+end_src
 ** org-ox,latex,word,markdown
 #+begin_src elisp
 (setup org
@@ -2564,26 +2258,6 @@ Citre is an advanced Ctags (or actually, readtags) frontend for Emacs.
     (add-to-list 'org-structure-template-alist
                  '("jp" . "src jupyter-python :async yes :kernel python3 :session py"))
 
-    ;; borrowed from HM0880
-    (defun lewis/convert-org-to-docx-with-pandoc ()
-      "Use Pandoc to convert .org to .docx.
-Comments:
-- The `-N' flag numbers the headers lines.
-- Use the `--from org' flag to have this function work on files
-  that are in Org syntax but do not have a .org extension"
-      (interactive)
-      (shell-command
-       (concat "pandoc -N --from org " (buffer-file-name)
-               " -o "
-               (file-name-sans-extension (buffer-file-name))
-               ".docx"))
-      (message "Convert finish: %s" docx-file))
-
-    (defun lewis/convert-md-to-org (start end)
-      "Convert region from markdown to org"
-      (interactive "r")
-      (shell-command-on-region start end "pandoc -f markdown -t org" t t)
-      (org-mode))
     ))
 #+end_src
 ** org-clock
@@ -3309,38 +2983,6 @@ See also `org-save-all-org-buffers'"
     )
   )
     #+end_src
-** inline-anki
-#+begin_src elisp :tangle no
-(setup request)
-(setup asyncloop)
-(setup inline-anki
-(defvar-local org-inline-anki-overlays nil)
-
-(defun org-inline-anki-overlay-update ()
-  "Update all inline anki overlays."
-  (mapc #'delete-overlay org-inline-anki-overlays)
-  (setq org-inline-anki-overlays nil)
-  (when org-inline-anki-overlay-mode
-    (save-excursion
-      (goto-char (point-min))
-      (while (re-search-forward "@\\^{\\([0-9]+\\)}" nil t)
-        (let ((ov (make-overlay (match-beginning 0) (match-end 0))))
-          (overlay-put ov 'display
-                       (propertize " 󰯂" 'face '(:foreground "#98C379" :weight bold)))
-          (push ov org-inline-anki-overlays))))))
-
-(define-minor-mode org-inline-anki-overlay-mode
-  "Toggle @^{timestamp} beautification for inline anki."
-  :lighter " 󰯂"
-  (org-inline-anki-overlay-update)
-  (if org-inline-anki-overlay-mode
-      (add-hook 'after-save-hook #'org-inline-anki-overlay-update nil t)
-    (remove-hook 'after-save-hook #'org-inline-anki-overlay-update t)))
-
-      ;; (add-hook 'org-mode-hook #'org-inline-anki-overlay-mode)
-
-    )
-#+end_src
 ** doc-capture
 #+begin_src elisp
 (setup doc-capture
@@ -3416,44 +3058,6 @@ See also `org-save-all-org-buffers'"
   )
 #+end_src
 * 阅读
-** pdf-tools
-#+begin_src elisp :tangle no
-(setup tablist)
-(setup pdf-tools
-  (setq pdf-view-use-scaling t
-           pdf-annot-list-format '((page . 3)
-                                   (type . 10)
-                                   (contents . 56)
-                                   (date . 24)))
-  (:with-map pdf-view-mode-map
-    (:bind "h h" pdf-annot-add-highlight-markup-annotation
-           "[" pdf-view-scroll-down-or-previous-page
-           "]" pdf-view-scroll-up-or-next-page))
-  (pdf-loader-install)
-  )
-;; (add-hook 'pdf-view-mode-hook (lambda() (linum-mode -1))))
-(setq TeX-view-program-selection '((output-pdf "PDF Tools"))
-      TeX-view-program-list '(("PDF Tools" TeX-pdf-tools-sync-view))
-      TeX-source-correlate-start-server t)
-
-(add-hook 'TeX-after-compilation-finished-functions
-          #'TeX-revert-document-buffer)
-#+end_src
-** pdf-view-pagemark
-#+begin_src elisp :tangle no
-(setup pdf-view-pagemark
-  (:hook-into pdf-view-mode-hook))
-#+end_src
-** pdf-to-org-mode
-#+begin_src elisp
-(defun nowis/pdf-to-org ()
-  "convert PDF to org-mode use mutool and pandoc"
-  (interactive)
-  (let ((pdf (buffer-file-name))
-        (org (concat (file-name-sans-extension (buffer-file-name)) ".org")))
-    (shell-command (format "mutool draw -F xhtml %s | pandoc -f html -t org -o %s" pdf org))
-    (find-file org)))
-#+end_src
 ** reader
 #+begin_src elisp
 (setup reader)
@@ -3592,6 +3196,97 @@ Simple distraction-free editing. I use darkroom instead of writeroom because it'
   )
 #+end_src
 *** gptel-agent
+#+begin_src elisp
+(setup gptel-agent
+  (:when-loaded
+    (let ((preset-dir (concat nowis/doc-emacs-dir "131-gptel-presets/")))
+      (when (file-directory-p preset-dir)
+        (add-to-list 'gptel-agent-dirs preset-dir)))
+
+    (mapc (lambda (agent)
+            (let ((agent-name (car agent)))
+              (unless (member agent-name '("gptel-agent" "gptel-plan"))
+                (apply #'gptel-make-preset agent))))
+          (gptel-agent-update))
+
+    ;; customize dangerous commands
+    (eval-when-compile
+      (require 'cl-lib)
+      (require 'gptel-request))
+
+    (defcustom gptel-bash-dangerous-commands
+      '("rm" "rmdir" "mv" "dd" "mkfs" "fdisk" "parted"
+        "chmod" "chown" "chgrp"
+        "sudo" "su"
+        "kill" "killall" "pkill"
+        "systemctl" "service" "reboot" "shutdown" "halt" "poweroff"
+        "iptables" "ufw" "firewall-cmd"
+        "apt" "apt-get" "yum" "dnf" "pacman" "brew"
+        "curl" "wget" "git" "svn" "mktemp")
+      "List of dangerous Bash commands that require user confirmation."
+      :type '(repeat string)
+      :group 'gptel)
+
+    (defun gptel-bash-extract-main-command (command)
+      "Extract the main command name from COMMAND (ignoring arguments, pipes, redirections, etc.)."
+      (when (and command (stringp command) (not (string-empty-p command)))
+        (let* ((cmd (string-trim command))
+               (cmd (replace-regexp-in-string "#.*$" "" cmd))
+               (cmd (car (split-string cmd "[|;&<>]\\|&&\\|||" t "[ \t\n]+")))
+               (words (split-string cmd nil t)))
+          (when words
+            (file-name-nondirectory (car words))))))
+
+    (defun gptel-bash-confirm-filter (command)
+      "Check if COMMAND requires confirmation (i.e., is dangerous)."
+      (when-let ((main-cmd (gptel-bash-extract-main-command command)))
+        (member main-cmd gptel-bash-dangerous-commands)))
+
+   (defun gptel-bash-apply-filter ()
+      "将 Bash 命令过滤器应用到 gptel-agent 的 Bash tool。"
+      (interactive)
+      (if-let* ((bash-tool (gptel-get-tool "Bash")))
+          (progn
+            (setf (gptel-tool-confirm bash-tool) #'gptel-bash-confirm-filter)
+            (message "✓ Applied smart confirmation filter to Bash tool"))
+        (user-error "Bash tool not found. Make sure gptel-agent-tools is loaded")))
+    (gptel-bash-apply-filter)
+    )
+  (defun gptel-simple-agent ()
+    "Start a `gptel-simple-agent' session."
+    (interactive)
+    (require 'gptel-agent)
+    (gptel-agent default-directory "gptel-simple-agent"))
+
+  )
+#+end_src
+*** gptel-local-org-prompts
+#+begin_src elisp
+(setup gptel-local-org-prompts
+  (keymap-global-set "M-L" #'gptel-choose-org-prompt)
+  (setq gptel-local-org-prompts-directory (expand-file-name "13-gptel-prompts/" nowis/doc-emacs-dir)
+        gptel-local-org-prompts-preview-length 100)
+  )
+#+end_src
+*** gptel-quick-with-prompt
+#+begin_src elisp
+(setup gptel-quick-with-prompt
+  (:autoload gptel-quick-with-prompt)
+  (keymap-global-set "M-l" #'gptel-quick-with-prompt)
+  (with-eval-after-load 'embark
+    (keymap-set embark-general-map "?" #'gptel-quick-with-prompt))
+  )
+#+end_src
+*** mcp
+#+begin_src elisp
+(setup mcp
+  (setq mcp-hub-servers
+        '(("drawio" . (:command "npx"
+                                :args ("@next-ai-drawio/mcp-server@latest")))
+        ))
+  )
+#+end_src
+
 *** whisper
 #+begin_src elisp
 (setup whisper
@@ -3603,19 +3298,6 @@ Simple distraction-free editing. I use darkroom instead of writeroom because it'
         whisper--ffmpeg-input-device "default"
         whisper--ffmpeg-input-format "pulse"
         )
-  (:when-loaded
-    ;; (defun whisper--ctranslate2-command (input-file)
-    ;;   `("whisper-ctranslate2"
-    ;;     ,@(when whisper-use-threads (list "--threads" (number-to-string whisper-use-threads)))
-    ;;     "--task" ,(if whisper-translate "translate" "transcribe")
-    ;;     "--model" ,whisper-model
-    ;;     "--language" "zh"
-    ;;     "--output_dir" "/tmp/"
-    ;;     "--output_format" "txt"
-    ;;     ,input-file))
-
-    ;; (advice-add 'whisper-command :override #'whisper--ctranslate2-command)
-    )
   )
 #+end_src
 *** whisper-api
@@ -3630,9 +3312,12 @@ Simple distraction-free editing. I use darkroom instead of writeroom because it'
       (setq whisper-api-ffmpeg-command "ffmpeg -y -t %d -f avfoundation -i \":1\" -ar 16000 %s"))
   )
 #+end_src
-*** eca
+*** pi-coding-agent
 #+begin_src elisp
-(setup eca)
+(setup pi-coding-agent
+  (defalias 'pi 'pi-coding-agent)
+  (setq pi-coding-agent-tool-preview-lines 1
+        pi-coding-agent-bash-preview-lines 1))
 #+end_src
 ** webjump
 #+begin_src elisp
@@ -3660,30 +3345,6 @@ Simple distraction-free editing. I use darkroom instead of writeroom because it'
                          [simple-query "book.cppinfo.cn"
                                        "book.cppinfo.cn/so/home/qhsearch?q=" ""])
                         )))
-#+end_src
-** backup scripts
-#+begin_src elisp
-(defun rsync-push-binary-files()
-  (interactive)
-  (async-shell-command "rsync -avbihn --exclude '.git' --exclude '.svn' --delete \
-     ~/Documents/emacs/02-binary-git/binary-files/ lewis-nas@192.168.31.108:/share/my_webdav/rsync/02-binary-git/binary-files/")
-  (let ((answer (read-char-choice "Do you want to continue? [y/n] " '(?y ?n))))
-    (cond
-     ((eq answer ?y)
-      (async-shell-command " rsync -avbih --exclude '.git' --exclude '.svn' --delete \
-     ~/Documents/emacs/02-binary-git/binary-files/ lewis-nas@192.168.31.108:/share/my_webdav/rsync/02-binary-git/binary-files/"))
-     ((eq answer ?n) (message "transfer exit")))))
-
-(defun rsync-pull-binary-files()
-  (interactive)
-  (async-shell-command " rsync -avbih --exclude '.git' --exclude '.svn' --delete\
- lewis-nas@192.168.31.108:/share/my_webdav/rsync/02-binary-git/binary-files/ ~/Documents/emacs/02-binary-git/binary-files/"))
-
-(transient-define-prefix backup-leader-map()
-  "Define leader-key map for backup functions"
-  [["rsync"
-    ("p" "push doc" rsync-push-binary-files)
-    ("F" "pull doc" rsync-pull-binary-files)]])
 #+end_src
 ** server
 #+begin_src elisp
