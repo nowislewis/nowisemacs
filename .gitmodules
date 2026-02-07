@@ -263,9 +263,6 @@
 [submodule "tabspaces"]
 	path = lib/tabspaces
 	url = https://github.com/mclear-tools/tabspaces.git
-[submodule "toc-org"]
-	path = lib/toc-org
-	url = https://github.com/snosov1/toc-org.git
 [submodule "tomelr"]
 	path = lib/tomelr
 	url = https://github.com/kaushalmodi/tomelr.git

@@ -1,139 +1,6 @@
 #+TITLE: Emacs Configuration
 #+PROPERTY: header-args:elisp :tangle ~/.emacs.d/init.el
 I failed in love with denote, so previous *org-roam* configs were refiled into [[file:useful-tools/old-elisps/org-roam-config.org][org-roam configs]]
-* Content                                                               :toc:
-- [[#startup-configs][Startup configs]]
-  - [[#ui-speed-up][UI speed up]]
-  - [[#basic-modes][basic modes]]
-  - [[#load-path][load-path]]
-  - [[#set-vars][set vars]]
-- [[#package-management][Package Management]]
-  - [[#setup][setup]]
-  - [[#other-macros][other macros]]
-- [[#keyboard-bindings][Keyboard Bindings]]
-  - [[#meow][meow]]
-  - [[#transient-and-related-leader-map][transient and related leader-map]]
-  - [[#meow-leader-keybindings][meow leader keybindings]]
-  - [[#which-key][which-key]]
-  - [[#electric][electric]]
-  - [[#smart-bind][smart-bind]]
-- [[#package-library][Package Library]]
-  - [[#dash][dash]]
-  - [[#s][s]]
-  - [[#f][f]]
-- [[#ui][UI]]
-  - [[#font][font]]
-  - [[#variable-pitch][variable-pitch]]
-  - [[#theme][Theme]]
-  - [[#line-number][line number]]
-  - [[#nerd-icons][nerd-icons]]
-  - [[#nerd-icons-completion][nerd-icons-completion]]
-  - [[#rainbow-delimiters][rainbow-delimiters]]
-  - [[#diff-hl][diff-hl]]
-  - [[#fringe-mode][fringe-mode]]
-  - [[#emacs-dashboard][emacs-dashboard]]
-  - [[#mini-echo][mini-echo]]
-  - [[#hl-todo][hl-todo]]
-  - [[#highlight-line][highlight line]]
-  - [[#show-paren-mode][show-paren-mode]]
-- [[#general-configuration][General Configuration]]
-  - [[#simple][simple]]
-  - [[#general-builtin-modes][general builtin modes]]
-  - [[#repeat-mode][repeat-mode]]
-  - [[#backup][backup]]
-  - [[#no-littering][no-littering]]
-  - [[#recentf][recentf]]
-  - [[#自动换行][自动换行]]
-  - [[#long-line][long-line]]
-  - [[#tramp][TRAMP]]
-  - [[#automatically-clean-whitespace][Automatically clean whitespace]]
-  - [[#vundo-for-undo-history][vundo for undo history]]
-- [[#search][Search]]
-  - [[#isearch][isearch]]
-  - [[#consult-commands][Consult Commands]]
-  - [[#rgel][rg.el]]
-- [[#补全][补全]]
-  - [[#default-completion-comfigurations][default completion comfigurations]]
-  - [[#completions-with-vertico][Completions with Vertico]]
-  - [[#icomplete][icomplete]]
-  - [[#flex][flex]]
-  - [[#orderless-and-pinyinlib][Orderless and pinyinlib]]
-  - [[#marginalia][Marginalia]]
-  - [[#embark][embark]]
-  - [[#yasnippet][yasnippet]]
-- [[#window-management][Window Management]]
-  - [[#window][window]]
-  - [[#winner-mode][winner-mode]]
-  - [[#popper][popper]]
-  - [[#move][Move]]
-- [[#ibuffer][ibuffer]]
-  - [[#ibuffer-1][ibuffer]]
-- [[#input][Input]]
-  - [[#posframe][posframe]]
-  - [[#rime][rime]]
-- [[#file-and-browsing][File and Browsing]]
-  - [[#file-browsing][file browsing]]
-  - [[#structure-browsing][structure browsing]]
-  - [[#tab-line-and-tab-bar][tab-line and tab-bar]]
-  - [[#tabspaces][tabspaces]]
-  - [[#project][project]]
-  - [[#project-rootfile][project-rootfile]]
-  - [[#auto-insert][auto-insert]]
-  - [[#midnight][midnight]]
-- [[#shell][shell]]
-  - [[#eshell][eshell]]
-  - [[#eat][eat]]
-- [[#git][git]]
-  - [[#magit][magit]]
-  - [[#ediff][ediff]]
-- [[#program][Program]]
-  - [[#language][Language]]
-  - [[#useful-programing-tools][Useful programing tools]]
-- [[#org-mode][Org Mode]]
-  - [[#org-mode-1][org-mode]]
-  - [[#org-src][org-src]]
-  - [[#org-oxlatexwordmarkdown][org-ox,latex,word,markdown]]
-  - [[#org-clock][org-clock]]
-  - [[#org-timer][org-timer]]
-  - [[#appt][appt]]
-  - [[#ui-1][ui]]
-  - [[#ox-hugo][ox-hugo]]
-  - [[#org-present][org-present]]
-  - [[#bibtex-related][bibtex related]]
-  - [[#toc-org][toc-org]]
-  - [[#denote-and-related][denote and related]]
-  - [[#find-orgmode-dir-files][find orgmode dir files]]
-  - [[#agendagtd][agenda/gtd]]
-  - [[#org-srs][org-srs]]
-  - [[#org-inc][org-inc]]
-  - [[#doc-capture][doc-capture]]
-  - [[#insert-from-clipboard][insert from clipboard]]
-  - [[#org-sliced-images][org-sliced-images]]
-  - [[#org-graphviz-mindmap][org-graphviz-mindmap]]
-  - [[#org-ladder][org-ladder]]
-- [[#阅读][阅读]]
-  - [[#reader][reader]]
-  - [[#newsticker][newsticker]]
-  - [[#nov][nov]]
-  - [[#darkroom][darkroom]]
-  - [[#markdown-mode][markdown-mode]]
-- [[#tools][tools]]
-  - [[#ai-related][ai related]]
-  - [[#webjump][webjump]]
-  - [[#server][server]]
-  - [[#macos-ocr][macos-ocr]]
-  - [[#esup][esup]]
-  - [[#uniline][uniline]]
-  - [[#excalidraw][excalidraw]]
-  - [[#manage-web-bookmarks][manage-web-bookmarks]]
-  - [[#eww][eww]]
-  - [[#life-calendar][life-calendar]]
-- [[#games][games]]
-  - [[#minesweeper][minesweeper]]
-- [[#system-specific-config][system-specific-config]]
-  - [[#windows-wslg][windows-wslg]]
-  - [[#android][android]]
-
 * Startup configs
 ** UI speed up
 #+NAME: ui-speed-up
@@ -142,9 +9,6 @@ I failed in love with denote, so previous *org-roam* configs were refiled into [
 ;; set gc according to EmacsConf 2023
 (setq gc-cons-threshold 8000000
       gc-cons-percentage 0.2)
-;; Package initialize occurs automatically, before `user-init-file' is
-;; loaded, but after `early-init-file'. We handle package
-;; initialization, so we must prevent Emacs from doing it early!
 (setq package-enable-at-startup nil)
 
 ;; Inhibit resizing frame
@@ -276,7 +140,6 @@ emacs
 I used to be a vim(evil) user, but now I use meow to manage all my keys.
 ** meow
 Maybe I should add a new state.
-#+name: meow
 #+begin_src elisp
 (setup meow
   (require 'meow)
@@ -667,13 +530,13 @@ Maybe I should add a new state.
   "Define leader-key map for ui functions"
   [("v" "toggle-variable-pitch" variable-pitch-mode)
    ("d" "toggle-darkroom" darkroom-mode)
+   ("r" "toggle-read-mode" nowis-read-mode)
     ])
 #+end_src
 *** tui-support
 #+begin_src elisp
 (unless (display-graphic-p)
-  (xterm-mouse-mode 1)
-  )
+  (xterm-mouse-mode 1))
 #+end_src
 **** clipetty
 #+begin_src elisp
@@ -1065,10 +928,6 @@ diff-hl-mode highlights uncommitted changes on the left side of the window (area
 (setup frame
   (blink-cursor-mode -1) ;指针不闪动
   )
-
-;; (setup pixel-scroll
-;;   (when (>= emacs-major-version 29)
-;;     (pixel-scroll-precision-mode t)))
 #+end_src
 ** repeat-mode
 #+begin_src elisp
@@ -1506,7 +1365,6 @@ Jump anywhere in the world
   (:with-map dired-mode-map
     (:bind "TAB" #'dired-subtree-toggle))
   )
-;; TODO if want to use dired-images, you should install eimp
 #+end_src
 *** dired-sidebar
 #+begin_src elisp
@@ -1551,11 +1409,7 @@ Jump anywhere in the world
         ("b" "tabspaces-switch-to-buffer" tabspaces-switch-to-buffer)
         ("d" "tabspaces-close-workspace" tabspaces-close-workspace)
         ("k" "tabspaces-remove-selected-buffer" tabspaces-remove-selected-buffer)
-        ("K" "tabspaces-kill-buffers-close-workspace" tabspaces-kill-buffers-close-workspace)
-        ("o" "tabspaces-open-or-create-project-and-workspace" tabspaces-open-or-create-project-and-workspace)
-        ("R" "tabspaces-remove-selected-buffer" tabspaces-remove-selected-buffer)
         ("r" "tab-bar-rename-tab-by-name" tab-bar-rename-tab-by-name)
-        ("t" "tabspaces-switch-buffer-and-tab" tabspaces-switch-buffer-and-tab)
         ]
        ["Switch tab bar"
         ("n" "tab-bar-switch-to-next-tab" tab-bar-switch-to-next-tab)
@@ -1626,34 +1480,40 @@ Jump anywhere in the world
                    (window-height . 0.3)))
     (add-to-list 'eat-semi-char-non-bound-keys [?\e ?o])
     (eat-update-semi-char-mode-map)))
-
 (defun eat-toggle-window(&optional choose-buffer)
-  "Toggle eat buffer window.
-With prefix argument CHOOSE-BUFFER, prompt for buffer name."
+  "Toggle eat buffer window or select from multiple buffers."
   (interactive "P")
   (let ((eat-win (seq-find (lambda (w)
                              (eq 'eat-mode (buffer-local-value 'major-mode (window-buffer w))))
-                           (window-list))))
+                           (window-list)))
+        (eat-buffers (eat--get-buffers)))
     (if eat-win
         (delete-window eat-win)
-      (if choose-buffer
-          ;; prompt to choosing buffer
-          (let* ((existing-bufs (mapcar #'buffer-name (eat--get-buffers)))
-                 (buf-name (completing-read "Choose eat buffer: "
-                                            existing-bufs
-                                            nil nil))
-                 (buf (get-buffer buf-name)))
-            (if buf
-                (pop-to-buffer buf)
-              ;; create new eat buffer
-              (unless (featurep 'eat) (require 'eat) (eat-reload))
-              (let ((eat-buffer-name buf-name))
-                (eat))))
-        ;; without prefix
-        (if-let ((buf (car (eat--get-buffers))))
+      (if (or choose-buffer (> (length eat-buffers) 1))
+          (eat--prompt-select-or-create)
+        (if-let ((buf (car eat-buffers)))
             (pop-to-buffer buf)
-          (unless (featurep 'eat) (require 'eat) (eat-reload))
-          (eat))))))
+          (eat--create-new-buffer))))))
+
+(defun eat--prompt-select-or-create ()
+  "Prompt user to select an existing eat buffer or type a new name to create one."
+  (let* ((eat-buffers (eat--get-buffers))
+         (existing-bufs (mapcar #'buffer-name eat-buffers))
+         (choice (completing-read "Select or create eat buffer: " existing-bufs nil nil)))
+    (let ((buf (get-buffer choice)))
+      (if buf
+          (pop-to-buffer buf)
+        (eat--create-new-buffer choice)))))
+
+(defun eat--create-new-buffer (&optional buffer-name)
+  "Create a new eat buffer with optional BUFFER-NAME and open it."
+  (unless (featurep 'eat)
+    (require 'eat)
+    (eat-reload))
+  (if buffer-name
+      (let ((eat-buffer-name buffer-name))
+        (eat))
+    (eat)))
 
 (defun eat--get-buffers ()
   "Return live eat buffers."
@@ -1661,6 +1521,8 @@ With prefix argument CHOOSE-BUFFER, prompt for buffer name."
                 (and (buffer-live-p b)
                      (eq 'eat-mode (buffer-local-value 'major-mode b))))
               (buffer-list)))
+
+
 #+end_src
 * git
 ** magit
@@ -2856,10 +2718,6 @@ See also `org-save-all-org-buffers'"
                        (org-agenda-skip-function #'my-org-agenda-skip-blocked)
                        (org-agenda-prefix-format nowis/agenda-prefix-format-enhanced)
                        (org-agenda-sorting-strategy '(todo-state-up priority-down timestamp-up))))
-           ;; (tags-todo ,(concat "+action" tag) ((org-agenda-overriding-header (nowis/align-to-window-center "Soft Time"))
-           ;;                                     (org-agenda-prefix-format "%-20:(org-get-parent-heading): [%-4e] ")
-           ;;                                     (org-agenda-sorting-strategy '(todo-state-up priority-down timestamp-up))
-           ;;                                     ))
            (tags-todo "inbox-TODO=\"NEXT\"+PRIORITY=\"E\""
                       ((org-agenda-overriding-header (nowis/align-to-window-center "Low Priority"))
                        (org-agenda-skip-function #'my-org-agenda-skip-blocked)
@@ -2983,6 +2841,33 @@ See also `org-save-all-org-buffers'"
     )
   )
     #+end_src
+** nowis-read-mode
+#+begin_src elisp
+(defgroup nowis-read nil
+  "nowis-read minor mode."
+  :group 'convenience
+  :prefix "nowis-read-")
+
+(defvar nowis-read-mode-map
+  (let ((map (make-sparse-keymap)))
+    (define-key map (kbd "M-z") #'nowis-capture-inc)
+    map)
+  "Keymap for `nowis-read-mode'.
+Keys defined here will override existing bindings when the mode is active.")
+
+(defun nowis-capture-inc ()
+  (interactive)
+      (progn
+        (execute-kbd-macro (kbd "M-w"))
+        (sit-for 0.1))
+  (org-inc-topic-capture-from-clipboard))
+
+(define-minor-mode nowis-read-mode
+  "Minor mode that overrides key bindings in the current buffer."
+  :lighter nil  ; No mode-line indicator
+  :keymap nowis-read-mode-map
+  :group 'nowis-read)
+#+end_src
 ** doc-capture
 #+begin_src elisp
 (setup doc-capture
@@ -3074,13 +2959,11 @@ See also `org-save-all-org-buffers'"
 #+end_src
 ** nov
 #+begin_src elisp :tangle no
-(setup kv)
 (setup esxml)
 (setup nov
   (:bind "]" nov-scroll-up
          "[" nov-scroll-down))
 (add-to-list 'auto-mode-alist '("\\.epub\\'" . nov-mode))
-
 #+end_src
 ** darkroom
 Simple distraction-free editing. I use darkroom instead of writeroom because it's more simple
@@ -3296,8 +3179,7 @@ Simple distraction-free editing. I use darkroom instead of writeroom because it'
         whisper-translate nil
         whisper-use-threads (- (num-processors) 1)
         whisper--ffmpeg-input-device "default"
-        whisper--ffmpeg-input-format "pulse"
-        )
+        whisper--ffmpeg-input-format "pulse")
   )
 #+end_src
 *** whisper-api
@@ -3368,10 +3250,7 @@ Simple distraction-free editing. I use darkroom instead of writeroom because it'
 ESUP - Emacs Start Up Profiler
 #+begin_src elisp
 (setup esup
-  ;; (if (eq system-type 'darwin)
-      (setq esup-depth 0)
-      ;; )
-  )
+  (setq esup-depth 0))
 #+end_src
 ** uniline
 #+begin_src elisp
