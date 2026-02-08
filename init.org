@@ -2388,7 +2388,7 @@ Always allow composition for org-mode keywords, regardless of context."
            ))
 #+end_src
 ** toc-org
-#+begin_src elisp
+#+begin_src elisp :tangle no
 (setup toc-org
   (:hook-into org-mode))
 #+end_src
