@@ -327,3 +327,15 @@
 [submodule "lib/pi-coding-agent"]
 	path = lib/pi-coding-agent
 	url = https://github.com/dnouri/pi-coding-agent.git
+[submodule "lib/agent-shell"]
+	path = lib/agent-shell
+	url = https://github.com/xenodium/agent-shell.git
+[submodule "lib/shell-maker"]
+	path = lib/shell-maker
+	url = https://github.com/xenodium/shell-maker.git
+[submodule "lib/acp"]
+	path = lib/acp
+	url = https://github.com/xenodium/acp.el.git
+[submodule "lib/agent-shell-manager"]
+	path = lib/agent-shell-manager
+	url = https://github.com/jethrokuan/agent-shell-manager.git

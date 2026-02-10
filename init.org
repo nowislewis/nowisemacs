@@ -644,8 +644,8 @@ Maybe I should add a new state.
 
 ;; fixed font
 (setq lewis-fixed-font (cl-loop for font in '(
-                                              "Maple Mono NF CN"
                                               "JetBrains Maple Mono"
+                                              "Maple Mono NF CN"
                                               "Maple Mono SC NF"
                                               "Unifont"
                                               ;; "InconsolataGo QiHei NF"
@@ -3201,6 +3201,14 @@ Simple distraction-free editing. I use darkroom instead of writeroom because it'
   (setq pi-coding-agent-tool-preview-lines 1
         pi-coding-agent-bash-preview-lines 1))
 #+end_src
+*** agent-shell
+#+begin_src elisp
+(setup acp)
+(setup shell-maker)
+(setup agent-shell)
+(setup ageht-shell-manager)
+#+end_src
+
 ** webjump
 #+begin_src elisp
 (setup webjump
