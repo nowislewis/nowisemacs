@@ -3,7 +3,6 @@
 I failed in love with denote, so previous *org-roam* configs were refiled into [[file:useful-tools/old-elisps/org-roam-config.org][org-roam configs]]
 * Startup configs
 ** UI speed up
-#+NAME: ui-speed-up
 #+begin_src elisp :tangle ~/.emacs.d/early-init.el
 ;;; -*- lexical-binding: t; -*-
 ;; set gc according to EmacsConf 2023
@@ -39,7 +38,6 @@ I failed in love with denote, so previous *org-roam* configs were refiled into [
 
 #+end_src
 ** basic modes
-#+NAME: basic-modes
 #+begin_src elisp
 ;;; -*- lexical-binding: t; -*-
 ;; basic modes
@@ -64,7 +62,6 @@ I failed in love with denote, so previous *org-roam* configs were refiled into [
 (setq mouse-yank-at-point t)            ;粘贴于光标处,而不是鼠标指针处
 #+end_src
 ** load-path
-#+NAME: load-path
 #+begin_src elisp
 (add-to-list 'load-path (expand-file-name "lisp" user-emacs-directory))
 (require 'capsule)
@@ -91,12 +88,6 @@ emacs
 ├── 08-keys
 └── 09-scripts
 #+end_example
-1. All files and folders except =02-binary-git/binary-files= are managed under git control, and =binary-file= is managed under =rsync= or =restic=.
-2. =01-orgmode= stores .org files, where =xnote= is the default directory of =Denote= .
-3. =02-binary-git/binary-files=, as its name, storing binary-fils. For example, =02-searchable= is used store the PDF of the literature
-   and daily MS Office files, the meaning of searchable means that all files under this folder maybe searched or
-   modified latter, and they should have nice naming specifications for convenience search.
-
 #+begin_src elisp
 (defvar nowis/config-file (expand-file-name "init.org" user-emacs-directory))
 (defvar nowis/config-useful-tools (expand-file-name "useful-tools/" user-emacs-directory))
@@ -334,7 +325,6 @@ Maybe I should add a new state.
 
 ** transient and related leader-map
 *** transient
-#+name: transient
 #+begin_src elisp
 (setup transient
   (require 'transient)
@@ -618,16 +608,9 @@ Maybe I should add a new state.
                           (message "No original binding for %s" key)))))))
 #+end_src
 * Package Library
-** dash
 #+begin_src elisp
 (setup dash)
-#+end_src
-** s
-#+begin_src elisp
 (setup s)
-#+end_src
-** f
-#+begin_src elisp
 (setup f)
 #+end_src
 * UI
@@ -663,6 +646,7 @@ Maybe I should add a new state.
                                                  "IBM Plex Sans"
                                                  "LXGW WenKai"
                                                  "Noto Sans CJK SC"
+                                                 "PingFang SC"
                                                  "Times"
                                                  "Helvetica"
                                                  "Maple UI"
@@ -790,9 +774,9 @@ diff-hl-mode highlights uncommitted changes on the left side of the window (area
 #+end_src
 *** my-simple-start
 #+begin_src elisp
-   (add-hook 'emacs-startup-hook
-     (lambda ()
-       (message "Emacs loaded in %s" (emacs-init-time))))
+(add-hook 'emacs-startup-hook
+          (lambda ()
+            (message "Emacs loaded in %s" (emacs-init-time))))
 #+end_src
 ** mini-echo
 #+begin_src elisp
@@ -1341,7 +1325,8 @@ Jump anywhere in the world
   (setq
    rime-emacs-module-header-root "/Applications/Emacs.app/Contents/Resources/include/" ;; use build-emacs
    ;; rime-emacs-module-header-root "/opt/homebrew/opt/emacs-plus@31/include" ;;use emacs-plus
-   rime-librime-root "~/Downloads/librime/dist"
+   ;; rime-librime-root "~/Downloads/librime/dist"
+   rime-librime-root "/opt/homebrew/opt/librime/"
    ))
 #+end_src
 * File and Browsing
@@ -2958,7 +2943,7 @@ Keys defined here will override existing bindings when the mode is active.")
                             ))
 #+end_src
 ** nov
-#+begin_src elisp :tangle no
+#+begin_src elisp
 (setup esxml)
 (setup nov
   (:bind "]" nov-scroll-up
@@ -3262,13 +3247,13 @@ ESUP - Emacs Start Up Profiler
 #+end_src
 ** uniline
 #+begin_src elisp
-(setup uniline
-  (:when-loaded
-  (define-key uniline-mode-map (kbd "M-i") #'uniline-launch-interface)
-  ))
+(setup uniline)
 (setup uniline-transient
   (:autoload uniline-mode)
   (:autoload uniline-launch-interface)
+  (:when-loaded
+    (define-key uniline-mode-map (kbd "M-i") #'uniline-launch-interface)
+    )
   )
 #+end_src
 ** excalidraw

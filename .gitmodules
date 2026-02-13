@@ -339,3 +339,9 @@
 [submodule "lib/agent-shell-manager"]
 	path = lib/agent-shell-manager
 	url = https://github.com/jethrokuan/agent-shell-manager.git
+[submodule "lib/nov"]
+	path = lib/nov
+	url = https://github.com/emacs-pe/nov.el.git
+[submodule "lib/esxml"]
+	path = lib/esxml
+	url = https://github.com/tali713/esxml.git
