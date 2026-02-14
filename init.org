@@ -500,6 +500,8 @@ Maybe I should add a new state.
    ["capture"
     ("c" "capture" org-capture)
     ("e" "extract topic" org-inc-topic-capture-from-clipboard)
+    ("E" "extract topic with prefix"
+     (lambda () (interactive) (org-inc-topic-capture-from-clipboard '(-1))))
     ("p" "planning today" nowis/goto-or-capture-daily-plan)
     ("s" "summary today" nowis/goto-or-capture-daily-summary)
     ]
@@ -2988,7 +2990,7 @@ Simple distraction-free editing. I use darkroom instead of writeroom because it'
       ;; :header (lambda () `(("Authorization" . ,(concat "Bearer " (gptel--get-api-key)))))
       :key 'gptel-api-key
       :stream t
-      :models '(gpt-5 deepseek-v3.1-250821 claude-haiku-4-5-20251001))
+      :models '(minimax-m2.5 claude-opus-4-6 claude-haiku-4-5-20251001))
     (gptel-make-gemini "Gemini" :key 'gptel-api-key :stream t)
     (gptel-make-anthropic "DeepSeek"
       :host "api.deepseek.com/anthropic"
@@ -3252,6 +3254,13 @@ ESUP - Emacs Start Up Profiler
   (:autoload uniline-mode)
   (:autoload uniline-launch-interface)
   (:when-loaded
+    (dolist (binding '(("h" . "<left>")
+                       ("j" . "<down>")
+                       ("k" . "<up>")
+                       ("l" . "<right>")))
+      (define-key meow-normal-state-keymap
+                  (kbd (car binding))
+                  (kbd (cdr binding))))
     (define-key uniline-mode-map (kbd "M-i") #'uniline-launch-interface)
     )
   )
