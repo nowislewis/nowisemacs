@@ -345,3 +345,9 @@
 [submodule "lib/esxml"]
 	path = lib/esxml
 	url = https://github.com/tali713/esxml.git
+[submodule "lib/tramp-rpc"]
+	path = lib/tramp-rpc
+	url = https://github.com/ArthurHeymans/emacs-tramp-rpc.git
+[submodule "lib/msgpack"]
+	path = lib/msgpack
+	url = https://github.com/xuchunyang/msgpack.el.git

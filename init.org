@@ -97,6 +97,10 @@ emacs
 (defvar nowis/bib-pdf-dir (concat nowis/doc-emacs-dir "02-binary-git/searchable"))
 #+end_src
 * Package Management
+** capsule
+#+begin_src elisp
+(setq capsule-skip-autoloads-packages '("reader"))
+#+end_src
 ** setup
 #+begin_src elisp
 (require 'setup)
@@ -973,6 +977,11 @@ diff-hl-mode highlights uncommitted changes on the left side of the window (area
 ** TRAMP
 #+begin_src elisp
 (setq tramp-default-method "ssh")
+#+end_src
+** tramp-rpc
+#+begin_src elisp
+(setup msgpack)
+(setup tramp-rpc)
 #+end_src
 ** Automatically clean whitespace
 #+begin_src elisp
@@ -3185,6 +3194,7 @@ Simple distraction-free editing. I use darkroom instead of writeroom because it'
 #+begin_src elisp
 (setup pi-coding-agent
   (defalias 'pi 'pi-coding-agent)
+  (setq transient-version "0.12.0")
   (setq pi-coding-agent-tool-preview-lines 1
         pi-coding-agent-bash-preview-lines 1))
 #+end_src
