@@ -24,9 +24,6 @@
 	path = lib/citar-denote
 	url = https://github.com/pprevos/citar-denote.git
     no-byte-compile = minimum-config.el 
-[submodule "citre"]
-	path = lib/citre
-	url = https://github.com/universal-ctags/citre.git
 [submodule "clipetty"]
 	path = lib/clipetty
 	url = https://github.com/spudlyo/clipetty.git
@@ -80,9 +77,6 @@
 [submodule "dired-sidebar"]
 	path = lib/dired-sidebar
 	url = https://github.com/jojojames/dired-sidebar.git
-[submodule "doc-capture"]
-	path = lib/doc-capture
-	url = https://github.com/nowislewis/doc-capture.git
 [submodule "dracula"]
 	path = lib/dracula
 	url = https://github.com/dracula/emacs.git

@@ -48,7 +48,7 @@ I failed in love with denote, so previous *org-roam* configs were refiled into [
 
 (setq use-short-answers t)
 (setq confirm-kill-emacs 'y-or-n-p)
-(setq ring-bell-function 'ignore)       ;关闭烦人的出错时的提示声
+(setq ring-bell-function 'ignore)
 (set-default-coding-systems 'utf-8)
 (setq-default indent-tabs-mode nil)
 
@@ -359,17 +359,6 @@ Maybe I should add a new state.
    ["Navigate"
     ("m" "consult-mark" consult-mark)
     ]
-   ["citre"
-    ("c d" "citre-jump" citre-jump)
-    ("c D" "citre-jump-to-reference" citre-jump-to-reference)
-    ("c p" "citre-peek" citre-peek)
-    ("c P" "citre-peek-reference" citre-peek-reference)
-    ("c r" "citre-peek-restore" citre-peek-restore)
-    ("c a" "citre-ace-peek" citre-ace-peek)
-    ("c u" "update-tags-file" citre-update-this-tags-file)
-    ("c s" "peek-save-session" citre-peek-save-session)
-    ("c l" "peek-load-session" citre-peek-load-session)
-    ]
    ])
 #+end_src
 *** find-file
@@ -440,13 +429,7 @@ Maybe I should add a new state.
     ("r j" "denote-journal" denote-journal-new-or-existing-entry)
     ("r s" "find-all-searchable" project-find-searchable-dir-files)
     ("r c" "calendar" calendar)
-    ("r w" "week-target" nowis/denote-journal-this-week-major-tasks)
     ("r g" "project-find-gtd-dir-files" project-find-gtd-dir-files)
-    ("r e" "find excalidraw" (lambda ()
-                               (interactive)
-                               (let ((denote-directory org-excalidraw-default-directory))
-                                 (call-interactively #'denote-open-or-create)
-                                 )))
     ]
    ["bibtex"
     ("e" "ebib" ebib)
@@ -507,8 +490,6 @@ Maybe I should add a new state.
     ("e" "extract topic" org-inc-topic-capture-from-clipboard)
     ("E" "extract topic with prefix"
      (lambda () (interactive) (org-inc-topic-capture-from-clipboard '(-1))))
-    ("p" "planning today" nowis/goto-or-capture-daily-plan)
-    ("s" "summary today" nowis/goto-or-capture-daily-summary)
     ]
 
    ["life"
@@ -1686,7 +1667,6 @@ borrowed from citre, now you can always jump-back use "M-," after any jump in th
                 consult-line
                 consult-find
                 find-file
-                citre-jump
                 consult-goto-line
                 isearch-forward))
   (if (fboundp func)
@@ -1885,19 +1865,6 @@ borrowed from citre, now you can always jump-back use "M-," after any jump in th
     '("python" "C++" "C" "c" "cpp" "dot"))
   (dolist (lang org-babel-lang-list)
     (eval `(lsp-org-babel-enable ,lang)))
-  )
-#+end_src
-**** citre
-Citre is an advanced Ctags (or actually, readtags) frontend for Emacs.
-#+begin_src elisp
-(setup citre
-  (add-hook 'prog-mode (lambda()
-                         (require 'citre-config)
-                         ))
-  (setq citre-use-project-root-when-creating-tags t
-        citre-prompt-language-for-ctags-command t
-        ;; citre-auto-enable-citre-mode-modes '(prog-mode)
-        )
   )
 #+end_src
 *** spell-check
@@ -2436,17 +2403,6 @@ Perform the comparison with `string<'."
 (setup denote-journal
   (setq denote-journal-title-format "%Y_%m_%d_%a_%j")
   (add-hook 'calendar-mode-hook #'denote-journal-calendar-mode)
-  (defun nowis/denote-journal-this-week-major-tasks ()
-    "Open this week's Saturday journal and jump to or insert '本周重点任务' headline."
-    (interactive)
-    (let ((date (nowis/current-week-saturday)))
-      (denote-journal-new-or-existing-entry date)
-      (goto-char (point-min))
-      (unless (re-search-forward "^\\*+ 本周重点任务" nil t)
-        (goto-char (point-max))
-        (unless (bolp) (insert "\n"))
-        (insert "* 本周重点任务 :week:\n"))
-      (org-show-entry)))
   )
 #+end_src
 *** denote-explorer
@@ -2546,18 +2502,6 @@ otherwise use the saved file."
 
     (setq org-capture-templates
           `(
-            ("p" "Plan" entry (file+olp+datetree "gtd/inbox.org")
-             ,(concat "* Daily Plan\n"
-                      ":PROPERTIES:\n"
-                      ":ENTRY_TYPE: plan\n"
-                      ":CREATED: %U\n"
-                      ":END:\n%?"))
-            ("s" "Summary" entry (file+olp+datetree "gtd/inbox.org")
-             ,(concat "* Daily Summary\n"
-                      ":PROPERTIES:\n"
-                      ":ENTRY_TYPE: summary\n"
-                      ":CREATED: %U\n"
-                      ":END:\n%?"))
             ("i" "Inbox" entry  (file "gtd/inbox.org")
              ,(concat "* TODO [#C] %?\n"
                       ":PROPERTIES:\n:CREATED: %U\n:END:\n")
@@ -2590,50 +2534,15 @@ When called with prefix argument, prompt to select target file."
     (org-capture nil "t")
       (insert content)))
   )
-(defun nowis/goto-or-capture-daily-entry (entry-type capture-key)
-  "通用函数: 跳转或创建每日条目"
-  (let* ((file (expand-file-name "gtd/inbox.org" org-directory))
-         (today-regexp (format-time-string "\\*\\{3,\\} %Y-%m-%d %a"))
-         found-pos)
-
-    (with-current-buffer (find-file-noselect file)
-      (save-excursion
-        (goto-char (point-min))
-        (when (re-search-forward today-regexp nil t)
-          (let ((tree-end (save-excursion (org-end-of-subtree t t))))
-            (while (and (not found-pos)
-                        (re-search-forward "^\\*\\{4,\\}" tree-end t))
-              (when (string= (org-entry-get nil "ENTRY_TYPE") entry-type)
-                (setq found-pos (match-beginning 0))))))))
-
-    (if found-pos
-        (progn
-          (find-file file)
-          (goto-char found-pos)
-          (org-show-context)
-          (org-reveal)
-          (recenter))
-      (org-capture nil capture-key))))
-
-(defun nowis/goto-or-capture-daily-plan ()
-  "智能跳转或创建今日计划"
-  (interactive)
-  (nowis/goto-or-capture-daily-entry "plan" "p"))
-
-(defun nowis/goto-or-capture-daily-summary ()
-  "智能跳转或创建今日总结"
-  (interactive)
-  (nowis/goto-or-capture-daily-entry "summary" "s"))
 #+end_src
 *** refile
 #+begin_src elisp
 (setup org
   (:when-loaded
-    (setq org-refile-use-outline-path 'full-file-path)
+    (setq org-refile-use-outline-path t)
     (setq org-outline-path-complete-in-steps nil)
-    (setq org-refile-targets '((org-refile-files :regexp . "*")))
-    ;; '(("action.org" :regexp . "\\(?:\\(?:Note\\|Task\\)s\\)")
-    ;;   ("incubate.org" :regexp . "\\(?:\\(?:Note\\|Task\\)s\\)")
+    (setq org-refile-targets
+          '((org-refile-files :level 1)))
     ;; Save the corresponding buffers
     (defun gtd-save-org-buffers ()
       "Save `org-agenda-files' buffers without user confirmation.
@@ -2664,15 +2573,6 @@ See also `org-save-all-org-buffers'"
          (width (window-width (get-buffer-window)))
          (pad (/ (1+ (- width (string-width title))) 2)))
     (concat (make-string (max 0 pad) ? ) title)))
-
-;; custom skip functins
-(defun my-org-agenda-skip-blocked ()
-  (when (org-entry-blocked-p)
-    (or (outline-next-heading) (point-max))))
-
-(defun my-org-agenda-skip-unblocked ()
-  (unless (org-entry-blocked-p)
-    (or (outline-next-heading) (point-max))))
 
 (defvar nowis/agenda-prefix-format-enhanced
   "[%-4e] :"
@@ -2728,7 +2628,6 @@ See also `org-save-all-org-buffers'"
            (tags-todo "action+project"
                       ((org-agenda-overriding-header (nowis/align-to-window-center "Multi-Steps Action"))
                        (org-agenda-skip-function '(org-agenda-skip-entry-if 'scheduled))
-                       ;; (org-agenda-skip-function #'my-org-agenda-skip-blocked)
                        ))
            (tags-todo "inbox"
                       ((org-agenda-overriding-header (nowis/align-to-window-center "Inbox"))
@@ -2873,17 +2772,6 @@ Keys defined here will override existing bindings when the mode is active.")
   :keymap nowis-read-mode-map
   :group 'nowis-read)
 #+end_src
-** doc-capture
-#+begin_src elisp
-(setup doc-capture
-  (:autoload doc-capture-process)
-  (setq doc-capture-org-directory (concat org-inc-directory "doc-capture/"))
-  (:when-loaded
-    (require' doc-capture-org-inc-integration)
-    )
-
-  )
-#+end_src
 ** insert from clipboard
 #+begin_src elisp
 (setup org
@@ -3023,6 +2911,7 @@ Simple distraction-free editing. I use darkroom instead of writeroom because it'
     ;; │ mcp │
     ;; └─────┘
     (require 'gptel-integrations)
+    (require 'mcp)
 
     ;; ┌──────────┐
     ;; │ autosave │
@@ -3186,18 +3075,6 @@ Simple distraction-free editing. I use darkroom instead of writeroom because it'
         whisper--ffmpeg-input-format "pulse")
   )
 #+end_src
-*** whisper-api
-#+begin_src elisp
-(setup whisper-api
-  (:autoload whisper-api-record-dwim)
-  (setq whisper-api-base-url "https://api.chatanywhere.tech/v1/audio/transcriptions"
-        whisper-api-model "gpt-4o-mini-transcribe"
-        whisper-api-max-recording-seconds 600
-        )
-  (if (eq system-type 'darwin)
-      (setq whisper-api-ffmpeg-command "ffmpeg -y -t %d -f avfoundation -i \":1\" -ar 16000 %s"))
-  )
-#+end_src
 *** pi-coding-agent
 #+begin_src elisp
 (setup pi-coding-agent
@@ -3233,9 +3110,6 @@ Simple distraction-free editing. I use darkroom instead of writeroom because it'
                         ("leetcode-cn" .
                          [simple-query "leetcode.cn"
                                        "leetcode.cn/search/?q=" ""])
-                        ("superlib" .
-                         [simple-query "book.ucdrs.superlib.net"
-                                       "http://book.ucdrs.superlib.net/search?sw=" "&allsw=%23%2Call&bCon=&ecode=utf-8&channel=search&Field=all"])
                         ("cppinfo" .
                          [simple-query "book.cppinfo.cn"
                                        "book.cppinfo.cn/so/home/qhsearch?q=" ""])
@@ -3282,44 +3156,6 @@ ESUP - Emacs Start Up Profiler
     (define-key uniline-mode-map (kbd "M-i") #'uniline-launch-interface)
     )
   )
-#+end_src
-** excalidraw
-#+begin_src elisp
-(setq org-excalidraw-default-directory (concat denote-directory "/excalidraw/"))
-(defconst org-excalidraw-default-template
-  "{
-    \"type\": \"excalidraw\",
-    \"version\": 2,
-    \"source\": \"https://excalidraw.com\",
-    \"elements\": [],
-    \"appState\": {
-      \"gridSize\": null,
-      \"viewBackgroundColor\": \"#ffffff\"
-    },
-    \"files\": {}
-  }
-"
-  "excalidraw template in JSON.")
-
-(defun org-excalidraw-create-drawing ()
-  "Create an excalidraw drawing and optionally insert an org-mode link at point."
-  (interactive)
-  (let* ((directory (if org-excalidraw-default-directory
-                        (expand-file-name org-excalidraw-default-directory)
-                      nil))
-         (temp-path (concat directory "temp.excalidraw"))
-         (origin-buffer (current-buffer))
-         (new-buf (find-file-noselect temp-path))
-         (new-path (with-current-buffer new-buf
-                     (insert org-excalidraw-default-template)
-                     (save-buffer)
-                     (let ((new-path (call-interactively #'denote-rename-file)))
-                       (embark-open-externally new-path)
-                       new-path))
-                   ))
-    (switch-to-buffer origin-buffer)
-    (when (derived-mode-p 'org-mode)
-      (insert (format "[[file:%s]]" new-path)))))
 #+end_src
 ** manage-web-bookmarks
 #+begin_src elisp
