@@ -205,9 +205,6 @@
 [submodule "org-appear"]
 	path = lib/org-appear
 	url = https://github.com/awth13/org-appear.git
-[submodule "org-graphviz-mindmap"]
-	path = lib/org-graphviz-mindmap
-	url = https://github.com/nowislewis/org-graphviz-mindmap.git
 [submodule "org-inc"]
 	path = lib/org-inc
 	url = https://github.com/bohonghuang/org-inc.git

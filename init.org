@@ -404,6 +404,10 @@ Maybe I should add a new state.
     ("r" "gptel-rewrite" gptel-rewrite)
     ("f" "gptel-file-add" gptel-add-file)
     ]
+   ["agent"
+    ("p" "pi" pi)
+    ("t" "pi-toggle" pi-coding-agent-toggle)
+    ]
    ])
 #+end_src
 *** buffer
@@ -448,9 +452,6 @@ Maybe I should add a new state.
     ("e" "ebib" ebib)
     ("b" "citar-open" citar-open)
     ("u" "update denote with bibtex" denote-bibtex-update-reference)
-    ]
-   ["graph"
-    ("g" "org-graphviz-mindmap" org-graphviz-mindmap-create)
     ]
    ["ladder"
     ("l c" "display current" org-ladder-display-current-status)
@@ -1739,8 +1740,6 @@ borrowed from citre, now you can always jump-back use "M-," after any jump in th
             (javascript "https://github.com/tree-sitter/tree-sitter-javascript" "master" "src")
             (json "https://github.com/tree-sitter/tree-sitter-json")
             (make "https://github.com/alemuller/tree-sitter-make")
-            ;; (markdown "https://github.com/tree-sitter-grammars/tree-sitter-markdown" "split_parser" "tree-sitter-markdown/src")
-            ;; (markdown-inline "https://github.com/tree-sitter-grammars/tree-sitter-markdown" "split_parser" "tree-sitter-markdown-inline/src")
             (python "https://github.com/tree-sitter/tree-sitter-python")
             (toml "https://github.com/tree-sitter/tree-sitter-toml")
             (tsx "https://github.com/tree-sitter/tree-sitter-typescript" "master" "tsx/src")
@@ -2248,9 +2247,6 @@ Always allow composition for org-mode keywords, regardless of context."
                                    ("#+end_tool" . ?)
                                    ("#+begin_quote" . ?󱀢)
                                    ("#+end_quote" . ?)
-                                   ("TODO" . ?T)
-                                   ("NEXT" . ?N)
-                                   ("DONE" . ?D)
                                    (":PROPERTIES:" . ?)
                                    (":SRSITEMS:" . ?)
                                    (":LOGBOOK:" . ?)
@@ -2382,11 +2378,6 @@ Always allow composition for org-mode keywords, regardless of context."
            ebib-bibtex-dialect 'biblatex
            ebib-create-backups nil
            ))
-#+end_src
-** toc-org
-#+begin_src elisp :tangle no
-(setup toc-org
-  (:hook-into org-mode))
 #+end_src
 ** denote and related
 *** denote
@@ -2683,54 +2674,72 @@ See also `org-save-all-org-buffers'"
   (unless (org-entry-blocked-p)
     (or (outline-next-heading) (point-max))))
 
-;; 定义统一的 prefix format
-(defvar nowis/agenda-prefix-format-basic "%-20:(org-get-parent-heading): [%-4e] "
-  "Basic agenda prefix format.")
-
 (defvar nowis/agenda-prefix-format-enhanced
-  "%-20:(org-get-parent-heading): [%-4e] [%3(or (org-entry-get nil \"value\") \"\")] [%4(if (and (org-entry-get nil \"value\") (org-entry-get nil \"Effort\")) (format \"%.2f\" (/ (string-to-number (org-entry-get nil \"value\")) (org-duration-to-minutes (org-entry-get nil \"Effort\")))) \"\")] "
-  "Enhanced agenda prefix format with value and effort/value ratio.")
+  "[%-4e] :"
+  "Enhanced agenda prefix format.")
+
+(defun my/agenda-sort-by-parent (a b)
+  "Sort agenda items by parent heading."
+  (let ((ha (org-with-point-at (get-text-property 0 'org-marker a)
+              (or (org-get-parent-heading) "")))
+        (hb (org-with-point-at (get-text-property 0 'org-marker b)
+              (or (org-get-parent-heading) ""))))
+    (string< ha hb)))
+
+(setq org-agenda-cmp-user-defined 'my/agenda-sort-by-parent)
+(setq org-agenda-sorting-strategy
+      '((user-defined-up todo-state-up priority-down timestamp-up)))
+(setq org-agenda-prefix-format
+      '((agenda . " %i %-12:c%?-12t% s[%-4e]") (todo . "[%-4e]: ") (tags . "[%-4e]: ")
+       (search . " %i %-12:c")))
+
+(defun my/agenda-add-parent-separators ()
+  "Add separator lines between different parent groups, depends on sorted by parent."
+  (save-excursion
+    (goto-char (point-min))
+    (let (last-parent)
+      (while (not (eobp))
+        (let ((marker (get-text-property (point) 'org-marker)))
+          (when marker
+            (let ((parent (org-with-point-at marker
+                            (or (org-get-parent-heading) ""))))
+              (when (not (string= parent (or last-parent "")))
+                (let ((inhibit-read-only t))
+                  (insert (propertize
+                           (concat " " parent "\n")
+                           'face 'org-agenda-structure)))
+                (setq last-parent parent)))))
+        (forward-line)))))
+
+(add-hook 'org-agenda-finalize-hook 'my/agenda-add-parent-separators)
 
 (defmacro nowis/create-agenda-command (key description tag)
   `(list ,key ,description
          '(
-           (tags-todo ,(concat "+week" tag)
-                      ((org-agenda-overriding-header
-                        (nowis/align-to-window-center "󰛨 Week's Target 󰛨\n"))
-                       (org-agenda-sorting-strategy '(todo-state-up priority-down timestamp-up))
-                       (org-agenda-prefix-format nowis/agenda-prefix-format-enhanced)))
            (agenda ""
                    ((org-agenda-overriding-header (nowis/align-to-window-center " Today's Target "))
                     (org-agenda-span 'day)
                     (org-agenda-skip-function
                      '(org-agenda-skip-if nil '(todo done)))))
-           (tags-todo "+TODO=\"NEXT\""
-                      ((org-agenda-overriding-header (nowis/align-to-window-center "NEXT"))
-                       (org-agenda-prefix-format nowis/agenda-prefix-format-enhanced)
-                       (org-agenda-sorting-strategy '(todo-state-up priority-down timestamp-up))
+           (tags-todo "action+next"
+                      ((org-agenda-overriding-header (nowis/align-to-window-center "One-Step Action"))
+                       (org-agenda-skip-function '(org-agenda-skip-entry-if 'scheduled))
                        ))
-           (tags-todo "inbox-TODO=\"NEXT\"-PRIORITY=\"E\""
+           (tags-todo "action+project"
+                      ((org-agenda-overriding-header (nowis/align-to-window-center "Multi-Steps Action"))
+                       (org-agenda-skip-function '(org-agenda-skip-entry-if 'scheduled))
+                       ;; (org-agenda-skip-function #'my-org-agenda-skip-blocked)
+                       ))
+           (tags-todo "inbox"
                       ((org-agenda-overriding-header (nowis/align-to-window-center "Inbox"))
-                       (org-agenda-skip-function #'my-org-agenda-skip-blocked)
-                       (org-agenda-prefix-format nowis/agenda-prefix-format-enhanced)
-                       (org-agenda-sorting-strategy '(todo-state-up priority-down timestamp-up))))
-           (tags-todo "inbox-TODO=\"NEXT\"+PRIORITY=\"E\""
-                      ((org-agenda-overriding-header (nowis/align-to-window-center "Low Priority"))
-                       (org-agenda-skip-function #'my-org-agenda-skip-blocked)
-                       (org-agenda-prefix-format nowis/agenda-prefix-format-enhanced)
-                       (org-agenda-sorting-strategy '(todo-state-up priority-down timestamp-up))))
-           (tags-todo "inbox-TODO=\"NEXT\""
-                      ((org-agenda-overriding-header (nowis/align-to-window-center "Blocked"))
-                       (org-agenda-skip-function #'my-org-agenda-skip-unblocked)
-                       (org-agenda-prefix-format nowis/agenda-prefix-format-basic)
-                       (org-agenda-sorting-strategy '(todo-state-up priority-down timestamp-up))))
+                       ))
            (tags ,(concat "CLOSED>=\"<today>\"" tag)
                  ((org-agenda-overriding-header (nowis/align-to-window-center "Completed today"))
-                  (org-agenda-prefix-format nowis/agenda-prefix-format-basic)
+                  (org-agenda-sorting-strategy '(tsia-down))
                   ))
            (tags ,(concat "CLOSED>=\"<-1w>\"" tag)
                  ((org-agenda-overriding-header (nowis/align-to-window-center "Completed last 7 days"))
-                  (org-agenda-prefix-format nowis/agenda-prefix-format-basic)
+                  (org-agenda-sorting-strategy '(tsia-down))
                   ))
            )))
 
@@ -2743,7 +2752,7 @@ See also `org-save-all-org-buffers'"
       org-agenda-clockreport-parameter-plist '(:link t :maxlevel 5 :properties ("Effort"))
       org-clock-out-remove-zero-time-clocks t)
 ;; agenda style
-(setq org-agenda-hide-tags-regexp "\\(inbox\\|action\\|journal\\)")
+(setq org-agenda-hide-tags-regexp "\\(inbox\\|action\\|journal\\|project\\|next\\)")
 #+end_src
 *** archive
 #+begin_src elisp
@@ -2925,10 +2934,6 @@ Keys defined here will override existing bindings when the mode is active.")
   (:hook-into org-mode)
   )
 #+end_src
-** org-graphviz-mindmap
-#+begin_src elisp
-(setup org-graphviz-mindmap)
-#+end_src
 ** org-ladder
 #+begin_src elisp
 (setup org-ladder
@@ -2969,7 +2974,10 @@ Simple distraction-free editing. I use darkroom instead of writeroom because it'
 ** markdown-mode
 #+begin_src elisp
 (setup markdown-mode
-  (:match-file "\\.md\\'"))
+  (:match-file "\\.md\\'")
+  (custom-set-faces
+   '(markdown-header-face-1 ((t (:inherit org-level-2)))))
+  )
 #+end_src
 * tools
 ** ai related
@@ -2979,7 +2987,7 @@ Simple distraction-free editing. I use darkroom instead of writeroom because it'
   (setq gptel-default-mode 'org-mode
         ;; gptel-crowdsourced-prompts-file (concat nowis/doc-emacs-dir "09-scripts/chatgpt.csv")
         gptel-highlight-methods '(face)
-        gptel-model 'claude-sonnet-4.5
+        gptel-model 'claude-sonnet-4.6
         ;; gptel-max-tokens
         )
   (keymap-global-set "M-p" #'gptel-send)
@@ -2993,7 +3001,7 @@ Simple distraction-free editing. I use darkroom instead of writeroom because it'
                     :host "llm-gateway.momenta.works"
                     :key 'gptel-api-key
                     :stream t
-                    :models '(claude-sonnet-4.5 claude-haiku-4.5 minimax-m2.1 gpt-5.2 gemini-3-pro qwen3-coder-plus deepseek-v3.2)))
+                    :models '(claude-sonnet-4.6 claude-haiku-4.5 minimax-m2.1 gpt-5.2 gemini-3-pro qwen3-coder-plus deepseek-v3.2)))
     (gptel-make-openai "chatanywhere"
       :host "api.chatanywhere.tech"
       ;; :header (lambda () `(("Authorization" . ,(concat "Bearer " (gptel--get-api-key)))))
