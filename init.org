@@ -497,8 +497,7 @@ Maybe I should add a new state.
     ]
    ["others"
     ("r" "restart emacs" restart-emacs)
-    ;; ("w" "whisper" whisper-run)
-    ("w" "whisper" whisper-api-record-dwim)
+    ("w" "whisper" whisper-run)
     ]
    ])
 #+end_src
@@ -2584,14 +2583,16 @@ See also `org-save-all-org-buffers'"
               (or (org-get-parent-heading) "")))
         (hb (org-with-point-at (get-text-property 0 'org-marker b)
               (or (org-get-parent-heading) ""))))
-    (string< ha hb)))
+    (cond
+     ((string< ha hb) 1)
+     ((string< hb ha) 1)
+     (t 0))))
 
-(setq org-agenda-cmp-user-defined 'my/agenda-sort-by-parent)
-(setq org-agenda-sorting-strategy
-      '((user-defined-up todo-state-up priority-down timestamp-up)))
+(setq org-agenda-cmp-user-defined #'my/agenda-sort-by-parent)
+
 (setq org-agenda-prefix-format
       '((agenda . " %i %-12:c%?-12t% s[%-4e]") (todo . "[%-4e]: ") (tags . "[%-4e]: ")
-       (search . " %i %-12:c")))
+        (search . " %i %-12:c")))
 
 (defun my/agenda-add-parent-separators ()
   "Add separator lines between different parent groups, depends on sorted by parent."
@@ -2624,13 +2625,16 @@ See also `org-save-all-org-buffers'"
            (tags-todo "action+next"
                       ((org-agenda-overriding-header (nowis/align-to-window-center "One-Step Action"))
                        (org-agenda-skip-function '(org-agenda-skip-entry-if 'scheduled))
+                       (org-agenda-sorting-strategy '(todo-state-up priority-down timestamp-up))
                        ))
            (tags-todo "action+project"
                       ((org-agenda-overriding-header (nowis/align-to-window-center "Multi-Steps Action"))
                        (org-agenda-skip-function '(org-agenda-skip-entry-if 'scheduled))
+                       (org-agenda-sorting-strategy '(user-defined-up todo-state-up priority-down timestamp-up))
                        ))
            (tags-todo "inbox"
                       ((org-agenda-overriding-header (nowis/align-to-window-center "Inbox"))
+                       (org-agenda-sorting-strategy '(todo-state-up priority-down timestamp-up))
                        ))
            (tags ,(concat "CLOSED>=\"<today>\"" tag)
                  ((org-agenda-overriding-header (nowis/align-to-window-center "Completed today"))
