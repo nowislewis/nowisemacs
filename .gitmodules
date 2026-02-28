@@ -27,9 +27,6 @@
 [submodule "clipetty"]
 	path = lib/clipetty
 	url = https://github.com/spudlyo/clipetty.git
-[submodule "cmake-mode"]
-	path = lib/cmake-mode
-	url = https://github.com/emacsmirror/cmake-mode.git
 [submodule "cond-let"]
 	path = lib/cond-let
 	url = https://github.com/tarsius/cond-let.git
@@ -157,9 +154,6 @@
 [submodule "llama"]
 	path = lib/llama
 	url = https://github.com/tarsius/llama.git
-[submodule "lua-mode"]
-	path = lib/lua-mode
-	url = https://github.com/immerrr/lua-mode.git
 [submodule "magit"]
 	path = lib/magit
 	url = https://github.com/magit/magit
@@ -236,9 +230,6 @@
 [submodule "project-rootfile"]
 	path = lib/project-rootfile
 	url = https://github.com/buzztaiki/project-rootfile.el.git
-[submodule "pulsar"]
-	path = lib/pulsar
-    url = https://github.com/protesilaos/pulsar.git
 [submodule "rainbow-delimiters"]
 	path = lib/rainbow-delimiters
 	url = https://github.com/Fanael/rainbow-delimiters.git
@@ -251,9 +242,6 @@
 [submodule "s"]
 	path = lib/s
 	url = https://github.com/magnars/s.el.git
-[submodule "tabspaces"]
-	path = lib/tabspaces
-	url = https://github.com/mclear-tools/tabspaces.git
 [submodule "tomelr"]
 	path = lib/tomelr
 	url = https://github.com/kaushalmodi/tomelr.git
@@ -279,9 +267,6 @@
 [submodule "with-editor"]
 	path = lib/with-editor
 	url = https://github.com/magit/with-editor.git
-[submodule "ws-butler"]
-	path = lib/ws-butler
-	url = https://github.com/lewang/ws-butler.git
 [submodule "yaml"]
 	path = lib/yaml
 	url = https://github.com/zkry/yaml.el.git

@@ -95,6 +95,8 @@ emacs
 (defvar nowis/gtd-dir (concat nowis/doc-emacs-dir "01-orgmode/xnotes/gtd"))
 (defvar nowis/bib-dir (concat nowis/doc-emacs-dir "03-bibliography/"))
 (defvar nowis/bib-pdf-dir (concat nowis/doc-emacs-dir "02-binary-git/searchable"))
+(defvar nowis/is-wsl (string= "Arch" (getenv "WSL_DISTRO_NAME"))
+  "Non-nil when running inside WSL (Arch distro).")
 #+end_src
 * Package Management
 ** capsule
@@ -296,13 +298,12 @@ Maybe I should add a new state.
         (progn
           (message "Quit temporary normal mode")
           (meow--switch-state 'motion))
-      (if (not (region-active-p))
-          (progn
-            (when (and meow-use-cursor-position-hack
-                       (< (point) (point-max)))
-              (forward-char 1))
-            (forward-char 1)
-            )
+      (unless (region-active-p)
+        (when (and meow-use-cursor-position-hack
+                   (< (point) (point-max)))
+          (forward-char 1))
+        (forward-char 1))
+      (when (region-active-p)
         (meow--direction-forward)
         (meow--cancel-selection))
       (meow--switch-state 'insert)))
@@ -340,7 +341,7 @@ Maybe I should add a new state.
 (transient-define-prefix g-extra-commands()
   "Define notes leader-key maps"
   [["Code find"
-    ("d" "find-definitions" (lambda () (interactive) (call-interactively (key-binding (kbd "M-.")))))
+    ("d" "find-definitions" xref-find-definitions)
     ("D" "find-references" xref-find-references)
     ("i" "find-impl" eglot-find-implementation)
     ("s" "find-symbols" xref-find-apropos)
@@ -436,12 +437,6 @@ Maybe I should add a new state.
     ("b" "citar-open" citar-open)
     ("u" "update denote with bibtex" denote-bibtex-update-reference)
     ]
-   ["ladder"
-    ("l c" "display current" org-ladder-display-current-status)
-    ("l d" "show detailed" org-ladder-show-detailed-status)
-    ("l f" "force update" org-ladder-force-refresh)
-    ("l h" "history" org-ladder-show-history-review)
-    ]
    ]
   )
 #+end_src
@@ -491,9 +486,14 @@ Maybe I should add a new state.
     ("E" "extract topic with prefix"
      (lambda () (interactive) (org-inc-topic-capture-from-clipboard '(-1))))
     ]
-
    ["life"
-    ("l" "life" life-calendar)
+    ("L" "life" life-calendar)
+    ]
+   ["ladder"
+    ("l c" "display current" org-ladder-display-current-status)
+    ("l d" "show detailed" org-ladder-show-detailed-status)
+    ("l f" "force update" org-ladder-force-refresh)
+    ("l h" "history" org-ladder-show-history-review)
     ]
    ["others"
     ("r" "restart emacs" restart-emacs)
@@ -556,7 +556,7 @@ Maybe I should add a new state.
  ;; notes
  '("n" . notes-leader-map)
  ;;w workspace
- '("TAB" . tabspaces-leader-map)
+ '("TAB" . tab-leader-map)
  ;; ;; org gtd
  ;; '("d" . org-gtd-leader-map)
  ;; ui
@@ -607,57 +607,53 @@ Maybe I should add a new state.
   "Check if font with FONT-NAME is available."
   (find-font (font-spec :name font-name)))
 
+(defun nowis/first-available-font (fonts)
+  "Return the first available font from FONTS list."
+  (cl-find-if #'font-installed-p fonts))
+
 ;; font size
 (if (eq system-type 'darwin)
     (defvar lewis-font-size 140)
   (defvar lewis-font-size 150))
 
 ;; fixed font
-(setq lewis-fixed-font (cl-loop for font in '(
-                                              "JetBrains Maple Mono"
-                                              "Maple Mono NF CN"
-                                              "Maple Mono SC NF"
-                                              "Unifont"
-                                              ;; "InconsolataGo QiHei NF"
-                                              ;; "yaheiInconsolata"
-                                              "JetBrainsMono Nerd Font"
-                                              "JetBrains Mono"
-                                              "Sarasa Mono SC Nerd"
-                                              "Monaco"
-                                              "Consolas"
-                                              )
-                                when (font-installed-p font)
-                                return font))
+(setq lewis-fixed-font
+      (nowis/first-available-font '("JetBrains Maple Mono"
+                                    "Maple Mono NF CN"
+                                    "Maple Mono SC NF"
+                                    "Unifont"
+                                    ;; "InconsolataGo QiHei NF"
+                                    ;; "yaheiInconsolata"
+                                    "JetBrainsMono Nerd Font"
+                                    "JetBrains Mono"
+                                    "Sarasa Mono SC Nerd"
+                                    "Monaco"
+                                    "Consolas")))
 ;; variable font
-(setq lewis-variable-font (cl-loop for font in '(
-                                                 "IBM Plex Sans"
-                                                 "LXGW WenKai"
-                                                 "Noto Sans CJK SC"
-                                                 "PingFang SC"
-                                                 "Times"
-                                                 "Helvetica"
-                                                 "Maple UI"
-                                                 ;; "Source Han Sans SC VF"
-                                                 "Arial"
-                                                 "Times New Roman")
-                                   when (font-installed-p font)
-                                   return font))
+(setq lewis-variable-font
+      (nowis/first-available-font '("IBM Plex Sans"
+                                    "LXGW WenKai"
+                                    "Noto Sans CJK SC"
+                                    "PingFang SC"
+                                    "Times"
+                                    "Helvetica"
+                                    "Maple UI"
+                                    ;; "Source Han Sans SC VF"
+                                    "Arial"
+                                    "Times New Roman")))
 
 ;; chinese font
-(setq lewis-chinese-font (cl-loop for font in '("Maple Mono SC NF"
-                                                "Unifont"
-                                                "Sarasa Mono SC Nerd"
-                                                "Microsoft Yahei")
-                                  when (font-installed-p font)
-                                  return font))
+(setq lewis-chinese-font
+      (nowis/first-available-font '("Maple Mono SC NF"
+                                    "Unifont"
+                                    "Sarasa Mono SC Nerd"
+                                    "Microsoft Yahei")))
 
 ;; symbol font
-(setq lewis-symbol-font (cl-loop for font in '("Symbols Nerd Font Mono"
-                                               "Symbola"
-                                               "Symbol"
-                                               )
-                                 when (font-installed-p font)
-                                 return font))
+(setq lewis-symbol-font
+      (nowis/first-available-font '("Symbols Nerd Font Mono"
+                                    "Symbola"
+                                    "Symbol")))
 
 ;; mayby I should remove all this font-seting and use only default font
 (defun nowis/setup-fonts()
@@ -688,8 +684,9 @@ Maybe I should add a new state.
 #+end_src
 ** variable-pitch
 #+begin_src elisp
-(defun dynamic-change-line-spacing( &optional ARG)
-  (if line-spacing (setq-local line-spacing nil) (setq-local line-spacing 0.5)))
+(defun dynamic-change-line-spacing (&rest _)
+  "Sync line-spacing with variable-pitch-mode state."
+  (setq-local line-spacing (if variable-pitch-mode 0.5 nil)))
 (advice-add 'variable-pitch-mode :after #'dynamic-change-line-spacing)
 #+end_src
 ** Theme
@@ -708,11 +705,7 @@ Maybe I should add a new state.
 #+begin_src elisp
 (setq line-number-display-limit large-file-warning-threshold)
 ;; only enable line number in some modes, borrowed from lazycat-emacs
-(dolist (hook (list
-               'prog-mode-hook
-               ;;'org-mode-hook
-               ))
-  (add-hook hook (lambda () (display-line-numbers-mode))))
+(add-hook 'prog-mode-hook #'display-line-numbers-mode)
 #+end_src
 ** nerd-icons
 #+begin_src elisp
@@ -847,17 +840,23 @@ diff-hl-mode highlights uncommitted changes on the left side of the window (area
   (defun nowis/recenter ()
     (interactive)
     (call-interactively 'recenter)
-    (pulsar-pulse-line))
+    (pulse-momentary-highlight-one-line (point)))
   (defvar my-hl-line-timer nil)
 #+end_src
 *** pulsar
 #+begin_src elisp
-(setup pulsar
-  (pulsar-global-mode 1)
-  (setq pulsar-delay 0.015
-        pulsar-iterations 10)
-  (:when-loaded
-    (add-hook 'pulsar-pulse-functions 'ace-window)))
+;; Use built-in pulse.el instead of third-party pulsar
+(require 'pulse)
+(setq pulse-delay 0.015
+      pulse-iterations 10)
+(defun nowis/pulse-line (&rest _)
+  "Pulse-highlight the current line."
+  (pulse-momentary-highlight-one-line (point)))
+(dolist (cmd '(recenter-top-bottom
+               other-window
+               ace-window
+               windmove-up windmove-down windmove-left windmove-right))
+  (advice-add cmd :after #'nowis/pulse-line))
 #+end_src
 ** show-paren-mode
 #+begin_src elisp
@@ -878,19 +877,14 @@ diff-hl-mode highlights uncommitted changes on the left side of the window (area
   ;; (add-hook 'org-mode-hook 'turn-on-auto-fill)
 
   ;; (global-visual-line-mode)
-  (dolist (hook (list
-                 'prog-mode-hook
-                 'org-mode-hook
-                 'vterm-mode-hook
-                 ))
-    (add-hook hook (lambda () (visual-line-mode))))
+  (dolist (hook '(prog-mode-hook org-mode-hook vterm-mode-hook))
+    (add-hook hook #'visual-line-mode))
   )
 #+end_src
 ** general builtin modes
 #+begin_src elisp
 (setup save-place
-   (save-place-mode)
-  )
+  (save-place-mode))
 
 (setup autorevert
   (setq global-auto-revert-non-file-buffers t)
@@ -966,8 +960,7 @@ diff-hl-mode highlights uncommitted changes on the left side of the window (area
 #+end_src
 ** Automatically clean whitespace
 #+begin_src elisp
-(setup ws-butler
-  (:hook-into text-mode prog-mode))
+(add-hook 'before-save-hook #'delete-trailing-whitespace)
 #+end_src
 ** vundo for undo history
 #+begin_src elisp
@@ -988,17 +981,7 @@ diff-hl-mode highlights uncommitted changes on the left side of the window (area
   (setq isearch-lazy-count t
         ;; lazy-highlight-cleanup nil
         )
-  (:bind [remap isearch-delete-char] isearch-del-char)
-  (:when-loaded
-    (defvar isearch-repeat-map
-      (let ((map (make-sparse-keymap)))
-        (define-key map (kbd "s") #'isearch-repeat-forward)
-        (define-key map (kbd "r") #'isearch-repeat-backward)
-        map))
-    (dolist (cmd '(isearch-repeat-forward isearch-repeat-backward))
-      (put cmd 'repeat-map 'isearch-repeat-map))
-
-    ))
+  (:bind [remap isearch-delete-char] isearch-del-char))
 #+end_src
 ** Consult Commands
 *** consult
@@ -1074,9 +1057,9 @@ diff-hl-mode highlights uncommitted changes on the left side of the window (area
 * 补全
 ** default completion comfigurations
 #+begin_src elisp
-(setq completions-detailed t) ;;useful in emacs 28
-(setq completions-group t)
-(setq completions-sort 'historical)
+(setq completions-detailed t  ;;useful in emacs 28
+      completions-group t
+      completions-sort 'historical)
 #+end_src
 ** Completions with Vertico
 #+name: vertico
@@ -1277,28 +1260,21 @@ Jump anywhere in the world
 (setq default-input-method "rime")
 (with-eval-after-load 'rime
   (defun nowis/rime-disable-predicates ()
-    (if (derived-mode-p 'eat-mode)
-        ;; 只在 eat buffer 下，禁用 predicates 约束，rime 全时可用
-        '(meow-normal-mode-p
-          meow-motion-mode-p
-          meow-keypad-mode-p
-          rime-predicate-after-alphabet-char-p
-          rime-predicate-current-input-punctuation-p
-          rime-predicate-current-uppercase-letter-p
-          rime-predicate-space-after-cc-p
-          )
-      ;; 其他 buffer 用你原来的 predicate 约束
-      '(meow-normal-mode-p
-        meow-motion-mode-p
-        meow-keypad-mode-p
-        rime-predicate-prog-in-code-p
-        rime-predicate-punctuation-line-begin-p ;;在行首要输入符号时
-        rime-predicate-after-alphabet-char-p ;;在英文字符串之后（必须为以字母开头的英文字符串）
-        rime-predicate-current-input-punctuation-p ;;当要输入的是符号时
-        ;; rime-predicate-after-ascii-char-p ;;任意英文字符后 ,enable this to use with <s
-        rime-predicate-current-uppercase-letter-p ;; 将要输入的为大写字母时
-        rime-predicate-space-after-cc-p ;;在中文字符且有空格之后
-        )))
+    (let ((common '(meow-normal-mode-p
+                    meow-motion-mode-p
+                    meow-keypad-mode-p
+                    rime-predicate-after-alphabet-char-p
+                    rime-predicate-current-input-punctuation-p
+                    rime-predicate-current-uppercase-letter-p
+                    rime-predicate-space-after-cc-p)))
+      (if (derived-mode-p 'eat-mode)
+          ;; 只在 eat buffer 下，禁用 predicates 约束，rime 全时可用
+          common
+        ;; 其他 buffer 用你原来的 predicate 约束
+        (append common '(rime-predicate-prog-in-code-p
+                         rime-predicate-punctuation-line-begin-p ;;在行首要输入符号时
+                         ;; rime-predicate-after-ascii-char-p ;;任意英文字符后 ,enable this to use with <s
+                         )))))
   (add-hook 'rime-mode-hook
             (lambda ()
               (setq-local rime-disable-predicates
@@ -1323,25 +1299,21 @@ Jump anywhere in the world
 #+end_src
 * File and Browsing
 ** file browsing
-*** dired
+*** dired & dired-hacks
 #+begin_src elisp
 (setup dired
   (setq dired-dwim-target t)
   (:hook dired-hide-details-mode
          ;; dired-omit-mode
-         ))
+         )
+  (:with-map dired-mode-map
+    (:bind "TAB" #'dired-subtree-toggle))
+  )
 #+end_src
 *** nerd-icons-dired
 #+begin_src elisp
 (setup nerd-icons-dired)
 (add-hook 'dired-mode-hook #'nerd-icons-dired-mode)
-#+end_src
-*** dired-hacks
-#+begin_src elisp
-(setup dired
-  (:with-map dired-mode-map
-    (:bind "TAB" #'dired-subtree-toggle))
-  )
 #+end_src
 *** dired-sidebar
 #+begin_src elisp
@@ -1364,38 +1336,24 @@ Jump anywhere in the world
 (setup tab-bar
   (setq tab-bar-new-button-show nil
         tab-bar-close-button-show nil)
-  )
+  (transient-define-prefix tab-leader-map ()
+    "Tab workspace operations"
+    [["Tab"
+      ("s" "switch or create" tab-bar-switch-to-tab)
+      ("d" "close tab" tab-bar-close-tab)
+      ("r" "rename tab" tab-bar-rename-tab)
+      ]
+     ["Navigate"
+      ("n" "next tab" tab-bar-switch-to-next-tab)
+      ("p" "prev tab" tab-bar-switch-to-prev-tab)
+      ("l" "last tab" tab-bar-switch-to-last-tab)
+      ]
+     ]
+    ))
 (setup tab-line
   (setq tab-line-new-button-show nil
            tab-line-close-button-show nil)
   ;; (:defer (global-tab-line-mode))
-  )
-#+end_src
-** tabspaces
-#+begin_src elisp
-(setup tabspaces
-  (setq tabspaces-use-filtered-buffers-as-default t
-        tabspaces-keymap-prefix nil)
-(with-idle-delay 2
-   (tabspaces-mode))
-  (:when-loaded
-    (transient-define-prefix tabspaces-leader-map()
-      "Define tabspaces leader-key maps"
-      [["Create or close"
-        ("s" "tabspaces-switch-or-create-workspace" tabspaces-switch-or-create-workspace)
-        ("b" "tabspaces-switch-to-buffer" tabspaces-switch-to-buffer)
-        ("d" "tabspaces-close-workspace" tabspaces-close-workspace)
-        ("k" "tabspaces-remove-selected-buffer" tabspaces-remove-selected-buffer)
-        ("r" "tab-bar-rename-tab-by-name" tab-bar-rename-tab-by-name)
-        ]
-       ["Switch tab bar"
-        ("n" "tab-bar-switch-to-next-tab" tab-bar-switch-to-next-tab)
-        ("p" "tab-bar-switch-to-prev-tab" tab-bar-switch-to-prev-tab)
-        ("l" "tab-bar-switch-to-last-tab" tab-bar-switch-to-last-tab)
-        ]
-       ]
-      )
-    )
   )
 #+end_src
 ** project
@@ -1476,20 +1434,18 @@ Jump anywhere in the world
   "Prompt user to select an existing eat buffer or type a new name to create one."
   (let* ((eat-buffers (eat--get-buffers))
          (existing-bufs (mapcar #'buffer-name eat-buffers))
-         (choice (completing-read "Select or create eat buffer: " existing-bufs nil nil)))
-    (let ((buf (get-buffer choice)))
-      (if buf
-          (pop-to-buffer buf)
-        (eat--create-new-buffer choice)))))
+         (choice (completing-read "Select or create eat buffer: " existing-bufs nil nil))
+         (buf (get-buffer choice)))
+    (if buf
+        (pop-to-buffer buf)
+      (eat--create-new-buffer choice))))
 
 (defun eat--create-new-buffer (&optional buffer-name)
   "Create a new eat buffer with optional BUFFER-NAME and open it."
   (unless (featurep 'eat)
     (require 'eat)
     (eat-reload))
-  (if buffer-name
-      (let ((eat-buffer-name buffer-name))
-        (eat))
+  (let ((eat-buffer-name (or buffer-name eat-buffer-name)))
     (eat)))
 
 (defun eat--get-buffers ()
@@ -1513,18 +1469,9 @@ Jump anywhere in the world
 #+begin_src elisp
 (setup ediff
   (setq ediff-split-window-function 'split-window-horizontally
-           ediff-window-setup-function 'ediff-setup-windows-plain)
-  ;; restore windows Configuration after ediff
-  (add-hook 'ediff-before-setup-hook #'ediff-save-window-conf)
-  (add-hook 'ediff-quit-hook #'ediff-restore-window-conf)
-  (:when-loaded
-    (defvar local-ediff-saved-window-conf nil)
-    (defun ediff-save-window-conf ()
-      (setq local-ediff-saved-window-conf (current-window-configuration)))
-    (defun ediff-restore-window-conf ()
-      (when (window-configuration-p local-ediff-saved-window-conf)
-        (set-window-configuration local-ediff-saved-window-conf)))
-    ))
+        ediff-window-setup-function 'ediff-setup-windows-plain)
+  ;; restore window configuration after ediff via winner-mode
+  (add-hook 'ediff-quit-hook #'winner-undo))
 #+end_src
 * Program
 ** Language
@@ -1630,14 +1577,6 @@ Emacs major-mode to work with Beancount ledger files
   (:with-feature hide-ifdef-mode
     (:hook-into c-mode c++-mode)))
 #+end_src
-*** lua-mode
-#+begin_src elisp
-(setup lua-mode)
-#+end_src
-*** cmake-mode
-#+begin_src elisp
-(setup cmake-mode)
-#+end_src
 *** csv-mode
 #+begin_src elisp
 (setup csv-mode)
@@ -1672,11 +1611,6 @@ borrowed from citre, now you can always jump-back use "M-," after any jump in th
       (advice-add func :before 'my--push-point-to-xref-marker-stack)))
 #+end_src
 *** UI
-**** electric-pair
-#+begin_src elisp
-(setup elec-pair
-  (electric-pair-mode))
-#+end_src
 **** indent-bars
 #+begin_src elisp
 (setup indent-bars
@@ -1698,38 +1632,46 @@ borrowed from citre, now you can always jump-back use "M-," after any jump in th
 #+begin_src elisp
 (setup treesit
   (setq treesit-font-lock-level 4)
-
-  ;; avoid some errors without treesit
-  (if (not (treesit-available-p))
-      (setq treesit-extra-load-path (list (concat user-emacs-directory "var/treesit/")))
-    )
-  (when (treesit-available-p)
-    ;; configure sources
-    (setq treesit-auto-install-grammar 'ask
-          major-mode-remap-alist treesit-major-mode-remap-alist
-          treesit-language-source-alist
-          '((bash "https://github.com/tree-sitter/tree-sitter-bash")
-            (c "https://github.com/tree-sitter/tree-sitter-c")
-            (cpp "https://github.com/tree-sitter/tree-sitter-cpp")
-            (cmake "https://github.com/uyha/tree-sitter-cmake")
-            (css "https://github.com/tree-sitter/tree-sitter-css")
-            (elisp "https://github.com/Wilfred/tree-sitter-elisp")
-            (go "https://github.com/tree-sitter/tree-sitter-go")
-            (html "https://github.com/tree-sitter/tree-sitter-html")
-            (javascript "https://github.com/tree-sitter/tree-sitter-javascript" "master" "src")
-            (json "https://github.com/tree-sitter/tree-sitter-json")
-            (make "https://github.com/alemuller/tree-sitter-make")
-            (python "https://github.com/tree-sitter/tree-sitter-python")
-            (toml "https://github.com/tree-sitter/tree-sitter-toml")
-            (tsx "https://github.com/tree-sitter/tree-sitter-typescript" "master" "tsx/src")
-            (typescript "https://github.com/tree-sitter/tree-sitter-typescript" "master" "typescript/src")
-            (yaml "https://github.com/ikatyang/tree-sitter-yaml")))
-    (defun treesit-install-all()
-      (interactive)
-      (mapc #'treesit-install-language-grammar (mapcar #'car treesit-language-source-alist))
-      )
-    )
-  )
+  (if (treesit-available-p)
+      ;; configure major-mode remapping to ts-modes
+      (setq major-mode-remap-alist
+            '((python-mode     . python-ts-mode)
+              (lua-mode        . lua-ts-mode)
+              (cmake-mode      . cmake-ts-mode)
+              (c-mode          . c-ts-mode)
+              (c++-mode        . c++-ts-mode)
+              (js-mode         . js-ts-mode)
+              (javascript-mode . js-ts-mode)
+              (css-mode        . css-ts-mode)
+              (html-mode       . html-ts-mode)
+              (json-mode       . json-ts-mode)
+              (yaml-mode       . yaml-ts-mode)
+              (toml-mode       . toml-ts-mode)
+              (bash-mode       . bash-ts-mode)
+              (sh-mode         . bash-ts-mode))
+            treesit-auto-install-grammar 'ask
+            treesit-language-source-alist
+            '((bash "https://github.com/tree-sitter/tree-sitter-bash")
+              (c "https://github.com/tree-sitter/tree-sitter-c")
+              (cpp "https://github.com/tree-sitter/tree-sitter-cpp")
+              (cmake "https://github.com/uyha/tree-sitter-cmake")
+              (css "https://github.com/tree-sitter/tree-sitter-css")
+              (elisp "https://github.com/Wilfred/tree-sitter-elisp")
+              (go "https://github.com/tree-sitter/tree-sitter-go")
+              (html "https://github.com/tree-sitter/tree-sitter-html")
+              (javascript "https://github.com/tree-sitter/tree-sitter-javascript" "master" "src")
+              (json "https://github.com/tree-sitter/tree-sitter-json")
+              (make "https://github.com/alemuller/tree-sitter-make")
+              (python "https://github.com/tree-sitter/tree-sitter-python")
+              (toml "https://github.com/tree-sitter/tree-sitter-toml")
+              (tsx "https://github.com/tree-sitter/tree-sitter-typescript" "master" "tsx/src")
+              (typescript "https://github.com/tree-sitter/tree-sitter-typescript" "master" "typescript/src")
+              (yaml "https://github.com/ikatyang/tree-sitter-yaml")))
+    ;; avoid some errors without treesit
+    (setq treesit-extra-load-path (list (concat user-emacs-directory "var/treesit/"))))
+  (defun treesit-install-all ()
+    (interactive)
+    (mapc #'treesit-install-language-grammar (mapcar #'car treesit-language-source-alist))))
 #+end_src
 *** Complete
 **** corfu related
@@ -1774,22 +1716,16 @@ borrowed from citre, now you can always jump-back use "M-," after any jump in th
 (setup cape
   ;; don't let dabbrev take over all things
   (defalias 'cape-dabbrev-min-2 (cape-capf-prefix-length #'cape-dabbrev 2))
-  ;; (add-to-list 'completion-at-point-functions #'cape-dabbrev)
-  (add-to-list 'completion-at-point-functions #'cape-dabbrev-min-2)
-  (add-to-list 'completion-at-point-functions #'cape-elisp-block)
-  (add-to-list 'completion-at-point-functions #'cape-dict)
-  (add-to-list 'completion-at-point-functions #'cape-file)
-  )
-
+  (dolist (f '(cape-file cape-dict cape-elisp-block cape-dabbrev-min-2))
+    (add-to-list 'completion-at-point-functions f)))
 #+end_src
 ***** ispell
 #+begin_src elisp
 (setup ispell
   (:when-loaded
     ;; if not find ispell-dict, use cape as default
-    (if (null ispell-alternate-dictionary)
-        (progn
-          (setq ispell-complete-word-dict (concat nowis/doc-emacs-dir "02-binary-git/binary-files/12-spell-dict/en_US.dict"))))))
+    (unless ispell-alternate-dictionary
+      (setq ispell-complete-word-dict (concat nowis/doc-emacs-dir "02-binary-git/binary-files/12-spell-dict/en_US.dict")))))
 #+end_src
 ***** nerd-icons-corfu
 #+begin_src elisp
@@ -1847,8 +1783,6 @@ borrowed from citre, now you can always jump-back use "M-," after any jump in th
            (let ((file-name (make-temp-file "babel-lsp-")))
              (setq buffer-file-name file-name)
              (eglot-ensure)))
-
-         ;; (lsp-deferred)))
          (put ',intern-pre 'function-documentation
               (format "Enable lsp-mode in the buffer of org source block (%s)."
                       (upcase ,lang)))
@@ -1870,13 +1804,9 @@ borrowed from citre, now you can always jump-back use "M-," after any jump in th
 **** jinx
 #+begin_src elisp
 (setup jinx
-(defun check-enchant-available ()
-  "Check if enchant is available on the system."
-  (executable-find "enchant-2"))
-
-(when (check-enchant-available)
-  (dolist (hook '(text-mode-hook conf-mode-hook))
-    (add-hook hook #'jinx-mode)))
+  (when (executable-find "enchant-2")
+    (dolist (hook '(text-mode-hook conf-mode-hook))
+      (add-hook hook #'jinx-mode)))
   (:when-loaded
     (setq jinx-languages "en_US")
     (add-to-list 'jinx-exclude-regexps '(t "\\cc"))
@@ -1975,113 +1905,102 @@ borrowed from citre, now you can always jump-back use "M-," after any jump in th
         org-list-demote-modify-bullet '(("+" . "-") ("-" . "+") ("*" . "+"))
         ;; attach
         org-yank-image-save-method (concat nowis/doc-emacs-dir "30-saved-binary/01-pictures/01-org_attachs")
-        )
+        ;; src
+        org-edit-src-content-indentation 0
+        org-confirm-babel-evaluate nil
+        org-src-window-setup 'split-window-below
+        ;; export
+        org-use-sub-superscripts nil
+        org-export-with-sub-superscripts nil)
   (:when-loaded
     (require 'org-tempo) ;; so that <s is useful
     ))
 #+end_src
 ** org-src
 #+begin_src elisp
-(setup org
-  (setq org-edit-src-content-indentation 0
-        org-confirm-babel-evaluate nil
-        ;; org-src
-        org-src-window-setup 'split-window-below)
-  (:when-loaded
-    ;; org-src-lang-modes
-    (add-to-list 'org-src-lang-modes '("dot" . graphviz-dot))
-    ;; dynamic load org-src modules to accelerate speed
-    (defun nowis/org-babel-execute-src-block (&optional _arg info _params)
-      "Load language if needed"
-      (let* ((lang (format "%s" (nth 0 info)))
-             (sym (cond ((member (downcase lang) '("c" "cpp" "c++")) 'C)
-                        ((member (downcase lang) '("jupyter-python")) 'jupyter)
-                        (t (intern lang))))
-             (backup-languages org-babel-load-languages))
-        (unless (assoc sym backup-languages)
-          (condition-case err
-              (progn
-                (org-babel-do-load-languages 'org-babel-load-languages (list (cons sym t)))
-                (setq-default org-babel-load-languages (append (list (cons sym t)) backup-languages)))
-            (file-missing
-             (setq-default org-babel-load-languages backup-languages)
-             err)))))
-    (advice-add 'org-babel-execute-src-block :before #'nowis/org-babel-execute-src-block )
-    ;; didn't redisplay for now
-    ;; (add-hook 'org-babel-after-execute-hook 'org-redisplay-inline-images)
-    (defun nowis/open-generated-image ()
-      "Open the image file generated by org-babel in a new window."
-      (when (org-in-src-block-p)  ; Check if inside a code block
-        (let* ((info (org-babel-get-src-block-info)))  ; Get code block info
-          (when info
-            (let ((file (cdr (assq :file (nth 2 info)))))  ; Extract the :file parameter value
-              (when (and file (file-exists-p file))  ; Check if the file exists
-                (let ((buffer (find-file-noselect file)))  ; Get the buffer for the image file
-                  (display-buffer buffer '(display-buffer-pop-up-window))  ; Display the buffer in a new window
-                  (with-current-buffer buffer
-                    (image-mode)))))))))  ; Enable image mode for the buffer
-      (add-hook 'org-babel-after-execute-hook 'nowis/open-generated-image)
-      ))
+(with-eval-after-load 'org
+  ;; org-src-lang-modes
+  (add-to-list 'org-src-lang-modes '("dot" . graphviz-dot))
+  ;; dynamic load org-src modules to accelerate speed
+  (defun nowis/org-babel-execute-src-block (&optional _arg info _params)
+    "Load language if needed"
+    (let* ((lang (format "%s" (nth 0 info)))
+           (sym (cond ((member (downcase lang) '("c" "cpp" "c++")) 'C)
+                      ((member (downcase lang) '("jupyter-python")) 'jupyter)
+                      (t (intern lang))))
+           (backup-languages org-babel-load-languages))
+      (unless (assoc sym backup-languages)
+        (condition-case err
+            (progn
+              (org-babel-do-load-languages 'org-babel-load-languages (list (cons sym t)))
+              (setq-default org-babel-load-languages (append (list (cons sym t)) backup-languages)))
+          (file-missing
+           (setq-default org-babel-load-languages backup-languages)
+           err)))))
+  (advice-add 'org-babel-execute-src-block :before #'nowis/org-babel-execute-src-block)
+  ;; didn't redisplay for now
+  ;; (add-hook 'org-babel-after-execute-hook 'org-redisplay-inline-images)
+  (defun nowis/open-generated-image ()
+    "Open the image file generated by org-babel in a new window."
+    (when (org-in-src-block-p)  ; Check if inside a code block
+      (let* ((info (org-babel-get-src-block-info)))  ; Get code block info
+        (when info
+          (let ((file (cdr (assq :file (nth 2 info)))))  ; Extract the :file parameter value
+            (when (and file (file-exists-p file))  ; Check if the file exists
+              (let ((buffer (find-file-noselect file)))  ; Get the buffer for the image file
+                (display-buffer buffer '(display-buffer-pop-up-window))  ; Display the buffer in a new window
+                (with-current-buffer buffer
+                  (image-mode)))))))))  ; Enable image mode for the buffer
+  (add-hook 'org-babel-after-execute-hook #'nowis/open-generated-image))
 #+end_src
 ** org-ox,latex,word,markdown
 #+begin_src elisp
-(setup org
-  ;; export without _ or ^
-  (setq org-use-sub-superscripts nil)
-  (setq org-export-with-sub-superscripts nil)
-  (:when-loaded
-    (with-eval-after-load 'ox-latex
-      (setq org-latex-pdf-process '("tectonic %f")
-            org-latex-default-class "scrbook"
-            user-full-name "Lewis Liu"
-            org-latex-default-table-environment "longtable"
-            org-latex-listings 'engraved
-            org-latex-image-default-option "max size={\\textwidth}{\\textheight}" ;; use adjustbox
-            org-latex-image-default-width ""
-            )
-      ;; if you want to add svg support:
-      ;;  1. install inkscape
-      ;;  2. \usepackage[inkscapeversion=1]{svg}
-      (add-to-list 'org-latex-classes
-                   '("scrbook"
-                     "\\documentclass[openany,oneside]{scrbook}
-                      \\usepackage{ctex}
-                      \\usepackage[export]{adjustbox}
-                      \\usepackage{fancyhdr}
-                      \\pagestyle{fancy}
-                      \\fancyhead[L]{\\textsl{\\rightmark}}
-                      \\fancyhead[R]{\\textsl{\\leftmark}}
-                      \\renewcommand{\\footrulewidth}{0.4pt}"
-                     ("\\part{%s}" . "\\part*{%s}")
-                     ("\\chapter{%s}" . "\\chapter*{%s}")
-                     ("\\section{%s}" . "\\section*{%s}")
-                     ("\\subsection{%s}" . "\\subsection*{%s}")
-                     ("\\subsubsection{%s}" . "\\subsubsection*{%s}")))
-      )
+(with-eval-after-load 'ox-latex
+  (setq org-latex-pdf-process '("tectonic %f")
+        org-latex-default-class "scrbook"
+        user-full-name "Lewis Liu"
+        org-latex-default-table-environment "longtable"
+        org-latex-listings 'engraved
+        org-latex-image-default-option "max size={\\textwidth}{\\textheight}" ;; use adjustbox
+        org-latex-image-default-width ""
+        org-preview-latex-default-process 'tectonic) ;; need to install tectonic and imagemagick
+  ;; if you want to add svg support:
+  ;;  1. install inkscape
+  ;;  2. \usepackage[inkscapeversion=1]{svg}
+  (add-to-list 'org-latex-classes
+               '("scrbook"
+                 "\\documentclass[openany,oneside]{scrbook}
+                  \\usepackage{ctex}
+                  \\usepackage[export]{adjustbox}
+                  \\usepackage{fancyhdr}
+                  \\pagestyle{fancy}
+                  \\fancyhead[L]{\\textsl{\\rightmark}}
+                  \\fancyhead[R]{\\textsl{\\leftmark}}
+                  \\renewcommand{\\footrulewidth}{0.4pt}"
+                 ("\\part{%s}" . "\\part*{%s}")
+                 ("\\chapter{%s}" . "\\chapter*{%s}")
+                 ("\\section{%s}" . "\\section*{%s}")
+                 ("\\subsection{%s}" . "\\subsection*{%s}")
+                 ("\\subsubsection{%s}" . "\\subsubsection*{%s}"))))
 
-    ;; preview latex
-    (add-to-list 'org-preview-latex-process-alist
-	             '(tectonic :programs ("tectonic" "convert")
-			                :description "pdf > png"
-			                :message "you need install the programs: tectonic and imagemagick."
-			                :image-input-type "pdf"
-			                :image-output-type "png"
-			                :image-size-adjust (1.0 . 1.0)
-			                :latex-compiler
-			                ("tectonic -Z shell-escape-cwd=%o --outfmt pdf --outdir %o %f")
-			                :image-converter
-			                ("convert -density %D -trim -antialias %f -quality 300 %O")))
-    (setq org-preview-latex-default-process 'tectonic) ;; need to install tectonic and imagemagick
-
-
-    (plist-put org-format-latex-options :scale 1.0) ;; use a large preview for latex
-    ;; (setq org-preview-latex-default-process 'dvisvgm)
-    ;; export and open word
-    (add-to-list 'org-file-apps '("\\.docx\\'" . default))
-    (add-to-list 'org-structure-template-alist
-                 '("jp" . "src jupyter-python :async yes :kernel python3 :session py"))
-
-    ))
+(with-eval-after-load 'org
+  ;; preview latex
+  (add-to-list 'org-preview-latex-process-alist
+               '(tectonic :programs ("tectonic" "convert")
+                          :description "pdf > png"
+                          :message "you need install the programs: tectonic and imagemagick."
+                          :image-input-type "pdf"
+                          :image-output-type "png"
+                          :image-size-adjust (1.0 . 1.0)
+                          :latex-compiler
+                          ("tectonic -Z shell-escape-cwd=%o --outfmt pdf --outdir %o %f")
+                          :image-converter
+                          ("convert -density %D -trim -antialias %f -quality 300 %O")))
+  (plist-put org-format-latex-options :scale 1.0) ;; use a large preview for latex
+  ;; export and open word
+  (add-to-list 'org-file-apps '("\\.docx\\'" . default))
+  (add-to-list 'org-structure-template-alist
+               '("jp" . "src jupyter-python :async yes :kernel python3 :session py")))
 #+end_src
 ** org-clock
 #+begin_src elisp
@@ -2131,51 +2050,41 @@ borrowed from citre, now you can always jump-back use "M-," after any jump in th
 ** ui
 *** org mode basic style
 #+begin_src elisp
-(setup org
+(with-eval-after-load 'org
+  (defface my-org-emphasis-bold
+    '((default :inherit bold)
+      (((class color) (min-colors 88) (background light))
+       :foreground "pale violet red")
+      (((class color) (min-colors 88) (background dark))
+       :foreground "pale violet red"))
+    "My bold emphasis for Org.")
+  (defface my-org-emphasis-italic
+    '((default :inherit italic)
+      (((class color) (min-colors 88) (background light))
+       :foreground "green3")
+      (((class color) (min-colors 88) (background dark))
+       :foreground "green3"))
+    "My italic emphasis for Org.")
+  (defface my-org-emphasis-underline
+    '((default :inherit underline)
+      (((class color) (min-colors 88) (background light))
+       :foreground "#813e00")
+      (((class color) (min-colors 88) (background dark))
+       :foreground "#d0bc00"))
+    "My underline emphasis for Org.")
   (setq org-auto-align-tags nil
         org-tags-column 0
         org-ellipsis " "
         org-hide-emphasis-markers t
-        org-pretty-entities nil ;; can perfor ui such as "a_words" into small "awords"
+        org-pretty-entities nil ;; can perform ui such as "a_words" into small "awords"
         org-habit-graph-column 50
-        ;; Agenda styling
         org-agenda-tags-column 0
-        )
-  (:when-loaded
-    ;; emphasis
-    (defface my-org-emphasis-bold
-      '((default :inherit bold)
-        (((class color) (min-colors 88) (background light))
-         :foreground "pale violet red")
-        (((class color) (min-colors 88) (background dark))
-         :foreground "pale violet red"))
-      "My bold emphasis for Org.")
-
-    (defface my-org-emphasis-italic
-      '((default :inherit italic)
-        (((class color) (min-colors 88) (background light))
-         :foreground "green3")
-        (((class color) (min-colors 88) (background dark))
-         :foreground "green3"))
-      "My italic emphasis for Org.")
-
-    (defface my-org-emphasis-underline
-      '((default :inherit underline)
-        (((class color) (min-colors 88) (background light))
-         :foreground "#813e00")
-        (((class color) (min-colors 88) (background dark))
-         :foreground "#d0bc00"))
-      "My underline emphasis for Org.")
-
-    (setq org-emphasis-alist
-          '(("*" my-org-emphasis-bold)
-            ("/" my-org-emphasis-italic)
-            ("_" underline)
-            ("=" org-verbatim verbatim)
-            ("~" org-code verbatim)
-            ("+" (:strike-through t))
-            ))
-    ))
+        org-emphasis-alist '(("*" my-org-emphasis-bold)
+                             ("/" my-org-emphasis-italic)
+                             ("_" underline)
+                             ("=" org-verbatim verbatim)
+                             ("~" org-code verbatim)
+                             ("+" (:strike-through t)))))
 #+end_src
 *** org beatury
 #+begin_src elisp
@@ -2190,6 +2099,8 @@ borrowed from citre, now you can always jump-back use "M-," after any jump in th
                (compose-region (match-beginning 1) (match-end 1)
                                ,(nth i star-list))))))))
     ))
+#+end_src
+#+begin_src elisp
 ;; ┌───────────────┐
 ;; │ prettify-mode │
 ;; └───────────────┘
@@ -2202,25 +2113,25 @@ Always allow composition for org-mode keywords, regardless of context."
    ((string-prefix-p ":" match) t)
    (t (prettify-symbols-default-compose-p start end match))))
 
+(defun nowis/org-setup-prettify ()
+  "Set up prettify-symbols for org-mode."
+  (setq-local prettify-symbols-alist
+              '(("#+begin_src" . ?)
+                ("#+end_src" . ?)
+                ("#+BEGIN_SRC" . ?)
+                ("#+END_SRC" . ?)
+                ("#+begin_tool" . ?󱁤)
+                ("#+end_tool" . ?)
+                ("#+begin_quote" . ?󱀢)
+                ("#+end_quote" . ?)
+                (":PROPERTIES:" . ?)
+                (":SRSITEMS:" . ?)
+                (":LOGBOOK:" . ?)
+                (":END:" . ?)))
+  (setq-local prettify-symbols-compose-predicate #'my/org-prettify-compose-p)
+  (prettify-symbols-mode))
 
-(add-hook 'org-mode-hook (lambda()
-                           (setq prettify-symbols-alist
-                                 '(("#+begin_src" . ?)
-                                   ("#+end_src" . ?)
-                                   ("#+BEGIN_SRC" . ?)
-                                   ("#+END_SRC" . ?)
-                                   ("#+begin_tool" . ?󱁤)
-                                   ("#+end_tool" . ?)
-                                   ("#+begin_quote" . ?󱀢)
-                                   ("#+end_quote" . ?)
-                                   (":PROPERTIES:" . ?)
-                                   (":SRSITEMS:" . ?)
-                                   (":LOGBOOK:" . ?)
-                                   (":END:" . ?)
-                                   ))
-                           (setq prettify-symbols-compose-predicate #'my/org-prettify-compose-p)
-                           (prettify-symbols-mode)
-                           ))
+(add-hook 'org-mode-hook #'nowis/org-setup-prettify)
 #+end_src
 *** org-appear
 #+begin_src elisp
@@ -2441,25 +2352,26 @@ In short, you will need 3 files:
              (gtd-files (when (file-exists-p gtd-dir)
                           (directory-files-recursively gtd-dir "\\.org$")))
              )
-        (setq org-agenda-files gtd-files)
-
-      (setq org-refile-files
-            (cl-remove-if (lambda (file) (string-match-p "inbox.org$" file))
-                          org-agenda-files))
-      (add-to-list 'org-refile-files (expand-file-name (concat org-directory "/org-inc/20251201T112101--incubate.org")))
-      ))
+        (setq org-agenda-files gtd-files
+              org-refile-files (cl-remove-if (lambda (file) (string-match-p "inbox.org$" file))
+                                             org-agenda-files))
+        (add-to-list 'org-refile-files (expand-file-name (concat org-directory "/org-inc/20251201T112101--incubate.org")))
+        ))
     (org-agenda-update-agenda-files)
     ))
 
 #+end_src
 *** todos
+:PROPERTIES:
+:ID:       20260228T154701_190172
+:END:
 #+begin_src elisp
 (setq org-enforce-todo-dependencies t
       org-enforce-todo-checkbox-dependencies t
-      )
-(setq org-log-done 'note)
-(setq org-todo-keywords
-      '((sequence "TODO(t)" "NEXT(n)" "WAIT(w)" "SMDY(s)" "|" "AXED(a)" "DONE(d)")))
+      org-log-done 'note
+      org-todo-keywords '((sequence "TODO(t)" "NEXT(n)" "WAIT(w)" "SMDY(s)" "|" "AXED(a)" "DONE(d)"))
+      org-priority-lowest 69  ;; E
+      org-priority-default 68) ;; D
 
 (defun log-todo-next-creation-date (&rest ignore)
   "Log NEXT creation time in the property drawer under the key 'ACTIVATED'"
@@ -2467,9 +2379,6 @@ In short, you will need 3 files:
              (not (org-entry-get nil "ACTIVATED")))
     (org-entry-put nil "ACTIVATED" (format-time-string "[%Y-%m-%d]"))))
 (add-hook 'org-after-todo-state-change-hook #'log-todo-next-creation-date)
-(setq org-priority-lowest 69) ;; E
-(setq org-priority-default 68) ;; D
-
 #+end_src
 *** capture
 #+begin_src elisp
@@ -2554,108 +2463,94 @@ See also `org-save-all-org-buffers'"
       (message "Saving org-agenda-files buffers... done"))
 
     ;; Add it after refile
-    (advice-add 'org-refile :after
-                (lambda (&rest _)
-                  (gtd-save-org-buffers)))
+    (advice-add 'org-refile :after #'gtd-save-org-buffers)
 
     ))
 #+end_src
 *** agenda
 #+begin_src elisp
-(defun org-get-parent-heading ()
-  (save-excursion
-    (when (org-up-heading-safe)
-      (let ((parent (org-get-heading 'no-tags 'no-todo 'no-priority 'no-comment)))
-        (truncate-string-to-width parent 20 nil ?\s)))))
-(defun nowis/align-to-window-center(text)
-  (let* ((title text)
-         (width (window-width (get-buffer-window)))
-         (pad (/ (1+ (- width (string-width title))) 2)))
-    (concat (make-string (max 0 pad) ? ) title)))
-
-(defvar nowis/agenda-prefix-format-enhanced
-  "[%-4e] :"
-  "Enhanced agenda prefix format.")
-
-(defun my/agenda-sort-by-parent (a b)
-  "Sort agenda items by parent heading."
-  (let ((ha (org-with-point-at (get-text-property 0 'org-marker a)
-              (or (org-get-parent-heading) "")))
-        (hb (org-with-point-at (get-text-property 0 'org-marker b)
-              (or (org-get-parent-heading) ""))))
-    (cond
-     ((string< ha hb) 1)
-     ((string< hb ha) 1)
-     (t 0))))
-
-(setq org-agenda-cmp-user-defined #'my/agenda-sort-by-parent)
-
-(setq org-agenda-prefix-format
-      '((agenda . " %i %-12:c%?-12t% s[%-4e]") (todo . "[%-4e]: ") (tags . "[%-4e]: ")
-        (search . " %i %-12:c")))
-
-(defun my/agenda-add-parent-separators ()
-  "Add separator lines between different parent groups, depends on sorted by parent."
+;;; ─── 分组（基于 Category）────────────────────────
+(defun nowis/agenda-add-category-separators ()
+  "在不同 category 分组间插入分隔标题行。需在排序完成后运行。"
   (save-excursion
     (goto-char (point-min))
-    (let (last-parent)
+    (let ((last-category nil))
       (while (not (eobp))
-        (let ((marker (get-text-property (point) 'org-marker)))
-          (when marker
-            (let ((parent (org-with-point-at marker
-                            (or (org-get-parent-heading) ""))))
-              (when (not (string= parent (or last-parent "")))
-                (let ((inhibit-read-only t))
-                  (insert (propertize
-                           (concat " " parent "\n")
-                           'face 'org-agenda-structure)))
-                (setq last-parent parent)))))
+        (when-let* ((cat (get-text-property (point) 'org-category)))
+          (unless (equal cat last-category)
+            (let ((inhibit-read-only t))
+              (insert (propertize (concat "  ◆ " cat "\n")
+                                  'face 'org-agenda-structure)))
+            (setq last-category cat)))
         (forward-line)))))
 
-(add-hook 'org-agenda-finalize-hook 'my/agenda-add-parent-separators)
+(add-hook 'org-agenda-finalize-hook #'nowis/agenda-add-category-separators)
 
-(defmacro nowis/create-agenda-command (key description tag)
-  `(list ,key ,description
-         '(
-           (agenda ""
-                   ((org-agenda-overriding-header (nowis/align-to-window-center " Today's Target "))
-                    (org-agenda-span 'day)
-                    (org-agenda-skip-function
-                     '(org-agenda-skip-if nil '(todo done)))))
-           (tags-todo "action+next"
-                      ((org-agenda-overriding-header (nowis/align-to-window-center "One-Step Action"))
-                       (org-agenda-skip-function '(org-agenda-skip-entry-if 'scheduled))
-                       (org-agenda-sorting-strategy '(todo-state-up priority-down timestamp-up))
-                       ))
-           (tags-todo "action+project"
-                      ((org-agenda-overriding-header (nowis/align-to-window-center "Multi-Steps Action"))
-                       (org-agenda-skip-function '(org-agenda-skip-entry-if 'scheduled))
-                       (org-agenda-sorting-strategy '(user-defined-up todo-state-up priority-down timestamp-up))
-                       ))
-           (tags-todo "inbox"
-                      ((org-agenda-overriding-header (nowis/align-to-window-center "Inbox"))
-                       (org-agenda-sorting-strategy '(todo-state-up priority-down timestamp-up))
-                       ))
-           (tags ,(concat "CLOSED>=\"<today>\"" tag)
-                 ((org-agenda-overriding-header (nowis/align-to-window-center "Completed today"))
-                  (org-agenda-sorting-strategy '(tsia-down))
-                  ))
-           (tags ,(concat "CLOSED>=\"<-1w>\"" tag)
-                 ((org-agenda-overriding-header (nowis/align-to-window-center "Completed last 7 days"))
-                  (org-agenda-sorting-strategy '(tsia-down))
-                  ))
-           )))
+;;; ─── 显示格式 ───────────────────────────────────────────
+(defun nowis/center-header (text)
+  "将 TEXT 在当前 agenda 窗口中居中。"
+  (let* ((width (window-width (get-buffer-window)))
+         (pad (max 0 (/ (- width (string-width text)) 2))))
+    (concat (make-string pad ?\s) text)))
+
+(setq org-agenda-prefix-format
+      '((agenda . " %i %-12:c%?-12t% s[%-4e]")
+        (todo   . "[%-4e]: ")
+        (tags   . "[%-4e]: ")
+        (search . " %i %-12:c")))
+
+(setq org-agenda-hide-tags-regexp
+      "\\(inbox\\|action\\|journal\\|project\\|next\\)")
+
+;;; ─── Agenda 视图构建 ────────────────────────────────────
+(defun nowis/make-agenda-command (key description tag)
+  "生成 GTD agenda 自定义命令，TAG 用于过滤（空字符串表示不过滤）。"
+  (let ((closed-tag (concat "CLOSED>=\"<today>\"" tag))
+        (week-tag   (concat "CLOSED>=\"<-1w>\""  tag)))
+    `(,key ,description
+      ((agenda ""
+               ((org-agenda-overriding-header (nowis/center-header "Today's Target"))
+                (org-agenda-span 'day)
+                (org-agenda-skip-function
+                 '(org-agenda-skip-if nil '(todo done)))))
+
+       (tags-todo "action+next"
+                  ((org-agenda-overriding-header (nowis/center-header "One Step Action"))
+                   (org-agenda-skip-function
+                    '(org-agenda-skip-entry-if 'scheduled))
+                   (org-agenda-sorting-strategy
+                    '(category-keep todo-state-up priority-down timestamp-up))))
+       (tags-todo "action+project"
+                  ((org-agenda-overriding-header (nowis/center-header "Multi Step Action"))
+                   (org-agenda-skip-function
+                    '(org-agenda-skip-entry-if 'scheduled))
+                   (org-agenda-sorting-strategy
+                    '(category-keep todo-state-up priority-down timestamp-up))))
+
+       (tags-todo "inbox"
+                  ((org-agenda-overriding-header (nowis/center-header "Inbox"))
+                   (org-agenda-sorting-strategy
+                    '(category-keep todo-state-up priority-down timestamp-up))))
+
+       (tags ,closed-tag
+             ((org-agenda-overriding-header (nowis/center-header "Completed Today"))
+              (org-agenda-sorting-strategy '(category-keep tsia-down))))
+
+       (tags ,week-tag
+             ((org-agenda-overriding-header (nowis/center-header "Completed Last 7 Days"))
+              (org-agenda-sorting-strategy '(category-keep tsia-down))))))))
 
 (setq org-agenda-custom-commands
-      (list (nowis/create-agenda-command "g" "GTD" "")
-            (nowis/create-agenda-command "w" "Work" "+work")
-            ))
-;; agenda clockreport
+      (list (nowis/make-agenda-command "g" "GTD"  "")
+            (nowis/make-agenda-command "w" "Work" "+work")))
+
+;;; ─── Clock 设置 ─────────────────────────────────────────
+
 (setq org-agenda-start-with-clockreport-mode nil
-      org-agenda-clockreport-parameter-plist '(:link t :maxlevel 5 :properties ("Effort"))
+      org-agenda-clockreport-parameter-plist
+      '(:link t :maxlevel 5 :properties ("Effort"))
       org-clock-out-remove-zero-time-clocks t)
-;; agenda style
-(setq org-agenda-hide-tags-regexp "\\(inbox\\|action\\|journal\\|project\\|next\\)")
+
 #+end_src
 *** archive
 #+begin_src elisp
@@ -2812,7 +2707,7 @@ Keys defined here will override existing bindings when the mode is active.")
     (defun nowis/org-yank-image-from-clipboard ()
       "paste pictures from powershell when using wsl, others use yank-media"
       (interactive)
-      (if (string= "Arch" (getenv "WSL_DISTRO_NAME"))
+      (if nowis/is-wsl
           (nowis/org-yank-image-from-clipboard-wsl)
         (nowis/org-yank-image-from-clipboard-native)))
     (:with-map org-mode-map
@@ -2827,6 +2722,9 @@ Keys defined here will override existing bindings when the mode is active.")
   )
 #+end_src
 ** org-ladder
+:PROPERTIES:
+:ID:       20260228T155259_728458
+:END:
 #+begin_src elisp
 (setup org-ladder
   (let* ((gtd-dir (expand-file-name "gtd" org-directory))
@@ -3122,11 +3020,9 @@ Simple distraction-free editing. I use darkroom instead of writeroom because it'
 ** server
 #+begin_src elisp
 (setup server
-   (progn
-     (require 'server)
-     (unless (server-running-p)
-       (server-start))
-   ))
+  (require 'server)
+  (unless (server-running-p)
+    (server-start)))
 #+end_src
 ** macos-ocr
 #+begin_src elisp
@@ -3154,12 +3050,8 @@ ESUP - Emacs Start Up Profiler
                        ("j" . "<down>")
                        ("k" . "<up>")
                        ("l" . "<right>")))
-      (define-key meow-normal-state-keymap
-                  (kbd (car binding))
-                  (kbd (cdr binding))))
-    (define-key uniline-mode-map (kbd "M-i") #'uniline-launch-interface)
-    )
-  )
+      (keymap-set meow-normal-state-keymap (car binding) (cdr binding)))
+    (keymap-set uniline-mode-map "M-i" #'uniline-launch-interface)))
 #+end_src
 ** manage-web-bookmarks
 #+begin_src elisp
@@ -3227,39 +3119,35 @@ ESUP - Emacs Start Up Profiler
 These codes are used to solve copy & paste problems under wslg inside win10/win11
 #+begin_src elisp
 ;; solve the problem of copying from windows to wslg
-(if (string= "Arch" (getenv "WSL_DISTRO_NAME"))
-    (progn
-      ;; (set-clipboard-coding-system 'gbk-dos)
-      ;; solve the problem of copying from wslg to windows
-      (defun wsl-copy-region-to-clipboard (start end)
-        "Copy region to Windows clipboard."
-        (interactive "r")
-        (call-process-region start end "wl-copy" nil 0))
+(when nowis/is-wsl
+  ;; (set-clipboard-coding-system 'gbk-dos)
+  ;; solve the problem of copying from wslg to windows
+  (defun wsl-copy-region-to-clipboard (start end)
+    "Copy region to Windows clipboard."
+    (interactive "r")
+    (call-process-region start end "wl-copy" nil 0))
 
-      (defun wsl-clipboard-to-string ()
-        "Return Windows clipboard as string."
-        (let ((coding-system-for-read 'dos))
-          (substring; remove added trailing \n
-           (shell-command-to-string
-            "wl-paste") 0 -1)))
-      (defun wsl-paste-from-clipboard (arg)
-        "Insert Windows clipboard at point. With prefix ARG, also add to kill-ring"
-        (interactive "P")
-        (let ((clip (wsl-clipboard-to-string)))
-          (insert clip)
-          (if arg (kill-new clip))))
-      (global-set-key [remap kill-ring-save] #'wsl-copy-region-to-clipboard)
-      (global-set-key [remap meow-yank] #'wsl-paste-from-clipboard)
-      ))
+  (defun wsl-clipboard-to-string ()
+    "Return Windows clipboard as string."
+    (let ((coding-system-for-read 'dos))
+      (substring; remove added trailing \n
+       (shell-command-to-string
+        "wl-paste") 0 -1)))
+  (defun wsl-paste-from-clipboard (arg)
+    "Insert Windows clipboard at point. With prefix ARG, also add to kill-ring"
+    (interactive "P")
+    (let ((clip (wsl-clipboard-to-string)))
+      (insert clip)
+      (if arg (kill-new clip))))
+  (global-set-key [remap kill-ring-save] #'wsl-copy-region-to-clipboard)
+  (global-set-key [remap meow-yank] #'wsl-paste-from-clipboard))
 #+end_src
 ** android
 #+begin_src elisp
-(if (eq system-type 'android)
-    (progn
-      (setq touch-screen-display-keyboard t)
-      (setq overriding-text-conversion-style nil)
-      ))
-(defun android-toggle-keyboard()
+(when (eq system-type 'android)
+  (setq touch-screen-display-keyboard t
+        overriding-text-conversion-style nil))
+(defun android-toggle-keyboard ()
   (interactive)
   (if touch-screen-display-keyboard
       (progn
@@ -3269,10 +3157,11 @@ These codes are used to solve copy & paste problems under wslg inside win10/win1
          'android-toggle-keyboard
          :help "Toggle keyboard")
         (message "Disable virtual keyboard"))
-    (setq touch-screen-display-keyboard t)
-    (tool-bar-add-item
-     "keyboard" 'android-toggle-keyboard
-     'android-toggle-keyboard
-     :help "Toggle keyboard")
-    (message "Enable virtual keyboard")))
+    (progn
+      (setq touch-screen-display-keyboard t)
+      (tool-bar-add-item
+       "keyboard" 'android-toggle-keyboard
+       'android-toggle-keyboard
+       :help "Toggle keyboard")
+      (message "Enable virtual keyboard"))))
 #+end_src
