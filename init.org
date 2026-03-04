@@ -618,8 +618,9 @@ Maybe I should add a new state.
 
 ;; fixed font
 (setq lewis-fixed-font
-      (nowis/first-available-font '("JetBrains Maple Mono"
+      (nowis/first-available-font '(
                                     "Maple Mono NF CN"
+                                    "JetBrains Maple Mono"
                                     "Maple Mono SC NF"
                                     "Unifont"
                                     ;; "InconsolataGo QiHei NF"
@@ -2494,10 +2495,11 @@ See also `org-save-all-org-buffers'"
     (concat (make-string pad ?\s) text)))
 
 (setq org-agenda-prefix-format
-      '((agenda . " %i %-12:c%?-12t% s[%-4e]")
-        (todo   . "[%-4e]: ")
-        (tags   . "[%-4e]: ")
-        (search . " %i %-12:c")))
+      ;; '((agenda . " %i %-12:c%?-12t% s[%-4e]")
+      '((agenda . " %i %?-12t% s[%-4e] ")
+      (todo   . "[%-4e]: ")
+      (tags   . "[%-4e]: ")
+      (search . " %i %-12:c")))
 
 (setq org-agenda-hide-tags-regexp
       "\\(inbox\\|action\\|journal\\|project\\|next\\)")
@@ -2508,37 +2510,37 @@ See also `org-save-all-org-buffers'"
   (let ((closed-tag (concat "CLOSED>=\"<today>\"" tag))
         (week-tag   (concat "CLOSED>=\"<-1w>\""  tag)))
     `(,key ,description
-      ((agenda ""
-               ((org-agenda-overriding-header (nowis/center-header "Today's Target"))
-                (org-agenda-span 'day)
-                (org-agenda-skip-function
-                 '(org-agenda-skip-if nil '(todo done)))))
+           ((agenda ""
+                    ((org-agenda-overriding-header (nowis/center-header "Today's Target"))
+                     (org-agenda-span 'day)
+                     (org-agenda-skip-function
+                      '(org-agenda-skip-if nil '(todo done)))))
 
-       (tags-todo "action+next"
-                  ((org-agenda-overriding-header (nowis/center-header "One Step Action"))
-                   (org-agenda-skip-function
-                    '(org-agenda-skip-entry-if 'scheduled))
-                   (org-agenda-sorting-strategy
-                    '(category-keep todo-state-up priority-down timestamp-up))))
-       (tags-todo "action+project"
-                  ((org-agenda-overriding-header (nowis/center-header "Multi Step Action"))
-                   (org-agenda-skip-function
-                    '(org-agenda-skip-entry-if 'scheduled))
-                   (org-agenda-sorting-strategy
-                    '(category-keep todo-state-up priority-down timestamp-up))))
+            (tags-todo "action+next"
+                       ((org-agenda-overriding-header (nowis/center-header "One Step Action"))
+                        (org-agenda-skip-function
+                         '(org-agenda-skip-entry-if 'scheduled))
+                        (org-agenda-sorting-strategy
+                         '(category-keep todo-state-up priority-down timestamp-up))))
+            (tags-todo "action+project"
+                       ((org-agenda-overriding-header (nowis/center-header "Multi Step Action"))
+                        (org-agenda-skip-function
+                         '(org-agenda-skip-entry-if 'scheduled))
+                        (org-agenda-sorting-strategy
+                         '(category-keep todo-state-up priority-down timestamp-up))))
 
-       (tags-todo "inbox"
-                  ((org-agenda-overriding-header (nowis/center-header "Inbox"))
-                   (org-agenda-sorting-strategy
-                    '(category-keep todo-state-up priority-down timestamp-up))))
+            (tags-todo "inbox"
+                       ((org-agenda-overriding-header (nowis/center-header "Inbox"))
+                        (org-agenda-sorting-strategy
+                         '(category-keep todo-state-up priority-down timestamp-up))))
 
-       (tags ,closed-tag
-             ((org-agenda-overriding-header (nowis/center-header "Completed Today"))
-              (org-agenda-sorting-strategy '(category-keep tsia-down))))
+            (tags ,closed-tag
+                  ((org-agenda-overriding-header (nowis/center-header "Completed Today"))
+                   (org-agenda-sorting-strategy '(category-keep tsia-down))))
 
-       (tags ,week-tag
-             ((org-agenda-overriding-header (nowis/center-header "Completed Last 7 Days"))
-              (org-agenda-sorting-strategy '(category-keep tsia-down))))))))
+            (tags ,week-tag
+                  ((org-agenda-overriding-header (nowis/center-header "Completed Last 7 Days"))
+                   (org-agenda-sorting-strategy '(category-keep tsia-down))))))))
 
 (setq org-agenda-custom-commands
       (list (nowis/make-agenda-command "g" "GTD"  "")
@@ -2985,14 +2987,6 @@ Simple distraction-free editing. I use darkroom instead of writeroom because it'
   (setq pi-coding-agent-tool-preview-lines 1
         pi-coding-agent-bash-preview-lines 1))
 #+end_src
-*** agent-shell
-#+begin_src elisp
-(setup acp)
-(setup shell-maker)
-(setup agent-shell)
-(setup ageht-shell-manager)
-#+end_src
-
 ** webjump
 #+begin_src elisp
 (setup webjump
