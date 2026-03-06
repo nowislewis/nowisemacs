@@ -2371,8 +2371,9 @@ In short, you will need 3 files:
       org-enforce-todo-checkbox-dependencies t
       org-log-done 'note
       org-todo-keywords '((sequence "TODO(t)" "NEXT(n)" "WAIT(w)" "SMDY(s)" "|" "AXED(a)" "DONE(d)"))
-      org-priority-lowest 69  ;; E
-      org-priority-default 68) ;; D
+      ;; org-priority-lowest 69  ;; E
+      ;; org-priority-default 67 ;; C
+      )
 
 (defun log-todo-next-creation-date (&rest ignore)
   "Log NEXT creation time in the property drawer under the key 'ACTIVATED'"
@@ -2646,6 +2647,11 @@ See also `org-save-all-org-buffers'"
     )
   )
     #+end_src
+** org-sm
+#+begin_src elisp
+(setup org-sm
+(setq org-sm-files   (directory-files-recursively "~/Documents/code/sm" "\\.org$")))
+#+end_src
 ** nowis-read-mode
 #+begin_src elisp
 (defgroup nowis-read nil
@@ -2769,6 +2775,13 @@ Simple distraction-free editing. I use darkroom instead of writeroom because it'
   (:match-file "\\.md\\'")
   (custom-set-faces
    '(markdown-header-face-1 ((t (:inherit org-level-2)))))
+  )
+#+end_src
+** md-ts-mode
+#+begin_src elisp
+(setup md-ts-mode
+  (custom-set-faces
+   '(md-ts-heading-1 ((t (:inherit org-level-2)))))
   )
 #+end_src
 * tools
