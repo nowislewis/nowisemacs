@@ -557,14 +557,11 @@ Maybe I should add a new state.
  '("n" . notes-leader-map)
  ;;w workspace
  '("TAB" . tab-leader-map)
- ;; ;; org gtd
- ;; '("d" . org-gtd-leader-map)
  ;; ui
  '("t" . toggle-leader-map)
  ;; '("d" . dictionary-leader-map)
-
- ;; org-srs review
- '("r" . org-srs-transient-map)
+ ;; org-sm review
+ '("r" . org-sm-transient-map)
  )
 #+end_src
 ** which-key
@@ -2389,7 +2386,7 @@ In short, you will need 3 files:
 (setup org
   (:when-loaded
     (defvar nowis/org-inc-topic-capture-file-path
-      (concat org-inc-directory "20251201T112101--incubate.org")
+      (concat org-sm-directory "20251201T112101--incubate.org")
       "topic capture file")
 
     (defun nowis/org-inc-topic-capture-file ()
@@ -2399,7 +2396,7 @@ otherwise use the saved file."
       (if current-prefix-arg
           (let ((selected-file
                  (read-file-name "Choose target topic capture file: "
-                                 org-inc-directory
+                                 org-sm-directory
                                  nil
                                  t
                                  nil
@@ -2575,82 +2572,31 @@ See also `org-save-all-org-buffers'"
     (org-archive-subtree)))
 
 #+end_src
-** org-srs
-#+begin_src elisp
-(setup lisp-fsrs)
-(setup org-srs
-  (add-hook 'org-mode-hook #'org-cloze-overlay-mode)
-
- (defun org-cloze-fontify (limit)
-  "Fontify cloze markup up to LIMIT."
-  (let (found)
-    (while (re-search-forward "{{\\([0-9a-z]+\\)}{\\([^}]+\\)}}" limit t)
-      (add-text-properties (match-beginning 0) (match-beginning 2) '(invisible t))
-      (add-text-properties (match-beginning 2) (match-end 2) '(face (:foreground "gold1")))
-      (add-text-properties (match-end 2) (match-end 0) '(invisible t))
-      (setq found t))
-    found))
- (define-minor-mode org-cloze-overlay-mode
-  "Toggle org-cloze-overlay-mode."
-  :lighter " Cloze"
-  (if org-cloze-overlay-mode
-      (progn
-        (font-lock-add-keywords nil '((org-cloze-fontify . 0)) t)
-        (font-lock-flush))
-    (font-lock-remove-keywords nil '((org-cloze-fontify . 0)))
-    (font-lock-flush)))
-
- (:when-loaded
-   ;; (org-srs-ui-mode +1)
-   )
-  )
-#+end_src
-** org-inc
-#+begin_src elisp
-(setup org-inc
-  (:autoload org-inc-continue)
-  (:autoload org-inc-create)
-  (defun nowis/org-inc-continue-interactive ()
-    "Call org-inc-continue interactively."
-    (interactive)
-    (call-interactively 'org-inc-continue))
-
-  (transient-define-prefix org-srs-transient-map()
-    "Define transient-key map for org-fc functions"
-    [
-     ["review"
-      ("r" "continue" nowis/org-inc-continue-interactive :transient t)
-      ("c" "create" org-inc-create)
-      ("a" "abort" org-inc-abort)
-      ("d" "dismiss" org-inc-dismiss)
-      ("p" "Priority" org-inc-priority)
-      ("P" "postpone" org-inc-postpone)
-      ]
-     ["rate"
-      ("1" "easy" org-srs-review-rate-easy :transient t)
-      ("2" "good" org-srs-review-rate-good :transient t)
-      ("3" "hard" org-srs-review-rate-hard :transient t)
-      ("4" "again" org-srs-review-rate-again :transient t)
-      ]])
-
-  (setq org-inc-directory (expand-file-name "org-inc/" org-directory)
-        org-srs-item-confirm #'org-srs-item-confirm-command)
-  (:with-map org-mode-map
-    (:bind "C-M-<return>" org-inc-continue
-           "<f4>" org-inc-continue
-           ))
-  (:when-loaded
-    (add-hook 'org-mode-hook #'org-inc-overlay-mode)
-
-    (nowis/smart-bind "M-z" #'region-active-p #'org-inc-extract)
-    (nowis/smart-bind "M-c" #'region-active-p #'org-srs-item-cloze-dwim)
-    )
-  )
-    #+end_src
 ** org-sm
 #+begin_src elisp
 (setup org-sm
-(setq org-sm-files   (directory-files-recursively "~/Documents/code/sm" "\\.org$")))
+  (:hook-into org-mode)
+  (setq org-sm-directory  (expand-file-name "org-inc/" org-directory))
+  (setq org-sm-file-filter-regexp "[^/]*srs[^/]*\\.org$")
+  (nowis/smart-bind "M-z" #'region-active-p #'org-sm-item-extract)
+  (transient-define-prefix org-sm-transient-map()
+    "Define transient-key map for org-sm functions"
+    [
+     ["review"
+      ("r" "review confirm" org-sm-review-confirm :transient t)
+      ("s" "start-review" org-sm-review-start)
+      ("a" "abort" org-sm-review-abort)
+      ("l" "list" org-sm-review-list)
+      ]
+     ["item"
+      ("m" "mark" org-sm-item-mark)
+      ("d" "dismiss" org-sm-item-dismiss)
+      ("z" "extract" org-sm-item-extract)
+      ]
+     ]
+    )
+  )
+
 #+end_src
 ** nowis-read-mode
 #+begin_src elisp
