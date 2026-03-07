@@ -312,7 +312,7 @@ Maybe I should add a new state.
   (defun toggle-between-meow-normal-motion()
     (interactive)
     (if meow-motion-mode (meow-normal-mode) (meow-motion-mode)))
-  (global-set-key (kbd "M-\\") #'toggle-between-meow-normal-motion)
+  (keymap-global-set "M-\\" #'toggle-between-meow-normal-motion)
 
   (defun surround-region-with-char (char)
     "用指定字符包围选中区域"
@@ -364,19 +364,16 @@ Maybe I should add a new state.
 #+end_src
 *** find-file
 #+begin_src elisp
+(defun nowis/find-config-file   () (interactive) (find-file nowis/config-file))
+(defun nowis/find-doc-emacs-dir () (interactive) (find-file nowis/doc-emacs-dir))
+(defun nowis/find-dotfiles      () (interactive) (find-file "~/dotfiles"))
+
 (transient-define-prefix file-leader-map()
   "Define leader-key map for file-related functions"
   [["config"
-    ("p" "personal emacs config" (lambda()
-                                   (interactive)
-                                   (find-file nowis/config-file)))
-    ("e" "emacs documents" (lambda()
-                             (interactive)
-                             (find-file nowis/doc-emacs-dir)))
-    ("d" "dot files" (lambda()
-                       (interactive)
-                       (find-file "~/dotfiles")))
-    ]
+    ("p" "personal emacs config" nowis/find-config-file)
+    ("e" "emacs documents"       nowis/find-doc-emacs-dir)
+    ("d" "dot files"             nowis/find-dotfiles)]
    ["history"
     ("r" "recent file" consult-recent-file)]])
 #+end_src
@@ -482,9 +479,9 @@ Maybe I should add a new state.
     ]
    ["capture"
     ("c" "capture" org-capture)
-    ("e" "extract topic" org-inc-topic-capture-from-clipboard)
+    ("e" "extract topic" nowis/org-sm-topic-capture-from-clipboard)
     ("E" "extract topic with prefix"
-     (lambda () (interactive) (org-inc-topic-capture-from-clipboard '(-1))))
+     (lambda () (interactive) (nowis/org-sm-topic-capture-from-clipboard '(-1))))
     ]
    ["life"
     ("L" "life" life-calendar)
@@ -996,19 +993,19 @@ diff-hl-mode highlights uncommitted changes on the left side of the window (area
 #+end_src
 *** search other cwd
 #+begin_src elisp
-(defun lewis/ripgrep-search-other-dir()
-  (interactive)
+(defun nowis/call-with-prefix (cmd)
+  "Call CMD interactively with prefix arg, prompting for directory."
   (let ((current-prefix-arg '(-1)))
-    (call-interactively 'consult-ripgrep)))
+    (call-interactively cmd)))
 
-(defun lewis/ripgrep-search-notes()
-  (interactive)
-  (consult-ripgrep (concat nowis/doc-emacs-dir "01-orgmode")))
+(defun lewis/ripgrep-search-other-dir ()
+  (interactive) (nowis/call-with-prefix #'consult-ripgrep))
 
-(defun lewis/find-file-other-dir()
-  (interactive)
-  (let ((current-prefix-arg '(-1)))
-    (call-interactively 'consult-fd)))
+(defun lewis/ripgrep-search-notes ()
+  (interactive) (consult-ripgrep (concat nowis/doc-emacs-dir "01-orgmode")))
+
+(defun lewis/find-file-other-dir ()
+  (interactive) (nowis/call-with-prefix #'consult-fd))
 #+end_src
 *** consult-dir
 #+begin_src elisp
@@ -1246,7 +1243,7 @@ Jump anywhere in the world
 ** ibuffer
 #+begin_src elisp
 (setup ibuffer
-  (global-set-key [remap list-buffers] #'ibuffer))
+  (keymap-global-set "<remap> <list-buffers>" #'ibuffer))
 #+end_src
 * Input
 ** posframe
@@ -1548,8 +1545,8 @@ Emacs major-mode to work with Beancount ledger files
 (setup python
   (:with-hook inferior-python-mode-hook
     (:hook (lambda ()
-             (process-query-on-exit-flag
-              (get-process "Python")))))
+             (set-process-query-on-exit-flag
+              (get-process "Python") nil))))
   (:when-loaded
     (when (and (executable-find "python3")
                (string= python-shell-interpreter "python"))
@@ -2048,55 +2045,57 @@ borrowed from citre, now you can always jump-back use "M-," after any jump in th
 ** ui
 *** org mode basic style
 #+begin_src elisp
-(with-eval-after-load 'org
-  (defface my-org-emphasis-bold
-    '((default :inherit bold)
-      (((class color) (min-colors 88) (background light))
-       :foreground "pale violet red")
-      (((class color) (min-colors 88) (background dark))
-       :foreground "pale violet red"))
-    "My bold emphasis for Org.")
-  (defface my-org-emphasis-italic
-    '((default :inherit italic)
-      (((class color) (min-colors 88) (background light))
-       :foreground "green3")
-      (((class color) (min-colors 88) (background dark))
-       :foreground "green3"))
-    "My italic emphasis for Org.")
-  (defface my-org-emphasis-underline
-    '((default :inherit underline)
-      (((class color) (min-colors 88) (background light))
-       :foreground "#813e00")
-      (((class color) (min-colors 88) (background dark))
-       :foreground "#d0bc00"))
-    "My underline emphasis for Org.")
-  (setq org-auto-align-tags nil
-        org-tags-column 0
-        org-ellipsis " "
-        org-hide-emphasis-markers t
-        org-pretty-entities nil ;; can perform ui such as "a_words" into small "awords"
-        org-habit-graph-column 50
-        org-agenda-tags-column 0
-        org-emphasis-alist '(("*" my-org-emphasis-bold)
-                             ("/" my-org-emphasis-italic)
-                             ("_" underline)
-                             ("=" org-verbatim verbatim)
-                             ("~" org-code verbatim)
-                             ("+" (:strike-through t)))))
+(setup org
+  (:when-loaded
+    (defface my-org-emphasis-bold
+      '((default :inherit bold)
+        (((class color) (min-colors 88) (background light))
+         :foreground "pale violet red")
+        (((class color) (min-colors 88) (background dark))
+         :foreground "pale violet red"))
+      "My bold emphasis for Org.")
+    (defface my-org-emphasis-italic
+      '((default :inherit italic)
+        (((class color) (min-colors 88) (background light))
+         :foreground "green3")
+        (((class color) (min-colors 88) (background dark))
+         :foreground "green3"))
+      "My italic emphasis for Org.")
+    (defface my-org-emphasis-underline
+      '((default :inherit underline)
+        (((class color) (min-colors 88) (background light))
+         :foreground "#813e00")
+        (((class color) (min-colors 88) (background dark))
+         :foreground "#d0bc00"))
+      "My underline emphasis for Org.")
+    (setq org-auto-align-tags nil
+          org-tags-column 0
+          org-ellipsis " "
+          org-hide-emphasis-markers t
+          org-pretty-entities nil ;; can perform ui such as "a_words" into small "awords"
+          org-habit-graph-column 50
+          org-agenda-tags-column 0
+          org-emphasis-alist '(("*" my-org-emphasis-bold)
+                               ("/" my-org-emphasis-italic)
+                               ("_" underline)
+                               ("=" org-verbatim verbatim)
+                               ("~" org-code verbatim)
+                               ("+" (:strike-through t))))))
 #+end_src
 *** org beatury
 #+begin_src elisp
-(with-eval-after-load 'org
-  (setq org-hide-leading-stars t)
-  (let ((star-list '("󰯬" "󰯯" "󰯲" "󰯵" "󰯸" "󰯻" "󰯾" "󰰁" "󰰄" "󰰇" "󰰊")))
-    (dotimes (i (length star-list))
-      (font-lock-add-keywords
-       'org-mode
-       `((,(format "^\\(\\*\\{%d\\}\\) " (+ i 1)) ;; 只捕获星号
-          (1 (prog1 nil   ;; 1 是第一个 group（星号）
-               (compose-region (match-beginning 1) (match-end 1)
-                               ,(nth i star-list))))))))
-    ))
+(setup org
+  (:when-loaded
+    (setq org-hide-leading-stars t)
+    (let ((star-list '("󰯬" "󰯯" "󰯲" "󰯵" "󰯸" "󰯻" "󰯾" "󰰁" "󰰄" "󰰇" "󰰊")))
+      (dotimes (i (length star-list))
+        (font-lock-add-keywords
+         'org-mode
+         `((,(format "^\\(\\*\\{%d\\}\\) " (+ i 1)) ;; 只捕获星号
+            (1 (prog1 nil   ;; 1 是第一个 group（星号）
+                 (compose-region (match-beginning 1) (match-end 1)
+                                 ,(nth i star-list))))))))
+      )))
 #+end_src
 #+begin_src elisp
 ;; ┌───────────────┐
@@ -2383,62 +2382,38 @@ In short, you will need 3 files:
 #+begin_src elisp
 ;; Use full window for org-capture
 ;; (add-hook 'org-capture-mode-hook 'delete-other-windows)
+
+(defvar nowis/org-sm-topic-capture-file
+  (concat nowis/doc-emacs-dir "01-orgmode/xnotes/org-inc/20251201T112101--incubate.org")
+  "Target file for org-sm topic capture.")
+
 (setup org
   (:when-loaded
-    (defvar nowis/org-inc-topic-capture-file-path
-      (concat org-sm-directory "20251201T112101--incubate.org")
-      "topic capture file")
-
-    (defun nowis/org-inc-topic-capture-file ()
-      "Return the target file for topic capture.
-If there is a prefix argument, prompt the user to select a file and save it for future use;
-otherwise use the saved file."
-      (if current-prefix-arg
-          (let ((selected-file
-                 (read-file-name "Choose target topic capture file: "
-                                 org-sm-directory
-                                 nil
-                                 t
-                                 nil
-                                 (lambda (name)
-                                   (string-match-p "\\.org$" name)))))
-            (setq nowis/org-inc-topic-capture-file-path selected-file)
-            (message "topic capture file is set to: %s" selected-file)
-            selected-file)
-        nowis/org-inc-topic-capture-file-path))
-
     (setq org-capture-templates
-          `(
-            ("i" "Inbox" entry  (file "gtd/inbox.org")
+          `(("i" "Inbox" entry (file "gtd/inbox.org")
              ,(concat "* TODO [#C] %?\n"
-                      ":PROPERTIES:\n:CREATED: %U\n:END:\n")
-             )
+                      ":PROPERTIES:\n:CREATED: %U\n:END:\n"))
             ("d" "Done without clock" entry (file+olp+datetree "gtd/inbox.org")
-             ,(concat "* DONE %?\n"
-                      "CLOSED: %U"))
-            ("t" "org-inc topic" entry (file nowis/org-inc-topic-capture-file)
+             ,(concat "* DONE %?\n" "CLOSED: %U"))
+            ("t" "org-sm topic" entry (file nowis/org-sm-topic-capture-file)
              ,(concat "** topic card\n" ":PROPERTIES:\n:CREATED: %U\n:END:\n%?")
-             :before-finalize ,(lambda ()
-                                 (if (not (featurep 'org-inc))
-                                     (require 'org-inc))
-                                 (unless (org-id-get)
-                                   (org-id-get-create))
-                                 (org-srs-item-new 'topic)))
-            )))
-  (defun org-inc-topic-capture-from-clipboard (&optional arg)
-    "Create a topic capture from clipboard contents.
-If region is active, use region text instead.
-When called with prefix argument, prompt to select target file."
+             :before-finalize (lambda () (org-sm-item-mark 'topic))))))
+
+  (defun nowis/org-sm-topic-capture-from-clipboard (&optional arg)
+    "Capture a topic from clipboard or active region.
+With prefix ARG, prompt to change the target file first."
     (interactive "P")
-  (let* ((current-prefix-arg arg)
-         (content (if (use-region-p)
-                      (buffer-substring-no-properties
-                       (region-beginning) (region-end))
-                    (or (and (fboundp 'gui-get-selection)
-                             (gui-get-selection 'CLIPBOARD 'STRING))
-                        (current-kill 0 t)   ;; t: 不报错，空则 nil
-                        ""))))
-    (org-capture nil "t")
+    (when arg
+      (setq nowis/org-sm-topic-capture-file
+            (read-file-name "Topic capture file: " org-sm-directory nil t nil
+                            (lambda (f) (string-match-p "\\.org$" f)))))
+    (let ((content (if (use-region-p)
+                       (buffer-substring-no-properties (region-beginning) (region-end))
+                     (or (and (fboundp 'gui-get-selection)
+                              (gui-get-selection 'CLIPBOARD 'STRING))
+                         (current-kill 0 t)
+                         ""))))
+      (org-capture nil "t")
       (insert content)))
   )
 #+end_src
@@ -2576,7 +2551,7 @@ See also `org-save-all-org-buffers'"
 #+begin_src elisp
 (setup org-sm
   (:hook-into org-mode)
-  (setq org-sm-directory  (expand-file-name "org-inc/" org-directory))
+  (setq org-sm-directory (expand-file-name "org-inc/" org-directory))
   (setq org-sm-file-filter-regexp "[^/]*srs[^/]*\\.org$")
   (nowis/smart-bind "M-z" #'region-active-p #'org-sm-item-extract)
   (transient-define-prefix org-sm-transient-map()
@@ -2596,7 +2571,6 @@ See also `org-save-all-org-buffers'"
      ]
     )
   )
-
 #+end_src
 ** nowis-read-mode
 #+begin_src elisp
@@ -2613,11 +2587,11 @@ See also `org-save-all-org-buffers'"
 Keys defined here will override existing bindings when the mode is active.")
 
 (defun nowis-capture-inc ()
+  "Copy selection with M-w then capture as org-sm topic."
   (interactive)
-      (progn
-        (execute-kbd-macro (kbd "M-w"))
-        (sit-for 0.1))
-  (org-inc-topic-capture-from-clipboard))
+  (execute-kbd-macro (kbd "M-w"))
+  (sit-for 0.1)
+  (nowis/org-sm-topic-capture-from-clipboard))
 
 (define-minor-mode nowis-read-mode
   "Minor mode that overrides key bindings in the current buffer."
@@ -3021,31 +2995,21 @@ ESUP - Emacs Start Up Profiler
       (save-buffer))))
 
 (defun nowis/consult-org-bookmarks ()
-  "A bookmark browser based on consult-org-heading, will return to origin place after opening url"
+  "Browse org bookmarks with consult-org-heading, return to origin buffer/point when done."
   (interactive)
   (let ((original-buffer (current-buffer))
         (original-point (point)))
-    (find-file org-bookmarks-file)
-    (condition-case err
+    (unwind-protect
         (progn
+          (find-file org-bookmarks-file)
           (consult-org-heading)
-          (let ((url (save-excursion
-                       (forward-line 1)
-                       (when (looking-at "\\[\\[\\([^]]+\\)\\]\\]")
-                         (match-string 1)))))
-            (when url
-              (if (not (featurep 'embark))
-                  (require 'embark))
-                (embark-open-externally url)))
-            (switch-to-buffer original-buffer)
-            (goto-char original-point))
-          (quit
-           (switch-to-buffer original-buffer)
-           (goto-char original-point))
-          (error
-           (switch-to-buffer original-buffer)
-           (goto-char original-point)
-           (signal (car err) (cdr err))))))
+          (when-let ((url (save-excursion
+                            (forward-line 1)
+                            (when (looking-at "\\[\\[\\([^]]+\\)\\]\\]")
+                              (match-string 1)))))
+            (embark-open-externally url)))
+      (switch-to-buffer original-buffer)
+      (goto-char original-point))))
 #+end_src
 ** eww
 #+begin_src elisp
@@ -3092,8 +3056,8 @@ These codes are used to solve copy & paste problems under wslg inside win10/win1
     (let ((clip (wsl-clipboard-to-string)))
       (insert clip)
       (if arg (kill-new clip))))
-  (global-set-key [remap kill-ring-save] #'wsl-copy-region-to-clipboard)
-  (global-set-key [remap meow-yank] #'wsl-paste-from-clipboard))
+  (keymap-global-set "<remap> <kill-ring-save>" #'wsl-copy-region-to-clipboard)
+  (keymap-global-set "<remap> <meow-yank>" #'wsl-paste-from-clipboard))
 #+end_src
 ** android
 #+begin_src elisp
