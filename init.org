@@ -2023,7 +2023,7 @@ borrowed from citre, now you can always jump-back use "M-," after any jump in th
     (add-hook 'org-timer-set-hook #'org-clock-in)
     (add-hook 'org-timer-done-hook #'nowis/org-show-reminder)
     (add-hook 'org-timer-done-hook #'org-clock-out)
-    ))
+ ))
 #+end_src
 ** org-timer
 #+begin_src elisp
@@ -2122,7 +2122,7 @@ Always allow composition for org-mode keywords, regardless of context."
                 ("#+begin_quote" . ?󱀢)
                 ("#+end_quote" . ?)
                 (":PROPERTIES:" . ?)
-                (":SRSITEMS:" . ?)
+                ;; (":SRSITEMS:" . ?)
                 (":LOGBOOK:" . ?)
                 (":END:" . ?)))
   (setq-local prettify-symbols-compose-predicate #'my/org-prettify-compose-p)
@@ -2453,7 +2453,7 @@ See also `org-save-all-org-buffers'"
         (when-let* ((cat (get-text-property (point) 'org-category)))
           (unless (equal cat last-category)
             (let ((inhibit-read-only t))
-              (insert (propertize (concat "  ◆ " cat "\n")
+              (insert (propertize (concat "◆ " cat "\n")
                                   'face 'org-agenda-structure)))
             (setq last-category cat)))
         (forward-line)))))
@@ -2475,7 +2475,7 @@ See also `org-save-all-org-buffers'"
       (search . " %i %-12:c")))
 
 (setq org-agenda-hide-tags-regexp
-      "\\(inbox\\|action\\|journal\\|project\\|next\\)")
+      "\\(inbox\\|action\\|journal\\|project\\|next\\|bib\\|srs\\)")
 
 ;;; ─── Agenda 视图构建 ────────────────────────────────────
 (defun nowis/make-agenda-command (key description tag)
@@ -2551,8 +2551,10 @@ See also `org-save-all-org-buffers'"
 #+begin_src elisp
 (setup org-sm
   (:hook-into org-mode)
-  (setq org-sm-directory (expand-file-name "org-inc/" org-directory))
-  (setq org-sm-file-filter-regexp "[^/]*srs[^/]*\\.org$")
+  (setq org-sm--files (directory-files-recursively
+                       (expand-file-name "org-inc/" org-directory)
+                       "[^/]*srs[^/]*\\.org$"
+                       ))
   (nowis/smart-bind "M-z" #'region-active-p #'org-sm-item-extract)
   (transient-define-prefix org-sm-transient-map()
     "Define transient-key map for org-sm functions"
