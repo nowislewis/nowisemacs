@@ -479,9 +479,9 @@ Maybe I should add a new state.
     ]
    ["capture"
     ("c" "capture" org-capture)
-    ("e" "extract topic" nowis/org-sm-topic-capture-from-clipboard)
-    ("E" "extract topic with prefix"
-     (lambda () (interactive) (nowis/org-sm-topic-capture-from-clipboard '(-1))))
+    ("e" "capture topic" org-sm-capture-topic)
+    ("E" "capture topic (change file)"
+     (lambda () (interactive) (org-sm-capture-topic '(-1))))
     ]
    ["life"
     ("L" "life" life-calendar)
@@ -2383,9 +2383,8 @@ In short, you will need 3 files:
 ;; Use full window for org-capture
 ;; (add-hook 'org-capture-mode-hook 'delete-other-windows)
 
-(defvar nowis/org-sm-topic-capture-file
-  (concat nowis/doc-emacs-dir "01-orgmode/xnotes/org-inc/20251201T112101--incubate.org")
-  "Target file for org-sm topic capture.")
+(setq org-sm-capture-file
+      (concat nowis/doc-emacs-dir "01-orgmode/xnotes/org-inc/20251201T112101--incubate.org"))
 
 (setup org
   (:when-loaded
@@ -2394,28 +2393,8 @@ In short, you will need 3 files:
              ,(concat "* TODO [#C] %?\n"
                       ":PROPERTIES:\n:CREATED: %U\n:END:\n"))
             ("d" "Done without clock" entry (file+olp+datetree "gtd/inbox.org")
-             ,(concat "* DONE %?\n" "CLOSED: %U"))
-            ("t" "org-sm topic" entry (file nowis/org-sm-topic-capture-file)
-             ,(concat "** topic card\n" ":PROPERTIES:\n:CREATED: %U\n:END:\n%?")
-             :before-finalize (lambda () (org-sm-item-mark 'topic))))))
-
-  (defun nowis/org-sm-topic-capture-from-clipboard (&optional arg)
-    "Capture a topic from clipboard or active region.
-With prefix ARG, prompt to change the target file first."
-    (interactive "P")
-    (when arg
-      (setq nowis/org-sm-topic-capture-file
-            (read-file-name "Topic capture file: " org-sm-directory nil t nil
-                            (lambda (f) (string-match-p "\\.org$" f)))))
-    (let ((content (if (use-region-p)
-                       (buffer-substring-no-properties (region-beginning) (region-end))
-                     (or (and (fboundp 'gui-get-selection)
-                              (gui-get-selection 'CLIPBOARD 'STRING))
-                         (current-kill 0 t)
-                         ""))))
-      (org-capture nil "t")
-      (insert content)))
-  )
+             ,(concat "* DONE %?\n" "CLOSED: %U"))))
+    ))
 #+end_src
 *** refile
 #+begin_src elisp
@@ -2556,6 +2535,9 @@ See also `org-save-all-org-buffers'"
                        "[^/]*srs[^/]*\\.org$"
                        ))
   (nowis/smart-bind "M-z" #'region-active-p #'org-sm-item-extract)
+  (:when-loaded
+    (org-sm-setup-capture)
+    )
   (transient-define-prefix org-sm-transient-map()
     "Define transient-key map for org-sm functions"
     [
@@ -2593,7 +2575,7 @@ Keys defined here will override existing bindings when the mode is active.")
   (interactive)
   (execute-kbd-macro (kbd "M-w"))
   (sit-for 0.1)
-  (nowis/org-sm-topic-capture-from-clipboard))
+  (org-sm-capture-topic))
 
 (define-minor-mode nowis-read-mode
   "Minor mode that overrides key bindings in the current buffer."
