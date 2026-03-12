@@ -487,10 +487,8 @@ Maybe I should add a new state.
     ("L" "life" life-calendar)
     ]
    ["ladder"
-    ("l c" "display current" org-ladder-display-current-status)
-    ("l d" "show detailed" org-ladder-show-detailed-status)
-    ("l f" "force update" org-ladder-force-refresh)
-    ("l h" "history" org-ladder-show-history-review)
+    ("l c" "display current" org-ladder-status)
+    ("l d" "show detailed" org-ladder-show-details)
     ]
    ["others"
     ("r" "restart emacs" restart-emacs)
@@ -688,7 +686,8 @@ Maybe I should add a new state.
 *** modus-themes
 #+begin_src elisp
 (setup modus-themes
-  (load-theme 'modus-vivendi t)
+  ;; (load-theme 'modus-vivendi t)
+  (load-theme 'dracula t)
   )
 #+end_src
 *** ef-themes
@@ -2627,13 +2626,13 @@ Keys defined here will override existing bindings when the mode is active.")
           (when (file-directory-p gtd-dir)
             (directory-files-recursively gtd-dir ".*"))))
   (setq org-ladder-sm-files org-sm--files)
-  )
+  (:when-loaded
+    (require 'org-ladder-sm)))
 #+end_src
 ** org-graph
 #+begin_src elisp
 (setup org-graph)
 #+end_src
-
 * 阅读
 ** reader
 #+begin_src elisp
@@ -2710,11 +2709,9 @@ Simple distraction-free editing. I use darkroom instead of writeroom because it'
 
     (custom-set-faces
      '(gptel-response-highlight ((((background dark) (min-colors 88)) :background "gray22" :extend t))))
-    ;; ┌─────┐
-    ;; │ mcp │
-    ;; └─────┘
+
+    ;; integration
     (require 'gptel-integrations)
-    (require 'mcp)
 
     ;; ┌──────────┐
     ;; │ autosave │
@@ -2856,16 +2853,6 @@ Simple distraction-free editing. I use darkroom instead of writeroom because it'
     (keymap-set embark-general-map "?" #'gptel-quick-with-prompt))
   )
 #+end_src
-*** mcp
-#+begin_src elisp
-(setup mcp
-  (setq mcp-hub-servers
-        '(("drawio" . (:command "npx"
-                                :args ("@next-ai-drawio/mcp-server@latest")))
-        ))
-  )
-#+end_src
-
 *** whisper
 #+begin_src elisp
 (setup whisper

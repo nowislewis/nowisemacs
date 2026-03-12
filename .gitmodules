@@ -284,9 +284,6 @@
 [submodule "lib/consult-omni"]
 	path = lib/consult-omni
 	url = https://github.com/armindarvish/consult-omni.git
-[submodule "lib/mcp"]
-	path = lib/mcp
-	url = https://github.com/lizqwerscott/mcp.el.git
 [submodule "lib/kdl-mode"]
 	path = lib/kdl-mode
 	url = https://github.com/taquangtrung/emacs-kdl-mode.git
