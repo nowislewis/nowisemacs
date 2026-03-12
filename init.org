@@ -1448,8 +1448,6 @@ Jump anywhere in the world
                 (and (buffer-live-p b)
                      (eq 'eat-mode (buffer-local-value 'major-mode b))))
               (buffer-list)))
-
-
 #+end_src
 * git
 ** magit
@@ -1495,36 +1493,6 @@ Jump anywhere in the world
   (add-to-list 'auto-mode-alist '("\\.dot\\'" . graphviz-dot-mode))
   (setq graphviz-dot-indent-width 4)
     )
-#+end_src
-*** plantuml
-This Emacs tool use plantuml to generate images for org, json, yaml files.
-#+begin_src elisp
-;; download plantuml jar
-(setq plantuml-jar-path (concat no-littering-var-directory "plantuml.jar"))
-(defun plantuml-download-jar ()
-  "Download the latest PlantUML JAR file and install it into `plantuml-jar-path'."
-  (interactive)
-  (if (y-or-n-p (format "Download the latest PlantUML JAR file into %s? " plantuml-jar-path))
-      (if (or (not (file-exists-p plantuml-jar-path))
-              (y-or-n-p (format "The PlantUML jar file already exists at %s, overwrite? " plantuml-jar-path)))
-          (with-current-buffer (url-retrieve-synchronously "https://search.maven.org/solrsearch/select?q=g:net.sourceforge.plantuml+AND+a:plantuml&core=gav&start=0&rows=1&wt=xml")
-            (mkdir (file-name-directory plantuml-jar-path) t)
-            (let* ((parse-tree (xml-parse-region))
-                   (doc        (->> parse-tree
-                                    (assq 'response)
-                                    (assq 'result)
-                                    (assq 'doc)))
-                   (strs       (xml-get-children doc 'str))
-                   (version    (->> strs
-                                    (--filter (string-equal "v" (xml-get-attribute it 'name)))
-                                    (car)
-                                    (xml-node-children)
-                                    (car))))
-              (message (concat "Downloading PlantUML v" version " into " plantuml-jar-path))
-              (url-copy-file (format "https://search.maven.org/remotecontent?filepath=net/sourceforge/plantuml/plantuml/%s/plantuml-%s.jar" version version) plantuml-jar-path t)
-              (kill-buffer)))
-        (message "Aborted."))
-    (message "Aborted.")))
 #+end_src
 *** beancount
 Emacs major-mode to work with Beancount ledger files
@@ -1857,12 +1825,10 @@ borrowed from citre, now you can always jump-back use "M-," after any jump in th
                                (gnus . org-gnus-no-new-news)
                                (file . find-file)
                                (wl . wl-other-frame))
-        ;; org-blank-before-new-entry '((heading . t)
-        ;;                              (plain-list-item . auto))
 
         org-image-actual-width 800 ;; this will use 600 for width for all the images.
         org-preview-latex-image-directory (concat no-littering-var-directory "ltximg/")
-        org-plantuml-jar-path plantuml-jar-path
+        ;; org-plantuml-jar-path plantuml-jar-path
         org-special-ctrl-a/e t
         ;; org-id
         org-attach-id-dir (concat nowis/doc-emacs-dir "01-orgmode/org-attach")
@@ -2107,7 +2073,6 @@ Always allow composition for org-mode keywords, regardless of context."
                 ("#+begin_quote" . ?󱀢)
                 ("#+end_quote" . ?)
                 (":PROPERTIES:" . ?)
-                ;; (":SRSITEMS:" . ?)
                 (":LOGBOOK:" . ?)
                 (":END:" . ?)))
   (setq-local prettify-symbols-compose-predicate #'my/org-prettify-compose-p)
@@ -2711,7 +2676,7 @@ Simple distraction-free editing. I use darkroom instead of writeroom because it'
      '(gptel-response-highlight ((((background dark) (min-colors 88)) :background "gray22" :extend t))))
 
     ;; integration
-    (require 'gptel-integrations)
+    ;; (require 'gptel-integrations)
 
     ;; ┌──────────┐
     ;; │ autosave │
