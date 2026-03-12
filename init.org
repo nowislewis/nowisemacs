@@ -1643,25 +1643,10 @@ borrowed from citre, now you can always jump-back use "M-," after any jump in th
               (yaml-mode       . yaml-ts-mode)
               (toml-mode       . toml-ts-mode)
               (bash-mode       . bash-ts-mode)
+              (markdown-mode       . md-ts-mode)
               (sh-mode         . bash-ts-mode))
             treesit-auto-install-grammar 'ask
-            treesit-language-source-alist
-            '((bash "https://github.com/tree-sitter/tree-sitter-bash")
-              (c "https://github.com/tree-sitter/tree-sitter-c")
-              (cpp "https://github.com/tree-sitter/tree-sitter-cpp")
-              (cmake "https://github.com/uyha/tree-sitter-cmake")
-              (css "https://github.com/tree-sitter/tree-sitter-css")
-              (elisp "https://github.com/Wilfred/tree-sitter-elisp")
-              (go "https://github.com/tree-sitter/tree-sitter-go")
-              (html "https://github.com/tree-sitter/tree-sitter-html")
-              (javascript "https://github.com/tree-sitter/tree-sitter-javascript" "master" "src")
-              (json "https://github.com/tree-sitter/tree-sitter-json")
-              (make "https://github.com/alemuller/tree-sitter-make")
-              (python "https://github.com/tree-sitter/tree-sitter-python")
-              (toml "https://github.com/tree-sitter/tree-sitter-toml")
-              (tsx "https://github.com/tree-sitter/tree-sitter-typescript" "master" "tsx/src")
-              (typescript "https://github.com/tree-sitter/tree-sitter-typescript" "master" "typescript/src")
-              (yaml "https://github.com/ikatyang/tree-sitter-yaml")))
+            )
     ;; avoid some errors without treesit
     (setq treesit-extra-load-path (list (concat user-emacs-directory "var/treesit/"))))
   (defun treesit-install-all ()
@@ -1706,7 +1691,8 @@ borrowed from citre, now you can always jump-back use "M-," after any jump in th
   )
 (setup corfu-popupinfo
   (setq corfu-popupinfo-delay '(0.5 . 0.5))
-  (:hook-into corfu))
+  (corfu-popupinfo-mode)
+  )
 
 (setup cape
   ;; don't let dabbrev take over all things
@@ -2634,17 +2620,20 @@ Keys defined here will override existing bindings when the mode is active.")
   )
 #+end_src
 ** org-ladder
-:PROPERTIES:
-:ID:       20260228T155259_728458
-:END:
 #+begin_src elisp
 (setup org-ladder
-  (let* ((gtd-dir (expand-file-name "gtd" org-directory))
-         (gtd-files (when (file-directory-p gtd-dir)
-                      (directory-files-recursively gtd-dir ".*"))))
-    (setq org-ladder-files gtd-files))
+  (setq org-ladder-clock-files
+        (let ((gtd-dir (expand-file-name "gtd" org-directory)))
+          (when (file-directory-p gtd-dir)
+            (directory-files-recursively gtd-dir ".*"))))
+  (setq org-ladder-sm-files org-sm--files)
   )
 #+end_src
+** org-graph
+#+begin_src elisp
+(setup org-graph)
+#+end_src
+
 * 阅读
 ** reader
 #+begin_src elisp
@@ -2673,17 +2662,10 @@ Simple distraction-free editing. I use darkroom instead of writeroom because it'
 #+begin_src elisp
 (setup darkroom)
 #+end_src
-** markdown-mode
-#+begin_src elisp
-(setup markdown-mode
-  (:match-file "\\.md\\'")
-  (custom-set-faces
-   '(markdown-header-face-1 ((t (:inherit org-level-2)))))
-  )
-#+end_src
 ** md-ts-mode
 #+begin_src elisp
 (setup md-ts-mode
+  (:match-file "\\.md\\'")
   (custom-set-faces
    '(md-ts-heading-1 ((t (:inherit org-level-2)))))
   )
@@ -2902,7 +2884,11 @@ Simple distraction-free editing. I use darkroom instead of writeroom because it'
   (defalias 'pi 'pi-coding-agent)
   (setq transient-version "0.12.0")
   (setq pi-coding-agent-tool-preview-lines 1
-        pi-coding-agent-bash-preview-lines 1))
+        pi-coding-agent-bash-preview-lines 1)
+  ;; (setq pi-coding-agent-extra-args
+  ;;       '("-e" "/usr/lib/node_modules/@mariozechner/pi-coding-agent/examples/extensions/ssh.ts"
+  ;;         "--ssh" "tmp:/home/yi3.liu/minfer"))
+  )
 #+end_src
 ** webjump
 #+begin_src elisp

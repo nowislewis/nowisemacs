@@ -160,9 +160,6 @@
 [submodule "marginalia"]
 	path = lib/marginalia
 	url = https://github.com/minad/marginalia.git
-[submodule "markdown-mode"]
-	path = lib/markdown-mode
-	url = https://github.com/jrblevin/markdown-mode.git
 [submodule "meow"]
 	path = lib/meow
 	url = https://github.com/meow-edit/meow.git
@@ -311,3 +308,6 @@
 [submodule "lib/org-sm"]
 	path = lib/org-sm
 	url = https://github.com/nowislewis/org-sm.git
+[submodule "lib/org-graph"]
+	path = lib/org-graph
+	url = https://github.com/nowislewis/org-graph.git
