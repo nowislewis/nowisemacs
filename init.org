@@ -1619,7 +1619,9 @@ borrowed from citre, now you can always jump-back use "M-," after any jump in th
     (setq treesit-extra-load-path (list (concat user-emacs-directory "var/treesit/"))))
   (defun treesit-install-all ()
     (interactive)
-    (mapc #'treesit-install-language-grammar (mapcar #'car treesit-language-source-alist))))
+    (require 'pi-coding-agent-grammars)
+    (mapc #'treesit-install-language-grammar (mapcar #'car treesit-language-source-alist)))
+  )
 #+end_src
 *** Complete
 **** corfu related
