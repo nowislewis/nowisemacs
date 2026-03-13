@@ -1,6 +1,6 @@
 #+TITLE: Emacs Configuration
 #+PROPERTY: header-args:elisp :tangle ~/.emacs.d/init.el
-I failed in love with denote, so previous *org-roam* configs were refiled into [[file:useful-tools/old-elisps/org-roam-config.org][org-roam configs]]
+I fell in love with denote, so previous *org-roam* configs were refiled into [[file:useful-tools/old-elisps/org-roam-config.org][org-roam configs]]
 * Startup configs
 ** UI speed up
 #+begin_src elisp :tangle ~/.emacs.d/early-init.el
@@ -422,12 +422,17 @@ Maybe I should add a new state.
 #+begin_src elisp
 (transient-define-prefix notes-leader-map()
   "Define leader-key map for notes functions"
-  [["Roam"
+  [["denote"
     ("r f" "denote-open-or-create" denote-open-or-create)
     ("r j" "denote-journal" denote-journal-new-or-existing-entry)
     ("r s" "find-all-searchable" project-find-searchable-dir-files)
     ("r c" "calendar" calendar)
     ("r g" "project-find-gtd-dir-files" project-find-gtd-dir-files)
+    ]
+   ["ladder"
+    ("l c" "display current" org-ladder-status)
+    ("l d" "show detailed" org-ladder-show-details)
+    ("l f" "force update" org-ladder-force-refresh)
     ]
    ["bibtex"
     ("e" "ebib" ebib)
@@ -485,10 +490,6 @@ Maybe I should add a new state.
     ]
    ["life"
     ("L" "life" life-calendar)
-    ]
-   ["ladder"
-    ("l c" "display current" org-ladder-status)
-    ("l d" "show detailed" org-ladder-show-details)
     ]
    ["others"
     ("r" "restart emacs" restart-emacs)
@@ -2156,7 +2157,6 @@ Always allow composition for org-mode keywords, regardless of context."
         (denote-rename-file-using-front-matter (buffer-file-name))
         ))))
 #+end_src
-
 *** citar
 #+begin_src elisp
 (setup parsebib)
@@ -2309,9 +2309,6 @@ In short, you will need 3 files:
 
 #+end_src
 *** todos
-:PROPERTIES:
-:ID:       20260228T154701_190172
-:END:
 #+begin_src elisp
 (setq org-enforce-todo-dependencies t
       org-enforce-todo-checkbox-dependencies t
@@ -2961,10 +2958,11 @@ These codes are used to solve copy & paste problems under wslg inside win10/win1
 (when nowis/is-wsl
   ;; (set-clipboard-coding-system 'gbk-dos)
   ;; solve the problem of copying from wslg to windows
-  (defun wsl-copy-region-to-clipboard (start end)
-    "Copy region to Windows clipboard."
-    (interactive "r")
-    (call-process-region start end "wl-copy" nil 0))
+(defun wsl-copy-region-to-clipboard (start end)
+  "Copy region to Windows clipboard and kill-ring."
+  (interactive "r")
+  (kill-ring-save start end)
+  (call-process-region start end "wl-copy" nil 0))
 
   (defun wsl-clipboard-to-string ()
     "Return Windows clipboard as string."
