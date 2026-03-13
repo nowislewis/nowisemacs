@@ -2476,10 +2476,10 @@ See also `org-save-all-org-buffers'"
 #+begin_src elisp
 (setup org-sm
   (:hook-into org-mode)
-  (setq org-sm--files (directory-files-recursively
-                       (expand-file-name "org-inc/" org-directory)
-                       "[^/]*srs[^/]*\\.org$"
-                       ))
+  (setq org-sm--files
+        (let ((dir (expand-file-name "org-inc/" org-directory)))
+          (when (file-directory-p dir)
+            (directory-files-recursively dir "[^/]*srs[^/]*\\.org$"))))
   (nowis/smart-bind "M-z" #'region-active-p #'org-sm-item-extract)
   (:when-loaded
     (org-sm-setup-capture)
