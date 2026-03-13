@@ -2297,12 +2297,11 @@ In short, you will need 3 files:
       (interactive)
       (let* ((gtd-dir (concat org-directory "/gtd"))
              (gtd-files (when (file-exists-p gtd-dir)
-                          (directory-files-recursively gtd-dir "\\.org$")))
+                          (directory-files-recursively gtd-dir "\\.org")))
              )
         (setq org-agenda-files gtd-files
               org-refile-files (cl-remove-if (lambda (file) (string-match-p "inbox.org$" file))
                                              org-agenda-files))
-        (add-to-list 'org-refile-files (expand-file-name (concat org-directory "/org-inc/20251201T112101--incubate.org")))
         ))
     (org-agenda-update-agenda-files)
     ))
@@ -2331,7 +2330,7 @@ In short, you will need 3 files:
 ;; (add-hook 'org-capture-mode-hook 'delete-other-windows)
 
 (setq org-sm-capture-file
-      (concat nowis/doc-emacs-dir "01-orgmode/xnotes/org-inc/20251201T112101--incubate.org"))
+      (concat nowis/doc-emacs-dir "01-orgmode/xnotes/gtd/20251201T112101--incubate.org0"))
 
 (setup org
   (:when-loaded
