@@ -308,3 +308,6 @@
 [submodule "lib/org-graph"]
 	path = lib/org-graph
 	url = https://github.com/nowislewis/org-graph.git
+[submodule "lib/md-ts-mode"]
+	path = lib/md-ts-mode
+	url = https://github.com/dnouri/md-ts-mode.git

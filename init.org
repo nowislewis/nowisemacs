@@ -2836,7 +2836,7 @@ Simple distraction-free editing. I use darkroom instead of writeroom because it'
   (setq pi-coding-agent-tool-preview-lines 1
         pi-coding-agent-bash-preview-lines 1)
   ;; (setq pi-coding-agent-extra-args
-  ;;       '("-e" "/usr/lib/node_modules/@mariozechner/pi-coding-agent/examples/extensions/ssh.ts"
+  ;;       '("-e" "~/.npm-global/lib/node_modules/@mariozechner/pi-coding-agent/examples/extensions/ssh.ts"
   ;;         "--ssh" "tmp:/home/yi3.liu/minfer"))
   )
 #+end_src
