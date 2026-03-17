@@ -2050,8 +2050,7 @@ borrowed from citre, now you can always jump-back use "M-," after any jump in th
                  (compose-region (match-beginning 1) (match-end 1)
                                  ,(nth i star-list))))))))
       )))
-#+end_src
-#+begin_src elisp
+
 ;; ┌───────────────┐
 ;; │ prettify-mode │
 ;; └───────────────┘
@@ -2624,14 +2623,6 @@ Simple distraction-free editing. I use darkroom instead of writeroom because it'
 #+begin_src elisp
 (setup darkroom)
 #+end_src
-** md-ts-mode
-#+begin_src elisp
-(setup md-ts-mode
-  (:match-file "\\.md\\'")
-  (custom-set-faces
-   '(md-ts-heading-1 ((t (:inherit org-level-2)))))
-  )
-#+end_src
 * tools
 ** ai related
 *** gptel
@@ -2820,7 +2811,7 @@ Simple distraction-free editing. I use darkroom instead of writeroom because it'
 #+begin_src elisp
 (setup whisper
   (setq whisper-language "auto"
-        whisper-model "base"
+        whisper-model "small"
         whisper-quantize nil
         whisper-translate nil
         whisper-use-threads (- (num-processors) 1)
@@ -2830,6 +2821,13 @@ Simple distraction-free editing. I use darkroom instead of writeroom because it'
 #+end_src
 *** pi-coding-agent
 #+begin_src elisp
+(setup markdown-table-wrap)
+(setup md-ts-mode
+  (:match-file "\\.md\\'")
+  (custom-set-faces
+   '(md-ts-heading-1 ((t (:inherit org-level-2)))))
+  )
+
 (setup pi-coding-agent
   (defalias 'pi 'pi-coding-agent)
   (setq transient-version "0.12.0")

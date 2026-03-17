@@ -311,3 +311,6 @@
 [submodule "lib/md-ts-mode"]
 	path = lib/md-ts-mode
 	url = https://github.com/dnouri/md-ts-mode.git
+[submodule "lib/markdown-table-wrap"]
+	path = lib/markdown-table-wrap
+	url = https://github.com/dnouri/markdown-table-wrap.git
