@@ -680,7 +680,7 @@ Maybe I should add a new state.
 #+begin_src elisp
 (defun dynamic-change-line-spacing (&rest _)
   "Sync line-spacing with variable-pitch-mode state."
-  (setq-local line-spacing (if variable-pitch-mode 0.5 nil)))
+  (setq-local line-spacing (if (bound-and-true-p variable-pitch-mode) 0.5 nil)))
 (advice-add 'variable-pitch-mode :after #'dynamic-change-line-spacing)
 #+end_src
 ** Theme
