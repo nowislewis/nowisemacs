@@ -1276,7 +1276,7 @@ Jump anywhere in the world
                           (funcall #'nowis/rime-disable-predicates))))
 
   (setq rime-show-candidate 'posframe
-        rime-posframe-properties (list :internal-border-width 1
+        rime-posframe-properties (list :internal-border-width 0
                                        :font lewis-fixed-font)
         rime-user-data-dir "~/Documents/rime/"
         rime-share-data-dir "~/Documents/rime/"
