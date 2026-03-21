@@ -1276,7 +1276,7 @@ Jump anywhere in the world
                           (funcall #'nowis/rime-disable-predicates))))
 
   (setq rime-show-candidate 'posframe
-        rime-posframe-properties (list :internal-border-width 1
+        rime-posframe-properties (list :internal-border-width 0
                                        :font lewis-fixed-font)
         rime-user-data-dir "~/Documents/rime/"
         rime-share-data-dir "~/Documents/rime/"
@@ -2524,11 +2524,14 @@ See also `org-save-all-org-buffers'"
 Keys defined here will override existing bindings when the mode is active.")
 
 (defun nowis-capture-inc ()
-  "Copy selection with M-w then capture as org-sm topic."
+  "Copy selection with M-w then capture as org-sm topic.
+Explicitly passes the selected text to avoid `gui-get-selection'
+decoding it as iso-8859-1 (STRING target) instead of utf-8."
   (interactive)
-  (execute-kbd-macro (kbd "M-w"))
-  (sit-for 0.1)
-  (org-sm-capture-topic))
+  (let ((text (buffer-substring-no-properties (region-beginning) (region-end))))
+    (execute-kbd-macro (kbd "M-w"))
+    (setq org-sm--pending-content text)
+    (org-capture nil "org-sm-topic")))
 
 (define-minor-mode nowis-read-mode
   "Minor mode that overrides key bindings in the current buffer."
@@ -2962,28 +2965,18 @@ These codes are used to solve copy & paste problems under wslg inside win10/win1
 #+begin_src elisp
 ;; solve the problem of copying from windows to wslg
 (when nowis/is-wsl
-  ;; (set-clipboard-coding-system 'gbk-dos)
-  ;; solve the problem of copying from wslg to windows
-(defun wsl-copy-region-to-clipboard (start end)
-  "Copy region to Windows clipboard and kill-ring."
-  (interactive "r")
-  (kill-ring-save start end)
-  (call-process-region start end "wl-copy" nil 0))
+  (setq interprogram-cut-function
+        (lambda (text)
+          (let ((process-connection-type nil))
+            (let ((proc (start-process "wl-copy" nil "wl-copy")))
+              (process-send-string proc text)
+              (process-send-eof proc))))
 
-  (defun wsl-clipboard-to-string ()
-    "Return Windows clipboard as string."
-    (let ((coding-system-for-read 'dos))
-      (substring; remove added trailing \n
-       (shell-command-to-string
-        "wl-paste") 0 -1)))
-  (defun wsl-paste-from-clipboard (arg)
-    "Insert Windows clipboard at point. With prefix ARG, also add to kill-ring"
-    (interactive "P")
-    (let ((clip (wsl-clipboard-to-string)))
-      (insert clip)
-      (if arg (kill-new clip))))
-  (keymap-global-set "<remap> <kill-ring-save>" #'wsl-copy-region-to-clipboard)
-  (keymap-global-set "<remap> <meow-yank>" #'wsl-paste-from-clipboard))
+        interprogram-paste-function
+        (lambda ()
+          (when (zerop (call-process "wl-paste" nil nil nil "--list-types"))
+            (let ((coding-system-for-read 'dos))
+              (shell-command-to-string "wl-paste --no-newline"))))))
 #+end_src
 ** android
 #+begin_src elisp
