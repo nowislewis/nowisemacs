@@ -2036,20 +2036,26 @@ borrowed from citre, now you can always jump-back use "M-," after any jump in th
                                ("~" org-code verbatim)
                                ("+" (:strike-through t))))))
 #+end_src
-*** org beatury
+*** org beauty
 #+begin_src elisp
 (setup org
   (:when-loaded
     (setq org-hide-leading-stars t)
-    (let ((star-list '("󰯬" "󰯯" "󰯲" "󰯵" "󰯸" "󰯻" "󰯾" "󰰁" "󰰄" "󰰇" "󰰊")))
-      (dotimes (i (length star-list))
-        (font-lock-add-keywords
-         'org-mode
-         `((,(format "^\\(\\*\\{%d\\}\\) " (+ i 1)) ;; 只捕获星号
-            (1 (prog1 nil   ;; 1 是第一个 group（星号）
-                 (compose-region (match-beginning 1) (match-end 1)
-                                 ,(nth i star-list))))))))
-      )))
+    (font-lock-add-keywords 'org-mode
+                            `(("^\\(\\**\\)\\(\\*\\) "
+                               (1 '(face org-hide invisible t))
+                               (2 (prog1 nil
+                                    (let* ((level (- (match-end 0) (match-beginning 0) 1)) ; 空格前的星数
+                                           (stars ["󰯬" "󰯯" "󰯲" "󰯵" "󰯸" "󰯻" "󰯾" "󰰁" "󰰄" "󰰇" "󰰊"]))
+                                      (compose-region
+                                       (match-beginning 2) (match-end 2)
+                                       (aref stars (min (1- level) 10)))))))))
+    ))
+;; heading-1
+(setq org-fontify-whole-heading-line t)
+(with-eval-after-load 'org
+  (custom-set-faces
+   '(org-level-1 ((t (:overline "#555555" :extend t))))))
 
 ;; ┌───────────────┐
 ;; │ prettify-mode │
@@ -2725,6 +2731,7 @@ Simple distraction-free editing. I use darkroom instead of writeroom because it'
     )
   )
 #+end_src
+
 *** gptel-agent
 #+begin_src elisp
 (setup gptel-agent
