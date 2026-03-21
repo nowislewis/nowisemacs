@@ -17,7 +17,7 @@ I fell in love with denote, so previous *org-roam* configs were refiled into [[f
 ;; no title bar
 ;; (add-to-list 'default-frame-alist '(undecorated . t))
 ;; Faster to disable these here (before they've been initialized)
-;; (push '(alpha-background . 80) default-frame-alist)
+(push '(alpha-background . 80) default-frame-alist)
 (push '(menu-bar-lines . 0) default-frame-alist)
 (push '(tool-bar-lines . 0) default-frame-alist)
 (push '(vertical-scroll-bars) default-frame-alist)
@@ -2489,6 +2489,7 @@ See also `org-save-all-org-buffers'"
             (directory-files-recursively dir "[^/]*srs[^/]*\\.org$"))))
   (nowis/smart-bind "M-z" #'region-active-p #'org-sm-item-extract)
   (:when-loaded
+    (require 'org-sm-gptel)
     (org-sm-setup-capture)
     )
   (transient-define-prefix org-sm-transient-map()
@@ -2504,6 +2505,11 @@ See also `org-save-all-org-buffers'"
       ("m" "mark" org-sm-item-mark)
       ("d" "dismiss" org-sm-item-dismiss)
       ("z" "extract" org-sm-item-extract)
+      ]
+     ["gpt"
+      ("f" "refine" org-sm-gptel-refine)
+      ("e" "explain" org-sm-gptel-explain)
+      ("M" "generate-concept" org-sm-gptel-generate-concept)
       ]
      ]
     )
