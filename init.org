@@ -485,7 +485,7 @@ Maybe I should add a new state.
    ["capture"
     ("c" "capture" org-capture)
     ("e" "capture topic" org-sm-capture-topic)
-    ("E" "capture topic (change file)"
+    ("E" "capture topic (change target)"
      (lambda () (interactive) (org-sm-capture-topic '(-1))))
     ]
    ["life"
@@ -2338,6 +2338,7 @@ In short, you will need 3 files:
 
 (setq org-sm-capture-file
       (concat nowis/doc-emacs-dir "01-orgmode/xnotes/gtd/20251201T112101--incubate.org0"))
+(setq org-sm-capture-olp '("org-sm topics"))
 
 (setup org
   (:when-loaded
@@ -2491,6 +2492,7 @@ See also `org-save-all-org-buffers'"
   (:when-loaded
     (require 'org-sm-gptel)
     (org-sm-setup-capture)
+    (global-org-sm-read-mode)
     )
   (transient-define-prefix org-sm-transient-map()
     "Define transient-key map for org-sm functions"
@@ -2514,36 +2516,6 @@ See also `org-save-all-org-buffers'"
      ]
     )
   )
-#+end_src
-** nowis-read-mode
-#+begin_src elisp
-(defgroup nowis-read nil
-  "nowis-read minor mode."
-  :group 'convenience
-  :prefix "nowis-read-")
-
-(defvar nowis-read-mode-map
-  (let ((map (make-sparse-keymap)))
-    (define-key map (kbd "M-z") #'nowis-capture-inc)
-    map)
-  "Keymap for `nowis-read-mode'.
-Keys defined here will override existing bindings when the mode is active.")
-
-(defun nowis-capture-inc ()
-  "Copy selection with M-w then capture as org-sm topic.
-Explicitly passes the selected text to avoid `gui-get-selection'
-decoding it as iso-8859-1 (STRING target) instead of utf-8."
-  (interactive)
-  (let ((text (buffer-substring-no-properties (region-beginning) (region-end))))
-    (execute-kbd-macro (kbd "M-w"))
-    (setq org-sm--pending-content text)
-    (org-capture nil "org-sm-topic")))
-
-(define-minor-mode nowis-read-mode
-  "Minor mode that overrides key bindings in the current buffer."
-  :lighter nil  ; No mode-line indicator
-  :keymap nowis-read-mode-map
-  :group 'nowis-read)
 #+end_src
 ** insert from clipboard
 #+begin_src elisp
@@ -2614,6 +2586,26 @@ decoding it as iso-8859-1 (STRING target) instead of utf-8."
 ** reader
 #+begin_src elisp
 (setup reader)
+(with-eval-after-load 'org
+  (org-link-set-parameters
+   "reader"
+   :follow (lambda (path)
+             (when (string-match "^\\(.*\\)::\\([0-9]+\\)$" path)
+               (find-file (match-string 1 path))
+               (reader-goto-page
+                (string-to-number (match-string 2 path)))))
+   :store  (lambda ()
+             (when (derived-mode-p 'reader-mode)
+               (org-link-store-props
+                :type "reader"
+                :link (format "reader:%s::%d"
+                              buffer-file-name
+                              (reader-current-doc-pagenumber))
+                :description (format "%s p.%d"
+                                     (file-name-base buffer-file-name)
+                                     (reader-current-doc-pagenumber)))))))
+
+
 #+end_src
 ** newsticker
 #+begin_src elisp
