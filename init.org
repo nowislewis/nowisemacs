@@ -17,7 +17,7 @@ I fell in love with denote, so previous *org-roam* configs were refiled into [[f
 ;; no title bar
 ;; (add-to-list 'default-frame-alist '(undecorated . t))
 ;; Faster to disable these here (before they've been initialized)
-(push '(alpha-background . 80) default-frame-alist)
+;; (push '(alpha-background . 80) default-frame-alist)
 (push '(menu-bar-lines . 0) default-frame-alist)
 (push '(tool-bar-lines . 0) default-frame-alist)
 (push '(vertical-scroll-bars) default-frame-alist)
@@ -2636,10 +2636,11 @@ Simple distraction-free editing. I use darkroom instead of writeroom because it'
 #+begin_src elisp
 (setup gptel
   (setq gptel-default-mode 'org-mode
-        ;; gptel-crowdsourced-prompts-file (concat nowis/doc-emacs-dir "09-scripts/chatgpt.csv")
         gptel-highlight-methods '(face)
         gptel-model 'claude-sonnet-4.6
-        ;; gptel-max-tokens
+        gptel-cache t
+        gptel-stream nil ;; to fix tool-call issue
+        gptel-max-tokens 32768
         )
   (keymap-global-set "M-p" #'gptel-send)
   (keymap-global-set "M-r" #'gptel-rewrite)
@@ -2648,14 +2649,13 @@ Simple distraction-free editing. I use darkroom instead of writeroom because it'
   (:hook gptel-highlight-mode)
   (:when-loaded
     (setq-default gptel-backend
-                  (gptel-make-openai "momenta"
+                  (gptel-make-anthropic "momenta"
                     :host "llm-gateway.momenta.works"
                     :key 'gptel-api-key
                     :stream t
                     :models '(claude-sonnet-4.6 claude-haiku-4.5 minimax-m2.1 gpt-5.2 gemini-3-pro qwen3-coder-plus deepseek-v3.2)))
     (gptel-make-openai "chatanywhere"
       :host "api.chatanywhere.tech"
-      ;; :header (lambda () `(("Authorization" . ,(concat "Bearer " (gptel--get-api-key)))))
       :key 'gptel-api-key
       :stream t
       :models '(minimax-m2.5 claude-opus-4-6 claude-haiku-4-5-20251001))
@@ -2846,7 +2846,13 @@ Simple distraction-free editing. I use darkroom instead of writeroom because it'
   ;;         "--ssh" "tmp:/home/yi3.liu/minfer"))
   )
 #+end_src
-** webjump
+*** agent-shell
+#+begin_src elisp :tangle nil
+(setup agent-shell)
+(setq agent-shell-prefer-viewport-interaction t)
+(setq agent-shell-thought-process-icon "󰟶")
+#+end_src
+* webjump
 #+begin_src elisp
 (setup webjump
   (setq webjump-sites '(
