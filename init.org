@@ -2639,7 +2639,7 @@ Simple distraction-free editing. I use darkroom instead of writeroom because it'
         gptel-highlight-methods '(face)
         gptel-model 'claude-sonnet-4.6
         gptel-cache t
-        gptel-stream nil ;; to fix tool-call issue
+        gptel-stream t ;; to fix tool-call issue
         gptel-max-tokens 32768
         gptel-confirm-tool-calls nil
         )
@@ -2730,7 +2730,10 @@ Simple distraction-free editing. I use darkroom instead of writeroom because it'
 #+end_src
 *** gptel-agent
 #+begin_src elisp
-(setup gptel-agent)
+(setup gptel-agent
+  (with-eval-after-load 'gptel-agent-tools
+    (setf (gptel-tool-include (gptel-get-tool "Agent")) nil))
+  )
 #+end_src
 *** gptel-local-org-prompts
 #+begin_src elisp
