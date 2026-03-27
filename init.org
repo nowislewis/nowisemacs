@@ -2730,10 +2730,7 @@ Simple distraction-free editing. I use darkroom instead of writeroom because it'
 #+end_src
 *** gptel-agent
 #+begin_src elisp
-(setup gptel-agent
-  (with-eval-after-load 'gptel-agent-tools
-    (setf (gptel-tool-include (gptel-get-tool "Agent")) nil))
-  )
+(setup gptel-agent)
 #+end_src
 *** gptel-local-org-prompts
 #+begin_src elisp
