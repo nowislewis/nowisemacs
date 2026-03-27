@@ -1666,6 +1666,7 @@ borrowed from citre, now you can always jump-back use "M-," after any jump in th
 
 (setup cape
   ;; don't let dabbrev take over all things
+(setq cape-dict-file (list (concat nowis/doc-emacs-dir "12-dictionary/en-words.txt") "/usr/share/dict/words"))
   (defalias 'cape-dabbrev-min-2 (cape-capf-prefix-length #'cape-dabbrev 2))
   (dolist (f '(cape-file cape-dict cape-elisp-block cape-dabbrev-min-2))
     (add-to-list 'completion-at-point-functions f)))
