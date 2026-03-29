@@ -503,7 +503,7 @@ Maybe I should add a new state.
   "Define leader-key map for ui functions"
   [("v" "toggle-variable-pitch" variable-pitch-mode)
    ("d" "toggle-darkroom" darkroom-mode)
-   ("r" "toggle-read-mode" nowis-read-mode)
+   ("r" "toggle-read-mode" org-sm-read-mode)
     ])
 #+end_src
 *** tui-support
@@ -686,15 +686,15 @@ Maybe I should add a new state.
 ** Theme
 *** modus-themes
 #+begin_src elisp
-(setup modus-themes
-  ;; (load-theme 'modus-vivendi t)
-  (load-theme 'dracula t)
-  )
+  (setup modus-themes
+    (load-theme 'modus-vivendi t)
+    )
 #+end_src
 *** ef-themes
 #+begin_src elisp
 (setup ef-themes)
-;; (load-theme 'ef-trio-dark t)
+  ;; (ef-themes-take-over-modus-themes-mode 1)
+(load-theme 'ef-cherie t)
 #+end_src
 ** line number
 #+begin_src elisp
@@ -2485,6 +2485,7 @@ See also `org-save-all-org-buffers'"
 #+begin_src elisp
 (setup org-sm
   (:hook-into org-mode)
+  (:autoload org-sm-read-mode)
   (setq org-sm--files
         (let ((dir (expand-file-name "org-inc/" org-directory)))
           (when (file-directory-p dir)

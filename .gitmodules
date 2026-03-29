@@ -80,9 +80,6 @@
 [submodule "ebib"]
 	path = lib/ebib
 	url = https://github.com/joostkremers/ebib.git
-[submodule "el-themes"]
-	path = lib/el-themes
-	url = https://github.com/protesilaos/ef-themes.git
 [submodule "elisp-demos"]
 	path = lib/elisp-demos
 	url = https://github.com/xuchunyang/elisp-demos.git
@@ -314,3 +311,6 @@
 [submodule "lib/markdown-table-wrap"]
 	path = lib/markdown-table-wrap
 	url = https://github.com/dnouri/markdown-table-wrap.git
+[submodule "lib/ef-themes"]
+	path = lib/ef-themes
+	url = https://github.com/protesilaos/ef-themes.git
