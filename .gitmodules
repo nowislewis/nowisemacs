@@ -314,3 +314,6 @@
 [submodule "lib/ef-themes"]
 	path = lib/ef-themes
 	url = https://github.com/protesilaos/ef-themes.git
+[submodule "lib/org-pretty-table"]
+	path = lib/org-pretty-table
+	url = https://github.com/Fuco1/org-pretty-table.git

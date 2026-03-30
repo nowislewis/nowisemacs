@@ -901,7 +901,7 @@ diff-hl-mode highlights uncommitted changes on the left side of the window (area
   (setq auto-save-default nil
         create-lockfiles nil
         make-backup-files nil
-        auto-save-visited-interval 1)
+        auto-save-visited-interval 3)
   (auto-save-visited-mode)
   )
 #+end_src
@@ -2099,7 +2099,12 @@ Always allow composition for org-mode keywords, regardless of context."
 (setup org-visual-outline
   (add-hook 'org-mode-hook #'org-visual-indent-mode))
 #+end_src
-** ox-hugo
+*** org-pretty-table
+#+begin_src elisp
+(setup org-pretty-table
+  (add-hook 'org-mode-hook (lambda () (org-pretty-table-mode))))
+#+end_src
+* ox-hugo
 #+begin_src elisp
 (setup tomelr)
 (setup ox-hugo
@@ -2670,7 +2675,6 @@ Simple distraction-free editing. I use darkroom instead of writeroom because it'
       :models '(deepseek-chat deepseek-reasoner)
       )
     (gptel-make-gh-copilot "Copilot")
-
     (custom-set-faces
      '(gptel-response-highlight ((((background dark) (min-colors 88)) :background "gray22" :extend t))))
 
