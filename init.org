@@ -2346,7 +2346,7 @@ In short, you will need 3 files:
 ;; (add-hook 'org-capture-mode-hook 'delete-other-windows)
 
 (setq org-sm-capture-file
-      (concat nowis/doc-emacs-dir "01-orgmode/xnotes/gtd/20251201T112101--incubate.org0"))
+      (concat nowis/doc-emacs-dir "01-orgmode/xnotes/org-inc/20260331T230205--incremental-reading-materials.org"))
 (setq org-sm-capture-olp '("org-sm topics"))
 
 (setup org
@@ -2497,7 +2497,8 @@ See also `org-save-all-org-buffers'"
   (setq org-sm--files
         (let ((dir (expand-file-name "org-inc/" org-directory)))
           (when (file-directory-p dir)
-            (directory-files-recursively dir "[^/]*srs[^/]*\\.org$"))))
+            (directory-files-recursively dir "\\.org$"))))
+            ;; (directory-files-recursively dir "[^/]*srs[^/]*\\.org$"))))
   (nowis/smart-bind "M-z" #'region-active-p #'org-sm-item-extract)
   (:when-loaded
     (require 'org-sm-gptel)
