@@ -2080,6 +2080,9 @@ Always allow composition for org-mode keywords, regardless of context."
                 ("#+begin_tool" . ?󱁤)
                 ("#+end_tool" . ?)
                 ("#+begin_quote" . ?󱀢)
+	            ("[ ]" . 9744) ;; ☐
+	            ("[X]" . 9745) ;; ☑
+	            ("[-]" . 8863) ;; ⊟
                 ("#+end_quote" . ?)
                 (":PROPERTIES:" . ?)
                 (":LOGBOOK:" . ?)
