@@ -687,14 +687,14 @@ Maybe I should add a new state.
 *** modus-themes
 #+begin_src elisp
   (setup modus-themes
-    (load-theme 'modus-vivendi t)
+    (load-theme 'modus-vivendi-tritanopia t)
     )
 #+end_src
 *** ef-themes
 #+begin_src elisp
 (setup ef-themes)
   ;; (ef-themes-take-over-modus-themes-mode 1)
-(load-theme 'ef-cherie t)
+;; (load-theme 'ef-cherie t)
 #+end_src
 ** line number
 #+begin_src elisp
@@ -2044,9 +2044,8 @@ borrowed from citre, now you can always jump-back use "M-," after any jump in th
     (setq org-hide-leading-stars t)
     (font-lock-add-keywords 'org-mode
                             `(("^\\(\\**\\)\\(\\*\\) "
-                               (1 '(face org-hide invisible t))
                                (2 (prog1 nil
-                                    (let* ((level (- (match-end 0) (match-beginning 0) 1)) ; 空格前的星数
+                                    (let* ((level (- (match-end 2) (match-beginning 1))) ; 当前标题的层级
                                            (stars ["󰯬" "󰯯" "󰯲" "󰯵" "󰯸" "󰯻" "󰯾" "󰰁" "󰰄" "󰰇" "󰰊"]))
                                       (compose-region
                                        (match-beginning 2) (match-end 2)
@@ -2096,11 +2095,6 @@ Always allow composition for org-mode keywords, regardless of context."
 #+begin_src elisp
 (setup org-appear
   (:hook-into org-mode))
-#+end_src
-*** org-visual-outline
-#+begin_src elisp
-(setup org-visual-outline
-  (add-hook 'org-mode-hook #'org-visual-indent-mode))
 #+end_src
 *** org-pretty-table
 #+begin_src elisp

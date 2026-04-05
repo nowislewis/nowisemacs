@@ -196,9 +196,6 @@
 [submodule "org-sliced-images"]
 	path = lib/org-sliced-images
 	url = https://github.com/jcfk/org-sliced-images.git
-[submodule "org-visual-outline"]
-	path = lib/org-visual-outline
-	url = https://github.com/legalnonsense/org-visual-outline.git
 [submodule "ox-hugo"]
 	path = lib/ox-hugo
 	url = https://github.com/kaushalmodi/ox-hugo.git
