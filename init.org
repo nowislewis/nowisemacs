@@ -424,6 +424,7 @@ Maybe I should add a new state.
   "Define leader-key map for notes functions"
   [["denote"
     ("r f" "denote-open-or-create" denote-open-or-create)
+    ("r l" "denote-link" denote-link)
     ("r j" "denote-journal" denote-journal-new-or-existing-entry)
     ("r s" "find-all-searchable" project-find-searchable-dir-files)
     ("r c" "calendar" calendar)
@@ -2272,10 +2273,6 @@ Perform the comparison with `string<'."
   (add-hook 'calendar-mode-hook #'denote-journal-calendar-mode)
   )
 #+end_src
-*** denote-explorer
-#+begin_src elisp
-(setup denote-explore)
-#+end_src
 ** find orgmode dir files
 #+begin_src elisp
 (defun project-find-searchable-dir-files ()
@@ -2644,8 +2641,9 @@ Simple distraction-free editing. I use darkroom instead of writeroom because it'
         gptel-highlight-methods '(face)
         gptel-model 'claude-sonnet-4.6
         gptel-cache t
-        gptel-stream t ;; to fix tool-call issue
+        gptel-stream nil ;; to fix tool-call issue
         gptel-max-tokens 32768
+        gptel-include-reasoning nil
         gptel-confirm-tool-calls nil
         )
   (keymap-global-set "M-p" #'gptel-send)
@@ -2659,7 +2657,7 @@ Simple distraction-free editing. I use darkroom instead of writeroom because it'
                     :host "llm-gateway.momenta.works"
                     :key 'gptel-api-key
                     :stream t
-                    :models '(claude-sonnet-4.6 claude-haiku-4.5 minimax-m2.1 gpt-5.2 gemini-3-pro qwen3-coder-plus deepseek-v3.2)))
+                    :models '(claude-sonnet-4.6 claude-haiku-4.5 gemini-3.1-pro qwen3.6-plus-anthropic)))
     (gptel-make-openai "chatanywhere"
       :host "api.chatanywhere.tech"
       :key 'gptel-api-key

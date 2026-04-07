@@ -59,9 +59,6 @@
 [submodule "denote"]
 	path = lib/denote
 	url = https://github.com/protesilaos/denote.git
-[submodule "denote-explore"]
-	path = lib/denote-explore
-	url = https://github.com/pprevos/denote-explore.git
 [submodule "denote-journal"]
 	path = lib/denote-journal
 	url = https://github.com/protesilaos/denote-journal.git
