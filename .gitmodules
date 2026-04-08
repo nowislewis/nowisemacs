@@ -311,3 +311,6 @@
 [submodule "lib/org-pretty-table"]
 	path = lib/org-pretty-table
 	url = https://github.com/Fuco1/org-pretty-table.git
+[submodule "lib/org-mindmap"]
+	path = lib/org-mindmap
+	url = https://github.com/krvkir/org-mindmap.git

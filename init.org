@@ -902,7 +902,7 @@ diff-hl-mode highlights uncommitted changes on the left side of the window (area
   (setq auto-save-default nil
         create-lockfiles nil
         make-backup-files nil
-        auto-save-visited-interval 3)
+        auto-save-visited-interval 2)
   (auto-save-visited-mode)
   )
 #+end_src
@@ -2583,6 +2583,12 @@ See also `org-save-all-org-buffers'"
 ** org-graph
 #+begin_src elisp
 (setup org-graph)
+#+end_src
+** org-mindmap
+#+begin_src elisp
+(setup org-mindmap
+  (with-eval-after-load 'org
+    (require 'org-mindmap))
 #+end_src
 * 阅读
 ** reader
