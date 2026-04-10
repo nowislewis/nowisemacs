@@ -873,7 +873,7 @@ diff-hl-mode highlights uncommitted changes on the left side of the window (area
   ;; (add-hook 'org-mode-hook 'turn-on-auto-fill)
 
   ;; (global-visual-line-mode)
-  (dolist (hook '(prog-mode-hook org-mode-hook vterm-mode-hook))
+  (dolist (hook '(prog-mode-hook))
     (add-hook hook #'visual-line-mode))
   )
 #+end_src
@@ -2588,7 +2588,7 @@ See also `org-save-all-org-buffers'"
 #+begin_src elisp
 (setup org-mindmap
   (with-eval-after-load 'org
-    (require 'org-mindmap))
+    (require 'org-mindmap)))
 #+end_src
 * 阅读
 ** reader
@@ -2647,7 +2647,7 @@ Simple distraction-free editing. I use darkroom instead of writeroom because it'
         gptel-highlight-methods '(face)
         gptel-model 'claude-sonnet-4.6
         gptel-cache t
-        gptel-stream nil ;; to fix tool-call issue
+        gptel-stream t ;; to fix tool-call issue
         gptel-max-tokens 32768
         gptel-include-reasoning nil
         gptel-confirm-tool-calls nil
@@ -2738,7 +2738,24 @@ Simple distraction-free editing. I use darkroom instead of writeroom because it'
 #+end_src
 *** gptel-agent
 #+begin_src elisp
-(setup gptel-agent)
+(setup gptel-agent
+  (keymap-global-set "C-M-p" #'gptel-simple-agent)
+  (defun gptel-simple-agent (&optional project-dir)
+    "Start a gptel-agent session using the gptel-simple-agent preset."
+    (interactive
+     (list (if current-prefix-arg
+               (funcall project-prompter)
+             (if-let ((proj (project-current)))
+                 (project-root proj)
+               default-directory))))
+    (gptel-agent project-dir 'gptel-simple-agent))
+
+  (:when-loaded
+    (add-to-list 'gptel-agent-dirs
+                 (expand-file-name "131-gptel-presets/" nowis/doc-emacs-dir))
+    (gptel-agent-update)
+    (when-let* ((plist (assoc-default "gptel-simple-agent" gptel-agent--agents nil nil)))
+      (apply #'gptel-make-preset 'gptel-simple-agent plist))))
 #+end_src
 *** gptel-local-org-prompts
 #+begin_src elisp
