@@ -873,7 +873,7 @@ diff-hl-mode highlights uncommitted changes on the left side of the window (area
   ;; (add-hook 'org-mode-hook 'turn-on-auto-fill)
 
   ;; (global-visual-line-mode)
-  (dolist (hook '(prog-mode-hook))
+  (dolist (hook '(prog-mode-hook org-mode-hook))
     (add-hook hook #'visual-line-mode))
   )
 #+end_src
@@ -1376,8 +1376,12 @@ Jump anywhere in the world
 #+end_src
 ** midnight
 #+begin_src elisp
-(setup midnight)
-(setq clean-buffer-list-delay-general 1)
+(setup midnight
+  (with-idle-delay 2
+     (midnight-mode 1))
+  (setq midnight-period 3600
+        clean-buffer-list-delay-special 3600
+        clean-buffer-list-delay-general 0.5))
 #+end_src
 * shell
 ** eshell
@@ -2489,7 +2493,6 @@ See also `org-save-all-org-buffers'"
         (let ((dir (expand-file-name "org-inc/" org-directory)))
           (when (file-directory-p dir)
             (directory-files-recursively dir "\\.org$"))))
-            ;; (directory-files-recursively dir "[^/]*srs[^/]*\\.org$"))))
   (nowis/smart-bind "M-z" #'region-active-p #'org-sm-item-extract)
   (:when-loaded
     (require 'org-sm-gptel)
@@ -2508,12 +2511,14 @@ See also `org-save-all-org-buffers'"
      ["item"
       ("m" "mark" org-sm-item-mark)
       ("d" "dismiss" org-sm-item-dismiss)
+      ("u" "undismiss" org-sm-item-undismiss)
       ("z" "extract" org-sm-item-extract)
       ]
      ["gpt"
       ("f" "refine" org-sm-gptel-refine)
-      ("e" "explain" org-sm-gptel-explain)
-      ("M" "generate-concept" org-sm-gptel-generate-concept)
+      ("?" "explain" org-sm-gptel-explain)
+      ("t" "talk like feynman" org-sm-gptel-feynman)
+      ("k" "Knowledge map" org-sm-gptel-knowledge-map)
       ]
      ]
     )
@@ -2739,7 +2744,7 @@ Simple distraction-free editing. I use darkroom instead of writeroom because it'
 *** gptel-agent
 #+begin_src elisp
 (setup gptel-agent
-  (keymap-global-set "C-M-p" #'gptel-simple-agent)
+  (keymap-global-set "C-M-P" #'gptel-simple-agent)
   (defun gptel-simple-agent (&optional project-dir)
     "Start a gptel-agent session using the gptel-simple-agent preset."
     (interactive
