@@ -627,8 +627,9 @@ Maybe I should add a new state.
 ;; variable font
 (setq lewis-variable-font
       (nowis/first-available-font '("IBM Plex Sans"
-                                    "LXGW WenKai"
                                     "Noto Sans CJK SC"
+                                    "WenQuanYi Micro Hei"
+                                    "LXGW WenKai"
                                     "PingFang SC"
                                     "Times"
                                     "Helvetica"
@@ -2231,7 +2232,7 @@ Always allow composition for org-mode keywords, regardless of context."
   (setq denote-templates
         `((bib . ,(concat "#+begin_src bibtex\n"
                           "#+end_src\n"
-                          "* notes"))))
+                          "* notes\n"))))
   )
 #+end_src
 *** denote-journal
@@ -2461,7 +2462,7 @@ See also `org-save-all-org-buffers'"
   (:when-loaded
     (require 'org-sm-gptel)
     (org-sm-setup-capture)
-    (global-org-sm-read-mode)
+    ;; (global-org-sm-read-mode)
     )
   (transient-define-prefix org-sm-transient-map()
     "Define transient-key map for org-sm functions"
