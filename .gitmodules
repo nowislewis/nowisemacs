@@ -272,9 +272,6 @@
 [submodule "lib/reader"]
 	path = lib/reader
 	url = https://codeberg.org/divyaranjan/emacs-reader.git
-[submodule "lib/consult-omni"]
-	path = lib/consult-omni
-	url = https://github.com/armindarvish/consult-omni.git
 [submodule "lib/kdl-mode"]
 	path = lib/kdl-mode
 	url = https://github.com/taquangtrung/emacs-kdl-mode.git
@@ -311,6 +308,3 @@
 [submodule "lib/org-pretty-table"]
 	path = lib/org-pretty-table
 	url = https://github.com/Fuco1/org-pretty-table.git
-[submodule "lib/org-mindmap"]
-	path = lib/org-mindmap
-	url = https://github.com/krvkir/org-mindmap.git

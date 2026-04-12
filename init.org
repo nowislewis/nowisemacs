@@ -1035,17 +1035,6 @@ diff-hl-mode highlights uncommitted changes on the left side of the window (area
     (add-to-list 'consult-dir-sources 'consult-dir--source-zoxide t)
     ))
 #+end_src
-*** consult-omni
-#+begin_src elisp
-(setup consult-omni
-  (:when-loaded
-    (require 'consult-omni-embark)
-    (require 'consult-omni-sources)
-    (setq consult-omni-sources-modules-to-load '(consult-omni-google consult-omni-bing))
-    (consult-omni-sources-load-modules)
-    )
-  )
-#+end_src
 ** rg.el
 #+begin_src elisp
 (setup rg)
@@ -1058,7 +1047,6 @@ diff-hl-mode highlights uncommitted changes on the left side of the window (area
       completions-sort 'historical)
 #+end_src
 ** Completions with Vertico
-#+name: vertico
 #+begin_src elisp
 (setq vertico-cycle t)
 (setup vertico
@@ -1641,12 +1629,11 @@ borrowed from citre, now you can always jump-back use "M-," after any jump in th
     (corfu-mode 1)))
 (add-hook 'minibuffer-setup-hook #'corfu-enable-in-minibuffer)
 
-(setq text-mode-ispell-word-completion nil)
 (setup corfu
-  (setq corfu-cycle t                ;; Enable cycling for `corfu-next/previous'
-        corfu-auto t                 ;; Enable auto completion
+  (setq corfu-cycle t
+        corfu-auto t
         corfu-quit-no-match t        ;; Automatically quit if there is no match
-        corfu-preview-current nil    ;; Disable current candidate preview
+        corfu-preview-current nil
         corfu-auto-prefix 1
         corfu-auto-delay 0.05
         corfu-scroll-margin 5
@@ -1670,8 +1657,12 @@ borrowed from citre, now you can always jump-back use "M-," after any jump in th
   )
 
 (setup cape
+(setq text-mode-ispell-word-completion nil)
+  (setq cape-dict-file
+        (let ((files (list (concat nowis/doc-emacs-dir "12-dictionary/en-words.txt")
+                           "/usr/share/dict/words")))
+          (seq-filter #'file-exists-p files)))
   ;; don't let dabbrev take over all things
-(setq cape-dict-file (list (concat nowis/doc-emacs-dir "12-dictionary/en-words.txt") "/usr/share/dict/words"))
   (defalias 'cape-dabbrev-min-2 (cape-capf-prefix-length #'cape-dabbrev 2))
   (dolist (f '(cape-file cape-dict cape-elisp-block cape-dabbrev-min-2))
     (add-to-list 'completion-at-point-functions f)))
@@ -2223,52 +2214,25 @@ Always allow composition for org-mode keywords, regardless of context."
 #+begin_src elisp
 (setup denote
   (setq denote-directory (expand-file-name (concat nowis/doc-emacs-dir "01-orgmode/xnotes"))
-        ;; denote-dired-directories (ffap-all-subdirs denote-directory)
         denote-date-prompt-use-org-read-date t
-        denote-modules '(project)
-        denote-prompts '(title keywords signature template)
+        denote-prompts '(subdirectory title keywords template)
         denote-dired-directories-include-subdirectories t
         )
   ;; (add-hook 'dired-mode-hook #'denote-dired-mode-in-directories)
+  (with-eval-after-load 'org-capture
+    (add-to-list 'org-capture-templates
+                 '("n" "New note (with Denote)" plain
+                   (file denote-last-path)
+                   #'denote-org-capture
+                   :no-save t
+                   :immediate-finish nil
+                   :kill-buffer t
+                   :jump-to-captured t)))
   (setq denote-templates
-        `((journal . ,(concat "* A\n"
-                              "* B\n"
-                              "* C\n"))
-          (bib . ,(concat "#+begin_src bibtex\n"
-                           "#+end_src\n"
-                           "* notes"))
-          (have_or_want . ,(concat "* 我有的\n"
-                           "* 我要的"))
-          (gtd . ,(concat "* Important\n\n"
-                          "* Diary\n\n"))
-          ))
+        `((bib . ,(concat "#+begin_src bibtex\n"
+                          "#+end_src\n"
+                          "* notes"))))
   )
-#+end_src
-*** denote-sort
-#+begin_src elisp
-(defun my-denote--split-luhman-sig (signature)
-  "Split numbers and letters in Luhmann-style SIGNATURE string."
-  (replace-regexp-in-string
-   "\\([a-zA-Z]?\\)\\([0-9]\\)" "\\1=\\2"
-   (replace-regexp-in-string
-    "\\([0-9]?\\)\\([a-zA-Z]\\)" "\\1=\\2"
-    signature)))
-
-(defun my-denote--pad-sig (signature)
-  "Create a new signature with padded spaces for all components"
-  (combine-and-quote-strings
-   (mapcar
-    (lambda (x)
-      (string-pad x 5 32 t))
-    (split-string (my-denote--split-luhman-sig signature) "=" t))
-   "="))
-
-(defun my-denote-sort-for-signatures (sig1 sig2)
-  "Return non-nil if SIG1 is smaller that SIG2.
-Perform the comparison with `string<'."
-  (string< (my-denote--pad-sig sig1) (my-denote--pad-sig sig2)))
-;; Change the sorting function only when we sort by signature.
-(setq denote-sort-signature-comparison-function #'my-denote-sort-for-signatures)
 #+end_src
 *** denote-journal
 #+begin_src elisp
@@ -2589,12 +2553,6 @@ See also `org-save-all-org-buffers'"
 #+begin_src elisp
 (setup org-graph)
 #+end_src
-** org-mindmap
-#+begin_src elisp
-(setup org-mindmap
-  (with-eval-after-load 'org
-    (require 'org-mindmap)))
-#+end_src
 * 阅读
 ** reader
 #+begin_src elisp
@@ -2691,10 +2649,29 @@ Simple distraction-free editing. I use darkroom instead of writeroom because it'
     ;; ┌──────────┐
     ;; │ autosave │
     ;; └──────────┘
-
     (defvar nowis/gpt-save-directory
       "~/.emacs.d/gpt-saves/"
       "Directory for auto-saving GPT buffers")
+
+    (defun nowis/gpt-save--slug ()
+      "Return a sanitized 10-char slug from the first non-empty line of body text.
+ Skips gptel system prompt (lines starting with @@) and blank lines."
+      (save-excursion
+        (goto-char (point-min))
+        (let ((text ""))
+          (while (and (= (length text) 0)
+                      (not (eobp)))
+            (let ((line (string-trim (thing-at-point 'line t))))
+              (unless (or (string-empty-p line)
+                          (string-prefix-p "@@" line)
+                          (string-prefix-p "#+" line))
+                (setq text (substring line 0 (min 10 (length line)))))
+              (forward-line 1)))
+          (if (string-empty-p text)
+              "untitled"
+            ;; replace filesystem-unsafe chars with hyphen
+            (replace-regexp-in-string "[^[:alnum:]\u4e00-\u9fff\u3040-\u30ff]+"
+                                      "-" text)))))
 
     (defun nowis/gpt-save-on-kill-buffer ()
       (when (and (bound-and-true-p gptel-mode)
@@ -2702,8 +2679,9 @@ Simple distraction-free editing. I use darkroom instead of writeroom because it'
         (if buffer-file-name
             (save-buffer)
           (let* ((ts   (format-time-string "%Y%m%dT%H%M%S"))
+                 (slug (nowis/gpt-save--slug))
                  (dir  (file-name-as-directory nowis/gpt-save-directory))
-                 (fn   (expand-file-name (format "gpt-%s.org" ts) dir)))
+                 (fn   (expand-file-name (format "gpt-%s-%s.org" ts slug) dir)))
             (unless (file-directory-p dir)
               (make-directory dir t))
             (write-file fn)))))
@@ -2737,7 +2715,9 @@ Simple distraction-free editing. I use darkroom instead of writeroom because it'
                         `(,(window-buffer win)
                           :bounds ((,(window-start win) . ,(window-end win)))))
                       (nowis/gptel-windows-on-frame))))
-
+    (gptel-make-preset 'lite
+      :description "Lite model"
+      :model 'qwen3.6-plus-anthropic)
     )
   )
 #+end_src
