@@ -1361,34 +1361,36 @@ Jump anywhere in the world
 #+end_src
 ** ghostel
 #+begin_src elisp
-;; meow integration: enter insert state on ghostel buffer entry;
-;; normal state → copy-mode, insert state → exit copy-mode
 (with-eval-after-load "meow"
-  (with-eval-after-load "ghostel"
-    (add-hook 'ghostel-mode-hook
-              (lambda ()
-                (meow-insert-mode)
-                (add-hook 'meow-normal-mode-hook
-                          (lambda ()
-                            (when (and (derived-mode-p 'ghostel-mode)
-                                       (not ghostel--copy-mode-active))
-                              (ghostel-copy-mode)))
-                          nil t)
-                (add-hook 'meow-insert-mode-hook
-                          (lambda ()
-                            (when (and (derived-mode-p 'ghostel-mode)
-                                       ghostel--copy-mode-active)
-                              (ghostel-copy-mode-exit)))
-                          nil t)))))
-
-;; n/p to navigate prompts in copy-mode (OSC 133)
-(with-eval-after-load "ghostel"
-  (keymap-set ghostel-copy-mode-map "n" #'ghostel-next-prompt)
-  (keymap-set ghostel-copy-mode-map "p" #'ghostel-previous-prompt))
+  (add-hook 'ghostel-mode-hook
+            (lambda ()
+              (let ((override (make-sparse-keymap)))
+                ;; Inherit meow-insert-state-keymap so [escape] -> meow-insert-exit
+                (set-keymap-parent override meow-insert-state-keymap)
+                (define-key override (kbd "C-c <escape>")
+                  (lambda () (interactive) (ghostel--send-encoded "escape" "")))
+                (push `(meow-insert-mode . ,override)
+                      minor-mode-overriding-map-alist))
+              ;; Sync ghostel-copy-mode with meow state via meow-switch-state-hook.
+              (add-hook 'meow-switch-state-hook
+                        (lambda (state)
+                          (when (derived-mode-p 'ghostel-mode)
+                            (pcase state
+                              ('normal (unless ghostel--copy-mode-active
+                                         (ghostel-copy-mode)))
+                              ('insert (when ghostel--copy-mode-active
+                                         (ghostel-copy-mode-exit))))))
+                        nil t))))
 
 (setup ghostel
+  (setq ghostel-ignore-cursor-change t)
   (keymap-global-set "M-`" #'ghostel-toggle-window)
   (:when-loaded
+    ;; delete-backward-char (and variants) should send DEL (\x7f) to the
+    ;; terminal rather than trying to modify the read-only buffer.
+    (keymap-set ghostel-mode-map "<remap> <delete-backward-char>" #'ghostel--send-event)
+    (keymap-set ghostel-mode-map "<remap> <backward-delete-char>" #'ghostel--send-event)
+    (keymap-set ghostel-mode-map "<remap> <backward-delete-char-untabify>" #'ghostel--send-event)
     (add-to-list 'display-buffer-alist
                  '((lambda (buffer-or-name _)
                      (with-current-buffer (get-buffer buffer-or-name)
@@ -1413,7 +1415,10 @@ Jump anywhere in the world
           (let* ((names (mapcar #'buffer-name bufs))
                  (choice (completing-read "Ghostel buffer: " names nil nil))
                  (buf (get-buffer choice)))
-            (if buf (pop-to-buffer buf) (ghostel)))
+            (if buf
+                (pop-to-buffer buf)
+              (let ((ghostel-buffer-name choice))
+                (ghostel))))
         (if bufs (pop-to-buffer (car bufs)) (ghostel))))))
 #+end_src
 * git
