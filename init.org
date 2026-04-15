@@ -106,14 +106,6 @@ emacs
 ** setup
 #+begin_src elisp
 (require 'setup)
-(setup-define :defer
-  (lambda (features)
-    `(run-with-idle-timer 2 nil
-                          (lambda ()
-                            ,features)))
-  :documentation "Delay loading the feature until a certain amount of idle time has passed."
-  :repeatable t)
-
 (setup-define :autoload
   (lambda (func)
     (let ((fn (if (memq (car-safe func) '(quote function))
@@ -125,13 +117,12 @@ emacs
   :repeatable t
   :signature '(FUNC ...))
 #+end_src
-** other macros
+** other check
 #+begin_src elisp
-(defmacro with-idle-delay (secs &rest body)
-  "Emacs 启动并空闲 SECS 秒后执行 BODY，仅执行一次。"
-  `(run-with-idle-timer
-    ,secs nil
-    (lambda () ,@body)))
+(defvar nowis/is-batch-open
+  (and command-line-args-left        ; 有文件参数
+       (not (daemonp)))              ; 不是 daemon 模式
+  "Non-nil when started as `emacs FILE'.")
 #+end_src
 * Keyboard Bindings
 I used to be a vim(evil) user, but now I use meow to manage all my keys.
@@ -737,17 +728,16 @@ diff-hl-mode highlights uncommitted changes on the left side of the window (area
 ** emacs-dashboard
 #+begin_src elisp
 (setup dashboard
-  (setq dashboard-items '((recents . 5)
-                          (bookmarks . 5)
-                          )
-        dashboard-icon-type 'nerd-icons
-        dashboard-set-heading-icons t
-        dashboard-set-file-icons t
-        dashboard-center-content t
-        dashboard-startup-banner (concat nowis/config-useful-tools "banner.txt")
-        dashboard-set-init-info t)
-  (dashboard-setup-startup-hook)
-  )
+  (when nowis/is-batch-open
+    (setq dashboard-items '((recents . 5)
+                            (bookmarks . 5))
+          dashboard-icon-type 'nerd-icons
+          dashboard-set-heading-icons t
+          dashboard-set-file-icons t
+          dashboard-center-content t
+          dashboard-startup-banner (concat nowis/config-useful-tools "banner.txt")
+          dashboard-set-init-info t)
+    (dashboard-setup-startup-hook)))
 #+end_src
 *** my-simple-start
 #+begin_src elisp
@@ -773,7 +763,7 @@ diff-hl-mode highlights uncommitted changes on the left side of the window (area
   (unless (display-graphic-p)
     (setq mini-echo-right-padding 1)
     )
-  (mini-echo-mode -1)
+  (require 'mini-echo)
   (:when-loaded
     (mini-echo-define-segment "org-clock"
       "Return org-clock."
@@ -928,8 +918,7 @@ diff-hl-mode highlights uncommitted changes on the left side of the window (area
         recentf-exclude `("/tmp/" "/ssh:" ,(concat user-emacs-directory "lib/.*-autoloads\\.el\\'")))
   (add-to-list 'recentf-exclude no-littering-var-directory)
   (add-to-list 'recentf-exclude no-littering-etc-directory)
-  (with-idle-delay 2
-     (recentf-mode))
+  (:hook-into emacs-startup-hook)
   )
 #+end_src
 ** 自动换行
@@ -1129,8 +1118,7 @@ should be check after reading the embark.el manual
 (setup yasnippet
   (keymap-global-set "M-*" #'yas-insert-snippet)
   (setq yas-snippet-dirs (list (concat nowis/config-useful-tools "snippets")))
-  (with-idle-delay 2
-    (yas-global-mode))
+  (add-hook 'prog-mode-hook #'yas-minor-mode)
   )
 #+end_src
 * Window Management
@@ -1338,7 +1326,6 @@ Jump anywhere in the world
 (setup tab-line
   (setq tab-line-new-button-show nil
            tab-line-close-button-show nil)
-  ;; (:defer (global-tab-line-mode))
   )
 #+end_src
 ** project
@@ -1359,15 +1346,12 @@ Jump anywhere in the world
 #+begin_src elisp
 (setup autoinsert
   (setq auto-insert-query t)
-  ;; (:defer
-  ;;  (auto-insert-mode t))
   )
 #+end_src
 ** midnight
 #+begin_src elisp
 (setup midnight
-  (with-idle-delay 2
-     (midnight-mode 1))
+  (:hook-into emacs-startup-hook)
   (setq midnight-period 3600
         clean-buffer-list-delay-special 3600
         clean-buffer-list-delay-general 0.5))
@@ -2169,14 +2153,14 @@ Always allow composition for org-mode keywords, regardless of context."
 (setup parsebib)
 ;; (setup citeproc) ;;<- (setup queue) (setup string-inflection)
 (setup citar
-  (setq org-cite-global-bibliography (do.refs/get-db-file-list)
-           org-cite-insert-processor 'citar
-           org-cite-follow-processor 'citar
-           org-cite-activate-processor 'citar
-           citar-library-paths (list nowis/bib-pdf-dir)
-           citar-bibliography org-cite-global-bibliography
-           ;; org-cite-export-processors '((t . (csl "modern-language-association.csl")))
-           ))
+    (setq org-cite-global-bibliography (do.refs/get-db-file-list)
+          org-cite-insert-processor 'citar
+          org-cite-follow-processor 'citar
+          org-cite-activate-processor 'citar
+          citar-library-paths (list nowis/bib-pdf-dir)
+          citar-bibliography org-cite-global-bibliography
+          ;; org-cite-export-processors '((t . (csl "modern-language-association.csl")))
+          ))
 #+end_src
 *** citar-denote
 #+begin_src elisp
@@ -2267,21 +2251,19 @@ In short, you will need 3 files:
 (setq org-directory "~/Documents/emacs/01-orgmode/xnotes")
 
 (setup org
-  (:when-loaded
-    (defun org-agenda-update-agenda-files ()
-      "Update agenda file list together with refile list."
-      (interactive)
-      (let* ((gtd-dir (concat org-directory "/gtd"))
-             (gtd-files (when (file-exists-p gtd-dir)
-                          (directory-files-recursively gtd-dir "\\.org")))
-             )
-        (setq org-agenda-files gtd-files
-              org-refile-files (cl-remove-if (lambda (file) (string-match-p "inbox.org$" file))
-                                             org-agenda-files))
-        ))
-    (org-agenda-update-agenda-files)
-    ))
-
+  (defun org-agenda-update-agenda-files ()
+    "Update agenda file list together with refile list."
+    (interactive)
+    (let* ((gtd-dir (concat org-directory "/gtd"))
+           (gtd-files (when (file-exists-p gtd-dir)
+                        (directory-files-recursively gtd-dir "\\.org")))
+           )
+      (setq org-agenda-files gtd-files
+            org-refile-files (cl-remove-if (lambda (file) (string-match-p "inbox.org$" file))
+                                           org-agenda-files))
+      ))
+  (add-hook 'org-agenda-mode-hook #'org-agenda-update-agenda-files)
+  )
 #+end_src
 *** todos
 #+begin_src elisp
@@ -2542,12 +2524,12 @@ See also `org-save-all-org-buffers'"
 ** org-ladder
 #+begin_src elisp
 (setup org-ladder
-  (setq org-ladder-clock-files
-        (let ((gtd-dir (expand-file-name "gtd" org-directory)))
-          (when (file-directory-p gtd-dir)
-            (directory-files-recursively gtd-dir ".*"))))
-  (setq org-ladder-sm-files org-sm--files)
   (:when-loaded
+    (setq org-ladder-clock-files
+          (let ((gtd-dir (expand-file-name "gtd" org-directory)))
+            (when (file-directory-p gtd-dir)
+              (directory-files-recursively gtd-dir ".*"))))
+    (setq org-ladder-sm-files org-sm--files)
     (require 'org-ladder-sm)))
 #+end_src
 ** org-graph
@@ -2725,7 +2707,7 @@ Simple distraction-free editing. I use darkroom instead of writeroom because it'
 *** gptel-agent
 #+begin_src elisp
 (setup gptel-agent
-  (keymap-global-set "C-M-P" #'gptel-simple-agent)
+  (keymap-global-set "C-M-S-p" #'gptel-simple-agent)
   (defun gptel-simple-agent (&optional project-dir)
     "Start a gptel-agent session using the gptel-simple-agent preset."
     (interactive
@@ -2821,7 +2803,7 @@ Simple distraction-free editing. I use darkroom instead of writeroom because it'
                         )))
 #+end_src
 ** server
-#+begin_src elisp
+#+begin_src elisp :tangle no
 (setup server
   (require 'server)
   (unless (server-running-p)
