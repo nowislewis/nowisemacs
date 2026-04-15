@@ -257,9 +257,6 @@
 [submodule "ztree"]
 	path = lib/ztree
 	url = https://codeberg.org/fourier/ztree.git
-[submodule "lib/eat"]
-	path = lib/eat
-	url = https://codeberg.org/akib/emacs-eat.git
 [submodule "lib/emacs-life-calendar"]
 	path = lib/emacs-life-calendar
 	url = https://github.com/vshender/emacs-life-calendar.git
@@ -308,3 +305,6 @@
 [submodule "lib/org-pretty-table"]
 	path = lib/org-pretty-table
 	url = https://github.com/Fuco1/org-pretty-table.git
+[submodule "lib/ghostel"]
+	path = lib/ghostel
+	url = https://github.com/dakra/ghostel.git

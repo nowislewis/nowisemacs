@@ -1333,14 +1333,12 @@ Jump anywhere in the world
 (setup project
   (:when-loaded
     (add-to-list 'project-find-functions #'project-rootfile-try-detect)
-    )
-  )
+    ))
 #+end_src
 ** project-rootfile
 #+begin_src elisp
 (setup project-rootfile
-  (setq project-rootfile-list '(".project"))
-  )
+  (setq project-rootfile-list '(".project")))
 #+end_src
 ** auto-insert
 #+begin_src elisp
@@ -1361,72 +1359,62 @@ Jump anywhere in the world
 #+begin_src elisp
 (setup eshell)
 #+end_src
-** eat
+** ghostel
 #+begin_src elisp
-(defun meomacs-eat-meow-setup()
-  (add-hook 'meow-normal-mode-hook 'eat-emacs-mode nil t)
-  (add-hook 'meow-insert-mode-hook 'eat-semi-char-mode nil t))
-
+;; meow integration: enter insert state on ghostel buffer entry;
+;; normal state → copy-mode, insert state → exit copy-mode
 (with-eval-after-load "meow"
-  (with-eval-after-load "eat"
-    (keymap-set eat-char-mode-map "C-S-v" 'eat-yank)
-    (add-hook 'eat-mode-hook 'meomacs-eat-meow-setup)))
+  (with-eval-after-load "ghostel"
+    (add-hook 'ghostel-mode-hook
+              (lambda ()
+                (meow-insert-mode)
+                (add-hook 'meow-normal-mode-hook
+                          (lambda ()
+                            (when (and (derived-mode-p 'ghostel-mode)
+                                       (not ghostel--copy-mode-active))
+                              (ghostel-copy-mode)))
+                          nil t)
+                (add-hook 'meow-insert-mode-hook
+                          (lambda ()
+                            (when (and (derived-mode-p 'ghostel-mode)
+                                       ghostel--copy-mode-active)
+                              (ghostel-copy-mode-exit)))
+                          nil t)))))
 
-(setup eat
-  (when (eq system-type 'darwin)
-    (setq eat-term-name "xterm-256color"))
-  (keymap-global-set "M-`" #'eat-toggle-window)
+;; n/p to navigate prompts in copy-mode (OSC 133)
+(with-eval-after-load "ghostel"
+  (keymap-set ghostel-copy-mode-map "n" #'ghostel-next-prompt)
+  (keymap-set ghostel-copy-mode-map "p" #'ghostel-previous-prompt))
+
+(setup ghostel
+  (keymap-global-set "M-`" #'ghostel-toggle-window)
   (:when-loaded
     (add-to-list 'display-buffer-alist
                  '((lambda (buffer-or-name _)
-                     (let ((buffer (get-buffer buffer-or-name)))
-                       (with-current-buffer buffer
-                         (or (equal major-mode 'eat-mode)
-                             (string-prefix-p "*eat" (buffer-name buffer))))))
+                     (with-current-buffer (get-buffer buffer-or-name)
+                       (derived-mode-p 'ghostel-mode)))
                    (display-buffer-reuse-window display-buffer-at-bottom)
                    (reusable-frames . visible)
-                   (window-height . 0.3)))
-    (add-to-list 'eat-semi-char-non-bound-keys [?\e ?o])
-    (eat-update-semi-char-mode-map)))
-(defun eat-toggle-window(&optional choose-buffer)
-  "Toggle eat buffer window or select from multiple buffers."
+                   (window-height . 0.3)))))
+
+(defun ghostel-toggle-window (&optional choose-buffer)
+  "Toggle ghostel window. With prefix arg, prompt for buffer selection."
   (interactive "P")
-  (let ((eat-win (seq-find (lambda (w)
-                             (eq 'eat-mode (buffer-local-value 'major-mode (window-buffer w))))
-                           (window-list)))
-        (eat-buffers (eat--get-buffers)))
-    (if eat-win
-        (delete-window eat-win)
-      (if (or choose-buffer (> (length eat-buffers) 1))
-          (eat--prompt-select-or-create)
-        (if-let ((buf (car eat-buffers)))
-            (pop-to-buffer buf)
-          (eat--create-new-buffer))))))
-
-(defun eat--prompt-select-or-create ()
-  "Prompt user to select an existing eat buffer or type a new name to create one."
-  (let* ((eat-buffers (eat--get-buffers))
-         (existing-bufs (mapcar #'buffer-name eat-buffers))
-         (choice (completing-read "Select or create eat buffer: " existing-bufs nil nil))
-         (buf (get-buffer choice)))
-    (if buf
-        (pop-to-buffer buf)
-      (eat--create-new-buffer choice))))
-
-(defun eat--create-new-buffer (&optional buffer-name)
-  "Create a new eat buffer with optional BUFFER-NAME and open it."
-  (unless (featurep 'eat)
-    (require 'eat)
-    (eat-reload))
-  (let ((eat-buffer-name (or buffer-name eat-buffer-name)))
-    (eat)))
-
-(defun eat--get-buffers ()
-  "Return live eat buffers."
-  (seq-filter (lambda (b)
-                (and (buffer-live-p b)
-                     (eq 'eat-mode (buffer-local-value 'major-mode b))))
-              (buffer-list)))
+  (if-let ((win (seq-find (lambda (w)
+                            (with-current-buffer (window-buffer w)
+                              (derived-mode-p 'ghostel-mode)))
+                          (window-list))))
+      (delete-window win)
+    (let ((bufs (seq-filter (lambda (b)
+                              (with-current-buffer b
+                                (derived-mode-p 'ghostel-mode)))
+                            (buffer-list))))
+      (if (or choose-buffer (> (length bufs) 1))
+          (let* ((names (mapcar #'buffer-name bufs))
+                 (choice (completing-read "Ghostel buffer: " names nil nil))
+                 (buf (get-buffer choice)))
+            (if buf (pop-to-buffer buf) (ghostel)))
+        (if bufs (pop-to-buffer (car bufs)) (ghostel))))))
 #+end_src
 * git
 ** magit
@@ -2153,14 +2141,14 @@ Always allow composition for org-mode keywords, regardless of context."
 (setup parsebib)
 ;; (setup citeproc) ;;<- (setup queue) (setup string-inflection)
 (setup citar
-    (setq org-cite-global-bibliography (do.refs/get-db-file-list)
-          org-cite-insert-processor 'citar
-          org-cite-follow-processor 'citar
-          org-cite-activate-processor 'citar
-          citar-library-paths (list nowis/bib-pdf-dir)
-          citar-bibliography org-cite-global-bibliography
-          ;; org-cite-export-processors '((t . (csl "modern-language-association.csl")))
-          ))
+  (setq org-cite-global-bibliography (do.refs/get-db-file-list)
+        org-cite-insert-processor 'citar
+        org-cite-follow-processor 'citar
+        org-cite-activate-processor 'citar
+        citar-library-paths (list nowis/bib-pdf-dir)
+        citar-bibliography org-cite-global-bibliography
+        ;; org-cite-export-processors '((t . (csl "modern-language-association.csl")))
+        ))
 #+end_src
 *** citar-denote
 #+begin_src elisp
