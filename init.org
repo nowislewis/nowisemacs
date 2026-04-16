@@ -117,13 +117,6 @@ emacs
   :repeatable t
   :signature '(FUNC ...))
 #+end_src
-** other check
-#+begin_src elisp
-(defvar nowis/is-batch-open
-  (and command-line-args-left        ; 有文件参数
-       (not (daemonp)))              ; 不是 daemon 模式
-  "Non-nil when started as `emacs FILE'.")
-#+end_src
 * Keyboard Bindings
 I used to be a vim(evil) user, but now I use meow to manage all my keys.
 ** meow
@@ -341,8 +334,8 @@ Maybe I should add a new state.
    ["Code action"
     ("a" "code-actions" eglot-code-actions)
     ("r" "rename" eglot-rename)
-    ("f" "format-all-region" format-all-region)
-    ("F" "format-all-buffer" format-all-buffer)]
+    ("f" "format-region" eglot-format)
+    ("F" "format-buffer" apheleia-format-buffer)]
    ["diagnostic"
     ("n" "jump-to-next-diagnostic" flymake-goto-next-error)
     ("N" "jump-to-prev-diagnostic" flymake-goto-prev-error)
@@ -728,16 +721,16 @@ diff-hl-mode highlights uncommitted changes on the left side of the window (area
 ** emacs-dashboard
 #+begin_src elisp
 (setup dashboard
-  (when nowis/is-batch-open
-    (setq dashboard-items '((recents . 5)
-                            (bookmarks . 5))
-          dashboard-icon-type 'nerd-icons
-          dashboard-set-heading-icons t
-          dashboard-set-file-icons t
-          dashboard-center-content t
-          dashboard-startup-banner (concat nowis/config-useful-tools "banner.txt")
-          dashboard-set-init-info t)
-    (dashboard-setup-startup-hook)))
+  (setq dashboard-items '((recents . 5)
+                          (bookmarks . 5))
+        dashboard-icon-type 'nerd-icons
+        dashboard-set-heading-icons t
+        dashboard-set-file-icons t
+        dashboard-center-content t
+        dashboard-startup-banner (concat nowis/config-useful-tools "banner.txt")
+        dashboard-set-init-info t)
+  (dashboard-setup-startup-hook)
+  )
 #+end_src
 *** my-simple-start
 #+begin_src elisp
@@ -830,9 +823,8 @@ diff-hl-mode highlights uncommitted changes on the left side of the window (area
     (pulse-momentary-highlight-one-line (point)))
   (defvar my-hl-line-timer nil)
 #+end_src
-*** pulsar
+*** pulse
 #+begin_src elisp
-;; Use built-in pulse.el instead of third-party pulsar
 (require 'pulse)
 (setq pulse-delay 0.015
       pulse-iterations 10)
@@ -1046,30 +1038,28 @@ diff-hl-mode highlights uncommitted changes on the left side of the window (area
            ))
   (vertico-mode))
 #+end_src
-** icomplete
+** fido-vertical-mode
 #+begin_src elisp :tangle no
-(setup icomplete
-  (setq icomplete-scroll t
-        icomplete-hide-common-prefix nil
-        icomplete-show-matches-on-no-input t
-        icomplete-prospects-height 1
-        icomplete-separator " "
-        )
-  (icomplete-vertical-mode)
+;; fido-vertical-mode 会自动开启 fido-mode + icomplete-vertical-mode
+(fido-vertical-mode 1)
 
-  (:when-loaded
-    (keymap-set icomplete-minibuffer-map "TAB" #'icomplete-force-complete)
-    (keymap-set icomplete-minibuffer-map "DEL" #'icomplete-fido-backward-updir)
-    (keymap-set icomplete-minibuffer-map "RET" #'icomplete-force-complete-and-exit)
-    ;; (keymap-set icomplete-minibuffer-map "C-s" #'icomplete-forward-completions)
-    ;; (keymap-set icomplete-minibuffer-map "C-r" #'icomplete-backward-completions)
-    ))
-#+end_src
-** flex
-#+begin_src elisp :tangle no
-(setq completion-styles '(basic partial-completion flex)
-      completion-cycling t
-      )
+;; 在更高的 depth 覆盖它，以继续使用 orderless
+(defun lewis/fido-use-orderless ()
+  "Override fido-mode's flex completion-styles with orderless."
+  (when (and fido-mode (icomplete-simple-completing-p))
+    (setq-local completion-styles '(orderless basic)
+                completion-category-defaults nil
+                completion-category-overrides '((file (styles partial-completion))))))
+(add-hook 'minibuffer-setup-hook #'lewis/fido-use-orderless 99)
+
+;; 候选行超出屏幕宽度时截断而非换行
+(defun lewis/minibuffer-truncate-lines ()
+  (setq-local truncate-lines t))
+(add-hook 'minibuffer-setup-hook #'lewis/minibuffer-truncate-lines 99)
+
+;; 调整候选列表高度（fido 通过 max-mini-window-height 控制）
+(setq max-mini-window-height 0.4
+      resize-mini-windows t)
 #+end_src
 ** Orderless and pinyinlib
 #+begin_src elisp
@@ -1349,7 +1339,7 @@ Jump anywhere in the world
 ** midnight
 #+begin_src elisp
 (setup midnight
-  (:hook-into emacs-startup-hook)
+  (midnight-mode)
   (setq midnight-period 3600
         clean-buffer-list-delay-special 3600
         clean-buffer-list-delay-general 0.5))
@@ -1772,11 +1762,10 @@ borrowed from citre, now you can always jump-back use "M-," after any jump in th
   (add-to-list 'hs-special-modes-alist '(verilog-mode "\\(\\<begin\\>\\|\\<case\\>\\|\\<module\\>\\|\\<class\\>\\|\\<function\\>\\|\\<task\\>\\)"
                                                       )))
 #+end_src
-*** format-all
+*** apheleia
 #+begin_src elisp
-(setup inheritenv)
-(setup language-id)
-(setup format-all)
+(setup apheleia
+  (apheleia-global-mode))
 #+end_src
 *** compile
 #+begin_src elisp
@@ -2764,12 +2753,6 @@ Simple distraction-free editing. I use darkroom instead of writeroom because it'
   ;;       '("-e" "~/.npm-global/lib/node_modules/@mariozechner/pi-coding-agent/examples/extensions/ssh.ts"
   ;;         "--ssh" "tmp:/home/yi3.liu/minfer"))
   )
-#+end_src
-*** agent-shell
-#+begin_src elisp :tangle nil
-(setup agent-shell)
-(setq agent-shell-prefer-viewport-interaction t)
-(setq agent-shell-thought-process-icon "󰟶")
 #+end_src
 * webjump
 #+begin_src elisp

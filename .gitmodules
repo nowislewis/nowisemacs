@@ -95,9 +95,6 @@
 [submodule "f"]
 	path = lib/f
 	url = https://github.com/rejeep/f.el.git
-[submodule "format-all"]
-	path = lib/format-all
-	url = https://github.com/lassik/emacs-format-all-the-code.git
 [submodule "geiser"]
 	path = lib/geiser
 	url = https://github.com/emacsmirror/geiser.git
@@ -132,15 +129,9 @@
 [submodule "indent-bars"]
 	path = lib/indent-bars
 	url = https://github.com/jdtsmith/indent-bars.git
-[submodule "inheritenv"]
-	path = lib/inheritenv
-	url = https://github.com/purcell/inheritenv.git
 [submodule "jinx"]
 	path = lib/jinx
 	url = https://github.com/minad/jinx.git
-[submodule "language-id"]
-	path = lib/language-id
-	url = https://github.com/lassik/emacs-language-id.git
 [submodule "lisp-fsrs"]
 	path = lib/lisp-fsrs
 	url = https://github.com/open-spaced-repetition/lisp-fsrs.git
@@ -308,3 +299,6 @@
 [submodule "lib/ghostel"]
 	path = lib/ghostel
 	url = https://github.com/dakra/ghostel.git
+[submodule "lib/apheleia"]
+	path = lib/apheleia
+	url = https://github.com/radian-software/apheleia.git
