@@ -1376,11 +1376,11 @@ Jump anywhere in the world
   (setq ghostel-ignore-cursor-change t)
   (keymap-global-set "M-`" #'ghostel-toggle-window)
   (:when-loaded
-    ;; delete-backward-char (and variants) should send DEL (\x7f) to the
-    ;; terminal rather than trying to modify the read-only buffer.
-    (keymap-set ghostel-mode-map "<remap> <delete-backward-char>" #'ghostel--send-event)
-    (keymap-set ghostel-mode-map "<remap> <backward-delete-char>" #'ghostel--send-event)
-    (keymap-set ghostel-mode-map "<remap> <backward-delete-char-untabify>" #'ghostel--send-event)
+    ;; ;; delete-backward-char (and variants) should send DEL (\x7f) to the
+    ;; ;; terminal rather than trying to modify the read-only buffer.
+    ;; (keymap-set ghostel-mode-map "<remap> <delete-backward-char>" #'ghostel--send-event)
+    ;; (keymap-set ghostel-mode-map "<remap> <backward-delete-char>" #'ghostel--send-event)
+    ;; (keymap-set ghostel-mode-map "<remap> <backward-delete-char-untabify>" #'ghostel--send-event)
     (add-to-list 'display-buffer-alist
                  '((lambda (buffer-or-name _)
                      (with-current-buffer (get-buffer buffer-or-name)
@@ -2591,7 +2591,7 @@ Simple distraction-free editing. I use darkroom instead of writeroom because it'
                     :host "llm-gateway.momenta.works"
                     :key 'gptel-api-key
                     :stream t
-                    :models '(claude-sonnet-4.6 claude-haiku-4.5 gemini-3.1-pro qwen3.6-plus-anthropic)))
+                    :models '(claude-sonnet-4.6 claude-haiku-4.5 gemini-3.1-pro qwen3.6-plus-anthropic qwen3.6-plus)))
     (gptel-make-openai "chatanywhere"
       :host "api.chatanywhere.tech"
       :key 'gptel-api-key
