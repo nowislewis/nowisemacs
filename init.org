@@ -467,11 +467,15 @@ Maybe I should add a new state.
                    (interactive)
                    (org-occur "^[ \t]*\\*+ +\\(TODO\\|NEXT\\)\\>")))
     ]
+   ["appt"
+    ("k" "appt-check" appt-check)]
    ["capture"
     ("c" "capture" org-capture)
     ("e" "capture topic" org-sm-capture-topic)
     ("E" "capture topic (change target)"
      (lambda () (interactive) (org-sm-capture-topic '(-1))))
+    ;; ("C" "clarify entry (AI refile)" nowis/gtd-clarify-entry)
+    ;; ("W" "weekly review (AI)" nowis/gtd-weekly-review)
     ]
    ["life"
     ("L" "life" life-calendar)
@@ -1949,16 +1953,21 @@ borrowed from citre, now you can always jump-back use "M-," after any jump in th
   (setq org-timer-default-timer 25))
 #+end_src
 ** appt
-#+begin_src elisp :tangle no
+#+begin_src elisp
 (setup appt
-  (:load-after org)
-  (:when-loaded
-    (run-at-time nil 3600 'org-agenda-to-appt)
-    ;; 更新agenda时，同步appt
-    (add-hook 'org-finalize-agenda-hook 'org-agenda-to-appt)
-    ;; 激活提醒
-    (appt-activate 1)
-    ))
+  (add-hook 'org-agenda-finalize-hook (lambda () (org-agenda-to-appt t)))
+  (with-eval-after-load 'org-agenda
+    (require' appt)
+    (setq appt-display-format 'window
+          appt-audible nil
+          appt-display-diary nil
+          appt-display-duration 180
+          appt-message-warning-time 6
+          ;; appt-display-interval 3
+          )
+    ;; 更新agenda时，同步appt（t = 先清空再重建，防止旧条目残留）
+    (run-at-time nil 3600 (lambda () (org-agenda-to-appt t)))
+    (appt-activate 1)))
 #+end_src
 ** ui
 *** org mode basic style
@@ -2238,7 +2247,9 @@ In short, you will need 3 files:
     (interactive)
     (let* ((gtd-dir (concat org-directory "/gtd"))
            (gtd-files (when (file-exists-p gtd-dir)
-                        (directory-files-recursively gtd-dir "\\.org")))
+                        (cl-remove-if
+                         (lambda (f) (string-match-p "beorg\\|archive" f))
+                         (directory-files-recursively gtd-dir "\\.org"))))
            )
       (setq org-agenda-files gtd-files
             org-refile-files (cl-remove-if (lambda (file) (string-match-p "inbox.org$" file))
@@ -2292,7 +2303,7 @@ In short, you will need 3 files:
     (setq org-refile-targets
           '((org-refile-files :level 1)))
     ;; Save the corresponding buffers
-    (defun gtd-save-org-buffers ()
+    (defun gtd-save-org-buffers (&rest _)
       "Save `org-agenda-files' buffers without user confirmation.
 See also `org-save-all-org-buffers'"
       (interactive)
@@ -2392,6 +2403,11 @@ See also `org-save-all-org-buffers'"
       '(:link t :maxlevel 5 :properties ("Effort"))
       org-clock-out-remove-zero-time-clocks t)
 
+#+end_src
+*** clarify with AI
+#+begin_src elisp
+(with-eval-after-load 'org
+  (require 'nowis-gtd))
 #+end_src
 *** archive
 #+begin_src elisp
@@ -2689,7 +2705,7 @@ Simple distraction-free editing. I use darkroom instead of writeroom because it'
 *** gptel-agent
 #+begin_src elisp
 (setup gptel-agent
-  (keymap-global-set "C-M-S-p" #'gptel-simple-agent)
+  ;; (keymap-global-set "C-M-S-p" #'gptel-simple-agent)
   (defun gptel-simple-agent (&optional project-dir)
     "Start a gptel-agent session using the gptel-simple-agent preset."
     (interactive

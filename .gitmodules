@@ -302,3 +302,6 @@
 [submodule "lib/apheleia"]
 	path = lib/apheleia
 	url = https://github.com/radian-software/apheleia.git
+[submodule "lib/denote-sequence"]
+	path = lib/denote-sequence
+	url = https://github.com/protesilaos/denote-sequence.git
