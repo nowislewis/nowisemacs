@@ -2726,6 +2726,7 @@ Simple distraction-free editing. I use darkroom instead of writeroom because it'
 *** gptel-local-org-prompts
 #+begin_src elisp
 (setup gptel-local-org-prompts
+  (:autoload gptel-choose-org-prompt)
   (keymap-global-set "M-L" #'gptel-choose-org-prompt)
   (setq gptel-local-org-prompts-directory (expand-file-name "13-gptel-prompts/" nowis/doc-emacs-dir)
         gptel-local-org-prompts-preview-length 100)
