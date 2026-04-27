@@ -302,3 +302,6 @@
 [submodule "lib/denote-sequence"]
 	path = lib/denote-sequence
 	url = https://github.com/protesilaos/denote-sequence.git
+[submodule "lib/org-mindmap"]
+	path = lib/org-mindmap
+	url = https://github.com/krvkir/org-mindmap.git

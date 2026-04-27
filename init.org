@@ -368,7 +368,6 @@ Maybe I should add a new state.
   [
    ["Imenu"
     ("l" "Imenu list smart toggle" imenu-list-smart-toggle)
-    ;; ("L" "Boxy imenu" boxy-imenu)
     ]
    ["gptel"
     ("a" "gptel-agent" gptel-agent)
@@ -474,8 +473,6 @@ Maybe I should add a new state.
     ("e" "capture topic" org-sm-capture-topic)
     ("E" "capture topic (change target)"
      (lambda () (interactive) (org-sm-capture-topic '(-1))))
-    ;; ("C" "clarify entry (AI refile)" nowis/gtd-clarify-entry)
-    ;; ("W" "weekly review (AI)" nowis/gtd-weekly-review)
     ]
    ["life"
     ("L" "life" life-calendar)
@@ -505,9 +502,7 @@ Maybe I should add a new state.
 (setup clipetty
   (unless (display-graphic-p)
     (require 'clipetty)
-    (global-clipetty-mode)
-    )
-  )
+    (global-clipetty-mode)))
 #+end_src
 ** meow leader keybindings
 #+begin_src elisp
@@ -625,14 +620,6 @@ Maybe I should add a new state.
                                     ;; "Source Han Sans SC VF"
                                     "Arial"
                                     "Times New Roman")))
-
-;; chinese font
-(setq lewis-chinese-font
-      (nowis/first-available-font '("Maple Mono SC NF"
-                                    "Unifont"
-                                    "Sarasa Mono SC Nerd"
-                                    "Microsoft Yahei")))
-
 ;; symbol font
 (setq lewis-symbol-font
       (nowis/first-available-font '("Symbols Nerd Font Mono"
@@ -649,18 +636,12 @@ Maybe I should add a new state.
           (set-face-attribute 'default nil :family lewis-fixed-font :height lewis-font-size)
           ;; (set-face-attribute 'fixed-pitch nil :family lewis-fixed-font :height 1.0)
           ))
-
     ;; variable-pitch
     (if lewis-variable-font
         (set-face-attribute 'variable-pitch nil :family lewis-variable-font :height 1.0))
-
     ;; Specify font for all unicode characters
     (if lewis-symbol-font
         (set-fontset-font t 'unicode lewis-symbol-font nil 'prepend))
-
-    ;; Specify font for Chinese characters
-    ;; (if lewis-chinese-font
-    ;;     (set-fontset-font t '(#x4e00 . #x9fff) lewis-chinese-font))
     )
   )
 
@@ -857,7 +838,6 @@ diff-hl-mode highlights uncommitted changes on the left side of the window (area
         kill-do-not-save-duplicates t
         shell-command-prompt-show-cwd t
         what-cursor-show-names t)
-  ;; (add-hook 'org-mode-hook 'turn-on-auto-fill)
 
   ;; (global-visual-line-mode)
   (dolist (hook '(prog-mode-hook org-mode-hook))
@@ -1000,14 +980,11 @@ diff-hl-mode highlights uncommitted changes on the left side of the window (area
   (define-key global-map (kbd "C-x C-d") #'consult-dir)
   (define-key minibuffer-local-completion-map (kbd "C-x C-d") #'consult-dir)
   (:when-loaded
-
     ;; add support for zoxide
     (setq consult-dir-default-command #'consult-dir-dired)
-
     (defun consult-dir--zoxide-dirs ()
       "Return list of zoxide dirs."
       (split-string (shell-command-to-string "zoxide query -l") "\n" t))
-
     (defvar consult-dir--source-zoxide
       `(:name "zoxide"
               :narrow ?z
@@ -1254,13 +1231,11 @@ Jump anywhere in the world
         rime-share-data-dir "~/Documents/rime/"
         rime-inline-ascii-trigger 'shift-r
         )
-  ;; (add-hook 'kill-emacs-hook #'rime-lib-finalize)
   )
 (when (eq system-type 'darwin)
   (setq
    rime-emacs-module-header-root "/Applications/Emacs.app/Contents/Resources/include/" ;; use build-emacs
    ;; rime-emacs-module-header-root "/opt/homebrew/opt/emacs-plus@31/include" ;;use emacs-plus
-   ;; rime-librime-root "~/Downloads/librime/dist"
    rime-librime-root "/opt/homebrew/opt/librime/"
    ))
 #+end_src
@@ -1315,8 +1290,7 @@ Jump anywhere in the world
       ("p" "prev tab" tab-bar-switch-to-prev-tab)
       ("l" "last tab" tab-bar-switch-to-last-tab)
       ]
-     ]
-    ))
+     ]))
 (setup tab-line
   (setq tab-line-new-button-show nil
            tab-line-close-button-show nil)
@@ -1380,11 +1354,6 @@ Jump anywhere in the world
   (setq ghostel-ignore-cursor-change t)
   (keymap-global-set "M-`" #'ghostel-toggle-window)
   (:when-loaded
-    ;; ;; delete-backward-char (and variants) should send DEL (\x7f) to the
-    ;; ;; terminal rather than trying to modify the read-only buffer.
-    ;; (keymap-set ghostel-mode-map "<remap> <delete-backward-char>" #'ghostel--send-event)
-    ;; (keymap-set ghostel-mode-map "<remap> <backward-delete-char>" #'ghostel--send-event)
-    ;; (keymap-set ghostel-mode-map "<remap> <backward-delete-char-untabify>" #'ghostel--send-event)
     (add-to-list 'display-buffer-alist
                  '((lambda (buffer-or-name _)
                      (with-current-buffer (get-buffer buffer-or-name)
@@ -2073,7 +2042,7 @@ Always allow composition for org-mode keywords, regardless of context."
 (setup org-pretty-table
   (add-hook 'org-mode-hook (lambda () (org-pretty-table-mode))))
 #+end_src
-* ox-hugo
+** ox-hugo
 #+begin_src elisp
 (setup tomelr)
 (setup ox-hugo
@@ -2427,7 +2396,6 @@ See also `org-save-all-org-buffers'"
                                "::datetree/")))
     (setq org-archive-location archive-file)
     (org-archive-subtree)))
-
 #+end_src
 ** org-sm
 #+begin_src elisp
@@ -2534,6 +2502,14 @@ See also `org-save-all-org-buffers'"
 #+begin_src elisp
 (setup org-graph)
 #+end_src
+** org-mindmap
+#+begin_src elisp
+(setup org-mindmap
+  (with-eval-after-load 'org
+    (require 'org-mindmap)
+    )
+  )
+#+end_src
 * 阅读
 ** reader
 #+begin_src elisp
@@ -2618,61 +2594,12 @@ Simple distraction-free editing. I use darkroom instead of writeroom because it'
       :host "api.deepseek.com/anthropic"
       :key 'gptel-api-key
       :stream t
-      :models '(deepseek-chat deepseek-reasoner)
+      :models '(deepseek-v4-flash deepseek-v4-pro)
       )
     (gptel-make-gh-copilot "Copilot")
     (custom-set-faces
      '(gptel-response-highlight ((((background dark) (min-colors 88)) :background "gray22" :extend t))))
 
-    ;; integration
-    ;; (require 'gptel-integrations)
-
-    ;; ┌──────────┐
-    ;; │ autosave │
-    ;; └──────────┘
-    (defvar nowis/gpt-save-directory
-      "~/.emacs.d/gpt-saves/"
-      "Directory for auto-saving GPT buffers")
-
-    (defun nowis/gpt-save--slug ()
-      "Return a sanitized 10-char slug from the first non-empty line of body text.
- Skips gptel system prompt (lines starting with @@) and blank lines."
-      (save-excursion
-        (goto-char (point-min))
-        (let ((text ""))
-          (while (and (= (length text) 0)
-                      (not (eobp)))
-            (let ((line (string-trim (thing-at-point 'line t))))
-              (unless (or (string-empty-p line)
-                          (string-prefix-p "@@" line)
-                          (string-prefix-p "#+" line))
-                (setq text (substring line 0 (min 10 (length line)))))
-              (forward-line 1)))
-          (if (string-empty-p text)
-              "untitled"
-            ;; replace filesystem-unsafe chars with hyphen
-            (replace-regexp-in-string "[^[:alnum:]\u4e00-\u9fff\u3040-\u30ff]+"
-                                      "-" text)))))
-
-    (defun nowis/gpt-save-on-kill-buffer ()
-      (when (and (bound-and-true-p gptel-mode)
-                 (buffer-modified-p))
-        (if buffer-file-name
-            (save-buffer)
-          (let* ((ts   (format-time-string "%Y%m%dT%H%M%S"))
-                 (slug (nowis/gpt-save--slug))
-                 (dir  (file-name-as-directory nowis/gpt-save-directory))
-                 (fn   (expand-file-name (format "gpt-%s-%s.org" ts slug) dir)))
-            (unless (file-directory-p dir)
-              (make-directory dir t))
-            (write-file fn)))))
-
-    (add-hook 'gptel-mode-hook
-              (lambda ()
-                (add-hook 'kill-buffer-hook
-                          #'nowis/gpt-save-on-kill-buffer
-                          nil  ; append
-                          t))) ; make buffer-local
     ;; ┌─────────┐
     ;; │ presets │
     ;; └─────────┘
@@ -2744,12 +2671,10 @@ Simple distraction-free editing. I use darkroom instead of writeroom because it'
 *** whisper
 #+begin_src elisp
 (setup whisper
-  (setq whisper-language "auto"
-        whisper-model "small"
-        whisper-translate nil
-        whisper-use-threads (- (num-processors) 1)
-        whisper--ffmpeg-input-device "default"
-        whisper--ffmpeg-input-format "pulse")
+  (setq whisper-server-mode 'remote
+        whisper-server-baseurl "http://127.0.0.1:8642"
+        whisper--ffmpeg-input-format "pulse"
+        whisper--ffmpeg-input-device "default")
   )
 #+end_src
 *** pi-coding-agent
