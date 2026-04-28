@@ -5,8 +5,7 @@ I fell in love with denote, so previous *org-roam* configs were refiled into [[f
 ** UI speed up
 #+begin_src elisp :tangle ~/.emacs.d/early-init.el
 ;;; -*- lexical-binding: t; -*-
-;; set gc according to EmacsConf 2023
-(setq gc-cons-threshold 8000000
+(setq gc-cons-threshold 300000000
       gc-cons-percentage 0.2)
 (setq package-enable-at-startup nil)
 
@@ -41,6 +40,7 @@ I fell in love with denote, so previous *org-roam* configs were refiled into [[f
 #+begin_src elisp
 ;;; -*- lexical-binding: t; -*-
 ;; basic modes
+(setq gc-cons-threshold 300000000)
 
 ;; turn off native-comp on macos
 (if (eq system-type 'darwin)
@@ -317,6 +317,7 @@ Maybe I should add a new state.
 #+begin_src elisp
 (setup transient
   (require 'transient)
+  (setq transient-version "0.13.0")
   (:with-map transient-base-map
     (:bind "<escape>" transient-quit-one)))
 #+end_src
@@ -496,13 +497,6 @@ Maybe I should add a new state.
 #+begin_src elisp
 (unless (display-graphic-p)
   (xterm-mouse-mode 1))
-#+end_src
-**** clipetty
-#+begin_src elisp
-(setup clipetty
-  (unless (display-graphic-p)
-    (require 'clipetty)
-    (global-clipetty-mode)))
 #+end_src
 ** meow leader keybindings
 #+begin_src elisp
@@ -1245,12 +1239,12 @@ Jump anywhere in the world
 #+begin_src elisp
 (setup dired
   (setq dired-dwim-target t)
-  (:hook dired-hide-details-mode
-         ;; dired-omit-mode
-         )
   (:with-map dired-mode-map
-    (:bind "TAB" #'dired-subtree-toggle))
-  )
+    (:bind "TAB" #'dired-subtree-toggle
+           "F" dired-preview-mode)))
+(add-hook 'dired-after-readin-hook #'dired-hide-details-mode)
+;; for subtree icons
+(add-hook 'dired-subtree-after-insert-hook #'nerd-icons-dired--refresh)
 #+end_src
 *** nerd-icons-dired
 #+begin_src elisp
@@ -1260,6 +1254,12 @@ Jump anywhere in the world
 *** dired-sidebar
 #+begin_src elisp
 (setup dired-sidebar)
+#+end_src
+*** dired-preview
+#+begin_src elisp
+  (setup dired-preview
+    (setq dired-preview-delay 0.1)
+    (:autoload dired-preview-mode))
 #+end_src
 ** structure browsing
 *** imenu-list
@@ -1399,6 +1399,10 @@ Jump anywhere in the world
         ediff-window-setup-function 'ediff-setup-windows-plain)
   ;; restore window configuration after ediff via winner-mode
   (add-hook 'ediff-quit-hook #'winner-undo))
+#+end_src
+** vc
+#+begin_src elisp
+(setq vc-follow-symlinks t)
 #+end_src
 * Program
 ** Language
@@ -1737,8 +1741,11 @@ borrowed from citre, now you can always jump-back use "M-," after any jump in th
 #+end_src
 *** apheleia
 #+begin_src elisp
-(setup apheleia
-  (apheleia-global-mode))
+  (setup apheleia
+    ;; (apheleia-global-mode)
+    (:when-loaded
+    (setf (alist-get 'python-ts-mode apheleia-mode-alist)
+          '(isort yapf))))
 #+end_src
 *** compile
 #+begin_src elisp
@@ -1884,9 +1891,7 @@ borrowed from citre, now you can always jump-back use "M-," after any jump in th
                           ("convert -density %D -trim -antialias %f -quality 300 %O")))
   (plist-put org-format-latex-options :scale 1.0) ;; use a large preview for latex
   ;; export and open word
-  (add-to-list 'org-file-apps '("\\.docx\\'" . default))
-  (add-to-list 'org-structure-template-alist
-               '("jp" . "src jupyter-python :async yes :kernel python3 :session py")))
+  (add-to-list 'org-file-apps '("\\.docx\\'" . default)))
 #+end_src
 ** org-clock
 #+begin_src elisp
@@ -2013,20 +2018,16 @@ Always allow composition for org-mode keywords, regardless of context."
 (defun nowis/org-setup-prettify ()
   "Set up prettify-symbols for org-mode."
   (setq-local prettify-symbols-alist
-              '(("#+begin_src" . ?)
-                ("#+end_src" . ?)
-                ("#+BEGIN_SRC" . ?)
-                ("#+END_SRC" . ?)
-                ("#+begin_tool" . ?󱁤)
-                ("#+end_tool" . ?)
-                ("#+begin_quote" . ?󱀢)
+              '(("#+begin_" . ?╭)
+                ("#+end_" . ?╰)
+                ("#+BEGIN_" . ?╭)
+                ("#+END_" . ?╰)
 	            ("[ ]" . 9744) ;; ☐
 	            ("[X]" . 9745) ;; ☑
 	            ("[-]" . 8863) ;; ⊟
-                ("#+end_quote" . ?)
                 (":PROPERTIES:" . ?)
                 (":LOGBOOK:" . ?)
-                (":END:" . ?)))
+                (":END:" . ?╰)))
   (setq-local prettify-symbols-compose-predicate #'my/org-prettify-compose-p)
   (prettify-symbols-mode))
 
@@ -2685,10 +2686,8 @@ Simple distraction-free editing. I use darkroom instead of writeroom because it'
   (custom-set-faces
    '(md-ts-heading-1 ((t (:inherit org-level-2)))))
   )
-
 (setup pi-coding-agent
   (defalias 'pi 'pi-coding-agent)
-  (setq transient-version "0.12.0")
   (setq pi-coding-agent-tool-preview-lines 1
         pi-coding-agent-bash-preview-lines 1)
   ;; (setq pi-coding-agent-extra-args

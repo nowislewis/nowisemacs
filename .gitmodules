@@ -24,9 +24,6 @@
 	path = lib/citar-denote
 	url = https://github.com/pprevos/citar-denote.git
     no-byte-compile = minimum-config.el 
-[submodule "clipetty"]
-	path = lib/clipetty
-	url = https://github.com/spudlyo/clipetty.git
 [submodule "cond-let"]
 	path = lib/cond-let
 	url = https://github.com/tarsius/cond-let.git
@@ -305,3 +302,6 @@
 [submodule "lib/org-mindmap"]
 	path = lib/org-mindmap
 	url = https://github.com/krvkir/org-mindmap.git
+[submodule "lib/dired-preview"]
+	path = lib/dired-preview
+	url = https://github.com/protesilaos/dired-preview.git
