@@ -1,0 +1,20 @@
+# -*- mode: snippet -*-
+# name: review_yearly
+# key: ryy
+# --
+* 年度回顾 :review:yearly:
+:PROPERTIES:
+:REVIEW_PERIOD: `(format-time-string "%Y")`
+:END:
+
+** 年度变化
+$1
+
+** 主要成果
+
+** 角色与方向变化
+
+** 愿景调整
+
+** 明年重点
+$0

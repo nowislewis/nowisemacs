@@ -1,0 +1,18 @@
+# -*- mode: snippet -*-
+# name: review_monthly
+# key: rmm
+# --
+* 月回顾 :review:monthly:
+:PROPERTIES:
+:REVIEW_PERIOD: `(format-time-string "%Y-%m")`
+:END:
+
+** 本月主题
+$1
+
+** 主要推进
+
+** 结构观察
+
+** 下月重点
+$0

@@ -1,0 +1,20 @@
+# -*- mode: snippet -*-
+# name: review_quarterly
+# key: rqq
+# --
+* 季度回顾 :review:quarterly:
+:PROPERTIES:
+:REVIEW_PERIOD: `(format "%s-Q%s" (format-time-string "%Y") (+ 1 (/ (1- (string-to-number (format-time-string "%m"))) 3)))`
+:END:
+
+** 本季度变化
+$1
+
+** 主要成果
+
+** Area 变化
+
+** Goal 对齐情况
+
+** Stop / Start / Continue
+$0

@@ -1,0 +1,16 @@
+# -*- mode: snippet -*-
+# name: review_daily
+# key: rdd
+# --
+* 日结 :review:daily:
+:PROPERTIES:
+:REVIEW_PERIOD: `(format-time-string "%Y-%m-%d")`
+:END:
+
+** 今天完成了什么
+$1
+
+** 卡住了什么
+
+** 明天第一步
+$0

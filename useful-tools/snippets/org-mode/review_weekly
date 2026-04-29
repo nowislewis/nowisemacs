@@ -1,0 +1,18 @@
+# -*- mode: snippet -*-
+# name: review_weekly
+# key: rww
+# --
+* 周回顾 :review:weekly:
+:PROPERTIES:
+:REVIEW_PERIOD: `(format-time-string "%G-W%V")`
+:END:
+
+** 本周完成
+$1
+
+** 卡点 / 风险
+
+** 一个观察
+
+** 下周重点
+$0
