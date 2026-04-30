@@ -317,7 +317,6 @@ Maybe I should add a new state.
 #+begin_src elisp
 (setup transient
   (require 'transient)
-  (setq transient-version "0.13.0")
   (:with-map transient-base-map
     (:bind "<escape>" transient-quit-one)))
 #+end_src
@@ -875,19 +874,13 @@ diff-hl-mode highlights uncommitted changes on the left side of the window (area
         savehist-save-minibuffer-history t)
   (savehist-mode))
 #+end_src
-** no-littering
-#+begin_src elisp
-(setup no-littering
-   (require 'no-littering)
-  )
-#+end_src
+
 ** recentf
 #+begin_src elisp
 (setup recentf
   (setq recentf-max-saved-items 100
         recentf-exclude `("/tmp/" "/ssh:" ,(concat user-emacs-directory "lib/.*-autoloads\\.el\\'")))
-  (add-to-list 'recentf-exclude no-littering-var-directory)
-  (add-to-list 'recentf-exclude no-littering-etc-directory)
+  (add-to-list 'recentf-exclude user-emacs-directory)
   (:hook-into emacs-startup-hook)
   )
 #+end_src
@@ -1774,7 +1767,7 @@ borrowed from citre, now you can always jump-back use "M-," after any jump in th
                                (wl . wl-other-frame))
 
         org-image-actual-width 800 ;; this will use 600 for width for all the images.
-        org-preview-latex-image-directory (concat no-littering-var-directory "ltximg/")
+        org-preview-latex-image-directory (expand-file-name "ltximg/" user-emacs-directory)
         ;; org-plantuml-jar-path plantuml-jar-path
         org-special-ctrl-a/e t
         ;; org-id

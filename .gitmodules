@@ -160,9 +160,6 @@
 [submodule "nerd-icons-dired"]
 	path = lib/nerd-icons-dired
 	url = https://github.com/rainstormstudio/nerd-icons-dired.git
-[submodule "no-littering"]
-	path = lib/no-littering
-	url = https://github.com/emacscollective/no-littering.git
 [submodule "orderless"]
 	path = lib/orderless
 	url = https://github.com/oantolin/orderless.git
