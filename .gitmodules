@@ -302,3 +302,6 @@
 [submodule "lib/dired-preview"]
 	path = lib/dired-preview
 	url = https://github.com/protesilaos/dired-preview.git
+[submodule "lib/whisper-funasr"]
+	path = lib/whisper-funasr
+	url = https://github.com/nowislewis/whisper-funasr.git
