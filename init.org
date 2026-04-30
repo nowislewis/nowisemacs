@@ -2664,6 +2664,7 @@ Simple distraction-free editing. I use darkroom instead of writeroom because it'
 #+end_src
 *** whisper
 #+begin_src elisp
+(setup whisper-funasr)
 (setup whisper
   (setq whisper-server-mode 'remote
         whisper-server-baseurl "http://127.0.0.1:8642"
