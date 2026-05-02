@@ -1148,6 +1148,11 @@ Jump anywhere in the world
          (let ((string (buffer-substring (point) (max (line-beginning-position) (- (point) 80)))))
            (string-match-p "[a-zA-Z]$" string))))
 
+  ;; Override: use \cC (real CJK only); \cc wrongly includes Box Drawing (─ │ ┌ etc.)
+  (defun rime-predicate-space-after-cc-p ()
+    (string-match-p "\\cC +$"
+                    (buffer-substring (point) (max (line-beginning-position) (- (point) 80)))))
+
   (defun nowis/rime-disable-predicates ()
     (let ((common '(
                     rime-predicate-current-input-punctuation-p
@@ -2439,6 +2444,7 @@ See also `org-save-all-org-buffers'"
 ** org-mindmap
 #+begin_src elisp
 (setup org-mindmap
+ (setq org-mindmap-parser-root-delimiters '(("«" . "»")))
   (with-eval-after-load 'org
     (require 'org-mindmap)
     )
