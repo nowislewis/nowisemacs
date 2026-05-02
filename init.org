@@ -13,9 +13,6 @@ I fell in love with denote, so previous *org-roam* configs were refiled into [[f
 (setq frame-inhibit-implied-resize t)
 ;; disable warning
 (setq byte-compile-warnings nil)
-;; no title bar
-;; (add-to-list 'default-frame-alist '(undecorated . t))
-;; Faster to disable these here (before they've been initialized)
 (push '(alpha-background . 90) default-frame-alist)
 (push '(menu-bar-lines . 0) default-frame-alist)
 (push '(tool-bar-lines . 0) default-frame-alist)
@@ -34,7 +31,6 @@ I fell in love with denote, so previous *org-roam* configs were refiled into [[f
       (setenv "PATH" (format "%s:%s" "/data/data/com.termux/files/usr/bin"
 		                     (getenv "PATH")))
       (push "/data/data/com.termux/files/usr/bin" exec-path)))
-
 #+end_src
 ** basic modes
 #+begin_src elisp
@@ -76,17 +72,7 @@ emacs
 ├── 02-binary-git/binary-files
 │   ├── 01-pictures
 │   ├── 02-searchable
-│   ├── 03-stardicts
-│   ├── 04-org-imagine
-│   └── 10-report-backup
 ├── 03-bibliography
-├── 04-beancount
-├── 05-excalidraw
-├── 06-anki
-├── 07-pyim
-│   └── dcache
-├── 08-keys
-└── 09-scripts
 #+end_example
 #+begin_src elisp
 (defvar nowis/config-file (expand-file-name "init.org" user-emacs-directory))
@@ -127,8 +113,6 @@ Maybe I should add a new state.
   (setq meow-use-keypad-when-execute-kbd nil
         meow-expand-exclude-mode-list nil
         meow-use-clipboard t
-        ;; meow-cursor-type-normal 'box
-        ;; meow-cursor-type-insert '(bar . 1)
         meow-replace-state-name-list '((normal . "N")
                                        (motion . "M")
                                        (keypad . "K")
@@ -145,8 +129,7 @@ Maybe I should add a new state.
                                 (?\{ . curly)
                                 (?\} . curly)
                                 (?\" . string)
-                                (?w . symbol)
-                                ;; (?w . window)
+                                (?w . window)
                                 (?b . buffer)
                                 (?p . paragraph)
                                 (?l . line)
@@ -192,7 +175,6 @@ Maybe I should add a new state.
                           '("1" . meow-expand-1)
 
                           '("a" . meow-vim-append)
-                          ;; '("A" . meow-append-vim)
                           '("b" . meow-back-word)
                           '("B" . meow-back-symbol)
                           '("c c" . meow-change)
@@ -205,7 +187,6 @@ Maybe I should add a new state.
                           '("h" . meow-left)
                           '("H" . meow-left-expand)
                           '("i" . meow-insert)
-                          ;; '("I" . meow-insert-vim)
                           '("j" . meow-next)
                           '("J" . meow-next-expand)
                           '("k" . meow-prev)
@@ -256,13 +237,8 @@ Maybe I should add a new state.
                           '(")" . forward-sentence)
                           '("{" . backward-paragraph)
                           '("}" . forward-paragraph)
-                          ;; '("]" . nowis/graphviz-symbol-with-label)
-                          ;; '("]" . (lambda()
-                          ;;           (interactive)
-                          ;;           (meow-bounds-of-thing ?\")))
                           (cons "\\" wrap-keymap)
                           '(";" . meow-expand-1)
-                          ;; '(":" . async-shell-command)
                           '("'" . consult-register-load)
                           '("\"" . consult-register)
                           '("," . meow-reverse)
@@ -517,23 +493,15 @@ Maybe I should add a new state.
  '("?" . meow-cheatsheet)
 
 ;; buffer
-;; (meow-leader-define-key
  '("b" . buffer-leader-map)
- ;; lewisliu
  '("e" . lewis-leader-map)
- ;; search
  '("s" . search-leader-map)
- ;; apps
  '("a" . apps-leader-map)
- ;; file
  '("f" . file-leader-map)
- ;; notes
  '("n" . notes-leader-map)
  ;;w workspace
  '("TAB" . tab-leader-map)
- ;; ui
  '("t" . toggle-leader-map)
- ;; '("d" . dictionary-leader-map)
  ;; org-sm review
  '("r" . org-sm-transient-map)
  )
@@ -542,8 +510,7 @@ Maybe I should add a new state.
 #+begin_src elisp
 (setup which-key
   (setq which-key-idle-delay 0.1)
-   (which-key-mode)
-  )
+   (which-key-mode))
 #+end_src
 ** electric
 #+begin_src elisp
@@ -626,18 +593,14 @@ Maybe I should add a new state.
   (when (display-graphic-p)
     ;; Set default font
     (if lewis-fixed-font
-        (progn
-          (set-face-attribute 'default nil :family lewis-fixed-font :height lewis-font-size)
-          ;; (set-face-attribute 'fixed-pitch nil :family lewis-fixed-font :height 1.0)
-          ))
+          (set-face-attribute 'default nil :family lewis-fixed-font :height lewis-font-size))
     ;; variable-pitch
     (if lewis-variable-font
         (set-face-attribute 'variable-pitch nil :family lewis-variable-font :height 1.0))
     ;; Specify font for all unicode characters
     (if lewis-symbol-font
         (set-fontset-font t 'unicode lewis-symbol-font nil 'prepend))
-    )
-  )
+    ))
 
 (nowis/setup-fonts)
 #+end_src
@@ -701,13 +664,13 @@ diff-hl-mode highlights uncommitted changes on the left side of the window (area
 #+begin_src elisp
 (setup dashboard
   (setq dashboard-items '((recents . 5)
+                          (projects . 5)
                           (bookmarks . 5))
         dashboard-icon-type 'nerd-icons
         dashboard-set-heading-icons t
         dashboard-set-file-icons t
         dashboard-center-content t
-        dashboard-startup-banner (concat nowis/config-useful-tools "banner.txt")
-        dashboard-set-init-info t)
+        dashboard-startup-banner (concat nowis/config-useful-tools "banner.txt"))
   (dashboard-setup-startup-hook)
   )
 #+end_src
@@ -845,7 +808,7 @@ diff-hl-mode highlights uncommitted changes on the left side of the window (area
 
 (setup autorevert
   (setq global-auto-revert-non-file-buffers t)
-  (global-auto-revert-mode t)); 当另一程序修改了文件时，让 Emacs 及时刷新 Buffer
+  (global-auto-revert-mode t))
 
 (setup frame
   (blink-cursor-mode -1) ;指针不闪动
@@ -918,11 +881,7 @@ diff-hl-mode highlights uncommitted changes on the left side of the window (area
   (setq undo-limit (* 64 1024 1024)
         undo-strong-limit (* 96 1024 1024)
         undo-outer-limit (* 960 1024 1024)
-        )
-  (:bind "l" vundo-forward
-         "h" vundo-backward
-         "j" vundo-next
-         "k" vundo-previous))
+        ))
 #+end_src
 * Search
 ** isearch
@@ -999,36 +958,34 @@ diff-hl-mode highlights uncommitted changes on the left side of the window (area
 #+end_src
 ** Completions with Vertico
 #+begin_src elisp
-(setq vertico-cycle t)
+(setq vertico-cycle t
+      vertico-count 15)
 (setup vertico
   (:with-map vertico-map
     (:bind [backspace] vertico-directory-delete-char
-           "DEL" vertico-directory-delete-char
-           ))
+           "DEL" vertico-directory-delete-char))
   (vertico-mode))
 #+end_src
 ** fido-vertical-mode
 #+begin_src elisp :tangle no
-;; fido-vertical-mode 会自动开启 fido-mode + icomplete-vertical-mode
 (fido-vertical-mode 1)
+;; advice 将其改回 orderless。
+(advice-add 'icomplete--fido-mode-setup :after
+            (lambda ()
+              (setq-local completion-styles '(orderless basic))))
 
-;; 在更高的 depth 覆盖它，以继续使用 orderless
-(defun lewis/fido-use-orderless ()
-  "Override fido-mode's flex completion-styles with orderless."
-  (when (and fido-mode (icomplete-simple-completing-p))
-    (setq-local completion-styles '(orderless basic)
-                completion-category-defaults nil
-                completion-category-overrides '((file (styles partial-completion))))))
-(add-hook 'minibuffer-setup-hook #'lewis/fido-use-orderless 99)
+;; orderless 依赖空格
+(define-key icomplete-fido-mode-map " " #'self-insert-command)
+(define-key icomplete-minibuffer-map "\t" #'icomplete-force-complete)
+(setq max-mini-window-height 0.3
+      resize-mini-windows 'grow-only)
 
-;; 候选行超出屏幕宽度时截断而非换行
-(defun lewis/minibuffer-truncate-lines ()
-  (setq-local truncate-lines t))
-(add-hook 'minibuffer-setup-hook #'lewis/minibuffer-truncate-lines 99)
-
-;; 调整候选列表高度（fido 通过 max-mini-window-height 控制）
-(setq max-mini-window-height 0.4
-      resize-mini-windows t)
+;; remove pad
+(advice-add 'icomplete--render-vertical :around
+            (lambda (orig comps md)
+              (cl-letf (((symbol-function 'make-string)
+                         (lambda (n c) (if (= c 32) " " (make-string n c)))))
+                (funcall orig comps md))))
 #+end_src
 ** Orderless and pinyinlib
 #+begin_src elisp
@@ -1036,14 +993,12 @@ diff-hl-mode highlights uncommitted changes on the left side of the window (area
   (setq completion-styles '(orderless basic)
         completion-category-defaults nil
         completion-category-overrides '((file (styles partial-completion)))
-        completion-pcm-leading-wildcard t
-        )
+        completion-pcm-leading-wildcard t)
   (:when-loaded
     (require 'pinyinlib)
     (defun completion--regex-pinyin (str)
       (orderless-regexp (pinyinlib-build-regexp-string str)))
-    (add-to-list 'orderless-matching-styles 'completion--regex-pinyin)
-    ))
+    (add-to-list 'orderless-matching-styles 'completion--regex-pinyin)))
 #+end_src
 ** Marginalia
 #+begin_src elisp
@@ -1100,11 +1055,9 @@ Popper is a minor-mode to tame the flood of ephemeral windows Emacs produces, wh
                                    "Output\\*$"
                                    "\\*Async Shell Command\\*"
                                    "\\*Org Clock Reminder\\*"
-                                   "gt-result"
                                    help-mode
                                    helpful-mode
-                                   compilation-mode
-                                   youdao-dictionary-mode)
+                                   compilation-mode)
         popper-window-height 0.33
         )
   (keymap-global-set "M-~" #'popper-toggle)
@@ -1191,21 +1144,26 @@ Jump anywhere in the world
 #+begin_src elisp
 (setq default-input-method "rime")
 (with-eval-after-load 'rime
+  (defun rime-predicate-after-pure-alphabet-char-p ()
+    "If the cursor is directly after an alphabet character (a-z, A-Z)"
+    (and (> (point) (save-excursion (back-to-indentation) (point)))
+         (let ((string (buffer-substring (point) (max (line-beginning-position) (- (point) 80)))))
+           (string-match-p "[a-zA-Z]$" string))))
+
   (defun nowis/rime-disable-predicates ()
-    (let ((common '(meow-normal-mode-p
-                    meow-motion-mode-p
-                    meow-keypad-mode-p
-                    rime-predicate-after-alphabet-char-p
+    (let ((common '(
                     rime-predicate-current-input-punctuation-p
                     rime-predicate-current-uppercase-letter-p
-                    rime-predicate-space-after-cc-p)))
+                    rime-predicate-after-pure-alphabet-char-p
+                    rime-predicate-space-after-cc-p
+                    ;; special mode
+                    meow-normal-mode-p
+                    meow-motion-mode-p
+                    meow-keypad-mode-p
+                    rime-predicate-ace-window-p)))
       (if (derived-mode-p 'eat-mode)
-          ;; 只在 eat buffer 下，禁用 predicates 约束，rime 全时可用
           common
-        ;; 其他 buffer 用你原来的 predicate 约束
         (append common '(rime-predicate-prog-in-code-p
-                         rime-predicate-punctuation-line-begin-p ;;在行首要输入符号时
-                         ;; rime-predicate-after-ascii-char-p ;;任意英文字符后 ,enable this to use with <s
                          )))))
   (add-hook 'rime-mode-hook
             (lambda ()
@@ -1227,6 +1185,7 @@ Jump anywhere in the world
    rime-librime-root "/opt/homebrew/opt/librime/"
    ))
 #+end_src
+
 * File and Browsing
 ** file browsing
 *** dired & dired-hacks
@@ -1264,8 +1223,7 @@ Jump anywhere in the world
            imenu-list-auto-resize t
            imenu-list-position 'left
            imenu-list-auto-update t
-           )
-  )
+           ))
 #+end_src
 ** tab-line and tab-bar
 #+begin_src elisp
@@ -1488,9 +1446,9 @@ Emacs major-mode to work with Beancount ledger files
                              ((executable-find "rg") 'ripgrep)
                              (t 'grep))
         xref-history-storage #'xref-window-local-history)
-  ;; (:autoload xref-push-marker-stack nil t)
-  (require 'xref)
-  ) ;; autoload this command for jump-back
+  (:autoload xref-push-marker-stack)
+  ;; (require 'xref)
+  )
 #+end_src
 **** xref jump back
 borrowed from citre, now you can always jump-back use "M-," after any jump in the list.
@@ -1621,7 +1579,6 @@ borrowed from citre, now you can always jump-back use "M-," after any jump in th
 (setup eglot
   (setq eglot-events-buffer-config'(:size 20000 :format full)
         eglot-extend-to-xref t
-        ;; eglot-workspace-configuration '((:python.analysis :useLibraryCodeForTypes t))
         )
   (:autoload eglot-find-implementation)
   (add-hook 'prog-mode-hook (lambda ()
@@ -1763,7 +1720,6 @@ borrowed from citre, now you can always jump-back use "M-," after any jump in th
 
         org-image-actual-width 800 ;; this will use 600 for width for all the images.
         org-preview-latex-image-directory (expand-file-name "ltximg/" user-emacs-directory)
-        ;; org-plantuml-jar-path plantuml-jar-path
         org-special-ctrl-a/e t
         ;; org-id
         org-attach-id-dir (concat nowis/doc-emacs-dir "01-orgmode/org-attach")
@@ -2060,7 +2016,6 @@ Always allow composition for org-mode keywords, regardless of context."
   (with-eval-after-load 'bibtex
     (add-to-list 'bibtex-biblatex-field-alist
                  '("keywords" "Keywords or phrases")))
-
   )
 
 (defun do.refs/get-db-file-list ()
@@ -2152,7 +2107,7 @@ Always allow composition for org-mode keywords, regardless of context."
         denote-prompts '(subdirectory title keywords template)
         denote-dired-directories-include-subdirectories t
         )
-  ;; (add-hook 'dired-mode-hook #'denote-dired-mode-in-directories)
+  (add-hook 'dired-mode-hook #'denote-dired-mode)
   (with-eval-after-load 'org-capture
     (add-to-list 'org-capture-templates
                  '("n" "New note (with Denote)" plain
@@ -2202,7 +2157,7 @@ Always allow composition for org-mode keywords, regardless of context."
 Borrowed from https://github.com/rougier/emacs-GTD
 
 In short, you will need 3 files:
-1. =index.org= for capture inbox TODOs
+1. =inboxx.org= for capture inbox TODOs
 2. =agenda.org= for recurrent events
 3. =action.org= for all tasks moving from inbox
 4. (Option) =incubate.org= for incubate ideas
@@ -2234,8 +2189,6 @@ In short, you will need 3 files:
       org-enforce-todo-checkbox-dependencies t
       org-log-done 'note
       org-todo-keywords '((sequence "TODO(t)" "NEXT(n)" "WAIT(w)" "SMDY(s)" "|" "AXED(a)" "DONE(d)"))
-      ;; org-priority-lowest 69  ;; E
-      ;; org-priority-default 67 ;; C
       )
 
 (defun log-todo-next-creation-date (&rest ignore)
@@ -2247,9 +2200,6 @@ In short, you will need 3 files:
 #+end_src
 *** capture
 #+begin_src elisp
-;; Use full window for org-capture
-;; (add-hook 'org-capture-mode-hook 'delete-other-windows)
-
 (setq org-sm-capture-file
       (concat nowis/doc-emacs-dir "01-orgmode/xnotes/org-inc/20260331T230205--incremental-reading-materials.org"))
 (setq org-sm-capture-olp '("org-sm topics"))
@@ -2271,7 +2221,9 @@ In short, you will need 3 files:
     (setq org-refile-use-outline-path t)
     (setq org-outline-path-complete-in-steps nil)
     (setq org-refile-targets
-          '((org-refile-files :level 1)))
+          '((org-refile-files :maxlevel 3)))
+   (setq org-refile-target-verify-function
+         (lambda () (not (org-get-todo-state))))
     ;; Save the corresponding buffers
     (defun gtd-save-org-buffers (&rest _)
       "Save `org-agenda-files' buffers without user confirmation.
@@ -2285,7 +2237,6 @@ See also `org-save-all-org-buffers'"
 
     ;; Add it after refile
     (advice-add 'org-refile :after #'gtd-save-org-buffers)
-
     ))
 #+end_src
 *** agenda
@@ -2633,7 +2584,6 @@ Simple distraction-free editing. I use darkroom instead of writeroom because it'
 *** gptel-agent
 #+begin_src elisp
 (setup gptel-agent
-  ;; (keymap-global-set "C-M-S-p" #'gptel-simple-agent)
   (defun gptel-simple-agent (&optional project-dir)
     "Start a gptel-agent session using the gptel-simple-agent preset."
     (interactive
