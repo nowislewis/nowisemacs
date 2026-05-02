@@ -838,7 +838,6 @@ diff-hl-mode highlights uncommitted changes on the left side of the window (area
         savehist-save-minibuffer-history t)
   (savehist-mode))
 #+end_src
-
 ** recentf
 #+begin_src elisp
 (setup recentf
@@ -966,26 +965,24 @@ diff-hl-mode highlights uncommitted changes on the left side of the window (area
            "DEL" vertico-directory-delete-char))
   (vertico-mode))
 #+end_src
-** fido-vertical-mode
+** icomplete-vertical-mode
 #+begin_src elisp :tangle no
-(fido-vertical-mode 1)
-;; advice 将其改回 orderless。
-(advice-add 'icomplete--fido-mode-setup :after
-            (lambda ()
-              (setq-local completion-styles '(orderless basic))))
-
+(icomplete-vertical-mode 1)
+(setq icomplete-show-matches-on-no-input t
+      icomplete-scroll t
+      icomplete-compute-delay 0.1
+      icomplete-vertical-render-prefix-indicator t
+)
+(add-hook 'icomplete-minibuffer-setup-hook
+          (lambda () (setq-local truncate-lines t)))
 ;; orderless 依赖空格
-(define-key icomplete-fido-mode-map " " #'self-insert-command)
+(define-key icomplete-minibuffer-map " " #'self-insert-command)
 (define-key icomplete-minibuffer-map "\t" #'icomplete-force-complete)
+(define-key icomplete-minibuffer-map [remap backward-delete-char] #'icomplete-fido-backward-updir)
+(define-key icomplete-minibuffer-map [remap delete-backward-char] #'icomplete-fido-backward-updir)
+(define-key icomplete-minibuffer-map [remap minibuffer-complete-and-exit] #'icomplete-force-complete-and-exit)
 (setq max-mini-window-height 0.3
       resize-mini-windows 'grow-only)
-
-;; remove pad
-(advice-add 'icomplete--render-vertical :around
-            (lambda (orig comps md)
-              (cl-letf (((symbol-function 'make-string)
-                         (lambda (n c) (if (= c 32) " " (make-string n c)))))
-                (funcall orig comps md))))
 #+end_src
 ** Orderless and pinyinlib
 #+begin_src elisp
@@ -1033,6 +1030,7 @@ should be check after reading the embark.el manual
   (keymap-global-set "M-*" #'yas-insert-snippet)
   (setq yas-snippet-dirs (list (concat nowis/config-useful-tools "snippets")))
   (add-hook 'prog-mode-hook #'yas-minor-mode)
+  (add-hook 'org-mode-hook #'yas-minor-mode)
   )
 #+end_src
 * Window Management
@@ -1252,13 +1250,7 @@ Jump anywhere in the world
 #+begin_src elisp
 (setup project
   (:when-loaded
-    (add-to-list 'project-find-functions #'project-rootfile-try-detect)
-    ))
-#+end_src
-** project-rootfile
-#+begin_src elisp
-(setup project-rootfile
-  (setq project-rootfile-list '(".project")))
+    (add-to-list 'project-vc-extra-root-markers ".project")))
 #+end_src
 ** auto-insert
 #+begin_src elisp
@@ -2522,8 +2514,7 @@ Simple distraction-free editing. I use darkroom instead of writeroom because it'
         gptel-stream t ;; to fix tool-call issue
         gptel-max-tokens 32768
         gptel-include-reasoning nil
-        gptel-confirm-tool-calls nil
-        )
+        gptel-confirm-tool-calls nil)
   (keymap-global-set "M-p" #'gptel-send)
   (keymap-global-set "M-r" #'gptel-rewrite)
   (keymap-global-set "M-P" #'gptel)

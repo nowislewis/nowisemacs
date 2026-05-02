@@ -190,9 +190,6 @@
 [submodule "posframe"]
 	path = lib/posframe
 	url = https://github.com/tumashu/posframe.git
-[submodule "project-rootfile"]
-	path = lib/project-rootfile
-	url = https://github.com/buzztaiki/project-rootfile.el.git
 [submodule "rainbow-delimiters"]
 	path = lib/rainbow-delimiters
 	url = https://github.com/Fanael/rainbow-delimiters.git
