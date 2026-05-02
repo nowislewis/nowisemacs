@@ -373,7 +373,9 @@ Maybe I should add a new state.
    ["Bookmark"
     ("j" "bookmark-jump" bookmark-jump)
     ("m" "bookmark-set" bookmark-set)
-    ("M" "bookmark-delete" bookmark-delete)]
+    ("M" "bookmark-delete" bookmark-delete)
+    ("a" "add web bookmark" nowis/add-bookmark)
+    ("w" "web bookmark" nowis/consult-org-bookmarks)]
    ]
   )
 #+end_src
@@ -427,8 +429,6 @@ Maybe I should add a new state.
     ("s" "line" consult-line)]
    ["web search"
     ("w" "webjump" webjump)
-    ("a" "add bookmark" nowis/add-bookmark)
-    ("b" "browse bookmark" nowis/consult-org-bookmarks)
     ]
    ])
 #+end_src
@@ -2385,18 +2385,12 @@ See also `org-save-all-org-buffers'"
 #+begin_src elisp
 (setup org
   (:when-loaded
-    (defcustom nowis/org-yank-image-filename-function
-      (lambda () (format-time-string "screenshot_%Y%m%d_%H%M%S.png"))
-      "A function to generate screenshot name"
-      :type 'function
-      :group 'org)
-
     (defun nowis/org-yank-image-from-clipboard-wsl ()
       "paste from wsl"
       ;; (interactive)
       (require 'org-attach)
       (let* ((attach-dir (org-attach-dir t))
-             (filename (funcall nowis/org-yank-image-filename-function))
+             (filename (format-time-string "screenshot_%Y%m%d_%H%M%S.png"))
              (filepath (expand-file-name filename attach-dir))
              (wsl-path (string-trim
                         (shell-command-to-string
@@ -2410,16 +2404,12 @@ See also `org-save-all-org-buffers'"
               (message "Image saved to attachment: %s" filepath))
           (error "Failed to save image from clipboard"))))
 
-    (defun nowis/org-yank-image-from-clipboard-native ()
-      "use the default yank-media"
-      (yank-media))
-
     (defun nowis/org-yank-image-from-clipboard ()
       "paste pictures from powershell when using wsl, others use yank-media"
       (interactive)
       (if nowis/is-wsl
           (nowis/org-yank-image-from-clipboard-wsl)
-        (nowis/org-yank-image-from-clipboard-native)))
+        (yank-media)))
     (:with-map org-mode-map
       (:bind "M-<f1>" nowis/org-yank-image-from-clipboard)
       )
@@ -2476,8 +2466,6 @@ See also `org-save-all-org-buffers'"
                 :description (format "%s p.%d"
                                      (file-name-base buffer-file-name)
                                      (reader-current-doc-pagenumber)))))))
-
-
 #+end_src
 ** newsticker
 #+begin_src elisp
@@ -2546,7 +2534,6 @@ Simple distraction-free editing. I use darkroom instead of writeroom because it'
     ;; ┌─────────┐
     ;; │ presets │
     ;; └─────────┘
-
     (defun nowis/gptel-windows-on-frame ()
       "Return all windows on frame that aren't gptel chat buffers."
       (delq (and-let* ((current-buf (window-buffer (selected-window)))
@@ -2558,17 +2545,6 @@ Simple distraction-free editing. I use darkroom instead of writeroom because it'
       :description "Include the full text of all buffers visible in the frame."
       :context
       '(:eval (mapcar #'window-buffer (nowis/gptel-windows-on-frame))))
-
-    (gptel-make-preset 'visible-text
-      :description "Include visible text from all windows in the frame."
-      :context
-      '(:eval (mapcar (lambda (win) ;; Create (<buffer> :bounds ((start . end)))
-                        `(,(window-buffer win)
-                          :bounds ((,(window-start win) . ,(window-end win)))))
-                      (nowis/gptel-windows-on-frame))))
-    (gptel-make-preset 'lite
-      :description "Lite model"
-      :model 'qwen3.6-plus-anthropic)
     )
   )
 #+end_src
@@ -2647,12 +2623,6 @@ Simple distraction-free editing. I use darkroom instead of writeroom because it'
                         ("DouBan DuShu" .
                          [simple-query "book.douban.com"
                                        "search.douban.com/book/subject_search?search_text=" ""])
-                        ("Github" .
-                         [simple-query "github.com"
-                                       "github.com/search?ref=simplesearch&q=" ""])
-                        ("Aur" .
-                         [simple-query "aur.archlinux.org"
-                                       "aur.archlinux.org/packages?O=0&K=" ""])
                         ("leetcode-cn" .
                          [simple-query "leetcode.cn"
                                        "leetcode.cn/search/?q=" ""])
