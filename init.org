@@ -16,7 +16,7 @@ I fell in love with denote, so previous *org-roam* configs were refiled into [[f
 ;; no title bar
 ;; (add-to-list 'default-frame-alist '(undecorated . t))
 ;; Faster to disable these here (before they've been initialized)
-;; (push '(alpha-background . 80) default-frame-alist)
+(push '(alpha-background . 90) default-frame-alist)
 (push '(menu-bar-lines . 0) default-frame-alist)
 (push '(tool-bar-lines . 0) default-frame-alist)
 (push '(vertical-scroll-bars) default-frame-alist)
@@ -412,6 +412,7 @@ Maybe I should add a new state.
     ("r s" "find-all-searchable" project-find-searchable-dir-files)
     ("r c" "calendar" calendar)
     ("r g" "project-find-gtd-dir-files" project-find-gtd-dir-files)
+    ("r L" "lint" denote-lint)
     ]
    ["ladder"
     ("l c" "display current" org-ladder-status)
@@ -1384,6 +1385,9 @@ Jump anywhere in the world
 (setup llama)
 (setup cond-let)
 (setup magit)
+;; we already have cape for git-commit
+(with-eval-after-load 'git-commit
+  (remove-hook 'git-commit-setup-hook #'git-commit-setup-capf))
 #+end_src
 ** ediff
 #+begin_src elisp
@@ -1558,27 +1562,19 @@ borrowed from citre, now you can always jump-back use "M-," after any jump in th
 **** corfu related
 ***** corfu
 #+begin_src elisp
-(defun corfu-enable-in-minibuffer ()
-  "Enable Corfu in the minibuffer."
-  (when (local-variable-p 'completion-at-point-functions)
-    ;; (setq-local corfu-auto nil) ;; Enable/disable auto completion
-    (setq-local corfu-echo-delay nil ;; Disable automatic echo and popup
-                corfu-popupinfo-delay nil)
-    (corfu-mode 1)))
-(add-hook 'minibuffer-setup-hook #'corfu-enable-in-minibuffer)
-
 (setup corfu
   (setq corfu-cycle t
         corfu-auto t
         corfu-quit-no-match t        ;; Automatically quit if there is no match
         corfu-preview-current nil
-        corfu-auto-prefix 1
-        corfu-auto-delay 0.05
+        corfu-auto-prefix 2
+        corfu-auto-delay 0.2
         corfu-scroll-margin 5
-        )        ;; Use scroll margin
+        )
   (:with-map corfu-map
     (:bind "<escape>" my-corfu-quit
            "C-SPC" corfu-insert-separator
+           "RET" corfu-send
            ))
 
   (defun my-corfu-quit()
@@ -1600,9 +1596,8 @@ borrowed from citre, now you can always jump-back use "M-," after any jump in th
         (let ((files (list (concat nowis/doc-emacs-dir "12-dictionary/en-words.txt")
                            "/usr/share/dict/words")))
           (seq-filter #'file-exists-p files)))
-  ;; don't let dabbrev take over all things
-  (defalias 'cape-dabbrev-min-2 (cape-capf-prefix-length #'cape-dabbrev 2))
-  (dolist (f '(cape-file cape-dict cape-elisp-block cape-dabbrev-min-2))
+  ;; (defalias 'cape-dabbrev-min-2 (cape-capf-prefix-length #'cape-dabbrev 2))
+  (dolist (f '(cape-file cape-dict cape-elisp-block cape-dabbrev))
     (add-to-list 'completion-at-point-functions f)))
 #+end_src
 ***** ispell
@@ -2171,6 +2166,14 @@ Always allow composition for org-mode keywords, regardless of context."
         `((bib . ,(concat "#+begin_src bibtex\n"
                           "#+end_src\n"
                           "* notes\n"))))
+(defun denote-lint (directory)
+  "Run denote-lint on DIRECTORY and show results in `compilation-mode'."
+  (interactive
+   (list (read-directory-name
+          "Lint denote directory: "
+          (or (bound-and-true-p denote-directory) default-directory))))
+  (compile (format "denote-lint %s"
+                   (shell-quote-argument (expand-file-name directory)))))
   )
 #+end_src
 *** denote-journal
@@ -2179,6 +2182,10 @@ Always allow composition for org-mode keywords, regardless of context."
   (setq denote-journal-title-format "%Y_%m_%d_%a_%j")
   (add-hook 'calendar-mode-hook #'denote-journal-calendar-mode)
   )
+#+end_src
+*** denote-sequence
+#+begin_src elisp
+(setup denote-sequence)
 #+end_src
 ** find orgmode dir files
 #+begin_src elisp
@@ -2577,7 +2584,7 @@ Simple distraction-free editing. I use darkroom instead of writeroom because it'
                     :host "llm-gateway.momenta.works"
                     :key 'gptel-api-key
                     :stream t
-                    :models '(claude-sonnet-4.6 claude-haiku-4.5 gemini-3.1-pro qwen3.6-plus-anthropic qwen3.6-plus)))
+                    :models '(claude-sonnet-4.6 claude-haiku-4.5 qwen3.6-max-anthropic deepseek-v4-pro deepseek-v4-flash)))
     (gptel-make-openai "chatanywhere"
       :host "api.chatanywhere.tech"
       :key 'gptel-api-key
