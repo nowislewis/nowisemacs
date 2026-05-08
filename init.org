@@ -1257,8 +1257,21 @@ Jump anywhere in the world
 ** project
 #+begin_src elisp
 (setup project
+  (keymap-global-set "C-x p t" #'project-ghostel)
   (:when-loaded
-    (add-to-list 'project-vc-extra-root-markers ".project")))
+    (add-to-list 'project-vc-extra-root-markers ".project")
+    (add-to-list 'project-switch-commands '(project-ghostel "Ghostel" "t"))
+    (define-key project-prefix-map "t" #'project-ghostel)))
+
+(defun project-ghostel ()
+  "Start ghostel in the current project's root directory. With -u, create a new buffer even if one exists."
+  (interactive)
+  (let* ((default-directory (project-root (project-current t)))
+         (buf-name (project-prefixed-buffer-name "ghostel"))
+         (ghostel-buffer-name buf-name))
+    (if (or current-prefix-arg (not (get-buffer buf-name)))
+        (ghostel)
+      (pop-to-buffer buf-name))))
 #+end_src
 ** auto-insert
 #+begin_src elisp
