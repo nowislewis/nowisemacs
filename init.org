@@ -1281,60 +1281,62 @@ Jump anywhere in the world
 #+end_src
 ** ghostel
 #+begin_src elisp
-(with-eval-after-load "meow"
+(with-eval-after-load 'meow
   (add-hook 'ghostel-mode-hook
             (lambda ()
-              (let ((override (make-sparse-keymap)))
-                ;; Inherit meow-insert-state-keymap so [escape] -> meow-insert-exit
-                (set-keymap-parent override meow-insert-state-keymap)
-                (define-key override (kbd "C-c <escape>")
-                  (lambda () (interactive) (ghostel--send-encoded "escape" "")))
-                (push `(meow-insert-mode . ,override)
-                      minor-mode-overriding-map-alist))
-              ;; Sync ghostel-copy-mode with meow state via meow-switch-state-hook.
               (add-hook 'meow-switch-state-hook
                         (lambda (state)
-                          (when (derived-mode-p 'ghostel-mode)
-                            (pcase state
-                              ('normal (unless ghostel--copy-mode-active
-                                         (ghostel-copy-mode)))
-                              ('insert (when ghostel--copy-mode-active
-                                         (ghostel-copy-mode-exit))))))
+                          (pcase state
+                            ('normal (unless (eq ghostel--input-mode 'copy)
+                                       (ghostel-copy-mode))
+                                     (setq cursor-type meow-cursor-type-normal))
+                            ('insert (when (eq ghostel--input-mode 'copy)
+                                       (ghostel-readonly-exit))
+                                     (ghostel-semi-char-mode)
+                                     (setq cursor-type meow-cursor-type-insert))))
                         nil t))))
 
 (setup ghostel
   (setq ghostel-ignore-cursor-change t)
   (keymap-global-set "M-`" #'ghostel-toggle-window)
   (:when-loaded
+    (define-key ghostel-semi-char-mode-map (kbd "M-q")
+      (lambda () (interactive) (ghostel--send-encoded "escape" "")))
     (add-to-list 'display-buffer-alist
                  '((lambda (buffer-or-name _)
-                     (with-current-buffer (get-buffer buffer-or-name)
+                     (with-current-buffer buffer-or-name
                        (derived-mode-p 'ghostel-mode)))
                    (display-buffer-reuse-window display-buffer-at-bottom)
                    (reusable-frames . visible)
                    (window-height . 0.3)))))
 
 (defun ghostel-toggle-window (&optional choose-buffer)
-  "Toggle ghostel window. With prefix arg, prompt for buffer selection."
+  "Toggle ghostel window. With C-u, prompt to select or create a buffer."
   (interactive "P")
   (if-let ((win (seq-find (lambda (w)
                             (with-current-buffer (window-buffer w)
                               (derived-mode-p 'ghostel-mode)))
                           (window-list))))
       (delete-window win)
-    (let ((bufs (seq-filter (lambda (b)
-                              (with-current-buffer b
-                                (derived-mode-p 'ghostel-mode)))
-                            (buffer-list))))
-      (if (or choose-buffer (> (length bufs) 1))
-          (let* ((names (mapcar #'buffer-name bufs))
-                 (choice (completing-read "Ghostel buffer: " names nil nil))
-                 (buf (get-buffer choice)))
-            (if buf
-                (pop-to-buffer buf)
-              (let ((ghostel-buffer-name choice))
-                (ghostel))))
-        (if bufs (pop-to-buffer (car bufs)) (ghostel))))))
+    (if choose-buffer
+        (let* ((bufs (seq-filter (lambda (b)
+                                   (with-current-buffer b
+                                     (derived-mode-p 'ghostel-mode)))
+                                 (buffer-list)))
+               (names (mapcar #'buffer-name bufs))
+               (choice (completing-read "Ghostel buffer: " names nil nil))
+               (buf (get-buffer choice)))
+          (if buf
+              (pop-to-buffer buf)
+            (let ((ghostel-buffer-name (format "*%s*" (string-trim choice "*" "*"))))
+              (ghostel))))
+      (if-let ((buf (seq-find (lambda (b)
+                                (with-current-buffer b
+                                  (derived-mode-p 'ghostel-mode)))
+                              (buffer-list))))
+          (pop-to-buffer buf)
+        (ghostel)))))
+
 #+end_src
 * git
 ** magit
