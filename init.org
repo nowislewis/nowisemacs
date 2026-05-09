@@ -450,6 +450,7 @@ Maybe I should add a new state.
     ("e" "capture topic" org-sm-capture-topic)
     ("E" "capture topic (change target)"
      (lambda () (interactive) (org-sm-capture-topic '(-1))))
+    ("t" "capture topic from input" org-sm-capture-topic-from-input)
     ]
    ["life"
     ("L" "life" life-calendar)
@@ -2352,6 +2353,7 @@ See also `org-save-all-org-buffers'"
       ("?" "explain" org-sm-gptel-explain)
       ("t" "talk like feynman" org-sm-gptel-feynman)
       ("k" "Knowledge map" org-sm-gptel-knowledge-map)
+      ("A" "PSA analyze" org-sm-gptel-analyze)
       ]
      ]
     )
