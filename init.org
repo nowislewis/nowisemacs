@@ -731,6 +731,8 @@ diff-hl-mode highlights uncommitted changes on the left side of the window (area
                   ((> total-lines 0)))
         (format "%d%%" (/ (* current-line 100) total-lines))))
     (mini-echo-mode)
+    ;; org-priority 内部使用 read-char-exclusive 等待输入期间，
+    (add-to-list 'mini-echo-skip-update-functions 'org-priority)
     ))
 #+end_src
 ** hl-todo
@@ -975,18 +977,20 @@ diff-hl-mode highlights uncommitted changes on the left side of the window (area
       icomplete-scroll t
       icomplete-compute-delay 0.1
       icomplete-vertical-render-prefix-indicator t
-)
+      )
 (add-hook 'icomplete-minibuffer-setup-hook
           (lambda () (setq-local truncate-lines t)))
 ;; orderless 依赖空格
-(define-key icomplete-minibuffer-map " " #'self-insert-command)
-(define-key icomplete-minibuffer-map "\t" #'icomplete-force-complete)
-(define-key icomplete-minibuffer-map [remap backward-delete-char] #'icomplete-fido-backward-updir)
-(define-key icomplete-minibuffer-map [remap delete-backward-char] #'icomplete-fido-backward-updir)
-(define-key icomplete-minibuffer-map [remap minibuffer-complete-and-exit] #'icomplete-force-complete-and-exit)
+(define-keymap :keymap icomplete-minibuffer-map
+  "SPC"                                    #'self-insert-command
+  "TAB"                                    #'icomplete-force-complete
+  "<remap> <backward-delete-char>"         #'icomplete-fido-backward-updir
+  "<remap> <delete-backward-char>"         #'icomplete-fido-backward-updir
+  "<remap> <minibuffer-complete-and-exit>" #'icomplete-force-complete-and-exit)
 (setq max-mini-window-height 0.3
       resize-mini-windows 'grow-only)
 #+end_src
+
 ** Orderless and pinyinlib
 #+begin_src elisp
 (setup orderless
@@ -2193,19 +2197,6 @@ In short, you will need 3 files:
           '((org-refile-files :maxlevel 3)))
    (setq org-refile-target-verify-function
          (lambda () (not (org-get-todo-state))))
-    ;; Save the corresponding buffers
-    (defun gtd-save-org-buffers (&rest _)
-      "Save `org-agenda-files' buffers without user confirmation.
-See also `org-save-all-org-buffers'"
-      (interactive)
-      (message "Saving org-agenda-files buffers...")
-      (save-some-buffers t (lambda ()
-                             (when (member (buffer-file-name) org-agenda-files)
-                               t)))
-      (message "Saving org-agenda-files buffers... done"))
-
-    ;; Add it after refile
-    (advice-add 'org-refile :after #'gtd-save-org-buffers)
     ))
 #+end_src
 *** agenda
@@ -2392,12 +2383,6 @@ See also `org-save-all-org-buffers'"
       (:bind "M-<f1>" nowis/org-yank-image-from-clipboard)
       )
     ))
-#+end_src
-** org-sliced-images
-#+begin_src elisp
-(setup org-sliced-images
-  (:hook-into org-mode)
-  )
 #+end_src
 ** org-ladder
 #+begin_src elisp

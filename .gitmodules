@@ -68,9 +68,6 @@
 [submodule "dired-sidebar"]
 	path = lib/dired-sidebar
 	url = https://github.com/jojojames/dired-sidebar.git
-[submodule "dracula"]
-	path = lib/dracula
-	url = https://github.com/dracula/emacs.git
 [submodule "ebib"]
 	path = lib/ebib
 	url = https://github.com/joostkremers/ebib.git
@@ -172,9 +169,6 @@
 [submodule "org-present"]
 	path = lib/org-present
 	url = https://github.com/rlister/org-present.git
-[submodule "org-sliced-images"]
-	path = lib/org-sliced-images
-	url = https://github.com/jcfk/org-sliced-images.git
 [submodule "ox-hugo"]
 	path = lib/ox-hugo
 	url = https://github.com/kaushalmodi/ox-hugo.git
