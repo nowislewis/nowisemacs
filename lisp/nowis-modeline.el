@@ -9,13 +9,11 @@
 (defface nowis-ml-dim  '((t :inherit shadow))              "" :group 'nowis-modeline)
 (defface nowis-ml-info '((t :inherit font-lock-type-face)) "" :group 'nowis-modeline)
 
-;;; shrink-path
+;;; shrink-path cache
 
-(defvar-local nowis-ml--path-cache nil
-  "已格式化的路径字符串缓存。")
+(defvar-local nowis-ml--path-cache nil)
 
 (defun nowis-ml--path-update (&rest _)
-  "更新当前 buffer 的路径缓存。"
   (setq nowis-ml--path-cache
         (let* ((file (buffer-file-name))
                (non-essential t)
@@ -40,7 +38,7 @@
            (file
             (concat icon (and icon " ")
                     (propertize (concat (file-name-nondirectory
-                                         (directory-file-name (file-name-directory file))) "/")
+                                        (directory-file-name (file-name-directory file))) "/")
                                 'face 'nowis-ml-dim)
                     (file-name-nondirectory file)))
            (t (propertize (buffer-name) 'face 'nowis-ml-dim))))))
@@ -49,42 +47,43 @@
 (add-hook 'after-save-hook #'nowis-ml--path-update)
 (advice-add 'rename-buffer :after #'nowis-ml--path-update)
 
-;; 对已有 buffer 初始化缓存
 (dolist (buf (buffer-list))
   (with-current-buffer buf
-    (when buffer-file-name
-      (nowis-ml--path-update))))
+    (when buffer-file-name (nowis-ml--path-update))))
 
 ;;; mode-line-format
 
 (setq-default mode-line-format
               '((:eval (and (fboundp 'meow-indicator) (meow-indicator)))
-                (defining-kbd-macro mode-line-defining-kbd-macro)  ; macro 录制
+                (defining-kbd-macro mode-line-defining-kbd-macro)
                 " "
-                nowis-ml--path-cache                               ; shrink-path
+                nowis-ml--path-cache
+                "  "
+                (:propertize ("%p") face font-lock-constant-face)
                 mode-line-format-right-align
-                mode-line-misc-info                                ; eglot/org-clock/…
+                mode-line-misc-info
                 " "
-                (flymake-mode flymake-mode-line-format)            ; flymake
+                (flymake-mode flymake-mode-line-format)
                 " "
-                (:eval (when (and (fboundp 'profiler-running-p)    ; profiler
-                                 (profiler-running-p))
+                (:eval (when (and (fboundp 'profiler-running-p) (profiler-running-p))
                          (propertize "Prof" 'face 'warning)))
                 " "
-                #("%n" 0 2 (help-echo "Narrowing"))               ; narrow
+                #("%n" 0 2 (help-echo "Narrowing"))
                 mode-line-mule-info
                 "  "
                 mode-line-modified
                 "  "
-                mode-line-position
-                " "
-                (:eval                                             ; branch + icon
+                (:eval
                  (when vc-mode
-                   (concat
-                    (when (fboundp 'nerd-icons-octicon)
-                      (propertize (nerd-icons-octicon "nf-oct-git_branch")
-                                  'face `(:inherit shadow)))
-                    (propertize vc-mode 'face 'shadow))))
+                   (let ((s (string-trim (substring-no-properties vc-mode))))
+                     (propertize
+                      (concat (when (fboundp 'nerd-icons-devicon)
+                                (nerd-icons-devicon "nf-dev-git_branch"))
+                              " "
+                              (substring s (1+ (or (string-search ":" s)
+                                                   (string-search "-" s 3)
+                                                   -1))))
+                      'face 'shadow))))
                 " "
                 (:propertize mode-name face bold)
                 ))
@@ -94,9 +93,10 @@
 (with-eval-after-load 'meow
   (advice-add 'meow-setup-mode-line :override #'ignore))
 
-(set-face-attribute 'mode-line          nil :inherit 'unspecified :box 'unspecified)
-(set-face-attribute 'mode-line-active   nil :inherit 'unspecified :box 'unspecified)
-(set-face-attribute 'mode-line-inactive nil :box 'unspecified)
+
+(set-face-attribute 'mode-line          nil :inherit 'unspecified :box nil)
+(set-face-attribute 'mode-line-active   nil :inherit 'unspecified :box nil)
+(set-face-attribute 'mode-line-inactive nil :box nil)
 
 (line-number-mode   1)
 (column-number-mode 1)
@@ -113,8 +113,7 @@ SECONDS 为采样时长（默认 1 秒）。"
   (require 'benchmark)
   (let* ((secs (or seconds 1.0))
          (items (cons (cons "[total]" mode-line-format)
-                      (mapcar (lambda (elem)
-                                (cons (format "%S" elem) elem))
+                      (mapcar (lambda (elem) (cons (format "%S" elem) elem))
                               mode-line-format))))
     (with-output-to-temp-buffer "*nowis-ml-benchmark*"
       (dolist (item items)
@@ -127,8 +126,7 @@ SECONDS 为采样时长（默认 1 秒）。"
                (time     (nth 1 r))
                (gc-count (nth 2 r))
                (per-call (* (/ time reps) 1e6)))
-          (princ (format "%-60s %6.2fµs  GC×%d
-"
+          (princ (format "%-60s %6.2fµs  GC×%d\n"
                          (truncate-string-to-width (car item) 60)
                          per-call gc-count)))))))
 

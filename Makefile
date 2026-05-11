@@ -31,7 +31,15 @@ autoloads:
 		--eval "(capsule-batch-autoloads)"
 
 # Phase 2: Compile all packages (can be parallel with -j)
-compile: autoloads $(addprefix compile-, $(PACKAGES))
+compile: autoloads compile-lisp $(addprefix compile-, $(PACKAGES))
+
+compile-lisp:
+	@echo "==== Compiling lisp/ directory ===="
+	@$(EMACS) -Q --batch \
+		-L $(LISP_DIR) \
+		-l capsule \
+		--eval "(capsule--setup-load-path-all)" \
+		--eval "(capsule--compile-package (expand-file-name \"$(LISP_DIR)\"))"
 
 # Native compilation variant
 compile-native: autoloads $(addprefix native-, $(PACKAGES))
@@ -88,6 +96,8 @@ clean:
 	@find $(LIB_DIR) -name "*.elc" -type f -delete -print
 	@find $(LIB_DIR) -name "*.eln" -type f -delete -print 2>/dev/null || true
 	@find $(LIB_DIR) -name "*-autoloads.el" -type f -delete -print
+	@find $(LISP_DIR) -name "*.elc" -type f -delete -print
+	@find $(LISP_DIR) -name "*.eln" -type f -delete -print 2>/dev/null || true
 	@echo "Clean complete!"
 
 init:
