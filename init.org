@@ -682,7 +682,7 @@ diff-hl-mode highlights uncommitted changes on the left side of the window (area
             (message "Emacs loaded in %s" (emacs-init-time))))
 #+end_src
 ** mini-echo
-#+begin_src elisp
+#+begin_src elisp :tangle no
 (setup hide-mode-line)
 (setup mini-echo
   ;; set default segments of long/short style
@@ -735,6 +735,11 @@ diff-hl-mode highlights uncommitted changes on the left side of the window (area
     (add-to-list 'mini-echo-skip-update-functions 'org-priority)
     ))
 #+end_src
+** modeline
+#+begin_src elisp
+(require 'nowis-modeline)
+#+end_src
+
 ** hl-todo
 #+begin_src elisp
 (setup hl-todo

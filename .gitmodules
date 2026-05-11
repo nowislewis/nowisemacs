@@ -108,9 +108,6 @@
 [submodule "helpful"]
 	path = lib/helpful
 	url = https://github.com/Wilfred/helpful.git
-[submodule "hide-mode-line"]
-	path = lib/hide-mode-line
-	url = https://github.com/hlissner/emacs-hide-mode-line.git
 [submodule "hl-todo"]
 	path = lib/hl-todo
 	url = https://github.com/tarsius/hl-todo.git
@@ -142,9 +139,6 @@
 [submodule "minesweeper"]
 	path = lib/minesweeper
 	url = https://github.com/calancha/Minesweeper.git
-[submodule "mini-echo"]
-	path = lib/mini-echo
-	url = https://github.com/liuyinz/mini-echo.el.git
 [submodule "nerd-icons"]
 	path = lib/nerd-icons
 	url = https://github.com/rainstormstudio/nerd-icons.el.git
