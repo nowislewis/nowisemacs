@@ -4,7 +4,8 @@
 (eval-when-compile (require 'subr-x))
 (require 'vc-hooks)
 
-(setq mode-line-right-align-edge 'right-margin)
+(setq mode-line-right-align-edge 'right-margin
+      mode-line-compact t)
 
 ;;; Faces
 
@@ -62,17 +63,13 @@
                 "  "
                 (:propertize ("%l %p") face font-lock-constant-face)
                 mode-line-format-right-align
+                (:propertize ("" current-input-method-title) face font-lock-keyword-face)
+                " "
                 mode-line-misc-info
                 " "
-                (:eval (when (and (fboundp 'profiler-running-p) (profiler-running-p))
-                         (propertize "Prof" 'face 'warning)))
-                " "
-                #("%n" 0 2 (help-echo "Narrowing"))
-                mode-line-mule-info
+                mode-line-modified
                 " "
                 (:propertize ("%I") face nowis-ml-dim)
-                "  "
-                mode-line-modified
                 "  "
                 (vc-mode vc-mode)
                 " "
@@ -84,10 +81,9 @@
 (with-eval-after-load 'meow
   (advice-add 'meow-setup-mode-line :override #'ignore))
 
-
-(set-face-attribute 'mode-line          nil :inherit 'unspecified :box nil)
-(set-face-attribute 'mode-line-active   nil :inherit 'unspecified :box nil)
-(set-face-attribute 'mode-line-inactive nil :box nil)
+(set-face-attribute 'mode-line          nil :height 0.88 :box nil)
+(set-face-attribute 'mode-line-active   nil :height 0.88 :box nil)
+(set-face-attribute 'mode-line-inactive nil :height 0.88 :box nil)
 
 (line-number-mode   1)
 (column-number-mode 1)
@@ -120,6 +116,7 @@ SECONDS 为采样时长（默认 1 秒）。"
           (princ (format "%-60s %6.2fµs  GC×%d\n"
                          (truncate-string-to-width (car item) 60)
                          per-call gc-count)))))))
+
 ;; (defmacro +measure-time(&rest body)
 ;;   `(let ((time (current-time)))
 ;;      ,@body
@@ -128,4 +125,4 @@ SECONDS 为采样时长（默认 1 秒）。"
 ;;   )
 ;; (+measure-time (format-mode-line mode-line-format))
 
-;;; nowis-modeline.el ends here
+;; nowis-modeline.el ends here
