@@ -4,6 +4,8 @@
 (eval-when-compile (require 'subr-x))
 (require 'vc-hooks)
 
+(setq mode-line-right-align-edge 'right-margin)
+
 ;;; Faces
 
 (defface nowis-ml-dim  '((t :inherit shadow))              "" :group 'nowis-modeline)
@@ -52,38 +54,27 @@
     (when buffer-file-name (nowis-ml--path-update))))
 
 ;;; mode-line-format
-
 (setq-default mode-line-format
               '((:eval (and (fboundp 'meow-indicator) (meow-indicator)))
                 (defining-kbd-macro mode-line-defining-kbd-macro)
                 " "
                 nowis-ml--path-cache
                 "  "
-                (:propertize ("%p") face font-lock-constant-face)
+                (:propertize ("%l %p") face font-lock-constant-face)
                 mode-line-format-right-align
                 mode-line-misc-info
-                " "
-                (flymake-mode flymake-mode-line-format)
                 " "
                 (:eval (when (and (fboundp 'profiler-running-p) (profiler-running-p))
                          (propertize "Prof" 'face 'warning)))
                 " "
                 #("%n" 0 2 (help-echo "Narrowing"))
                 mode-line-mule-info
+                " "
+                (:propertize ("%I") face nowis-ml-dim)
                 "  "
                 mode-line-modified
                 "  "
-                (:eval
-                 (when vc-mode
-                   (let ((s (string-trim (substring-no-properties vc-mode))))
-                     (propertize
-                      (concat (when (fboundp 'nerd-icons-devicon)
-                                (nerd-icons-devicon "nf-dev-git_branch"))
-                              " "
-                              (substring s (1+ (or (string-search ":" s)
-                                                   (string-search "-" s 3)
-                                                   -1))))
-                      'face 'shadow))))
+                (vc-mode vc-mode)
                 " "
                 (:propertize mode-name face bold)
                 ))
@@ -129,5 +120,12 @@ SECONDS 为采样时长（默认 1 秒）。"
           (princ (format "%-60s %6.2fµs  GC×%d\n"
                          (truncate-string-to-width (car item) 60)
                          per-call gc-count)))))))
+;; (defmacro +measure-time(&rest body)
+;;   `(let ((time (current-time)))
+;;      ,@body
+;;      (message "%.06fs" (float-time (time-since time)))
+;;      )
+;;   )
+;; (+measure-time (format-mode-line mode-line-format))
 
 ;;; nowis-modeline.el ends here
