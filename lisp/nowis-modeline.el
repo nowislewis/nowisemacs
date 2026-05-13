@@ -69,7 +69,6 @@
       (nowis-ml--path-update)))
   (force-mode-line-update t))
 
-(nowis-ml-refresh)
 (with-eval-after-load 'project
   (nowis-ml-refresh))
 

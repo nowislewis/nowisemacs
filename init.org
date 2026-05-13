@@ -2428,7 +2428,7 @@ In short, you will need 3 files:
 #+end_src
 * 阅读
 ** reader
-#+begin_src elisp
+#+begin_src elisp :tangle no
 (setup reader)
 (with-eval-after-load 'org
   (org-link-set-parameters
