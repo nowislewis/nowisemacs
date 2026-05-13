@@ -1,73 +1,92 @@
 ;;; nowis-modeline.el --- Minimal mode-line -*- lexical-binding: t -*-
 ;;; Code:
 
-(eval-when-compile (require 'subr-x))
 (require 'vc-hooks)
+(declare-function project-current "project" (&optional maybe-prompt directory))
+(declare-function project-root "project" (project))
 
 (setq mode-line-right-align-edge 'right-margin
       mode-line-compact t)
 
 ;;; Faces
 
-(defface nowis-ml-dim  '((t :inherit shadow))              "" :group 'nowis-modeline)
-(defface nowis-ml-info '((t :inherit font-lock-type-face)) "" :group 'nowis-modeline)
+(defface nowis-ml-dim  '((t :inherit shadow)) "" :group 'nowis-modeline)
+(defface nowis-ml-file
+  '((t :weight bold))
+  "Face used for the buffer file name in the mode line."
+  :group 'nowis-modeline)
+(defface nowis-ml-modified '((t :inherit warning :weight bold)) "" :group 'nowis-modeline)
+(defface nowis-ml-read-only '((t :inherit nowis-ml-dim :weight bold)) "" :group 'nowis-modeline)
 
 ;;; shrink-path cache
 
 (defvar-local nowis-ml--path-cache nil)
+;; Mode-line symbols that may contain text properties must be marked risky,
+;; otherwise Emacs strips/ignores properties such as `face'.
+(put 'nowis-ml--path-cache 'risky-local-variable t)
 
 (defun nowis-ml--path-update (&rest _)
   (setq nowis-ml--path-cache
         (let* ((file (buffer-file-name))
                (non-essential t)
-               (root (and file
-                          (fboundp 'project-current)
-                          (fboundp 'project-root)
-                          (when-let* ((pr (project-current nil)))
-                            (expand-file-name (project-root pr)))))
-               (icon (when (fboundp 'nerd-icons-icon-for-buffer)
-                       (nerd-icons-icon-for-buffer))))
-          (cond
-           ((and root (string-prefix-p root file))
-            (let* ((rel   (string-remove-prefix root file))
-                   (dirs  (butlast (split-string (or (file-name-directory rel) "") "/" t)))
-                   (abbr  (and dirs
-                               (propertize
-                                (concat (mapconcat (lambda (s) (substring s 0 1)) dirs "/") "/")
-                                'face 'nowis-ml-dim)))
-                   (pname (propertize (file-name-nondirectory (directory-file-name root))
-                                      'face 'nowis-ml-info)))
-              (concat icon (and icon " ") pname "/" abbr (file-name-nondirectory file))))
-           (file
-            (concat icon (and icon " ")
-                    (propertize (concat (file-name-nondirectory
-                                        (directory-file-name (file-name-directory file))) "/")
-                                'face 'nowis-ml-dim)
-                    (file-name-nondirectory file)))
-           (t (propertize (buffer-name) 'face 'nowis-ml-dim))))))
+               (icon (and (fboundp 'nerd-icons-icon-for-buffer)
+                          (nerd-icons-icon-for-buffer)))
+               (name (if file (file-name-nondirectory file) (buffer-name))))
+          (if file
+              (let* ((project (and (featurep 'project) (project-current nil)))
+                     (root (and project (expand-file-name (project-root project))))
+                     (in-project (and root (file-in-directory-p file root)))
+                     (rel-dir (and in-project
+                                   (file-name-directory (file-relative-name file root))))
+                     (dir (if in-project
+                              (concat (file-name-nondirectory (directory-file-name root)) "/"
+                                      (and rel-dir
+                                           (concat (mapconcat (lambda (s) (substring s 0 1))
+                                                              (split-string rel-dir "/" t) "/")
+                                                   "/")))
+                            (concat (file-name-nondirectory
+                                     (directory-file-name
+                                      (file-name-parent-directory file)))
+                                    "/"))))
+                (concat (and icon (concat icon " "))
+                        (propertize dir 'face 'nowis-ml-dim)
+                        (propertize name 'face 'nowis-ml-file)))
+            (propertize name 'face 'nowis-ml-file)))))
+
+(defun nowis-ml--modified ()
+  (cond ((buffer-modified-p) (propertize "●" 'face 'nowis-ml-modified))
+        (buffer-read-only    (propertize "RO" 'face 'nowis-ml-read-only))))
 
 (add-hook 'find-file-hook  #'nowis-ml--path-update)
 (add-hook 'after-save-hook #'nowis-ml--path-update)
 (advice-add 'rename-buffer :after #'nowis-ml--path-update)
 
-(dolist (buf (buffer-list))
-  (with-current-buffer buf
-    (when buffer-file-name (nowis-ml--path-update))))
+(defun nowis-ml-refresh ()
+  "Refresh cached mode-line path for all buffers."
+  (interactive)
+  (dolist (buf (buffer-list))
+    (with-current-buffer buf
+      (nowis-ml--path-update)))
+  (force-mode-line-update t))
+
+(nowis-ml-refresh)
+(with-eval-after-load 'project
+  (nowis-ml-refresh))
 
 ;;; mode-line-format
 (setq-default mode-line-format
               '((:eval (and (fboundp 'meow-indicator) (meow-indicator)))
                 (defining-kbd-macro mode-line-defining-kbd-macro)
                 " "
-                nowis-ml--path-cache
+                (:eval nowis-ml--path-cache)
                 "  "
-                (:propertize ("%l %p") face font-lock-constant-face)
+                (:propertize ("%p %l") face font-lock-constant-face)
                 mode-line-format-right-align
                 (:propertize ("" current-input-method-title) face font-lock-keyword-face)
                 " "
                 mode-line-misc-info
                 " "
-                mode-line-modified
+                (:eval (nowis-ml--modified))
                 " "
                 (:propertize ("%I") face nowis-ml-dim)
                 "  "
