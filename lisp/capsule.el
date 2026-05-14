@@ -101,15 +101,14 @@ Adds each package to load-path and loads each package's autoloads file."
 
 (defun capsule--compile-package (pkg-dir)
   "Compile all Elisp files in PKG-DIR."
+  (require 'bytecomp)
   (let ((byte-compile-warnings '(not free-vars unresolved))
         (files (capsule--collect-el-files pkg-dir)))
     (if capsule-use-native-compile
-        ;; Native compilation
         (progn
           (require 'comp)
           (dolist (file files)
             (native-compile file)))
-      ;; Byte compilation
       (dolist (file files)
         (byte-compile-file file)))))
 
@@ -144,8 +143,6 @@ This function is meant to be called from Emacs --batch mode."
   (unless noninteractive
     (error "capsule-batch-compile-single is only for batch mode"))
 
-  (require 'bytecomp)
-
   (let ((pkg-dir (expand-file-name package capsule-drones-directory)))
     (unless (file-directory-p pkg-dir)
       (error "Package directory not found: %s" pkg-dir))
@@ -162,7 +159,6 @@ This function is meant to be called from Emacs --batch mode."
   (unless noninteractive
     (error "capsule-batch-build-single is only for batch mode"))
 
-  (require 'bytecomp)
   (require 'loaddefs-gen)
 
   (let ((pkg-dir (expand-file-name package capsule-drones-directory)))
