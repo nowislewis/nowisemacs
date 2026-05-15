@@ -2338,7 +2338,7 @@ In short, you will need 3 files:
       ]
      ["item"
       ("m" "mark" org-sm-item-mark)
-      ("d" "dismiss" org-sm-item-dismiss)
+      ("d" "dismiss" org-sm-item-dismiss :transient t)
       ("u" "undismiss" org-sm-item-undismiss)
       ("z" "extract" org-sm-item-extract)
       ]
