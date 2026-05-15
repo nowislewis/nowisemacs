@@ -441,7 +441,7 @@ Maybe I should add a new state.
     ("A" "archive" nowis/org-archive-subtree)
     ("o" "occur" (lambda ()
                    (interactive)
-                   (org-occur "^[ \t]*\\*+ +\\(TODO\\|NEXT\\)\\>")))
+                   (org-occur "^[ \t]*\\*+ +\\(TODO\\)\\>")))
     ]
    ["appt"
     ("k" "appt-check" appt-check)]
@@ -739,7 +739,6 @@ diff-hl-mode highlights uncommitted changes on the left side of the window (area
 #+begin_src elisp
 (require 'nowis-modeline)
 #+end_src
-
 ** hl-todo
 #+begin_src elisp
 (setup hl-todo
@@ -1756,7 +1755,6 @@ borrowed from citre, now you can always jump-back use "M-," after any jump in th
         system-time-locale "C" ;; ensure time format is always english
         ;; todo keywords
         org-todo-keyword-faces '(("TODO"    :foreground "red"    :weight bold)
-                                 ("NEXT"    :foreground "deep sky blue" :weight bold)
                                  ("WAIT"    :foreground "goldenrod"     :weight bold)
                                  ("SMDY"    :foreground "medium purple" :weight bold)
                                  ("DONE"    :foreground "forest green"  :weight bold)
@@ -2179,15 +2177,8 @@ In short, you will need 3 files:
 (setq org-enforce-todo-dependencies t
       org-enforce-todo-checkbox-dependencies t
       org-log-done 'note
-      org-todo-keywords '((sequence "TODO(t)" "NEXT(n)" "WAIT(w)" "SMDY(s)" "|" "AXED(a)" "DONE(d)"))
+      org-todo-keywords '((sequence "TODO(t)" "WAIT(w)" "SMDY(s)" "|" "AXED(a)" "DONE(d)"))
       )
-
-(defun log-todo-next-creation-date (&rest ignore)
-  "Log NEXT creation time in the property drawer under the key 'ACTIVATED'"
-  (when (and (string= (org-get-todo-state) "NEXT")
-             (not (org-entry-get nil "ACTIVATED")))
-    (org-entry-put nil "ACTIVATED" (format-time-string "[%Y-%m-%d]"))))
-(add-hook 'org-after-todo-state-change-hook #'log-todo-next-creation-date)
 #+end_src
 *** capture
 #+begin_src elisp
@@ -2260,19 +2251,13 @@ In short, you will need 3 files:
         (week-tag   (concat "CLOSED>=\"<-1w>\""  tag)))
     `(,key ,description
            ((agenda ""
-                    ((org-agenda-overriding-header (nowis/center-header "Today's Target"))
+                    ((org-agenda-overriding-header (nowis/center-header "Launch Pad"))
                      (org-agenda-span 'day)
                      (org-agenda-skip-function
                       '(org-agenda-skip-if nil '(todo done)))))
 
-            (tags-todo "action+next"
-                       ((org-agenda-overriding-header (nowis/center-header "One Step Action"))
-                        (org-agenda-skip-function
-                         '(org-agenda-skip-entry-if 'scheduled))
-                        (org-agenda-sorting-strategy
-                         '(category-keep todo-state-up priority-down timestamp-up))))
-            (tags-todo "action+project"
-                       ((org-agenda-overriding-header (nowis/center-header "Multi Step Action"))
+            (tags-todo "action"
+                       ((org-agenda-overriding-header (nowis/center-header "Ready to Start"))
                         (org-agenda-skip-function
                          '(org-agenda-skip-entry-if 'scheduled))
                         (org-agenda-sorting-strategy
@@ -2410,7 +2395,8 @@ In short, you will need 3 files:
           (let ((gtd-dir (expand-file-name "gtd" org-directory)))
             (when (file-directory-p gtd-dir)
               (directory-files-recursively gtd-dir ".*"))))
-    (setq org-ladder-sm-files org-sm--files)
+    (setq org-ladder-sm-files org-sm--files
+          org-ladder-art-directory (concat nowis/doc-emacs-dir "67-org-ladder-arts"))
     (require 'org-ladder-sm)))
 #+end_src
 ** org-graph
