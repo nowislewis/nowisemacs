@@ -16,7 +16,6 @@
   "Face used for the buffer file name in the mode line."
   :group 'nowis-modeline)
 (defface nowis-ml-modified '((t :inherit warning :weight bold)) "" :group 'nowis-modeline)
-(defface nowis-ml-read-only '((t :inherit nowis-ml-dim :weight bold)) "" :group 'nowis-modeline)
 
 ;;; shrink-path cache
 
@@ -54,8 +53,8 @@
             (propertize name 'face 'nowis-ml-file)))))
 
 (defun nowis-ml--modified ()
-  (cond ((buffer-modified-p) (propertize "●" 'face 'nowis-ml-modified))
-        (buffer-read-only    (propertize "RO" 'face 'nowis-ml-read-only))))
+  (cond ((buffer-modified-p) (propertize "󰆓" 'face 'nerd-icons-red))
+        (buffer-read-only    (propertize "" 'face 'nerd-icons-lyellow))))
 
 (add-hook 'find-file-hook  #'nowis-ml--path-update)
 (add-hook 'after-save-hook #'nowis-ml--path-update)
@@ -75,17 +74,18 @@
 ;;; mode-line-format
 (setq-default mode-line-format
               '((:eval (and (fboundp 'meow-indicator) (meow-indicator)))
-                (defining-kbd-macro mode-line-defining-kbd-macro)
+                " "
+                (defining-kbd-macro "󰧟")
+                " "
+                (:eval (nowis-ml--modified))
                 " "
                 (:eval nowis-ml--path-cache)
                 "  "
-                (:propertize ("%p %l") face font-lock-constant-face)
+                (:propertize "%p %l" face nowis-ml-dim)
                 mode-line-format-right-align
                 (:propertize ("" current-input-method-title) face font-lock-keyword-face)
                 " "
                 mode-line-misc-info
-                " "
-                (:eval (nowis-ml--modified))
                 " "
                 (:propertize ("%I") face nowis-ml-dim)
                 "  "

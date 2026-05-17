@@ -2242,7 +2242,7 @@ In short, you will need 3 files:
       (search . " %i %-12:c")))
 
 (setq org-agenda-hide-tags-regexp
-      "\\(inbox\\|action\\|journal\\|project\\|next\\|bib\\|srs\\)")
+      "\\(inbox\\|action\\|journal\\|project\\|next\\|bib\\|srs\\|reading\\)")
 
 ;;; ─── Agenda 视图构建 ────────────────────────────────────
 (defun nowis/make-agenda-command (key description tag)
@@ -2251,29 +2251,36 @@ In short, you will need 3 files:
         (week-tag   (concat "CLOSED>=\"<-1w>\""  tag)))
     `(,key ,description
            ((agenda ""
-                    ((org-agenda-overriding-header (nowis/center-header "Launch Pad"))
+                    ((org-agenda-overriding-header (nowis/center-header " Launch Pad"))
                      (org-agenda-span 'day)
                      (org-agenda-skip-function
                       '(org-agenda-skip-if nil '(todo done)))))
 
             (tags-todo "action"
-                       ((org-agenda-overriding-header (nowis/center-header "Ready to Start"))
+                       ((org-agenda-overriding-header (nowis/center-header " Ready to Start"))
                         (org-agenda-skip-function
                          '(org-agenda-skip-entry-if 'scheduled))
                         (org-agenda-sorting-strategy
                          '(category-keep todo-state-up priority-down timestamp-up))))
 
             (tags-todo "inbox"
-                       ((org-agenda-overriding-header (nowis/center-header "Inbox"))
+                       ((org-agenda-overriding-header (nowis/center-header " Inbox"))
+                        (org-agenda-sorting-strategy
+                         '(category-keep todo-state-up priority-down timestamp-up))))
+
+            (tags-todo "reading"
+                       ((org-agenda-overriding-header (nowis/center-header " Leisure & Reading"))
+                        (org-agenda-skip-function
+                         '(org-agenda-skip-entry-if 'scheduled))
                         (org-agenda-sorting-strategy
                          '(category-keep todo-state-up priority-down timestamp-up))))
 
             (tags ,closed-tag
-                  ((org-agenda-overriding-header (nowis/center-header "Completed Today"))
+                  ((org-agenda-overriding-header (nowis/center-header "󰔹 Completed Today"))
                    (org-agenda-sorting-strategy '(category-keep tsia-down))))
 
             (tags ,week-tag
-                  ((org-agenda-overriding-header (nowis/center-header "Completed Last 7 Days"))
+                  ((org-agenda-overriding-header (nowis/center-header " Completed Last 7 Days"))
                    (org-agenda-sorting-strategy '(category-keep tsia-down))))))))
 
 (setq org-agenda-custom-commands
@@ -2497,7 +2504,7 @@ Simple distraction-free editing. I use darkroom instead of writeroom because it'
       )
     (gptel-make-gh-copilot "Copilot")
     (custom-set-faces
-     '(gptel-response-highlight ((((background dark) (min-colors 88)) :background "gray22" :extend t))))
+     '(gptel-response-highlight ((((background dark) (min-colors 88)) :background "gray15" :extend t))))
     )
   )
 #+end_src
