@@ -641,13 +641,13 @@ Maybe I should add a new state.
   (:hook-into vertico-mode marginalia-mode))
 #+end_src
 ** rainbow-delimiters
-rainbow-delimiters is a "rainbow parentheses"-like mode which highlights delimiters such as parentheses, brackets or braces according to their depth.
+rainbow-delimiters is a "rainbow parentheses"-like mode which highlights delimiters
 #+begin_src elisp
 (setup rainbow-delimiters
   (:hook-into prog-mode))
 #+end_src
 ** diff-hl
-diff-hl-mode highlights uncommitted changes on the left side of the window (area also known as the "gutter"), allows you to jump between and revert them selectively.
+diff-hl-mode highlights uncommitted changes on the left side of the window
 #+begin_src elisp
 (setup diff-hl
   (:hook-into prog-mode)
@@ -689,10 +689,10 @@ diff-hl-mode highlights uncommitted changes on the left side of the window (area
   (setq mini-echo-persistent-rule
         '(:long
           ("major-mode" "vcs" "time" "flymake" "process"
-           "narrow"  "profiler" "repeat" "buffer-size" "buffer-position" "buffer-percent" "shrink-path"  "meow" "macro" "org-clock" "org-timer")
+           "narrow"  "profiler" "repeat" "buffer-size" "buffer-position" "buffer-percent" "shrink-path"  "meow" "macro")
           ;; remove "selection-info"
           :short
-          ("major-mode" "vcs" "time" "buffer-size" "buffer-position" "shrink-path"  "meow" "macro" "org-clock" "org-timer")))
+          ("major-mode" "vcs" "time" "buffer-size" "buffer-position" "shrink-path"  "meow" "macro")))
   (setq mini-echo-separator "  ")
   (setq mini-echo-window-divider-args '(t 2 2))
   (setq mini-echo-update-interval 0.04)
@@ -701,24 +701,6 @@ diff-hl-mode highlights uncommitted changes on the left side of the window (area
     )
   (require 'mini-echo)
   (:when-loaded
-    (mini-echo-define-segment "org-clock"
-      "Return org-clock."
-      :fetch
-      (when (and (fboundp 'org-clocking-p)
-                 (org-clocking-p)
-                 (not
-                  (and (boundp 'org-timer-mode-line-string)
-                       org-timer-start-time)))
-        (let* ((time-string (org-clock-get-clock-string))
-               (time-face 'mini-echo-magenta))
-          (mini-echo-segment--print time-string time-face))))
-
-    (mini-echo-define-segment "org-timer"
-      "Return org-clock."
-      :fetch
-      (when (and (boundp 'org-timer-mode-line-string)
-                 org-timer-start-time)
-        (mini-echo-segment--print (concat "⏱" org-timer-mode-line-string) 'diff-added)))
     (mini-echo-define-segment "time"
       "Show the current time."
       :fetch
@@ -840,9 +822,10 @@ diff-hl-mode highlights uncommitted changes on the left side of the window (area
 *** savehist
 #+begin_src elisp
 (setup savehist
-  (setq history-length 100
+  (setq history-length 2000
         history-delete-duplicates t
-        savehist-save-minibuffer-history t)
+        savehist-save-minibuffer-history t
+        savehist-autosave-interval 60)
   (savehist-mode))
 #+end_src
 ** recentf
@@ -1610,17 +1593,8 @@ borrowed from citre, now you can always jump-back use "M-," after any jump in th
                                   (or (file-remote-p default-directory)
                                       (derived-mode-p 'emacs-lisp-mode 'lisp-mode 'makefile-mode 'snippet-mode)
                                       (eglot-ensure)))))
-
   (:when-loaded
-    ;; hightlight face
-    (defface new-hi-green
-      '((((min-colors 88) (background dark))
-         (:background "light green" :foreground "black"))
-        (((background dark)) (:background "green" :foreground "black"))
-        (((min-colors 88)) (:background "light green"))
-        (t (:background "green")))
-      "Face for hi-lock mode.")
-    (set-face-attribute 'eglot-highlight-symbol-face nil :inherit 'new-hi-green)
+    (set-face-attribute 'eglot-highlight-symbol-face nil :inherit 'query-replace)
     ;; more languare server
     (add-to-list 'eglot-server-programs
                  '(graphviz-dot-mode . ("dot-language-server" "--stdio")))
