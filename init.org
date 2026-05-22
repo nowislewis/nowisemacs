@@ -2446,7 +2446,7 @@ Simple distraction-free editing. I use darkroom instead of writeroom because it'
 (setup gptel
   (setq gptel-default-mode 'org-mode
         gptel-highlight-methods '(face)
-        gptel-model 'claude-sonnet-4.6
+        gptel-model 'claude-opus-4.6
         gptel-cache t
         gptel-stream t ;; to fix tool-call issue
         gptel-max-tokens 32768
@@ -2463,7 +2463,7 @@ Simple distraction-free editing. I use darkroom instead of writeroom because it'
                     :host "llm-gateway.momenta.works"
                     :key 'gptel-api-key
                     :stream t
-                    :models '(claude-sonnet-4.6 claude-haiku-4.5 qwen3.6-max-anthropic deepseek-v4-pro deepseek-v4-flash)))
+                    :models '(claude-opus-4.6 claude-haiku-4.5 qwen3.7-max deepseek-v4-pro deepseek-v4-flash glm-5.1)))
     (gptel-make-openai "chatanywhere"
       :host "api.chatanywhere.tech"
       :key 'gptel-api-key
