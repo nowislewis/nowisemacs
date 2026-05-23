@@ -1912,40 +1912,11 @@ Always allow composition for org-mode keywords, regardless of context."
     (add-to-list 'bibtex-biblatex-field-alist
                  '("keywords" "Keywords or phrases")))
   )
-
 (defun do.refs/get-db-file-list ()
   "Get the list of all the bib files containing my bib database."
   (if (file-exists-p nowis/bib-dir)
       (directory-files-recursively nowis/bib-dir "\\.bib\\'" t)
     nil))
-#+end_src
-*** parse-bibtex-into-denote
-#+begin_src elisp
-(defun denote-bibtex-update-reference ()
-  (interactive)
-  (save-excursion
-    (goto-char (point-min))
-    (when (re-search-forward "^#\\+begin_src bibtex\n@\\w+{\\([^,]+\\)" nil t)
-      (let ((key (match-string 1)))
-        (goto-char (point-min))
-        (if (re-search-forward "^#\\+title:" nil t)
-            (progn
-              (beginning-of-line)
-              (kill-line)
-              (insert (format "#+title:      %s" key))))
-        (if (re-search-forward "^#\\+reference:" nil t)
-            (progn
-              (beginning-of-line)
-              (kill-line)
-              (insert (format "#+reference:  %s" key)))
-          (goto-char (point-min))
-          (when (re-search-forward "^#\\+identifier:" nil t)
-            (end-of-line)
-            (insert (format "\n#+reference:  %s" key))))
-        (message "已更新 reference: %s" key)
-        ;; use denote to rename current file
-        (denote-rename-file-using-front-matter (buffer-file-name))
-        ))))
 #+end_src
 *** citar
 #+begin_src elisp
