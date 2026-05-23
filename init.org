@@ -69,7 +69,7 @@ I use the following file paths to manage all the files in Nowisemacs:
 emacs
 ├── 01-orgmode
 │   └── xnotes
-├── 02-binary-git/binary-files
+├── 02-binary-file
 │   ├── 01-pictures
 │   ├── 02-searchable
 ├── 03-bibliography
@@ -80,7 +80,7 @@ emacs
 (defvar nowis/doc-emacs-dir (file-truename "~/Documents/emacs/"))
 (defvar nowis/gtd-dir (concat nowis/doc-emacs-dir "01-orgmode/xnotes/gtd"))
 (defvar nowis/bib-dir (concat nowis/doc-emacs-dir "03-bibliography/"))
-(defvar nowis/bib-pdf-dir (concat nowis/doc-emacs-dir "02-binary-git/searchable"))
+(defvar nowis/bib-pdf-dir (concat nowis/doc-emacs-dir "02-binary-file/02-searchable"))
 (defvar nowis/is-wsl (string= "Arch" (getenv "WSL_DISTRO_NAME"))
   "Non-nil when running inside WSL (Arch distro).")
 #+end_src
@@ -384,22 +384,28 @@ Maybe I should add a new state.
 (transient-define-prefix notes-leader-map()
   "Define leader-key map for notes functions"
   [["denote"
+    ("r a" "citar-denote-add-ref" citar-denote-add-reference)
     ("r f" "denote-open-or-create" denote-open-or-create)
     ("r l" "denote-link" denote-link)
     ("r j" "denote-journal" denote-journal-new-or-existing-entry)
-    ("r s" "find-all-searchable" project-find-searchable-dir-files)
     ("r c" "calendar" calendar)
-    ("r g" "project-find-gtd-dir-files" project-find-gtd-dir-files)
     ("r L" "lint" denote-lint)
+    ]
+   ["navigate"
+    ("r s" "find-all-searchable" project-find-searchable-dir-files)
+    ("r g" "project-find-gtd-dir-files" project-find-gtd-dir-files)
     ]
    ["ladder"
     ("l c" "display current" org-ladder-status)
     ("l d" "show detailed" org-ladder-show-details)
     ("l f" "force update" org-ladder-force-refresh)
     ]
-   ["bibtex"
-    ("e" "ebib" ebib)
+   ["bib"
+    ("a" "citar-add-file" citar-add-file-to-library)
     ("b" "citar-open" citar-open)
+    ("B" "open all.bib" (lambda () (interactive)
+                          (let ((f (expand-file-name "~/Documents/emacs/03-bibliography/all.bib")))
+                            (when (file-exists-p f) (find-file f)))))
     ("u" "update denote with bibtex" denote-bibtex-update-reference)
     ]
    ]
@@ -684,7 +690,7 @@ diff-hl-mode highlights uncommitted changes on the left side of the window
 *** hl-line
 #+begin_src elisp
 (setup hl-line
-  (keymap-global-set "C-l" #'nowis/recenter)
+  (keymap-global-set "C-l" #'recenter)
   ;; Only highliht current buffer in current window
   (setq hl-line-sticky-flag nil
         global-hl-line-sticky-flag nil)
@@ -700,13 +706,7 @@ diff-hl-mode highlights uncommitted changes on the left side of the window
             (run-with-idle-timer 0.05 nil #'global-hl-line-highlight)))
     (remove-hook 'post-command-hook #'global-hl-line-highlight)
     (add-hook 'post-command-hook #'nowis/global-hl-line-highlight-debounce)
-
     ))
-  (defun nowis/recenter ()
-    (interactive)
-    (call-interactively 'recenter)
-    (pulse-momentary-highlight-one-line (point)))
-  (defvar my-hl-line-timer nil)
 #+end_src
 *** pulse
 #+begin_src elisp
@@ -718,6 +718,7 @@ diff-hl-mode highlights uncommitted changes on the left side of the window
   (pulse-momentary-highlight-one-line (point)))
 (dolist (cmd '(recenter-top-bottom
                other-window
+               recenter
                ace-window
                windmove-up windmove-down windmove-left windmove-right))
   (advice-add cmd :after #'nowis/pulse-line))
@@ -818,7 +819,7 @@ diff-hl-mode highlights uncommitted changes on the left side of the window
 #+end_src
 ** Automatically clean whitespace
 #+begin_src elisp
-(delete-trailing-whitespace-mode)
+(add-hook 'before-save-hook #'delete-trailing-whitespace)
 #+end_src
 ** vundo for undo history
 #+begin_src elisp
@@ -1504,14 +1505,6 @@ borrowed from citre, now you can always jump-back use "M-," after any jump in th
   (dolist (f '(cape-file cape-dict cape-elisp-block cape-dabbrev))
     (add-to-list 'completion-at-point-functions f)))
 #+end_src
-***** ispell
-#+begin_src elisp
-(setup ispell
-  (:when-loaded
-    ;; if not find ispell-dict, use cape as default
-    (unless ispell-alternate-dictionary
-      (setq ispell-complete-word-dict (concat nowis/doc-emacs-dir "02-binary-git/binary-files/12-spell-dict/en_US.dict")))))
-#+end_src
 ***** nerd-icons-corfu
 #+begin_src elisp
 (setup nerd-icons-corfu
@@ -1677,7 +1670,7 @@ borrowed from citre, now you can always jump-back use "M-," after any jump in th
         ;; plain list
         org-list-demote-modify-bullet '(("+" . "-") ("-" . "+") ("*" . "+"))
         ;; attach
-        org-yank-image-save-method (concat nowis/doc-emacs-dir "30-saved-binary/01-pictures/01-org_attachs")
+        org-yank-image-save-method (concat nowis/doc-emacs-dir "02-binary-file/01-pictures/01-org_attachs")
         ;; src
         org-edit-src-content-indentation 0
         org-confirm-babel-evaluate nil
@@ -1957,15 +1950,14 @@ Always allow composition for org-mode keywords, regardless of context."
 *** citar
 #+begin_src elisp
 (setup parsebib)
-;; (setup citeproc) ;;<- (setup queue) (setup string-inflection)
 (setup citar
   (setq org-cite-global-bibliography (do.refs/get-db-file-list)
         org-cite-insert-processor 'citar
         org-cite-follow-processor 'citar
         org-cite-activate-processor 'citar
-        citar-library-paths (list nowis/bib-pdf-dir)
         citar-bibliography org-cite-global-bibliography
-        ;; org-cite-export-processors '((t . (csl "modern-language-association.csl")))
+        citar-library-paths (list nowis/bib-pdf-dir)
+        citar-library-paths-recursive t
         ))
 #+end_src
 *** citar-denote
@@ -1976,29 +1968,6 @@ Always allow composition for org-mode keywords, regardless of context."
     (citar-denote-mode)
     )
   )
-#+end_src
-*** ebib
-#+begin_src elisp
-(setup ebib
-  (setq ebib-preload-bib-files org-cite-global-bibliography
-           ebib-file-search-dirs (list nowis/bib-pdf-dir)
-           ebib-bib-search-dirs (list nowis/bib-dir)
-           ebib-default-directory 'first-bib-dir
-           ebib-file-associations '(("pdf")
-                                    ("ps" . "gv")
-                                    ("epub"))
-           ebib-index-window-size 25
-           ebib-index-columns '(("Score" 2 t)
-                                ("Year" 6 t)
-                                ("Author/Editor" 10 t)
-                                ("Title" 80 t)
-                                ("abstract" 10 t)
-                                )
-           ebib-reading-list-file (concat nowis/doc-emacs-dir "01-orgmode/xnotes/20230403T125743--ebib-reading-lists.org")
-           ebib-use-timestamp t
-           ebib-bibtex-dialect 'biblatex
-           ebib-create-backups nil
-           ))
 #+end_src
 ** denote and related
 *** denote
@@ -2048,7 +2017,7 @@ Always allow composition for org-mode keywords, regardless of context."
 #+begin_src elisp
 (defun project-find-searchable-dir-files ()
   (interactive)
-  (dired (concat nowis/doc-emacs-dir "02-binary-git/searchable"))
+  (dired (concat nowis/doc-emacs-dir "02-binary-file/02-searchable"))
   (project-find-file t))
 (defun project-find-gtd-dir-files ()
   (interactive)
