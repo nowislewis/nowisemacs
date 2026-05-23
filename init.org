@@ -470,11 +470,6 @@ Maybe I should add a new state.
    ("r" "toggle-read-mode" org-sm-read-mode)
     ])
 #+end_src
-*** tui-support
-#+begin_src elisp
-(unless (display-graphic-p)
-  (xterm-mouse-mode 1))
-#+end_src
 ** meow leader keybindings
 #+begin_src elisp
 ;; default
@@ -684,11 +679,6 @@ diff-hl-mode highlights uncommitted changes on the left side of the window
 ** modeline
 #+begin_src elisp
 (require 'nowis-modeline)
-#+end_src
-** hl-todo
-#+begin_src elisp
-(setup hl-todo
-  (global-hl-todo-mode))
 #+end_src
 ** highlight line
 *** hl-line

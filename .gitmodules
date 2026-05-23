@@ -108,9 +108,6 @@
 [submodule "helpful"]
 	path = lib/helpful
 	url = https://github.com/Wilfred/helpful.git
-[submodule "hl-todo"]
-	path = lib/hl-todo
-	url = https://github.com/tarsius/hl-todo.git
 [submodule "imenu-list"]
 	path = lib/imenu-list
 	url = https://github.com/nowislewis/imenu-list.git
