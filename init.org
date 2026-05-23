@@ -638,7 +638,7 @@ Maybe I should add a new state.
 ** nerd-icons-completion
 #+begin_src elisp
 (setup nerd-icons-completion
-  (:hook-into vertico-mode marginalia-mode))
+  (:hook-into marginalia-mode))
 #+end_src
 ** rainbow-delimiters
 rainbow-delimiters is a "rainbow parentheses"-like mode which highlights delimiters
@@ -680,42 +680,6 @@ diff-hl-mode highlights uncommitted changes on the left side of the window
 (add-hook 'emacs-startup-hook
           (lambda ()
             (message "Emacs loaded in %s" (emacs-init-time))))
-#+end_src
-** mini-echo
-#+begin_src elisp :tangle no
-(setup hide-mode-line)
-(setup mini-echo
-  ;; set default segments of long/short style
-  (setq mini-echo-persistent-rule
-        '(:long
-          ("major-mode" "vcs" "time" "flymake" "process"
-           "narrow"  "profiler" "repeat" "buffer-size" "buffer-position" "buffer-percent" "shrink-path"  "meow" "macro")
-          ;; remove "selection-info"
-          :short
-          ("major-mode" "vcs" "time" "buffer-size" "buffer-position" "shrink-path"  "meow" "macro")))
-  (setq mini-echo-separator "  ")
-  (setq mini-echo-window-divider-args '(t 2 2))
-  (setq mini-echo-update-interval 0.04)
-  (unless (display-graphic-p)
-    (setq mini-echo-right-padding 1)
-    )
-  (require 'mini-echo)
-  (:when-loaded
-    (mini-echo-define-segment "time"
-      "Show the current time."
-      :fetch
-      (mini-echo-segment--print (format-time-string "%H:%M Day%u") 'mini-echo-green))
-    (mini-echo-define-segment "buffer-percent"
-      "Return the current line as a percentage of total lines in buffer."
-      :fetch
-      (when-let* ((total-lines (line-number-at-pos (point-max)))
-                  (current-line (line-number-at-pos (point)))
-                  ((> total-lines 0)))
-        (format "%d%%" (/ (* current-line 100) total-lines))))
-    (mini-echo-mode)
-    ;; org-priority 内部使用 read-char-exclusive 等待输入期间，
-    (add-to-list 'mini-echo-skip-update-functions 'org-priority)
-    ))
 #+end_src
 ** modeline
 #+begin_src elisp
@@ -864,7 +828,7 @@ diff-hl-mode highlights uncommitted changes on the left side of the window
 #+end_src
 ** Automatically clean whitespace
 #+begin_src elisp
-(add-hook 'before-save-hook #'delete-trailing-whitespace)
+(delete-trailing-whitespace-mode)
 #+end_src
 ** vundo for undo history
 #+begin_src elisp
@@ -969,13 +933,30 @@ diff-hl-mode highlights uncommitted changes on the left side of the window
           (lambda () (setq-local truncate-lines t)))
 ;; orderless 依赖空格
 (define-keymap :keymap icomplete-minibuffer-map
-  "SPC"                                    #'self-insert-command
   "TAB"                                    #'icomplete-force-complete
   "<remap> <backward-delete-char>"         #'icomplete-fido-backward-updir
   "<remap> <delete-backward-char>"         #'icomplete-fido-backward-updir
   "<remap> <minibuffer-complete-and-exit>" #'icomplete-force-complete-and-exit)
 (setq max-mini-window-height 0.3
       resize-mini-windows 'grow-only)
+
+;; could highlight selected line
+(advice-add 'icomplete--render-vertical :filter-return
+            (lambda (str)
+              (when str
+                (let ((start 0) end
+                      (width (window-body-width)))
+                  (while (< start (length str))
+                    (setq end (or (cl-position ?\n str :start start) (length str)))
+                    (when (text-property-any start end 'icomplete-selected t str)
+                      (let ((pad (max 0 (- width (string-width (substring str start end))))))
+                        (when (> pad 0)
+                          (let ((spaces (propertize (make-string pad ?\s) 'face 'hl-line)))
+                            (setq str (concat (substring str 0 end) spaces (substring str end))
+                                  end (+ end pad))))
+                        (add-face-text-property start end 'hl-line nil str)))
+                    (setq start (1+ end)))))
+              str))
 #+end_src
 
 ** Orderless and pinyinlib
@@ -983,13 +964,18 @@ diff-hl-mode highlights uncommitted changes on the left side of the window
 (setup orderless
   (setq completion-styles '(orderless basic)
         completion-category-defaults nil
-        completion-category-overrides '((file (styles partial-completion)))
-        completion-pcm-leading-wildcard t)
+        completion-category-overrides '((file (styles partial-completion))))
   (:when-loaded
     (require 'pinyinlib)
     (defun completion--regex-pinyin (str)
       (orderless-regexp (pinyinlib-build-regexp-string str)))
     (add-to-list 'orderless-matching-styles 'completion--regex-pinyin)))
+#+end_src
+** flex
+#+begin_src elisp :tangle no
+   (setq completion-styles '(flex basic)
+         completion-category-defaults nil
+         completion-category-overrides '((file (styles partial-completion))))
 #+end_src
 ** Marginalia
 #+begin_src elisp
@@ -1082,24 +1068,6 @@ Jump anywhere in the world
 *** bookmark
 #+begin_src elisp
 (setq bookmark-default-file (concat nowis/doc-emacs-dir "bookmarks"))
-#+end_src
-*** windmove
-#+begin_src elisp
-(setup windmove
-  (transient-define-prefix windmove-transient-keybindings()
-    "Define windmove maps"
-    [[("h" "left" windmove-left :transient t)
-      ("H" "swap-left" windmove-swap-states-left :transient t)]
-     [("j" "down" windmove-down :transient t)
-      ("J" "swap-down" windmove-swap-states-down :transient t)]
-     [("k" "up" windmove-up :transient t)
-      ("K" "swap-up" windmove-swap-states-up :transient t)]
-     [("l" "right" windmove-right :transient t)
-      ("L" "swap-right" windmove-swap-states-right :transient t)]
-     ])
-  (keymap-global-set "C-x O" #'windmove-transient-keybindings)
-  )
-
 #+end_src
 *** ace-window
 #+begin_src elisp
@@ -1494,29 +1462,10 @@ borrowed from citre, now you can always jump-back use "M-," after any jump in th
 **** treesit
 #+begin_src elisp
 (setup treesit
-  (setq treesit-font-lock-level 4)
-  (if (treesit-available-p)
-      ;; configure major-mode remapping to ts-modes
-      (setq major-mode-remap-alist
-            '((python-mode     . python-ts-mode)
-              (lua-mode        . lua-ts-mode)
-              (cmake-mode      . cmake-ts-mode)
-              (c-mode          . c-ts-mode)
-              (c++-mode        . c++-ts-mode)
-              (js-mode         . js-ts-mode)
-              (javascript-mode . js-ts-mode)
-              (css-mode        . css-ts-mode)
-              (html-mode       . html-ts-mode)
-              (json-mode       . json-ts-mode)
-              (yaml-mode       . yaml-ts-mode)
-              (toml-mode       . toml-ts-mode)
-              (bash-mode       . bash-ts-mode)
-              (markdown-mode       . md-ts-mode)
-              (sh-mode         . bash-ts-mode))
-            treesit-auto-install-grammar 'ask
-            )
-    ;; avoid some errors without treesit
-    (setq treesit-extra-load-path (list (concat user-emacs-directory "var/treesit/"))))
+  (setq treesit-font-lock-level 4
+        treesit-enabled-modes t
+        treesit-auto-install-grammar 'ask
+        treesit-extra-load-path (list (concat user-emacs-directory "var/treesit/")))
   (defun treesit-install-all ()
     (interactive)
     (require 'pi-coding-agent-grammars)

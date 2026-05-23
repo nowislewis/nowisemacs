@@ -196,11 +196,6 @@
 [submodule "uniline"]
 	path = lib/uniline
 	url = https://github.com/tbanel/uniline.git
-[submodule "vertico"]
-	path = lib/vertico
-	url = https://github.com/minad/vertico.git
-    load-path = .
-    load-path = extensions
 [submodule "vundo"]
 	path = lib/vundo
 	url = https://github.com/casouri/vundo.git
@@ -287,3 +282,6 @@
 [submodule "lib/whisper-funasr"]
 	path = lib/whisper-funasr
 	url = https://github.com/nowislewis/whisper-funasr.git
+[submodule "lib/vertico"]
+	path = lib/vertico
+	url = https://github.com/minad/vertico.git
