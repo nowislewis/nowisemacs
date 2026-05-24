@@ -1964,7 +1964,7 @@ Always allow composition for org-mode keywords, regardless of context."
 *** denote-journal
 #+begin_src elisp
 (setup denote-journal
-  (setq denote-journal-title-format "%Y_%m_%d_%a_%j")
+  (setq denote-journal-title-format "%Y_%m_%d_%a_W%V")
   (add-hook 'calendar-mode-hook #'denote-journal-calendar-mode)
   )
 #+end_src
