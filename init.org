@@ -406,7 +406,6 @@ Maybe I should add a new state.
     ("B" "open all.bib" (lambda () (interactive)
                           (let ((f (expand-file-name "~/Documents/emacs/03-bibliography/all.bib")))
                             (when (file-exists-p f) (find-file f)))))
-    ("u" "update denote with bibtex" denote-bibtex-update-reference)
     ]
    ]
   )
@@ -416,8 +415,6 @@ Maybe I should add a new state.
 (transient-define-prefix search-leader-map()
   "Define leader-key map for search functions"
   [
-   ;; ["blink-search"
-   ;;  ("b" "blink-search" blink-search)]
    ["grep"
     ("d" "consult-rg-in-dir" lewis/ripgrep-search-other-dir)
     ("D" "consult-rg" consult-ripgrep)
@@ -777,7 +774,7 @@ diff-hl-mode highlights uncommitted changes on the left side of the window
 *** savehist
 #+begin_src elisp
 (setup savehist
-  (setq history-length 2000
+  (setq history-length 1500
         history-delete-duplicates t
         savehist-save-minibuffer-history t
         savehist-autosave-interval 60)
@@ -900,10 +897,12 @@ diff-hl-mode highlights uncommitted changes on the left side of the window
 #+begin_src elisp
 (setq completions-detailed t  ;;useful in emacs 28
       completions-group t
-      completions-sort 'historical)
+      completions-sort 'historical
+      completion-auto-help nil ;; turn off *Completions* buffer
+)
 #+end_src
 ** Completions with Vertico
-#+begin_src elisp
+#+begin_src elisp :tangle no
 (setq vertico-cycle t
       vertico-count 15)
 (setup vertico
@@ -913,7 +912,7 @@ diff-hl-mode highlights uncommitted changes on the left side of the window
   (vertico-mode))
 #+end_src
 ** icomplete-vertical-mode
-#+begin_src elisp :tangle no
+#+begin_src elisp
 (icomplete-vertical-mode 1)
 (setq icomplete-show-matches-on-no-input t
       icomplete-scroll t
@@ -922,13 +921,14 @@ diff-hl-mode highlights uncommitted changes on the left side of the window
       )
 (add-hook 'icomplete-minibuffer-setup-hook
           (lambda () (setq-local truncate-lines t)))
-;; orderless 依赖空格
+
 (define-keymap :keymap icomplete-minibuffer-map
   "TAB"                                    #'icomplete-force-complete
   "<remap> <backward-delete-char>"         #'icomplete-fido-backward-updir
   "<remap> <delete-backward-char>"         #'icomplete-fido-backward-updir
-  "<remap> <minibuffer-complete-and-exit>" #'icomplete-force-complete-and-exit)
-(setq max-mini-window-height 0.3
+  "<remap> <minibuffer-complete-and-exit>" #'icomplete-force-complete-and-exit
+)
+(setq max-mini-window-height 0.25
       resize-mini-windows 'grow-only)
 
 ;; could highlight selected line
@@ -949,7 +949,6 @@ diff-hl-mode highlights uncommitted changes on the left side of the window
                     (setq start (1+ end)))))
               str))
 #+end_src
-
 ** Orderless and pinyinlib
 #+begin_src elisp
 (setup orderless
@@ -964,9 +963,9 @@ diff-hl-mode highlights uncommitted changes on the left side of the window
 #+end_src
 ** flex
 #+begin_src elisp :tangle no
-   (setq completion-styles '(flex basic)
-         completion-category-defaults nil
-         completion-category-overrides '((file (styles partial-completion))))
+(setq completion-styles '(flex basic)
+      completion-category-defaults nil
+      completion-category-overrides '((file (styles partial-completion))))
 #+end_src
 ** Marginalia
 #+begin_src elisp
@@ -1351,8 +1350,7 @@ Jump anywhere in the world
 #+begin_src elisp
 (setup graphviz-dot-mode
   (add-to-list 'auto-mode-alist '("\\.dot\\'" . graphviz-dot-mode))
-  (setq graphviz-dot-indent-width 4)
-    )
+  (setq graphviz-dot-indent-width 4))
 #+end_src
 *** beancount
 Emacs major-mode to work with Beancount ledger files
@@ -1936,8 +1934,7 @@ Always allow composition for org-mode keywords, regardless of context."
 (setup citar-denote
   (setq citar-denote-title-format "author-year-title")
   (with-eval-after-load 'citar
-    (citar-denote-mode)
-    )
+    (citar-denote-mode))
   )
 #+end_src
 ** denote and related
@@ -1950,15 +1947,6 @@ Always allow composition for org-mode keywords, regardless of context."
         denote-dired-directories-include-subdirectories t
         )
   (add-hook 'dired-mode-hook #'denote-dired-mode)
-  (with-eval-after-load 'org-capture
-    (add-to-list 'org-capture-templates
-                 '("n" "New note (with Denote)" plain
-                   (file denote-last-path)
-                   #'denote-org-capture
-                   :no-save t
-                   :immediate-finish nil
-                   :kill-buffer t
-                   :jump-to-captured t)))
   (setq denote-templates
         `((bib . ,(concat "#+begin_src bibtex\n"
                           "#+end_src\n"
@@ -2002,7 +1990,6 @@ In short, you will need 3 files:
 1. =inboxx.org= for capture inbox TODOs
 2. =agenda.org= for recurrent events
 3. =action.org= for all tasks moving from inbox
-4. (Option) =incubate.org= for incubate ideas
 *** file
 #+begin_src elisp
 ;; Files

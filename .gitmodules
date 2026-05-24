@@ -276,6 +276,3 @@
 [submodule "lib/whisper-funasr"]
 	path = lib/whisper-funasr
 	url = https://github.com/nowislewis/whisper-funasr.git
-[submodule "lib/vertico"]
-	path = lib/vertico
-	url = https://github.com/minad/vertico.git
