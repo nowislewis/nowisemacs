@@ -898,7 +898,7 @@ diff-hl-mode highlights uncommitted changes on the left side of the window
 (setq completions-detailed t  ;;useful in emacs 28
       completions-group t
       completions-sort 'historical
-      completion-auto-help nil ;; turn off *Completions* buffer
+      completion-auto-help 'lazy ;; turn off *Completions* buffer
 )
 #+end_src
 ** Completions with Vertico
@@ -926,8 +926,9 @@ diff-hl-mode highlights uncommitted changes on the left side of the window
   "TAB"                                    #'icomplete-force-complete
   "<remap> <backward-delete-char>"         #'icomplete-fido-backward-updir
   "<remap> <delete-backward-char>"         #'icomplete-fido-backward-updir
-  "<remap> <minibuffer-complete-and-exit>" #'icomplete-force-complete-and-exit
-)
+  "RET"                                    #'icomplete-force-complete-and-exit
+  "C-j"                                    #'minibuffer-complete-and-exit
+  )
 (setq max-mini-window-height 0.25
       resize-mini-windows 'grow-only)
 
@@ -1650,7 +1651,7 @@ borrowed from citre, now you can always jump-back use "M-," after any jump in th
         org-preview-latex-image-directory (expand-file-name "ltximg/" user-emacs-directory)
         org-special-ctrl-a/e t
         ;; org-id
-        org-attach-id-dir (concat nowis/doc-emacs-dir "01-orgmode/org-attach")
+        org-attach-id-dir (concat nowis/doc-emacs-dir "02-binary-file/03-org_attachs")
         org-id-method 'ts
         org-id-ts-format "%Y%m%dT%H%M%S_%6N"
 
@@ -1668,7 +1669,7 @@ borrowed from citre, now you can always jump-back use "M-," after any jump in th
         ;; plain list
         org-list-demote-modify-bullet '(("+" . "-") ("-" . "+") ("*" . "+"))
         ;; attach
-        org-yank-image-save-method (concat nowis/doc-emacs-dir "02-binary-file/01-pictures/01-org_attachs")
+        org-yank-image-save-method org-attach-id-dir
         ;; src
         org-edit-src-content-indentation 0
         org-confirm-babel-evaluate nil
