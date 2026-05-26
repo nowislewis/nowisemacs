@@ -1928,12 +1928,17 @@ Always allow composition for org-mode keywords, regardless of context."
         citar-bibliography org-cite-global-bibliography
         citar-library-paths (list nowis/bib-pdf-dir)
         citar-library-paths-recursive t
-        ))
+        citar-select-multiple nil
+        )
+  (:when-loaded
+    (citar-embark-mode)
+    )
+  )
 #+end_src
 *** citar-denote
 #+begin_src elisp
 (setup citar-denote
-  (setq citar-denote-title-format "author-year-title")
+  (setq citar-denote-title-format nil)
   (with-eval-after-load 'citar
     (citar-denote-mode))
   )
@@ -2522,7 +2527,7 @@ ESUP - Emacs Start Up Profiler
 * system-specific-config
 ** windows-wslg
 These codes are used to solve copy & paste problems under wslg inside win10/win11
-#+begin_src elisp
+#+begin_src elisp :tangle no
 ;; solve the problem of copying from windows to wslg
 (when nowis/is-wsl
   (setq interprogram-cut-function
