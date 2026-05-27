@@ -1261,7 +1261,8 @@ Jump anywhere in the world
                         nil t))))
 
 (setup ghostel
-  (setq ghostel-ignore-cursor-change t)
+  (setq ghostel-ignore-cursor-change t
+        ghostel-shell "zsh")
   (keymap-global-set "M-`" #'ghostel-toggle-window)
   (:when-loaded
     (define-key ghostel-semi-char-mode-map (kbd "M-q")
