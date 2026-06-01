@@ -976,8 +976,7 @@ diff-hl-mode highlights uncommitted changes on the left side of the window
 ** embark
 should be check after reading the embark.el manual
 #+begin_src elisp
-(setup embark-consult
-  (add-hook 'embark-collect-mode-hook #'consult-preview-at-point-mode))
+(setup embark-consult)
 
 (setup embark
   (:also-load embark-consult)
@@ -986,7 +985,6 @@ should be check after reading the embark.el manual
   (keymap-global-set "C-S-a" #'embark-act))
 
 (setup wgrep)
-
 ;; open pdf with zathura
 (defun nowis/open-with-zathura (file)
   "Open FILE with zathura."
@@ -1652,7 +1650,6 @@ borrowed from citre, now you can always jump-back use "M-," after any jump in th
         org-preview-latex-image-directory (expand-file-name "ltximg/" user-emacs-directory)
         org-special-ctrl-a/e t
         ;; org-id
-        org-attach-id-dir (concat nowis/doc-emacs-dir "02-binary-file/03-org_attachs")
         org-id-method 'ts
         org-id-ts-format "%Y%m%dT%H%M%S_%6N"
 
@@ -1669,8 +1666,9 @@ borrowed from citre, now you can always jump-back use "M-," after any jump in th
         org-log-state-notes-into-drawer t
         ;; plain list
         org-list-demote-modify-bullet '(("+" . "-") ("-" . "+") ("*" . "+"))
-        ;; attach
-        org-yank-image-save-method org-attach-id-dir
+        ;; org-attach
+        org-yank-image-save-method 'attach
+        org-attach-id-dir (concat nowis/doc-emacs-dir "02-binary-file/03-org_attachs")
         ;; src
         org-edit-src-content-indentation 0
         org-confirm-babel-evaluate nil
