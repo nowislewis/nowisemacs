@@ -399,6 +399,7 @@ Maybe I should add a new state.
     ("l c" "display current" org-ladder-status)
     ("l d" "show detailed" org-ladder-show-details)
     ("l f" "force update" org-ladder-force-refresh)
+    ("l r" "recent done" (lambda () (interactive) (org-agenda nil "R")))
     ]
    ["bib"
     ("a" "citar-add-file" citar-add-file-to-library)
@@ -2001,19 +2002,26 @@ In short, you will need 3 files:
 (setq org-directory "~/Documents/emacs/01-orgmode/xnotes")
 
 (setup org
+  (defun nowis/gtd-dir ()
+    "GTD 文件根目录。"
+    (concat org-directory "/gtd"))
+
+  (defun nowis/gtd-files ()
+    "GTD 目录下的活跃 org 文件（排除 beorg/archive）。"
+    (let ((dir (nowis/gtd-dir)))
+      (when (file-exists-p dir)
+        (cl-remove-if
+         (lambda (f) (string-match-p "beorg\\|archive" f))
+         (directory-files-recursively dir "\\.org")))))
+
   (defun org-agenda-update-agenda-files ()
     "Update agenda file list together with refile list."
     (interactive)
-    (let* ((gtd-dir (concat org-directory "/gtd"))
-           (gtd-files (when (file-exists-p gtd-dir)
-                        (cl-remove-if
-                         (lambda (f) (string-match-p "beorg\\|archive" f))
-                         (directory-files-recursively gtd-dir "\\.org"))))
-           )
-      (setq org-agenda-files gtd-files
-            org-refile-files (cl-remove-if (lambda (file) (string-match-p "inbox.org$" file))
-                                           org-agenda-files))
-      ))
+    (let ((gtd-files (nowis/gtd-files)))
+      (setq org-agenda-files (cl-remove-if (lambda (f) (string-match-p "incubate" f))
+                                           gtd-files)
+            org-refile-files (cl-remove-if (lambda (f) (string-match-p "inbox\\|agenda\\|reading" f))
+                                           gtd-files))))
   (add-hook 'org-agenda-mode-hook #'org-agenda-update-agenda-files)
   )
 #+end_src
@@ -2035,10 +2043,14 @@ In short, you will need 3 files:
   (:when-loaded
     (setq org-capture-templates
           `(("i" "Inbox" entry (file "gtd/inbox.org")
-             ,(concat "* TODO [#C] %?\n"
+             ,(concat "* TODO [#C] %?  :%^{Area|misc|work|grow|health|family|life}:\n"
                       ":PROPERTIES:\n:CREATED: %U\n:END:\n"))
-            ("d" "Done without clock" entry (file+olp+datetree "gtd/inbox.org")
-             ,(concat "* DONE %?\n" "CLOSED: %U"))))
+            ("d" "Done" entry (file "gtd/inbox.org")
+             ,(concat "* DONE %?  :%^{Area|misc|work|grow|health|family|life}:\n"
+                      "CLOSED: %U\n"
+                      ":PROPERTIES:\n"
+                      ":EFFORT: %^{Effort|0:05|0:15|0:30|1:00|2:00|4:00}\n"
+                      ":END:"))))
     ))
 #+end_src
 *** refile
@@ -2050,19 +2062,29 @@ In short, you will need 3 files:
     (setq org-refile-targets
           '((org-refile-files :maxlevel 3)))
    (setq org-refile-target-verify-function
-         (lambda () (not (org-get-todo-state))))
+         ;; 排除自身或任一祖先带 TODO 的标题
+         (lambda ()
+           (save-excursion
+             (cl-loop always (not (org-get-todo-state))
+                      while (org-up-heading-safe)))))
     ))
 #+end_src
 *** agenda
 #+begin_src elisp
 ;;; ─── 分组（基于 Category）────────────────────────
+(defun nowis/agenda-entry-category ()
+  "返回当前 agenda 行的真实 category：归档条目优先用 ARCHIVE_CATEGORY。"
+  (let ((m (get-text-property (point) 'org-marker)))
+    (or (and m (org-entry-get m "ARCHIVE_CATEGORY"))
+        (get-text-property (point) 'org-category))))
+
 (defun nowis/agenda-add-category-separators ()
   "在不同 category 分组间插入分隔标题行。需在排序完成后运行。"
   (save-excursion
     (goto-char (point-min))
     (let ((last-category nil))
       (while (not (eobp))
-        (when-let* ((cat (get-text-property (point) 'org-category)))
+        (when-let* ((cat (nowis/agenda-entry-category)))
           (unless (equal cat last-category)
             (let ((inhibit-read-only t))
               (insert (propertize (concat "◆ " cat "\n")
@@ -2092,8 +2114,7 @@ In short, you will need 3 files:
 ;;; ─── Agenda 视图构建 ────────────────────────────────────
 (defun nowis/make-agenda-command (key description tag)
   "生成 GTD agenda 自定义命令，TAG 用于过滤（空字符串表示不过滤）。"
-  (let ((closed-tag (concat "CLOSED>=\"<today>\"" tag))
-        (week-tag   (concat "CLOSED>=\"<-1w>\""  tag)))
+  (let ((closed-tag (concat "CLOSED>=\"<today>\"" tag)))
     `(,key ,description
            ((agenda ""
                     ((org-agenda-overriding-header (nowis/center-header " Launch Pad"))
@@ -2119,18 +2140,50 @@ In short, you will need 3 files:
                          '(org-agenda-skip-entry-if 'scheduled))
                         (org-agenda-sorting-strategy
                          '(category-keep todo-state-up priority-down timestamp-up))))
-
             (tags ,closed-tag
                   ((org-agenda-overriding-header (nowis/center-header "󰔹 Completed Today"))
                    (org-agenda-sorting-strategy '(category-keep tsia-down))))
+            ))))
 
-            (tags ,week-tag
-                  ((org-agenda-overriding-header (nowis/center-header " Completed Last 7 Days"))
-                   (org-agenda-sorting-strategy '(category-keep tsia-down))))))))
+;;; ─── 近期完成（复用 agenda，临时含 archive，可回车跳转）─────────────────
+(defun nowis/recent-done-files ()
+  "近期完成扫描范围：活跃文件 + 当年 archive。"
+  (cl-remove-if-not
+   #'file-exists-p
+   (append (nowis/gtd-files)
+           (list (concat (nowis/gtd-dir) "/gtd_archive_" (format-time-string "%Y"))))))
+
+(defun nowis/agenda-closed-date ()
+  "返回当前 agenda 条目的 CLOSED 日期 MM-DD（用于 prefix 显示）。"
+  (let ((c (org-entry-get (point) "CLOSED")))
+    (if c (format-time-string "%m-%d" (org-time-string-to-time c)) "     ")))
+
+(defun nowis/agenda-cmp-closed (a b)
+  "按 CLOSED 时间比较两个 agenda 行（配合 user-defined-down 实现时间倒序）。"
+  (cl-flet ((secs (line)
+              (let ((m (get-text-property 0 'org-marker line)))
+                (if m (with-current-buffer (marker-buffer m)
+                        (save-excursion (goto-char m)
+                          (let ((c (org-entry-get (point) "CLOSED")))
+                            (if c (float-time (org-time-string-to-time c)) 0))))
+                  0))))
+    (let ((sa (secs a)) (sb (secs b)))
+      (cond ((> sa sb) 1) ((< sa sb) -1) (t nil)))))
+
+(defun nowis/make-recent-done-command (key days)
+  "生成「近 DAYS 天完成」agenda 命令：先按 category(项目)聚拢，组内按完成时间倒序。"
+  `(,key ,(format "近%d天完成" days)
+         ((tags ,(format "CLOSED>=\"<-%dd>\"" days)
+                ((org-agenda-overriding-header ,(format "近 %d 天完成" days))
+                 (org-agenda-files (nowis/recent-done-files))
+                 (org-agenda-prefix-format "  %(nowis/agenda-closed-date)  ")
+                 (org-agenda-cmp-user-defined #'nowis/agenda-cmp-closed)
+                 (org-agenda-sorting-strategy '(category-keep user-defined-down)))))))
 
 (setq org-agenda-custom-commands
       (list (nowis/make-agenda-command "g" "GTD"  "")
-            (nowis/make-agenda-command "w" "Work" "+work")))
+            (nowis/make-recent-done-command "r" 7)
+            (nowis/make-recent-done-command "R" 30)))
 
 ;;; ─── Clock 设置 ─────────────────────────────────────────
 
@@ -2138,7 +2191,6 @@ In short, you will need 3 files:
       org-agenda-clockreport-parameter-plist
       '(:link t :maxlevel 5 :properties ("Effort"))
       org-clock-out-remove-zero-time-clocks t)
-
 #+end_src
 *** clarify with AI
 #+begin_src elisp
@@ -2256,7 +2308,7 @@ In short, you will need 3 files:
 (setup org-graph)
 #+end_src
 ** org-mindmap
-#+begin_src elisp
+#+begin_src elisp :tangle no
 (setup org-mindmap
  (setq org-mindmap-parser-root-delimiters '(("«" . "»")))
   (with-eval-after-load 'org
