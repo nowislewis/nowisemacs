@@ -917,7 +917,7 @@ diff-hl-mode highlights uncommitted changes on the left side of the window
 (icomplete-vertical-mode 1)
 (setq icomplete-show-matches-on-no-input t
       icomplete-scroll t
-      icomplete-compute-delay 0.1
+      icomplete-compute-delay 0.05
       icomplete-vertical-render-prefix-indicator t
       )
 (add-hook 'icomplete-minibuffer-setup-hook
@@ -1978,6 +1978,11 @@ Always allow composition for org-mode keywords, regardless of context."
 #+begin_src elisp
 (setup denote-sequence)
 #+end_src
+*** denote-moc-graph
+#+begin_src elisp
+(setup denote-moc-graph
+  (setq denote-moc-graph-dir denote-directory))
+#+end_src
 ** find orgmode dir files
 #+begin_src elisp
 (defun project-find-searchable-dir-files ()
@@ -2036,7 +2041,7 @@ In short, you will need 3 files:
 *** capture
 #+begin_src elisp
 (setq org-sm-capture-file
-      (concat nowis/doc-emacs-dir "01-orgmode/xnotes/org-inc/20260331T230205--incremental-reading-materials.org"))
+      (concat nowis/doc-emacs-dir "01-orgmode/xnotes/incremental/20260331T230205--incremental-reading-materials.org"))
 (setq org-sm-capture-olp '("org-sm topics"))
 
 (setup org
@@ -2222,7 +2227,7 @@ In short, you will need 3 files:
   (:hook-into org-mode)
   (:autoload org-sm-read-mode)
   (setq org-sm--files
-        (let ((dir (expand-file-name "org-inc/" org-directory)))
+        (let ((dir (expand-file-name "incremental/" org-directory)))
           (when (file-directory-p dir)
             (directory-files-recursively dir "\\.org$"))))
   (nowis/smart-bind "M-z" #'region-active-p #'org-sm-item-extract)

@@ -276,3 +276,6 @@
 [submodule "lib/whisper-funasr"]
 	path = lib/whisper-funasr
 	url = https://github.com/nowislewis/whisper-funasr.git
+[submodule "lib/denote-moc-graph"]
+	path = lib/denote-moc-graph
+	url = https://github.com/nowislewis/denote-moc-graph.git
