@@ -1698,15 +1698,15 @@ borrowed from citre, now you can always jump-back use "M-," after any jump in th
              (cons (cons sym t) org-babel-load-languages))
           (file-missing nil)))))
   (advice-add 'org-babel-execute-src-block :before #'nowis/org-babel-load-lang)
-  ;; 执行后如果有 :file 且文件存在，就展示生成的图片
+  ;; 执行后在独立窗口展示生成的图片（不再问 reload）
   (add-hook 'org-babel-after-execute-hook
             (lambda ()
               (when-let* (((org-in-src-block-p))
                           (file (cdr (assq :file (nth 2 (org-babel-get-src-block-info)))))
-                          ((file-exists-p file)))
-                (with-current-buffer (find-file-noselect file)
-                  (image-mode)
-                  (display-buffer (current-buffer) '(display-buffer-pop-up-window)))))))
+                          ((file-exists-p file))
+                          (revert-without-query '(".*")))
+                (display-buffer (find-file-noselect file)
+                                '(display-buffer-pop-up-window))))))
 #+end_src
 ** org-ox,latex,word,markdown
 #+begin_src elisp
@@ -1998,7 +1998,7 @@ Always allow composition for org-mode keywords, regardless of context."
 Borrowed from https://github.com/rougier/emacs-GTD
 
 In short, you will need 3 files:
-1. =inboxx.org= for capture inbox TODOs
+1. =inbox.org= for capture inbox TODOs
 2. =agenda.org= for recurrent events
 3. =action.org= for all tasks moving from inbox
 *** file

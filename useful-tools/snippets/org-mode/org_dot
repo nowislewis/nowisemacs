@@ -6,20 +6,34 @@
 #+begin_src dot :file /tmp/`(format-time-string "%Y%m%d%H%M%S")`.png
 digraph {
     rankdir=LR
+    compound=true
+    bgcolor="white"
+    fontname="Noto Sans CJK SC"
+    graph [
+        style="filled,rounded"
+        fillcolor="#F5F8FF"
+        color="#7EA8F6"
+        fontname="Noto Sans CJK SC"
+        fontsize=13
+        labeljust=l
+    ];
     node [
         shape=record
-        style=filled
+        style="filled,rounded"
         fillcolor="#E3EFFE"
         color="#7EA8F6"
+        fontname="Noto Sans CJK SC"
         fontsize=12
     ];
     edge [
         color="#B3C3F3"
         arrowsize=0.8
         penwidth=2
+        fontname="Noto Sans CJK SC"
         fontsize=11
     ];
     subgraph cluster_a {
+        label=""
     }
     $1
 }
