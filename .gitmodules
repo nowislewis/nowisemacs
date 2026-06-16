@@ -279,3 +279,6 @@
 [submodule "lib/denote-moc-graph"]
 	path = lib/denote-moc-graph
 	url = https://github.com/nowislewis/denote-moc-graph.git
+[submodule "lib/emacs-kokoro-onnx"]
+	path = lib/emacs-kokoro-onnx
+	url = https://github.com/nowislewis/emacs-kokoro-onnx.git
