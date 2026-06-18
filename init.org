@@ -461,7 +461,7 @@ Maybe I should add a new state.
     ]
    ["others"
     ("r" "restart emacs" restart-emacs)
-    ("w" "whisper" whisper-run)
+    ("w" "sherpa-dictate" emacs-sherpa-dictate)
     ]
    ])
 #+end_src
@@ -2314,13 +2314,10 @@ In short, you will need 3 files:
 (setup org-graph)
 #+end_src
 ** org-mindmap
-#+begin_src elisp :tangle no
+#+begin_src elisp
 (setup org-mindmap
- (setq org-mindmap-parser-root-delimiters '(("«" . "»")))
-  (with-eval-after-load 'org
-    (require 'org-mindmap)
-    )
-  )
+ (:autoload org-mindmap-mode)
+ (:hook-into org-mode))
 #+end_src
 * 阅读
 ** reader
