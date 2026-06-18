@@ -447,8 +447,6 @@ Maybe I should add a new state.
                    (interactive)
                    (org-occur "^[ \t]*\\*+ +\\(TODO\\)\\>")))
     ]
-   ["appt"
-    ("k" "appt-check" appt-check)]
    ["capture"
     ("c" "capture" org-capture)
     ("e" "capture topic" org-sm-capture-topic)
@@ -456,12 +454,13 @@ Maybe I should add a new state.
      (lambda () (interactive) (org-sm-capture-topic '(-1))))
     ("t" "capture topic from input" org-sm-capture-topic-from-input)
     ]
-   ["life"
-    ("L" "life" life-calendar)
+   ["voice"
+    ("s d" "sherpa-dictate" emacs-sherpa-dictate)
+    ("s r" "sherpa-record" emacs-sherpa-only-record)
+    ("s k" "kokoro-read" emacs-kokoro-read)
     ]
    ["others"
     ("r" "restart emacs" restart-emacs)
-    ("w" "sherpa-dictate" emacs-sherpa-dictate)
     ]
    ])
 #+end_src
@@ -2449,6 +2448,10 @@ Simple distraction-free editing. I use darkroom instead of writeroom because it'
 *** emacs-sherpa-onnx
 #+begin_src elisp
 (setup emacs-sherpa-onnx)
+#+end_src
+*** emacs-kokoro-onnx
+#+begin_src elisp
+(setup emacs-kokoro-onnx)
 #+end_src
 * webjump
 #+begin_src elisp
