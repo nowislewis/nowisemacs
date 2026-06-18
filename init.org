@@ -1455,7 +1455,8 @@ borrowed from citre, now you can always jump-back use "M-," after any jump in th
   (setq treesit-font-lock-level 4
         treesit-enabled-modes t
         treesit-auto-install-grammar 'ask
-        treesit-extra-load-path (list (concat user-emacs-directory "var/treesit/")))
+        treesit-extra-load-path (list (concat user-emacs-directory "var/treesit/"))
+        )
   (defun treesit-install-all ()
     (interactive)
     (require 'pi-coding-agent-grammars)
@@ -2448,32 +2449,9 @@ Simple distraction-free editing. I use darkroom instead of writeroom because it'
     (keymap-set embark-general-map "?" #'gptel-quick-with-prompt))
   )
 #+end_src
-*** whisper
+*** emacs-sherpa-onnx
 #+begin_src elisp
-(setup whisper-funasr)
-(setup whisper
-  (setq whisper-server-mode 'remote
-        whisper-server-baseurl "http://127.0.0.1:8642"
-        whisper--ffmpeg-input-format "pulse"
-        whisper--ffmpeg-input-device "default")
-  )
-#+end_src
-*** pi-coding-agent
-#+begin_src elisp
-(setup markdown-table-wrap)
-(setup md-ts-mode
-  (:match-file "\\.md\\'")
-  (custom-set-faces
-   '(md-ts-heading-1 ((t (:inherit org-level-2)))))
-  )
-(setup pi-coding-agent
-  (defalias 'pi 'pi-coding-agent)
-  (setq pi-coding-agent-tool-preview-lines 1
-        pi-coding-agent-bash-preview-lines 1)
-  ;; (setq pi-coding-agent-extra-args
-  ;;       '("-e" "~/.npm-global/lib/node_modules/@mariozechner/pi-coding-agent/examples/extensions/ssh.ts"
-  ;;         "--ssh" "tmp:/home/yi3.liu/minfer"))
-  )
+(setup emacs-sherpa-onnx)
 #+end_src
 * webjump
 #+begin_src elisp

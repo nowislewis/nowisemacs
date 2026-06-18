@@ -198,9 +198,6 @@
 	url = https://github.com/mhayashi1120/Emacs-wgrep.git
     no-byte-compile = wgrep-subtest.el
     no-byte-compile = wgrep-ag.el
-[submodule "whisper"]
-	path = lib/whisper
-	url = https://github.com/natrys/whisper.el.git
 [submodule "with-editor"]
 	path = lib/with-editor
 	url = https://github.com/magit/with-editor.git
@@ -225,9 +222,6 @@
 [submodule "lib/kdl-mode"]
 	path = lib/kdl-mode
 	url = https://github.com/taquangtrung/emacs-kdl-mode.git
-[submodule "lib/pi-coding-agent"]
-	path = lib/pi-coding-agent
-	url = https://github.com/dnouri/pi-coding-agent.git
 [submodule "lib/nov"]
 	path = lib/nov
 	url = https://github.com/emacs-pe/nov.el.git
@@ -246,12 +240,6 @@
 [submodule "lib/org-graph"]
 	path = lib/org-graph
 	url = https://github.com/nowislewis/org-graph.git
-[submodule "lib/md-ts-mode"]
-	path = lib/md-ts-mode
-	url = https://github.com/dnouri/md-ts-mode.git
-[submodule "lib/markdown-table-wrap"]
-	path = lib/markdown-table-wrap
-	url = https://github.com/dnouri/markdown-table-wrap.git
 [submodule "lib/ef-themes"]
 	path = lib/ef-themes
 	url = https://github.com/protesilaos/ef-themes.git
@@ -273,12 +261,12 @@
 [submodule "lib/dired-preview"]
 	path = lib/dired-preview
 	url = https://github.com/protesilaos/dired-preview.git
-[submodule "lib/whisper-funasr"]
-	path = lib/whisper-funasr
-	url = https://github.com/nowislewis/whisper-funasr.git
 [submodule "lib/denote-moc-graph"]
 	path = lib/denote-moc-graph
 	url = https://github.com/nowislewis/denote-moc-graph.git
 [submodule "lib/emacs-kokoro-onnx"]
 	path = lib/emacs-kokoro-onnx
 	url = https://github.com/nowislewis/emacs-kokoro-onnx.git
+[submodule "lib/emacs-sherpa-onnx"]
+	path = lib/emacs-sherpa-onnx
+	url = https://github.com/nowislewis/emacs-sherpa-onnx.git
