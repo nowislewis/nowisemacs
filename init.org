@@ -684,21 +684,11 @@ diff-hl-mode highlights uncommitted changes on the left side of the window
 #+begin_src elisp
 (setup hl-line
   (keymap-global-set "C-l" #'recenter)
-  ;; Only highliht current buffer in current window
-  (setopt hl-line-sticky-flag nil)
   (global-hl-line-mode)
   (:when-loaded
-    ;; update only 0.05 timer
-    (defvar nowis/global-hl-line-timer nil)
-
-    (defun nowis/global-hl-line-highlight-debounce ()
-      (when nowis/global-hl-line-timer
-        (cancel-timer nowis/global-hl-line-timer))
-      (setq nowis/global-hl-line-timer
-            (run-with-idle-timer 0.05 nil #'global-hl-line-highlight)))
-    (remove-hook 'post-command-hook #'global-hl-line-highlight)
-    (add-hook 'post-command-hook #'nowis/global-hl-line-highlight-debounce)
-    ))
+    ;; debounce 0.05s，避免快速移动/滚动时频繁重画导致卡顿
+    (require 'timeout)
+    (timeout-debounce! 'global-hl-line-highlight 0.05)))
 #+end_src
 *** pulse
 #+begin_src elisp
@@ -897,8 +887,8 @@ diff-hl-mode highlights uncommitted changes on the left side of the window
 (icomplete-vertical-mode 1)
 (setq icomplete-scroll t)
 (setopt icomplete-show-matches-on-no-input t
-      icomplete-compute-delay 0.05
-      icomplete-vertical-render-prefix-indicator t)
+        icomplete-compute-delay 0.05
+        icomplete-vertical-render-prefix-indicator t)
 (add-hook 'icomplete-minibuffer-setup-hook
           (lambda () (setq-local truncate-lines t)))
 
@@ -907,8 +897,7 @@ diff-hl-mode highlights uncommitted changes on the left side of the window
   "<remap> <backward-delete-char>"         #'icomplete-fido-backward-updir
   "<remap> <delete-backward-char>"         #'icomplete-fido-backward-updir
   "RET"                                    #'icomplete-force-complete-and-exit
-  "C-j"                                    #'minibuffer-complete-and-exit
-  )
+  "C-j"                                    #'minibuffer-complete-and-exit)
 
 ;; could highlight selected line
 (advice-add 'icomplete--render-vertical :filter-return
@@ -970,8 +959,7 @@ should be check after reading the embark.el manual
 (setup yasnippet
   (keymap-global-set "M-*" #'yas-insert-snippet)
   (setopt yas-snippet-dirs (list (concat nowis/config-useful-tools "snippets")))
-(yas-global-mode)
-  )
+  (yas-global-mode))
 #+end_src
 * Window Management
 ** window
@@ -1105,11 +1093,9 @@ Jump anywhere in the world
         )
   )
 (when (eq system-type 'darwin)
-  (setq
-   rime-emacs-module-header-root "/Applications/Emacs.app/Contents/Resources/include/" ;; use build-emacs
-   ;; rime-emacs-module-header-root "/opt/homebrew/opt/emacs-plus@31/include" ;;use emacs-plus
-   rime-librime-root "/opt/homebrew/opt/librime/"
-   ))
+  (setq rime-emacs-module-header-root "/Applications/Emacs.app/Contents/Resources/include/" ;; use build-emacs
+        rime-librime-root "/opt/homebrew/opt/librime/"
+        ))
 #+end_src
 
 * File and Browsing
@@ -2469,7 +2455,6 @@ ESUP - Emacs Start Up Profiler
 ** windows-wslg
 These codes are used to solve copy & paste problems under wslg inside win10/win11
 #+begin_src elisp :tangle no
-;; solve the problem of copying from windows to wslg
 (when nowis/is-wsl
   (setq interprogram-cut-function
         (lambda (text)
