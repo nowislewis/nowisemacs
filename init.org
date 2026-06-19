@@ -1953,7 +1953,8 @@ In short, you will need 3 files:
                                            gtd-files))
       (setopt org-agenda-files (cl-remove-if (lambda (f) (string-match-p "incubate" f))
                                            gtd-files))))
-  (add-hook 'org-agenda-mode-hook #'org-agenda-update-agenda-files)
+  ;; 启动时刷新一次即可
+  (with-eval-after-load 'org-agenda (org-agenda-update-agenda-files))
   )
 #+end_src
 *** todos
