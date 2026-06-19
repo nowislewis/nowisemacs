@@ -386,7 +386,6 @@ Maybe I should add a new state.
     ("r l" "denote-link" denote-link)
     ("r j" "denote-journal" denote-journal-new-or-existing-entry)
     ("r c" "calendar" calendar)
-    ("r L" "lint" denote-lint)
     ]
    ["navigate"
     ("r s" "find-all-searchable" project-find-searchable-dir-files)
