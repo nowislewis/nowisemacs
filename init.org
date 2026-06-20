@@ -1174,28 +1174,49 @@ Jump anywhere in the world
 #+end_src
 ** ghostel
 #+begin_src elisp
+;; meow insert<->char-mode, normal<->copy-mode.
+(defun ghostel-meow-sync (state)
+  (pcase state
+    ('normal (unless (eq ghostel--input-mode 'copy) (ghostel-copy-mode))
+             (setq cursor-type meow-cursor-type-normal))
+    ('insert (ghostel-char-mode)
+             (setq cursor-type meow-cursor-type-insert))))
+
 (with-eval-after-load 'meow
   (add-hook 'ghostel-mode-hook
             (lambda ()
-              (add-hook 'meow-switch-state-hook
-                        (lambda (state)
-                          (pcase state
-                            ('normal (unless (eq ghostel--input-mode 'copy)
-                                       (ghostel-copy-mode))
-                                     (setopt cursor-type meow-cursor-type-normal))
-                            ('insert (when (eq ghostel--input-mode 'copy)
-                                       (ghostel-readonly-exit))
-                                     (ghostel-semi-char-mode)
-                                     (setopt cursor-type meow-cursor-type-insert))))
-                        nil t))))
+              (add-hook 'meow-switch-state-hook #'ghostel-meow-sync nil t))))
+
+(defun ghostel-char-exit-to-normal ()
+  ;; meow--switch-state (not meow-normal-mode) so the sync hook fires.
+  (interactive)
+  (when (bound-and-true-p meow-mode) (meow--switch-state 'normal)))
+
+(defun ghostel-edit-input ()
+  (interactive)
+  (let ((src (current-buffer))
+        (buf (generate-new-buffer "*ghostel-edit*")))
+    (pop-to-buffer buf)
+    (text-mode)
+    (when (bound-and-true-p meow-mode) (meow-insert-mode))
+    (local-set-key
+     (kbd "C-c C-c")
+     (lambda () (interactive)
+       (let ((text (buffer-string)))
+         (with-current-buffer src
+           (ghostel-paste-string text)
+           (ghostel-send-key "return"))
+         (kill-buffer-and-window))))))
 
 (setup ghostel
   (setq ghostel-ignore-cursor-change t
         ghostel-shell "zsh")
   (keymap-global-set "M-`" #'ghostel-toggle-window)
   (:when-loaded
-    (define-key ghostel-semi-char-mode-map (kbd "M-q")
-      (lambda () (interactive) (ghostel--send-encoded "escape" "")))
+    (define-key ghostel-char-mode-map (kbd "M-RET") #'ghostel-char-exit-to-normal)
+    (define-key ghostel-char-mode-map (kbd "M-<return>") #'ghostel-char-exit-to-normal)
+    (define-key ghostel-char-mode-map (kbd "M-'") #'ghostel-edit-input)
+    (define-key ghostel-char-mode-map (kbd "M-`") #'ghostel-toggle-window)
     (add-to-list 'display-buffer-alist
                  '((lambda (buffer-or-name _)
                      (with-current-buffer buffer-or-name
