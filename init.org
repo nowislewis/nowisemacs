@@ -1213,8 +1213,7 @@ Jump anywhere in the world
         ghostel-shell "zsh")
   (keymap-global-set "M-`" #'ghostel-toggle-window)
   (:when-loaded
-    (define-key ghostel-char-mode-map (kbd "M-RET") #'ghostel-char-exit-to-normal)
-    (define-key ghostel-char-mode-map (kbd "M-<return>") #'ghostel-char-exit-to-normal)
+    (define-key ghostel-char-mode-map (kbd "M-\\") #'ghostel-char-exit-to-normal)
     (define-key ghostel-char-mode-map (kbd "M-'") #'ghostel-edit-input)
     (define-key ghostel-char-mode-map (kbd "M-`") #'ghostel-toggle-window)
     (add-to-list 'display-buffer-alist
