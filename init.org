@@ -347,10 +347,6 @@ Maybe I should add a new state.
     ("r" "gptel-rewrite" gptel-rewrite)
     ("f" "gptel-file-add" gptel-add-file)
     ]
-   ["agent"
-    ("p" "pi" pi)
-    ("t" "pi-toggle" pi-coding-agent-toggle)
-    ]
    ])
 #+end_src
 *** buffer
@@ -415,7 +411,6 @@ Maybe I should add a new state.
    ["grep"
     ("d" "consult-rg-in-dir" lewis/ripgrep-search-other-dir)
     ("D" "consult-rg" consult-ripgrep)
-    ("g" "rg" rg)
     ("n" "grep-notes" lewis/ripgrep-search-notes)
     ]
    ["find"
@@ -868,60 +863,41 @@ diff-hl-mode highlights uncommitted changes on the left side of the window
     (add-to-list 'consult-dir-sources 'consult-dir--source-zoxide t)
     ))
 #+end_src
-** rg.el
-#+begin_src elisp
-(setup rg)
-#+end_src
 * 补全
-** default completion comfigurations
+** minibuffer 杂项
 #+begin_src elisp
-(setopt completions-detailed t  ;;useful in emacs 28
-      completions-group t
-      completions-sort 'historical
-      completion-auto-help 'lazy ;; turn off *Completions* buffer
-)
+(setopt completions-detailed t            ;; C-h f/v 等带类型+文档说明
+        enable-recursive-minibuffers t    ;; 允许嵌套 minibuffer
+        ;; M-x 隐藏当前 mode 用不了的命令
+        read-extended-command-predicate #'command-completion-default-include-p
+        ;; 光标不进 prompt
+        minibuffer-prompt-properties '(read-only t cursor-intangible t face minibuffer-prompt))
+
+;; 递归 minibuffer 时显示嵌套层级, 如 [2]
+(minibuffer-depth-indicate-mode 1)
 #+end_src
-** icomplete-vertical-mode
+** vertico
 #+begin_src elisp
-(icomplete-vertical-mode 1)
-(setq icomplete-scroll t)
-(setopt icomplete-show-matches-on-no-input t
-        icomplete-compute-delay 0.05
-        icomplete-vertical-render-prefix-indicator t)
-(add-hook 'icomplete-minibuffer-setup-hook
-          (lambda () (setq-local truncate-lines t)))
-
-(define-keymap :keymap icomplete-minibuffer-map
-  "TAB"                                    #'icomplete-force-complete
-  "<remap> <backward-delete-char>"         #'icomplete-fido-backward-updir
-  "<remap> <delete-backward-char>"         #'icomplete-fido-backward-updir
-  "RET"                                    #'icomplete-force-complete-and-exit
-  "C-j"                                    #'minibuffer-complete-and-exit)
-
-;; could highlight selected line
-(advice-add 'icomplete--render-vertical :filter-return
-            (lambda (str)
-              (when str
-                (let ((start 0) end
-                      (width (window-body-width)))
-                  (while (< start (length str))
-                    (setq end (or (cl-position ?\n str :start start) (length str)))
-                    (when (text-property-any start end 'icomplete-selected t str)
-                      (let ((pad (max 0 (- width (string-width (substring str start end))))))
-                        (when (> pad 0)
-                          (let ((spaces (propertize (make-string pad ?\s) 'face 'hl-line)))
-                            (setq str (concat (substring str 0 end) spaces (substring str end))
-                                  end (+ end pad))))
-                        (add-face-text-property start end 'hl-line nil str)))
-                    (setq start (1+ end)))))
-              str))
+(setup vertico
+  (:also-load vertico-directory)
+  (vertico-mode)
+  (setopt vertico-cycle t
+          vertico-count 15)
+  (:with-map vertico-map
+    (:bind "RET"   vertico-directory-enter
+           "DEL"   vertico-directory-delete-char
+           "M-DEL" vertico-directory-delete-word))
+  ;; 整理 shadowed 文件名 (如 ~/foo//etc/)
+  (add-hook 'rfn-eshadow-update-overlay-hook #'vertico-directory-tidy))
 #+end_src
+
 ** Orderless and pinyinlib
 #+begin_src elisp
 (setup orderless
   (setq completion-category-defaults nil)
   (setopt completion-styles '(orderless basic)
-        completion-category-overrides '((file (styles partial-completion))))
+        completion-category-overrides '((file (styles partial-completion)))
+        completion-pcm-leading-wildcard t) ;; Emacs31: partial-completion 近似 substring
   (:when-loaded
     (require 'pinyinlib)
     (defun completion--regex-pinyin (str)
@@ -944,7 +920,7 @@ should be check after reading the embark.el manual
   (setq prefix-help-command #'embark-prefix-help-command)
   (keymap-global-set "C-S-a" #'embark-act))
 
-(setup wgrep)
+;; grep-mode / embark-export 的 buffer: 按 e 进内置 grep-edit-mode, C-c C-c 确认
 ;; open pdf with zathura
 (defun nowis/open-with-zathura (file)
   "Open FILE with zathura."

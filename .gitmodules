@@ -175,9 +175,6 @@
 [submodule "rainbow-delimiters"]
 	path = lib/rainbow-delimiters
 	url = https://github.com/Fanael/rainbow-delimiters.git
-[submodule "rg"]
-	path = lib/rg
-	url = https://github.com/dajva/rg.el.git
 [submodule "rime"]
 	path = lib/rime
 	url = https://github.com/DogLooksGood/emacs-rime.git
@@ -193,11 +190,6 @@
 [submodule "vundo"]
 	path = lib/vundo
 	url = https://github.com/casouri/vundo.git
-[submodule "wgrep"]
-	path = lib/wgrep
-	url = https://github.com/mhayashi1120/Emacs-wgrep.git
-    no-byte-compile = wgrep-subtest.el
-    no-byte-compile = wgrep-ag.el
 [submodule "with-editor"]
 	path = lib/with-editor
 	url = https://github.com/magit/with-editor.git
@@ -270,3 +262,6 @@
 [submodule "lib/emacs-sherpa-onnx"]
 	path = lib/emacs-sherpa-onnx
 	url = https://github.com/nowislewis/emacs-sherpa-onnx.git
+[submodule "lib/vertico"]
+	path = lib/vertico
+	url = https://github.com/minad/vertico.git
