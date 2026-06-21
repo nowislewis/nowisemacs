@@ -1458,9 +1458,10 @@ borrowed from citre, now you can always jump-back use "M-," after any jump in th
 (setup project)
 (setq read-process-output-max (* 1024 1024))
 (setup eglot
-  (setopt eglot-events-buffer-config'(:size 20000 :format full)
-        eglot-extend-to-xref t
-        )
+  (setopt eglot-events-buffer-config '(:size 20000 :format full)
+          eglot-extend-to-xref t
+          eglot-documentation-renderer 'markdown-ts-view-mode
+          )
   (:autoload eglot-find-implementation)
   (add-hook 'prog-mode-hook (lambda ()
                               (unless
@@ -1469,14 +1470,10 @@ borrowed from citre, now you can always jump-back use "M-," after any jump in th
                                       (eglot-ensure)))))
   (:when-loaded
     (set-face-attribute 'eglot-highlight-symbol-face nil :inherit 'query-replace)
-    ;; more languare server
-    (add-to-list 'eglot-server-programs
-                 '(graphviz-dot-mode . ("dot-language-server" "--stdio")))
     )
   )
 (setup eldoc
   (setopt eldoc-echo-area-use-multiline-p nil))
-;; (setopt eldoc-echo-area-prefer-doc-buffer nil)
 #+end_src
 ***** eglot in org-src
 #+begin_src elisp
