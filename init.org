@@ -1995,11 +1995,18 @@ In short, you will need 3 files:
 *** agenda
 #+begin_src elisp
 ;;; ─── 分组（基于 Category）────────────────────────
-(defun nowis/agenda-entry-category ()
-  "返回当前 agenda 行的真实 category：归档条目优先用 ARCHIVE_CATEGORY。"
-  (let ((m (get-text-property (point) 'org-marker)))
-    (or (and m (org-entry-get m "ARCHIVE_CATEGORY"))
-        (get-text-property (point) 'org-category))))
+(defun nowis/agenda-entry-category (&optional marker)
+  "项目名（分组键）唯一来源：优先 ARCHIVE_CATEGORY，否则普通 category。
+MARKER 空=用当前 agenda 行（分隔标题）；非空=跨 buffer 取值（排序）。"
+  (if marker
+      (with-current-buffer (marker-buffer marker)
+        (save-excursion
+          (goto-char marker)
+          (or (org-entry-get (point) "ARCHIVE_CATEGORY")
+              (org-get-category (point)))))
+    (let ((m (get-text-property (point) 'org-marker)))
+      (or (and m (org-entry-get m "ARCHIVE_CATEGORY"))
+          (get-text-property (point) 'org-category)))))
 
 (defun nowis/agenda-add-category-separators ()
   "在不同 category 分组间插入分隔标题行。需在排序完成后运行。"
@@ -2081,17 +2088,25 @@ In short, you will need 3 files:
   (let ((c (org-entry-get (point) "CLOSED")))
     (if c (format-time-string "%m-%d" (org-time-string-to-time c)) "     ")))
 
+(defun nowis/agenda--closed-secs (marker)
+  "MARKER 处条目的 CLOSED 时间戳（秒），无则 0。"
+  (with-current-buffer (marker-buffer marker)
+    (save-excursion
+      (goto-char marker)
+      (let ((c (org-entry-get (point) "CLOSED")))
+        (if c (float-time (org-time-string-to-time c)) 0)))))
+
 (defun nowis/agenda-cmp-closed (a b)
-  "按 CLOSED 时间比较两个 agenda 行（配合 user-defined-down 实现时间倒序）。"
-  (cl-flet ((secs (line)
-              (let ((m (get-text-property 0 'org-marker line)))
-                (if m (with-current-buffer (marker-buffer m)
-                        (save-excursion (goto-char m)
-                          (let ((c (org-entry-get (point) "CLOSED")))
-                            (if c (float-time (org-time-string-to-time c)) 0))))
-                  0))))
-    (let ((sa (secs a)) (sb (secs b)))
-      (cond ((> sa sb) 1) ((< sa sb) -1) (t nil)))))
+  "先按项目聚拢、组内按 CLOSED 倒序比较两行。配合 user-defined-down（取反）。"
+  (let* ((ma (get-text-property 0 'org-marker a))
+         (mb (get-text-property 0 'org-marker b))
+         (ca (if ma (nowis/agenda-entry-category ma) ""))
+         (cb (if mb (nowis/agenda-entry-category mb) "")))
+    (cond
+     ((not (string= ca cb)) (if (string> ca cb) 1 -1))
+     (t (let ((sa (if ma (nowis/agenda--closed-secs ma) 0))
+              (sb (if mb (nowis/agenda--closed-secs mb) 0)))
+          (cond ((> sa sb) 1) ((< sa sb) -1) (t nil)))))))
 
 (defun nowis/make-recent-done-command (key days)
   "生成「近 DAYS 天完成」agenda 命令：先按 category(项目)聚拢，组内按完成时间倒序。"
@@ -2101,7 +2116,7 @@ In short, you will need 3 files:
                  (org-agenda-files (nowis/recent-done-files))
                  (org-agenda-prefix-format "  %(nowis/agenda-closed-date)  ")
                  (org-agenda-cmp-user-defined #'nowis/agenda-cmp-closed)
-                 (org-agenda-sorting-strategy '(category-keep user-defined-down)))))))
+                 (org-agenda-sorting-strategy '(user-defined-down)))))))
 
 (setq org-agenda-custom-commands
       (list (nowis/make-agenda-command "g" "GTD"  "")
