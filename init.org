@@ -447,7 +447,7 @@ Maybe I should add a new state.
     ]
    ["voice"
     ("s d" "sherpa-dictate" emacs-sherpa-dictate)
-    ("s r" "sherpa-record" emacs-sherpa-only-record)
+    ("s r" "sherpa-only-record" emacs-sherpa-only-record)
     ("s k" "kokoro-read" emacs-kokoro-read)
     ]
    ["others"
@@ -1138,21 +1138,11 @@ Jump anywhere in the world
 ** project
 #+begin_src elisp
 (setup project
-  (keymap-global-set "C-x p t" #'project-ghostel)
+  (keymap-global-set "C-x p t" #'ghostel-project)
   (:when-loaded
     (add-to-list 'project-vc-extra-root-markers ".project")
-    (add-to-list 'project-switch-commands '(project-ghostel "Ghostel" "t"))
-    (define-key project-prefix-map "t" #'project-ghostel)))
-
-(defun project-ghostel ()
-  "Start ghostel in the current project's root directory. With -u, create a new buffer even if one exists."
-  (interactive)
-  (let* ((default-directory (project-root (project-current t)))
-         (buf-name (project-prefixed-buffer-name "ghostel"))
-         (ghostel-buffer-name buf-name))
-    (if (or current-prefix-arg (not (get-buffer buf-name)))
-        (ghostel)
-      (pop-to-buffer buf-name))))
+    (add-to-list 'project-switch-commands '(ghostel-project "Ghostel" "t"))
+    (define-key project-prefix-map "t" #'ghostel-project)))
 #+end_src
 ** auto-insert
 #+begin_src elisp
@@ -1171,51 +1161,45 @@ Jump anywhere in the world
 ** eshell
 #+begin_src elisp
 (setup eshell)
+;; less/htop/... inside eshell via ghostel's VT
+(setup ghostel-eshell
+  (add-hook 'eshell-load-hook #'ghostel-eshell-visual-command-mode))
 #+end_src
 ** ghostel
 #+begin_src elisp
-;; meow insert<->char-mode, normal<->copy-mode.
-(defun ghostel-meow-sync (state)
-  (pcase state
-    ('normal (unless (eq ghostel--input-mode 'copy) (ghostel-copy-mode))
-             (setq cursor-type meow-cursor-type-normal))
-    ('insert (ghostel-char-mode)
-             (setq cursor-type meow-cursor-type-insert))))
+;; meow insert -> char-mode (live terminal); ESC -> line-mode (meow editing).
+(defun ghostel--meow-to-line ()
+  (when ghostel--term (ghostel-line-mode)))
+(defun ghostel--meow-setup ()
+  ;; terminal isn't created until after ghostel-mode-hook; just register hooks.
+  (add-hook 'meow-insert-enter-hook #'ghostel-char-mode nil t)
+  (add-hook 'meow-insert-exit-hook  #'ghostel--meow-to-line nil t))
+
+;; In char-mode ESC exits to line-mode; M-q sends a literal ESC to the terminal.
+(defun ghostel-char-escape ()
+  (interactive)
+  (if (bound-and-true-p meow-insert-mode)
+      (meow-insert-exit)
+    (ghostel--meow-to-line)))
+
+(defun ghostel-char-send-escape ()
+  (interactive)
+  (ghostel-send-key "escape"))
 
 (with-eval-after-load 'meow
-  (add-hook 'ghostel-mode-hook
-            (lambda ()
-              (add-hook 'meow-switch-state-hook #'ghostel-meow-sync nil t))))
-
-(defun ghostel-char-exit-to-normal ()
-  ;; meow--switch-state (not meow-normal-mode) so the sync hook fires.
-  (interactive)
-  (when (bound-and-true-p meow-mode) (meow--switch-state 'normal)))
-
-(defun ghostel-edit-input ()
-  (interactive)
-  (let ((src (current-buffer))
-        (buf (generate-new-buffer "*ghostel-edit*")))
-    (pop-to-buffer buf)
-    (text-mode)
-    (when (bound-and-true-p meow-mode) (meow-insert-mode))
-    (local-set-key
-     (kbd "C-c C-c")
-     (lambda () (interactive)
-       (let ((text (buffer-string)))
-         (with-current-buffer src
-           (ghostel-paste-string text)
-           (ghostel-send-key "return"))
-         (kill-buffer-and-window))))))
+  (add-hook 'ghostel-mode-hook #'ghostel--meow-setup))
 
 (setup ghostel
   (setq ghostel-ignore-cursor-change t
         ghostel-shell "zsh")
   (keymap-global-set "M-`" #'ghostel-toggle-window)
   (:when-loaded
-    (define-key ghostel-char-mode-map (kbd "M-\\") #'ghostel-char-exit-to-normal)
-    (define-key ghostel-char-mode-map (kbd "M-'") #'ghostel-edit-input)
+    (define-key ghostel-char-mode-map (kbd "<escape>") #'ghostel-char-escape)
+    (define-key ghostel-char-mode-map (kbd "M-q") #'ghostel-char-send-escape)
     (define-key ghostel-char-mode-map (kbd "M-`") #'ghostel-toggle-window)
+    ;; keep point after a jump instead of snapping back to the prompt
+    (with-eval-after-load 'avy
+      (advice-add 'avy-action-goto :after #'ghostel-maybe-leave-input))
     (add-to-list 'display-buffer-alist
                  '((lambda (buffer-or-name _)
                      (with-current-buffer buffer-or-name
