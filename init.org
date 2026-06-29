@@ -79,8 +79,6 @@ emacs
 (defvar nowis/gtd-dir (concat nowis/doc-emacs-dir "01-orgmode/xnotes/gtd"))
 (defvar nowis/bib-dir (concat nowis/doc-emacs-dir "03-bibliography/"))
 (defvar nowis/bib-pdf-dir (concat nowis/doc-emacs-dir "02-binary-file/02-searchable"))
-(defvar nowis/is-wsl (string= "Arch" (getenv "WSL_DISTRO_NAME"))
-  "Non-nil when running inside WSL (Arch distro).")
 #+end_src
 * Package Management
 ** capsule
@@ -366,9 +364,7 @@ Maybe I should add a new state.
    ["Bookmark"
     ("j" "bookmark-jump" bookmark-jump)
     ("m" "bookmark-set" bookmark-set)
-    ("M" "bookmark-delete" bookmark-delete)
-    ("a" "add web bookmark" nowis/add-bookmark)
-    ("w" "web bookmark" nowis/consult-org-bookmarks)]
+    ("M" "bookmark-delete" bookmark-delete)]
    ]
   )
 #+end_src
@@ -1010,8 +1006,8 @@ Jump anywhere in the world
        (cons window type)))
    nil "[ace-window]")
   (message "Use `ace-window' to display next command buffer..."))
-;; (keymap-global-set "C-x 4 o" 'ace-window-prefix)
-  (keymap-global-set "M-O" #'ace-window-prefix)
+(keymap-global-set "C-x 4 o" 'ace-window-prefix)
+  ;; (keymap-global-set "M-O" #'ace-window-prefix)
 #+end_src
 * ibuffer
 ** ibuffer
@@ -1197,6 +1193,7 @@ Jump anywhere in the world
     (define-key ghostel-char-mode-map (kbd "<escape>") #'ghostel-char-escape)
     (define-key ghostel-char-mode-map (kbd "M-q") #'ghostel-char-send-escape)
     (define-key ghostel-char-mode-map (kbd "M-`") #'ghostel-toggle-window)
+    (define-key ghostel-char-mode-map (kbd "C-\\") #'toggle-input-method)
     ;; keep point after a jump instead of snapping back to the prompt
     (with-eval-after-load 'avy
       (advice-add 'avy-action-goto :after #'ghostel-maybe-leave-input))
@@ -2347,7 +2344,7 @@ Simple distraction-free editing. I use darkroom instead of writeroom because it'
 #+begin_src elisp
 (setup emacs-kokoro-onnx)
 #+end_src
-* webjump
+** webjump
 #+begin_src elisp
 (setup webjump
   (setopt webjump-sites '(
@@ -2357,16 +2354,13 @@ Simple distraction-free editing. I use darkroom instead of writeroom because it'
                         ("DouBan DuShu" .
                          [simple-query "book.douban.com"
                                        "search.douban.com/book/subject_search?search_text=" ""])
-                        ("leetcode-cn" .
-                         [simple-query "leetcode.cn"
-                                       "leetcode.cn/search/?q=" ""])
                         ("cppinfo" .
                          [simple-query "book.cppinfo.cn"
                                        "book.cppinfo.cn/so/home/qhsearch?q=" ""])
                         )))
 #+end_src
 ** server
-#+begin_src elisp :tangle no
+#+begin_src elisp
 (setup server
   (require 'server)
   (unless (server-running-p)
@@ -2401,36 +2395,18 @@ ESUP - Emacs Start Up Profiler
       (keymap-set meow-normal-state-keymap (car binding) (cdr binding)))
     (keymap-set uniline-mode-map "M-i" #'uniline-launch-interface)))
 #+end_src
-** manage-web-bookmarks
+** Global popup menu
 #+begin_src elisp
-(setq org-bookmarks-file (concat nowis/doc-emacs-dir "01-orgmode/xnotes/incremental/20250731T173729--bookmarks.org"))
-(defun nowis/add-bookmark ()
-  "add bookmark for url into org files"
-  (interactive)
-  (let ((url (read-string "URL: "))
-        (title (read-string "TiTle: "))
-        (timestamp (format-time-string "[%Y-%m-%d %a %H:%M]")))
-    (with-current-buffer (find-file-noselect org-bookmarks-file)
-      (goto-char (point-max))
-      (insert (format "\n* %s\n[[%s]]\n  added: %s\n" title url timestamp))
-      (save-buffer))))
-
-(defun nowis/consult-org-bookmarks ()
-  "Browse org bookmarks with consult-org-heading, return to origin buffer/point when done."
-  (interactive)
-  (let ((original-buffer (current-buffer))
-        (original-point (point)))
-    (unwind-protect
-        (progn
-          (find-file org-bookmarks-file)
-          (consult-org-heading)
-          (when-let* ((url (save-excursion
-                            (forward-line 1)
-                            (when (looking-at "\\[\\[\\([^]]+\\)\\]\\]")
-                              (match-string 1)))))
-            (embark-open-externally url)))
-      (switch-to-buffer original-buffer)
-      (goto-char original-point))))
+(require 'nowis-popup)
+(setq nowis-popup-bookmark-file
+      (concat nowis/doc-emacs-dir
+              "01-orgmode/xnotes/incremental/20250731T173729--bookmarks.org"))
+(nowis-popup-define
+ '(("Bookmarks"
+    ("j" "open bookmark" nowis-popup-bookmark-jump)
+    ("a" "add bookmark" nowis-popup-bookmark-add))
+   ("Misc"
+    ("c" "org-capture" org-capture))))
 #+end_src
 ** eww
 #+begin_src elisp
@@ -2451,23 +2427,6 @@ ESUP - Emacs Start Up Profiler
   )
 #+end_src
 * system-specific-config
-** windows-wslg
-These codes are used to solve copy & paste problems under wslg inside win10/win11
-#+begin_src elisp :tangle no
-(when nowis/is-wsl
-  (setq interprogram-cut-function
-        (lambda (text)
-          (let ((process-connection-type nil))
-            (let ((proc (start-process "wl-copy" nil "wl-copy")))
-              (process-send-string proc text)
-              (process-send-eof proc))))
-
-        interprogram-paste-function
-        (lambda ()
-          (when (zerop (call-process "wl-paste" nil nil nil "--list-types"))
-            (let ((coding-system-for-read 'dos))
-              (shell-command-to-string "wl-paste --no-newline"))))))
-#+end_src
 ** android
 #+begin_src elisp
 (when (eq system-type 'android)
