@@ -2418,8 +2418,13 @@ ESUP - Emacs Start Up Profiler
     ("j" "open bookmark" nowis-popup-bookmark-jump)
     ("a" "add bookmark"  nowis-popup-bookmark-add)]
    ]
+[
   ["Quit"
    ("q" "quit" delete-frame)]
+  ["macro"
+   ("!" "kmacro-start" kmacro-start-macro-or-insert-counter :transient t)
+   ("@" "kmacro-end" meow-end-or-call-kmacro :transient t)
+   ]]
   )
 #+end_src
 ** eww
