@@ -2395,18 +2395,32 @@ ESUP - Emacs Start Up Profiler
       (keymap-set meow-normal-state-keymap (car binding) (cdr binding)))
     (keymap-set uniline-mode-map "M-i" #'uniline-launch-interface)))
 #+end_src
-** Global popup menu
+** Global popup menu(nowis-popup)
 #+begin_src elisp
 (require 'nowis-popup)
 (setq nowis-popup-bookmark-file
       (concat nowis/doc-emacs-dir
               "01-orgmode/xnotes/incremental/20250731T173729--bookmarks.org"))
-(nowis-popup-define
- '(("Bookmarks"
+(transient-define-prefix nowis-popup--transient ()
+  "nowis-popup menu.  Press `q' to close the popup frame."
+  [
+   ["Agenda"
+    ("a" "org-agenda" org-agenda)
+    ("c" "org-capture" org-capture)]
+   ["org-sm"
+    ("r" "review confirm" org-sm-review-confirm :transient t)
+    ("s" "start-review" org-sm-review-start)
+    ("e" "topic from clipboard" org-sm-capture-topic)
+    ("E" "change target"
+     (lambda () (interactive) (org-sm-capture-topic '(-1))))]
+
+   ["Bookmarks"
     ("j" "open bookmark" nowis-popup-bookmark-jump)
-    ("a" "add bookmark" nowis-popup-bookmark-add))
-   ("Misc"
-    ("c" "org-capture" org-capture))))
+    ("a" "add bookmark"  nowis-popup-bookmark-add)]
+   ]
+  ["Quit"
+   ("q" "quit" delete-frame)]
+  )
 #+end_src
 ** eww
 #+begin_src elisp
