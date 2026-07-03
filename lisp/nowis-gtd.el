@@ -105,5 +105,82 @@
            "** 优先处理\n\n"
            "每个 *** 条目后附 *用户决定：* 留空。\n\n")))
 
+;;;; ---- 快速时间录入 --------------------------------------------------------
+;;
+;; DSL（minibuffer 输入）：
+;;   "25 看编译器书"  → 有描述 → 新建 DONE（一次性事件），clock 25min
+;;   "25"             → 纯数字 → 光标所在 heading 追加 clock 25min，不改状态
+;;
+;; CLOCK 行不带描述，故有描述即视为新任务。
+
+(defvar nowis/gtd-log-time-target nil
+  "新建 DONE 条目的写入位置，在 init 中配置。
+nil 表示插到当前光标处。否则为 (FILE . HEADING)：
+FILE 为绝对路径（由用户拼好，库不假设目录），
+HEADING 为一级标题文本，新条目插到其子树末尾并存盘。
+例：(setq nowis/gtd-log-time-target
+        (cons (expand-file-name \"action.org\" (nowis/gtd-dir)) \"inbox\"))
+纯数字追加不受此影响，始终作用于当前光标 heading。")
+
+(defun nowis/gtd--goto-target ()
+  "根据 `nowis/gtd-log-time-target' 定位：切到目标 buffer、移 point 到插入点。"
+  (when nowis/gtd-log-time-target
+    (let ((file (car nowis/gtd-log-time-target))
+          (head (cdr nowis/gtd-log-time-target)))
+      (set-buffer (find-file-noselect file))
+      (goto-char (point-min))
+      (unless (re-search-forward (format "^\\* +%s" (regexp-quote head)) nil t)
+        (user-error "在 %s 未找到一级标题「%s」" file head))
+      (org-end-of-subtree t t))))
+
+(defun nowis/gtd--new-done (task mins)
+  "在光标处新建一条 DONE（含 CLOSED + CREATED + CLOCK）。"
+  (let ((ts (format-time-string "[%Y-%m-%d %a %H:%M]")))
+    (insert (format (concat "** DONE %s\nCLOSED: %s\n"
+                            ":PROPERTIES:\n:CREATED:  %s\n:END:\n"
+                            ":LOGBOOK:\n%s\n:END:\n")
+                    task ts ts (nowis/gtd--clock-line mins)))))
+
+(defun nowis/gtd--clock-line (mins)
+  "生成一条 CLOCK 行：end=现在，start=现在-MINS 分钟。"
+  (let* ((now (current-time))
+         (start (time-subtract now (seconds-to-time (* mins 60))))
+         (f (lambda (tm) (format-time-string "[%Y-%m-%d %a %H:%M]" tm))))
+    (format "CLOCK: %s--%s =>  %d:%02d"
+            (funcall f start) (funcall f now) (/ mins 60) (% mins 60))))
+
+(defun nowis/gtd--append-clock (mins)
+  "给光标所在 heading 的 LOGBOOK 顶部追加一条 CLOCK。"
+  (save-excursion
+    (org-back-to-heading t)
+    (let ((clock (nowis/gtd--clock-line mins))
+          (end (save-excursion (org-end-of-subtree t))))
+      (if (re-search-forward "^[ \t]*:LOGBOOK:[ \t]*$" end t)
+          (progn (forward-line 1) (insert clock "\n"))
+        (org-end-of-meta-data t)
+        (insert ":LOGBOOK:\n" clock "\n:END:\n")))))
+
+;;;###autoload
+(defun nowis/gtd-log-time (input)
+  "事后补记时间。INPUT 格式「分钟 [描述]」：
+有描述→新建 DONE（一次性事件）；纯数字→给光标所在 heading 追加 CLOCK，不改状态。"
+  (interactive "s记时间（如「25 看编译器书」或「25」）: ")
+  (if (not (string-match "\\`[ \t]*\\([0-9]+\\)[ \t]*\\(.*\\)\\'" input))
+      (user-error "格式应为「分钟 [描述]」，如「25 看编译器书」")
+    (let ((mins (string-to-number (match-string 1 input)))
+          (task (string-trim (match-string 2 input))))
+      (cond
+       ((> (length task) 0)
+        (save-window-excursion
+          (save-excursion
+            (nowis/gtd--goto-target)
+            (nowis/gtd--new-done task mins)
+            (when nowis/gtd-log-time-target (save-buffer))))
+        (message "已新建 DONE：%s (%dmin)" task mins))
+       ((org-at-heading-p)
+        (nowis/gtd--append-clock mins)
+        (message "已追加 %dmin 到当前任务" mins))
+       (t (user-error "光标不在 heading 上，纯数字无处追加；请补描述新建任务"))))))
+
 (provide 'nowis-gtd)
 ;;; nowis-gtd.el ends here

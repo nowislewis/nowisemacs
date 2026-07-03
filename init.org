@@ -436,6 +436,7 @@ Maybe I should add a new state.
     ]
    ["capture"
     ("c" "capture" org-capture)
+    ("d" "done works" nowis/gtd-log-time)
     ("e" "capture topic" org-sm-capture-topic)
     ("E" "capture topic (change target)"
      (lambda () (interactive) (org-sm-capture-topic '(-1))))
@@ -444,6 +445,7 @@ Maybe I should add a new state.
    ["voice"
     ("s d" "sherpa-dictate" emacs-sherpa-dictate)
     ("s r" "sherpa-only-record" emacs-sherpa-only-record)
+    ("s f" "sherpa-dictate-file" emacs-sherpa-dictate-file)
     ("s k" "kokoro-read" emacs-kokoro-read)
     ]
    ["others"
@@ -2125,7 +2127,10 @@ MARKER 空=用当前 agenda 行；非空=跨 buffer 取值（排序用）。"
 *** clarify with AI
 #+begin_src elisp
 (with-eval-after-load 'org
-  (require 'nowis-gtd))
+  (require 'nowis-gtd)
+  (setq nowis/gtd-log-time-target
+        (cons (expand-file-name "action.org" (nowis/gtd-dir)) "inbox"))
+  )
 #+end_src
 *** archive
 #+begin_src elisp
@@ -2395,7 +2400,9 @@ ESUP - Emacs Start Up Profiler
   [
    ["Agenda"
     ("a" "org-agenda" org-agenda)
-    ("c" "org-capture" org-capture)]
+    ("c" "org-capture" org-capture)
+    ("d" "done works" nowis/gtd-log-time)
+]
    ["org-sm"
     ("r" "review confirm" org-sm-review-confirm :transient t)
     ("s" "start-review" org-sm-review-start)
