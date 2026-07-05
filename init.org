@@ -1770,7 +1770,6 @@ borrowed from citre, now you can always jump-back use "M-," after any jump in th
 ;; ┌───────────────┐
 ;; │ prettify-mode │
 ;; └───────────────┘
-
 (defun my/org-prettify-compose-p (start end match)
   "Custom compose predicate for org-mode.
 Always allow composition for org-mode keywords, regardless of context."
@@ -1791,11 +1790,18 @@ Always allow composition for org-mode keywords, regardless of context."
 	            ("[-]" . 8863) ;; ⊟
                 (":PROPERTIES:" . ?)
                 (":LOGBOOK:" . ?)
-                (":END:" . ?╰)))
+                (":END:" . ?╰)
+                ("[#A]" . ?󰫮)
+                ("[#B]" . ?󰫯)
+                ("[#C]" . ?󰫰)
+                ("TODO" . ?󰰤)
+                ("DONE" . ?󰯴)
+                ))
   (setq-local prettify-symbols-compose-predicate #'my/org-prettify-compose-p)
   (prettify-symbols-mode))
 
 (add-hook 'org-mode-hook #'nowis/org-setup-prettify)
+(add-hook 'org-agenda-finalize-hook #'nowis/org-setup-prettify)
 #+end_src
 *** org-appear
 #+begin_src elisp
@@ -2137,7 +2143,6 @@ MARKER 空=用当前 agenda 行；非空=跨 buffer 取值（排序用）。"
 ;; ── Datetree archive ──
 (setq org-archive-location (concat (nowis/gtd-dir) "/gtd_archive::datetree/"))
 #+end_src
-
 ** org-sm
 #+begin_src elisp
 (setup org-sm
@@ -2243,6 +2248,14 @@ MARKER 空=用当前 agenda 行；非空=跨 buffer 取值（排序用）。"
 (setup nov
   (:bind "]" nov-scroll-up
          "[" nov-scroll-down))
+   ;; indent first line
+   (add-hook 'nov-post-html-render-hook
+             (defun my-nov-indent ()
+               (save-excursion
+                 (goto-char (point-min))
+                 (insert "    ")
+                 (while (re-search-forward "\n\n" nil t)
+                   (insert "    ")))))
 (add-to-list 'auto-mode-alist '("\\.epub\\'" . nov-mode))
 #+end_src
 ** darkroom
@@ -2359,6 +2372,11 @@ Simple distraction-free editing. I use darkroom instead of writeroom because it'
   (require 'server)
   (unless (server-running-p)
     (server-start)))
+#+end_src
+** tui
+#+begin_src elisp
+(unless (display-graphic-p)
+  (xterm-mouse-mode))
 #+end_src
 ** macos-ocr
 #+begin_src elisp
