@@ -430,6 +430,7 @@ Maybe I should add a new state.
   [["agenda"
     ("a" "org-agenda" org-agenda)
     ("A" "archive" org-archive-subtree)
+    ("b" "time blocks" nowis/time-blocks)
     ("o" "occur" (lambda ()
                    (interactive)
                    (org-occur "^[ \t]*\\*+ +\\(TODO\\)\\>")))
@@ -1811,7 +1812,9 @@ Always allow composition for org-mode keywords, regardless of context."
 *** org-pretty-table
 #+begin_src elisp
 (setup org-pretty-table
-  (add-hook 'org-mode-hook (lambda () (org-pretty-table-mode))))
+  (add-hook 'org-mode-hook (lambda () (org-pretty-table-mode)))
+  (add-hook 'org-agenda-finalize-hook (lambda () (org-pretty-table-mode)))
+)
 #+end_src
 ** ox-hugo
 #+begin_src elisp
@@ -1914,38 +1917,24 @@ Always allow composition for org-mode keywords, regardless of context."
 #+end_src
 ** agenda/gtd
 Borrowed from https://github.com/rougier/emacs-GTD
-
-In short, you will need 3 files:
-1. =inbox.org= for capture inbox TODOs
-2. =agenda.org= for recurrent events
-3. =action.org= for all tasks moving from inbox
 *** file
 #+begin_src elisp
 ;; Files
 (setopt org-directory "~/Documents/emacs/01-orgmode/xnotes")
 
 (setup org
-  (defun nowis/gtd-dir ()
-    "GTD 文件根目录。"
-    (concat org-directory "/gtd"))
-
   (defun nowis/gtd-files ()
-    "GTD 目录下的活跃 org 文件（排除 beorg/archive）。"
-    (let ((dir (nowis/gtd-dir)))
-      (when (file-exists-p dir)
-        (cl-remove-if
-         (lambda (f) (string-match-p "beorg\\|archive" f))
-         (directory-files-recursively dir "\\.org")))))
+    (cl-remove-if (lambda (f) (or (file-directory-p f)
+                                  (string-match-p "beorg\\|project\\|incubate" f)))
+                  (directory-files nowis/gtd-dir t)))
 
   (defun org-agenda-update-agenda-files ()
-    "Update agenda file list together with refile list."
+    "agenda 用全集, refile 落点收窄"
     (interactive)
-    (let ((gtd-files (nowis/gtd-files)))
-      (setq org-refile-files (cl-remove-if (lambda (f) (string-match-p "inbox\\|agenda\\|reading" f))
-                                           gtd-files))
-      (setopt org-agenda-files (cl-remove-if (lambda (f) (string-match-p "incubate" f))
-                                           gtd-files))))
-  ;; 启动时刷新一次即可
+    (setopt org-agenda-files (nowis/gtd-files))
+    (setq org-refile-files (list (expand-file-name "action.org" nowis/gtd-dir)
+                                 (expand-file-name "20251201T112101--incubate.org0" nowis/gtd-dir)
+                                 )))
   (with-eval-after-load 'org-agenda (org-agenda-update-agenda-files))
   )
 #+end_src
@@ -1955,6 +1944,9 @@ In short, you will need 3 files:
       org-enforce-todo-checkbox-dependencies t
       org-log-done 'note
       org-todo-keywords '((sequence "TODO(t)" "WAIT(w)" "SMDY(s)" "|" "AXED(a)" "DONE(d)"))
+      ;; 持久化 org-element 缓存，减少多文件（含 archive）的冷启动解析开销
+      org-element-use-cache t
+      org-element-cache-persistent t
       )
 #+end_src
 *** capture
@@ -1964,10 +1956,10 @@ In short, you will need 3 files:
 (setup org
   (:when-loaded
     (setq org-capture-templates
-          `(("i" "Inbox" entry (file+headline "gtd/action.org" "Inbox")
+          `(("i" "Inbox" entry (file "gtd/inbox.org")
              ,(concat "* TODO [#C] %?\n"
                       ":PROPERTIES:\n:CREATED: %U\n:END:\n"))
-            ("d" "Done" entry (file+headline "gtd/action.org" "Inbox")
+            ("d" "Done" entry (file+headline "gtd/action.org" "Done")
              ,(concat "* DONE %?  :%^{Area|misc|work|grow|health|family|life}:\n"
                       "CLOSED: %U\n"
                       ":PROPERTIES:\n"
@@ -1995,8 +1987,7 @@ In short, you will need 3 files:
 #+begin_src elisp
 ;;; ─── 分组（基于 Category）────────────────────────
 (defun nowis/agenda-entry-olpath (&optional marker)
-  "获取当前 agenda 条目的项目路径。优先 ARCHIVE_OLPATH，否则回退到 CATEGORY。
-MARKER 空=用当前 agenda 行；非空=跨 buffer 取值（排序用）。"
+  "获取当前 agenda 条目的项目路径。优先 ARCHIVE_OLPATH，否则回退到 CATEGORY。"
   (if marker
       (with-current-buffer (marker-buffer marker)
         (save-excursion
@@ -2053,7 +2044,7 @@ MARKER 空=用当前 agenda 行；非空=跨 buffer 取值（排序用）。"
                      (org-agenda-skip-function
                       '(org-agenda-skip-if nil '(todo done)))))
 
-            (tags-todo "action-inbox"
+            (tags-todo "action"
                        ((org-agenda-overriding-header (nowis/center-header " Ready to Start"))
                         (org-agenda-skip-function
                          '(org-agenda-skip-entry-if 'scheduled))
@@ -2076,14 +2067,7 @@ MARKER 空=用当前 agenda 行；非空=跨 buffer 取值（排序用）。"
                    (org-agenda-sorting-strategy '(category-keep tsia-down))))
             ))))
 
-;;; ─── 近期完成（复用 agenda，临时含 archive，可回车跳转）─────────────────
-(defun nowis/recent-done-files ()
-  "近期完成扫描范围：活跃文件 + 当年 archive。"
-  (cl-remove-if-not
-   #'file-exists-p
-   (append (nowis/gtd-files)
-           (list (concat (nowis/gtd-dir) "/gtd_archive")))))
-
+;;; ─── 近期完成（agenda 已统一含 archive，直接复用全集）─────────────────
 (defun nowis/agenda-closed-date ()
   "返回当前 agenda 条目的 CLOSED 日期 MM-DD（用于 prefix 显示）。"
   (let ((c (org-entry-get (point) "CLOSED")))
@@ -2114,7 +2098,6 @@ MARKER 空=用当前 agenda 行；非空=跨 buffer 取值（排序用）。"
   `(,key ,(format "近%d天完成" days)
          ((tags ,(format "CLOSED>=\"<-%dd>\"" days)
                 ((org-agenda-overriding-header ,(format "近 %d 天完成" days))
-                 (org-agenda-files (nowis/recent-done-files))
                  (org-agenda-prefix-format "  %(nowis/agenda-closed-date)  ")
                  (org-agenda-cmp-user-defined #'nowis/agenda-cmp-closed)
                  (org-agenda-sorting-strategy '(user-defined-down)))))))
@@ -2135,13 +2118,18 @@ MARKER 空=用当前 agenda 行；非空=跨 buffer 取值（排序用）。"
 (with-eval-after-load 'org
   (require 'nowis-gtd)
   (setq nowis/gtd-log-time-target
-        (cons (expand-file-name "action.org" (nowis/gtd-dir)) "inbox"))
+        (cons (expand-file-name "inbox.org" nowis/gtd-dir) "Done from capture"))
   )
+#+end_src
+*** time blocks
+#+begin_src elisp
+(setup nowis-time-blocks
+  (:autoload nowis/time-blocks))
 #+end_src
 *** archive
 #+begin_src elisp
 ;; ── Datetree archive ──
-(setq org-archive-location (concat (nowis/gtd-dir) "/gtd_archive::datetree/"))
+(setq org-archive-location (concat nowis/gtd-dir "/gtd_archive::datetree/"))
 #+end_src
 ** org-sm
 #+begin_src elisp
