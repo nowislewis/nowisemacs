@@ -1792,17 +1792,11 @@ Always allow composition for org-mode keywords, regardless of context."
                 (":PROPERTIES:" . ?)
                 (":LOGBOOK:" . ?)
                 (":END:" . ?╰)
-                ("[#A]" . ?󰫮)
-                ("[#B]" . ?󰫯)
-                ("[#C]" . ?󰫰)
-                ("TODO" . ?󰰤)
-                ("DONE" . ?󰯴)
                 ))
   (setq-local prettify-symbols-compose-predicate #'my/org-prettify-compose-p)
   (prettify-symbols-mode))
 
 (add-hook 'org-mode-hook #'nowis/org-setup-prettify)
-(add-hook 'org-agenda-finalize-hook #'nowis/org-setup-prettify)
 #+end_src
 *** org-appear
 #+begin_src elisp
