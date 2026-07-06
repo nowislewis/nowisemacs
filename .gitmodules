@@ -265,3 +265,6 @@
 [submodule "lib/vertico"]
 	path = lib/vertico
 	url = https://github.com/minad/vertico.git
+[submodule "lib/nethack"]
+	path = lib/nethack
+	url = https://github.com/Feyorsh/nethack-el.git

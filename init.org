@@ -2447,6 +2447,10 @@ ESUP - Emacs Start Up Profiler
   (setq gamegrid-user-score-file-directory (concat nowis/doc-emacs-dir "66-gamegrid-user-score"))
   )
 #+end_src
+** nethack
+#+begin_src elisp
+(setup nethack)
+#+end_src
 * system-specific-config
 ** android
 #+begin_src elisp
