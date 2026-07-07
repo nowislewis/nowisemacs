@@ -650,7 +650,7 @@ diff-hl-mode highlights uncommitted changes on the left side of the window
     ))
 #+end_src
 ** emacs-dashboard
-#+begin_src elisp
+#+begin_src elisp :tangle no
 (setup dashboard
   (setopt dashboard-items '((recents . 5)
                           (projects . 5)
@@ -750,7 +750,7 @@ diff-hl-mode highlights uncommitted changes on the left side of the window
 *** savehist
 #+begin_src elisp
 (setup savehist
-  (setopt history-length 1500
+  (setopt history-length 500
         history-delete-duplicates t
         savehist-autosave-interval 60)
   (savehist-mode))
@@ -2124,6 +2124,13 @@ Borrowed from https://github.com/rougier/emacs-GTD
 #+begin_src elisp
 ;; ── Datetree archive ──
 (setq org-archive-location (concat nowis/gtd-dir "/gtd_archive::datetree/"))
+#+end_src
+*** nowis-gantt
+#+begin_src elisp
+(setup nowis-gantt
+  (:autoload nowis/gtd-gantt)
+  (setq nowis/gantt-timezone "Asia/Shanghai"
+        nowis/gantt-done-color "#a6e3a1"))
 #+end_src
 ** org-sm
 #+begin_src elisp
