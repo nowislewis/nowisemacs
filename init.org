@@ -351,15 +351,19 @@ Maybe I should add a new state.
 #+begin_src elisp
 (transient-define-prefix buffer-leader-map()
   "Define leader-key map for buffer functions"
-  [["Buffer"
+  [["Buffer Switch"
     ("b" "consult-buffer" consult-buffer) ;; work with C-x b
-    ("k" "kill-current-buffer" kill-current-buffer)
+    ("f" "buffer-other-frame" consult-buffer-other-frame)
+    ("w" "buffer-other-window" consult-buffer-other-window)
     ("l" "meow-last-buffer" meow-last-buffer)
     ("n" "next-buffer" next-buffer)
     ("p" "previous-buffer" previous-buffer)
+    ("s" "scratch-buffer" scratch-buffer)
+    ]
+  ["Buffer Ops"
+    ("k" "kill-current-buffer" kill-current-buffer)
     ("r" "revert-buffer" revert-buffer)
     ("c" "clean-buffer" clean-buffer-list)
-    ("s" "scratch-buffer" scratch-buffer)
     ]
    ["Bookmark"
     ("j" "bookmark-jump" bookmark-jump)
@@ -1882,7 +1886,7 @@ Always allow composition for org-mode keywords, regardless of context."
   (add-hook 'dired-mode-hook #'denote-dired-mode)
   )
 #+end_src
-*** denote-journal
+** denote-journal
 #+begin_src elisp
 (setup denote-journal
   (setq denote-journal-title-format "%Y_%m_%d_%a_W%V")
