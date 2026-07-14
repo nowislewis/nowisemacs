@@ -1982,36 +1982,18 @@ Borrowed from https://github.com/rougier/emacs-GTD
 #+end_src
 *** agenda
 #+begin_src elisp
-;;; ─── 分组（基于 Category）────────────────────────
-(defun nowis/agenda-entry-olpath (&optional marker)
-  "获取当前 agenda 条目的项目路径。优先 ARCHIVE_OLPATH，否则回退到 CATEGORY。"
-  (if marker
-      (with-current-buffer (marker-buffer marker)
-        (save-excursion
-          (goto-char marker)
-          (or (org-entry-get (point) "ARCHIVE_OLPATH")
-              (org-get-category (point)))))
-    (let ((m (get-text-property (point) 'org-marker)))
-      (if m
-          (or (org-entry-get m "ARCHIVE_OLPATH")
-              (get-text-property (point) 'org-category))
-        (get-text-property (point) 'org-category)))))
+;;; ─── 跳到任务所属 project（看 note）──────────────────────
+(defun nowis/agenda-goto-project ()
+  "从 agenda 当前任务跳到它所属的 project heading（level 2），看该战线的 note。"
+  (interactive)
+  (org-agenda-goto)                     ; 复用原生跳转（开窗、widen、展开都处理好）
+  (while (> (org-current-level) 2)      ; 上溯到 project 层
+    (org-up-heading-safe))
+  (org-fold-show-children)
+  (recenter-top-bottom 2))
 
-(defun nowis/agenda-add-category-separators ()
-  "在不同 olpath 分组间插入分隔标题行。需在排序完成后运行。"
-  (save-excursion
-    (goto-char (point-min))
-    (let ((last-group nil))
-      (while (not (eobp))
-        (when-let* ((group (nowis/agenda-entry-olpath)))
-          (unless (equal group last-group)
-            (let ((inhibit-read-only t))
-              (insert (propertize (concat "◆ " group "\n")
-                                  'face 'org-agenda-structure)))
-            (setq last-group group)))
-        (forward-line)))))
-
-(add-hook 'org-agenda-finalize-hook #'nowis/agenda-add-category-separators)
+(with-eval-after-load 'org-agenda
+  (keymap-set org-agenda-mode-map "P" #'nowis/agenda-goto-project))
 
 ;;; ─── 显示格式 ───────────────────────────────────────────
 (defun nowis/center-header (text)
@@ -2022,87 +2004,46 @@ Borrowed from https://github.com/rougier/emacs-GTD
 
 (setq org-agenda-prefix-format
       ;; '((agenda . " %i %-12:c%?-12t% s[%-4e]")
-      '((agenda . " %i %?-12t% s[%-4e] ")
+      '((agenda . "%-10c %i %?-12t% s[%-4e] ")
       (todo   . "[%-4e]: ")
-      (tags   . "[%-4e]: ")
-      (search . " %i %-12:c")))
+      (tags   . "%-10c [%-4e] ")
+      (search . "%i %-12:c")))
 
 (setq org-agenda-hide-tags-regexp
       "\\(inbox\\|action\\|journal\\|project\\|next\\|bib\\|srs\\|reading\\)")
 
 ;;; ─── Agenda 视图构建 ────────────────────────────────────
-(defun nowis/make-agenda-command (key description tag)
-  "生成 GTD agenda 自定义命令，TAG 用于过滤（空字符串表示不过滤）。"
-  (let ((closed-tag (concat "CLOSED>=\"<today>\"" tag)))
-    `(,key ,description
-           ((agenda ""
-                    ((org-agenda-overriding-header (nowis/center-header " Launch Pad"))
-                     (org-agenda-span 'day)
-                     (org-agenda-skip-function
-                      '(org-agenda-skip-if nil '(todo done)))))
+;; blocked 任务在 agenda 中隐藏
+(setq org-agenda-dim-blocked-tasks 'invisible)
 
-            (tags-todo "action"
-                       ((org-agenda-overriding-header (nowis/center-header " Ready to Start"))
-                        (org-agenda-skip-function
-                         '(org-agenda-skip-entry-if 'scheduled))
-                        (org-agenda-sorting-strategy
-                         '(category-keep todo-state-up priority-down timestamp-up))))
-
-            (tags-todo "inbox"
-                       ((org-agenda-overriding-header (nowis/center-header " Inbox"))
-                        (org-agenda-sorting-strategy
-                         '(category-keep todo-state-up priority-down timestamp-up))))
-
-            (tags-todo "reading"
-                       ((org-agenda-overriding-header (nowis/center-header " Leisure & Reading"))
-                        (org-agenda-skip-function
-                         '(org-agenda-skip-entry-if 'scheduled))
-                        (org-agenda-sorting-strategy
-                         '(category-keep todo-state-up priority-down timestamp-up))))
-            (tags ,closed-tag
-                  ((org-agenda-overriding-header (nowis/center-header "󰔹 Completed Today"))
-                   (org-agenda-sorting-strategy '(category-keep tsia-down))))
-            ))))
-
-;;; ─── 近期完成（agenda 已统一含 archive，直接复用全集）─────────────────
-(defun nowis/agenda-closed-date ()
-  "返回当前 agenda 条目的 CLOSED 日期 MM-DD（用于 prefix 显示）。"
-  (let ((c (org-entry-get (point) "CLOSED")))
-    (if c (format-time-string "%m-%d" (org-time-string-to-time c)) "     ")))
-
-(defun nowis/agenda--closed-secs (marker)
-  "MARKER 处条目的 CLOSED 时间戳（秒），无则 0。"
-  (with-current-buffer (marker-buffer marker)
-    (save-excursion
-      (goto-char marker)
-      (let ((c (org-entry-get (point) "CLOSED")))
-        (if c (float-time (org-time-string-to-time c)) 0)))))
-
-(defun nowis/agenda-cmp-closed (a b)
-  "先按项目聚拢、组内按 CLOSED 倒序比较两行。配合 user-defined-down（取反）。"
-  (let* ((ma (get-text-property 0 'org-marker a))
-         (mb (get-text-property 0 'org-marker b))
-         (ca (if ma (nowis/agenda-entry-olpath ma) ""))
-         (cb (if mb (nowis/agenda-entry-olpath mb) "")))
-    (cond
-     ((not (string= ca cb)) (if (string> ca cb) 1 -1))
-     (t (let ((sa (if ma (nowis/agenda--closed-secs ma) 0))
-              (sb (if mb (nowis/agenda--closed-secs mb) 0)))
-          (cond ((> sa sb) 1) ((< sa sb) -1) (t nil)))))))
-
-(defun nowis/make-recent-done-command (key days)
-  "生成「近 DAYS 天完成」agenda 命令：先按 category(项目)聚拢，组内按完成时间倒序。"
-  `(,key ,(format "近%d天完成" days)
-         ((tags ,(format "CLOSED>=\"<-%dd>\"" days)
-                ((org-agenda-overriding-header ,(format "近 %d 天完成" days))
-                 (org-agenda-prefix-format "  %(nowis/agenda-closed-date)  ")
-                 (org-agenda-cmp-user-defined #'nowis/agenda-cmp-closed)
-                 (org-agenda-sorting-strategy '(user-defined-down)))))))
-
+;;; GTD 主视图（g）；近期完成回顾（r)
 (setq org-agenda-custom-commands
-      (list (nowis/make-agenda-command "g" "GTD"  "")
-            (nowis/make-recent-done-command "r" 7)
-            (nowis/make-recent-done-command "R" 30)))
+      '(("r" "近 N 天完成（按 oldpath）"
+         (lambda (_) (call-interactively #'nowis/review-done-by-project)))
+
+        ("g" "GTD"
+         ((agenda ""
+                  ((org-agenda-overriding-header (nowis/center-header " Launch Pad"))
+                   (org-agenda-span 'day)
+                   (org-agenda-skip-function
+                    '(org-agenda-skip-if nil '(todo done)))))
+
+          (tags-todo "action"
+                     ((org-agenda-overriding-header (nowis/center-header " Ready to Start"))
+                      (org-agenda-skip-function
+                       '(org-agenda-skip-entry-if 'scheduled))
+                      (org-agenda-sorting-strategy
+                       '(category-up todo-state-up priority-down timestamp-up))))
+
+          (tags-todo "inbox"
+                     ((org-agenda-overriding-header (nowis/center-header " Inbox"))
+                      (org-agenda-sorting-strategy
+                       '(category-up todo-state-up priority-down timestamp-up))))
+
+          (tags-todo "reading"
+                     ((org-agenda-overriding-header (nowis/center-header " Leisure & Reading"))
+                      (org-agenda-sorting-strategy
+                       '(category-up todo-state-up priority-down timestamp-up))))))))
 
 ;;; ─── Clock 设置 ─────────────────────────────────────────
 
@@ -2127,6 +2068,53 @@ Borrowed from https://github.com/rougier/emacs-GTD
 #+begin_src elisp
 ;; ── Datetree archive ──
 (setq org-archive-location (concat nowis/gtd-dir "/gtd_archive::datetree/"))
+
+;; ── 按完整 oldpath 层级浏览近期完成 ──
+(defun nowis/review--entry ()
+  "当前 DONE 条目 → (路径段列表 . 显示行)，不符合返回 nil。"
+  (when-let* ((closed (org-entry-get nil "CLOSED"))
+              (title (org-get-heading t t t t)))
+    (let* ((olp (org-entry-get nil "ARCHIVE_OLPATH"))
+           (segs (if olp (split-string olp "/" t "[ \t]+") (org-get-outline-path)))
+           (segs (or segs (list "其他")))
+           (date (substring closed 1 11))
+           (id (org-id-get))
+           (link (if id (format "[[id:%s][%s]]" id title) title)))
+      (cons segs (format "- [%s] %s" date link)))))
+
+(defun nowis/review-done-by-project (days)
+  "扫描近 DAYS 天所有 DONE，按完整 oldpath 层级建树，生成只读 org buffer。"
+  (interactive "n近多少天完成: ")
+  (let* ((match (format "TODO=\"DONE\"+CLOSED>=\"<-%dd>\"" days))
+         (items (delq nil (org-map-entries #'nowis/review--entry match
+                                           (nowis/gtd-files))))
+         ;; 按路径排序，使相同前缀相邻 → 能共享标题
+         (items (sort items (lambda (a b)
+                              (string< (mapconcat #'identity (car a) "/")
+                                       (mapconcat #'identity (car b) "/")))))
+         (last nil))
+    (with-current-buffer (get-buffer-create "*Review by Project*")
+      (let ((inhibit-read-only t))
+        (erase-buffer)
+        (org-mode)
+        (insert (format "#+title: 近 %d 天完成(按 oldpath)\n\n" days))
+        (dolist (item items)
+          (let* ((segs (car item))
+                 (common 0))
+            ;; 与上一条路径的公共前缀，只为新增层级插入标题
+            (while (and (< common (length segs)) (< common (length last))
+                        (equal (nth common segs) (nth common last)))
+              (setq common (1+ common)))
+            (cl-loop for d from common below (length segs) do
+                     (insert (make-string (1+ d) ?*) " " (nth d segs) "\n"))
+            (setq last segs))
+          ;; 完成行缩进到路径深度下一级
+          (insert (make-string (1+ (length (car item))) ?\s) (cdr item) "\n")))
+      (goto-char (point-min))
+      (org-fold-show-all)
+      (setq buffer-read-only t)
+      (view-mode 1)
+      (pop-to-buffer (current-buffer)))))
 #+end_src
 *** nowis-gantt
 #+begin_src elisp

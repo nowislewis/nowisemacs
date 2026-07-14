@@ -1,0 +1,17 @@
+# -*- mode: snippet -*-
+# name: project_note
+# key: pn
+# --
+** ${1:项目名}
+:PROPERTIES:
+:CATEGORY: $1
+:ID:       `(org-id-new)`
+:END:
+
+- 目标 :: ${2:这条战线要达成什么}
+- 当前状态 :: ${3:进展到哪 / 卡在哪}
+- 关键链接 :: ${4:工单 / MR / 文档}
+
+*** 行动
+**** TODO ${5:第一个下一步动作}
+$0
