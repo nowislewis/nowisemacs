@@ -617,9 +617,10 @@ Maybe I should add a new state.
 #+end_src
 ** line number
 #+begin_src elisp
-(setopt line-number-display-limit large-file-warning-threshold)
-;; only enable line number in some modes, borrowed from lazycat-emacs
-(add-hook 'prog-mode-hook #'display-line-numbers-mode)
+(defun my/enable-line-numbers-maybe ()
+  (when (<= (buffer-size) (* 4 1024 1024))
+    (display-line-numbers-mode 1)))
+(add-hook 'prog-mode-hook #'my/enable-line-numbers-maybe)
 #+end_src
 ** nerd-icons
 #+begin_src elisp
@@ -643,13 +644,6 @@ diff-hl-mode highlights uncommitted changes on the left side of the window
   (:hook-into prog-mode)
   (:when-loaded
     (diff-hl-margin-mode)))
-#+end_src
-** fringe-mode
-#+begin_src elisp
-(setup fringe
-  (if (featurep 'fringe)
-      (fringe-mode 4)
-    ))
 #+end_src
 ** emacs-dashboard
 #+begin_src elisp :tangle no
@@ -681,7 +675,6 @@ diff-hl-mode highlights uncommitted changes on the left side of the window
   (keymap-global-set "C-l" #'recenter)
   (global-hl-line-mode)
   (:when-loaded
-    ;; debounce 0.05s，避免快速移动/滚动时频繁重画导致卡顿
     (require 'timeout)
     (timeout-debounce! 'global-hl-line-highlight 0.05)))
 #+end_src
@@ -921,7 +914,6 @@ should be check after reading the embark.el manual
   (setq prefix-help-command #'embark-prefix-help-command)
   (keymap-global-set "C-S-a" #'embark-act))
 
-;; grep-mode / embark-export 的 buffer: 按 e 进内置 grep-edit-mode, C-c C-c 确认
 ;; open pdf with zathura
 (defun nowis/open-with-zathura (file)
   "Open FILE with zathura."
@@ -1117,7 +1109,7 @@ Jump anywhere in the world
 #+begin_src elisp
 (setup tab-bar
   (setopt tab-bar-format '(tab-bar-format-history tab-bar-format-tabs tab-bar-separator)
-        tab-bar-close-button "")
+          tab-bar-close-button "")
   (transient-define-prefix tab-leader-map ()
     "Tab workspace operations"
     [["Tab"
@@ -1133,7 +1125,7 @@ Jump anywhere in the world
      ]))
 (setup tab-line
   (setq tab-line-new-button-show nil
-           tab-line-close-button-show nil)
+        tab-line-close-button-show nil)
   )
 #+end_src
 ** project
@@ -1148,8 +1140,7 @@ Jump anywhere in the world
 ** auto-insert
 #+begin_src elisp
 (setup autoinsert
-  (setq auto-insert-query t)
-  )
+  (setq auto-insert-query t))
 #+end_src
 ** midnight
 #+begin_src elisp
@@ -1162,7 +1153,6 @@ Jump anywhere in the world
 ** eshell
 #+begin_src elisp
 (setup eshell)
-;; less/htop/... inside eshell via ghostel's VT
 (setup ghostel-eshell
   (add-hook 'eshell-load-hook #'ghostel-eshell-visual-command-mode))
 #+end_src
@@ -1784,16 +1774,16 @@ Always allow composition for org-mode keywords, regardless of context."
 (defun nowis/org-setup-prettify ()
   "Set up prettify-symbols for org-mode."
   (setq-local prettify-symbols-alist
-              '(("#+begin_" . ?╭)
-                ("#+end_" . ?╰)
-                ("#+BEGIN_" . ?╭)
-                ("#+END_" . ?╰)
+              '(("#+begin_" . ?󰄾)
+                ("#+end_" . ?󰄽)
+                ("#+BEGIN_" . ?󰄾)
+                ("#+END_" . ?󰄽)
 	            ("[ ]" . 9744) ;; ☐
 	            ("[X]" . 9745) ;; ☑
 	            ("[-]" . 8863) ;; ⊟
                 (":PROPERTIES:" . ?)
                 (":LOGBOOK:" . ?)
-                (":END:" . ?╰)
+                (":END:" . ?󰄽)
                 ))
   (setq-local prettify-symbols-compose-predicate #'my/org-prettify-compose-p)
   (prettify-symbols-mode))
@@ -1805,13 +1795,6 @@ Always allow composition for org-mode keywords, regardless of context."
 (setup org-appear
 (setopt org-appear-delay 0.05)
   (:hook-into org-mode))
-#+end_src
-*** org-pretty-table
-#+begin_src elisp
-(setup org-pretty-table
-  (add-hook 'org-mode-hook (lambda () (org-pretty-table-mode)))
-  (add-hook 'org-agenda-finalize-hook (lambda () (org-pretty-table-mode)))
-)
 #+end_src
 ** ox-hugo
 #+begin_src elisp
@@ -1941,9 +1924,6 @@ Borrowed from https://github.com/rougier/emacs-GTD
       org-enforce-todo-checkbox-dependencies t
       org-log-done 'note
       org-todo-keywords '((sequence "TODO(t)" "WAIT(w)" "SMDY(s)" "|" "AXED(a)" "DONE(d)"))
-      ;; 持久化 org-element 缓存，减少多文件（含 archive）的冷启动解析开销
-      org-element-use-cache t
-      org-element-cache-persistent t
       )
 #+end_src
 *** capture
@@ -2128,10 +2108,11 @@ Borrowed from https://github.com/rougier/emacs-GTD
 (setup org-sm
   (:hook-into org-mode)
   (:autoload org-sm-read-mode)
-  (setq org-sm--files
-        (let ((dir (expand-file-name "incremental/" org-directory)))
-          (when (file-directory-p dir)
-            (directory-files-recursively dir "\\.org$"))))
+  (:when-loaded
+    (setq org-sm--files
+          (let ((dir (expand-file-name "incremental/" org-directory)))
+            (when (file-directory-p dir)
+              (directory-files-recursively dir "\\.org$")))))
   (nowis/smart-bind "M-z" #'region-active-p #'org-sm-item-extract)
   (:when-loaded
     (require 'org-sm-gptel)
@@ -2254,7 +2235,9 @@ Simple distraction-free editing. I use darkroom instead of writeroom because it'
           gptel-cache t
           gptel-max-tokens 32768
           gptel-include-reasoning nil
-          gptel-confirm-tool-calls nil)
+          gptel-confirm-tool-calls nil
+          gptel-include-tool-results 'auto
+)
   (keymap-global-set "M-p" #'gptel-send)
   (keymap-global-set "M-r" #'gptel-rewrite)
   (keymap-global-set "M-P" #'gptel)
@@ -2320,12 +2303,9 @@ Simple distraction-free editing. I use darkroom instead of writeroom because it'
     (keymap-set embark-general-map "?" #'gptel-quick-with-prompt))
   )
 #+end_src
-*** emacs-sherpa-onnx
+*** read & speek
 #+begin_src elisp
 (setup emacs-sherpa-onnx)
-#+end_src
-*** emacs-kokoro-onnx
-#+begin_src elisp
 (setup emacs-kokoro-onnx)
 #+end_src
 ** webjump
@@ -2369,20 +2349,6 @@ ESUP - Emacs Start Up Profiler
 #+begin_src elisp
 (setup esup
   (setq esup-depth 0))
-#+end_src
-** uniline
-#+begin_src elisp
-(setup uniline)
-(setup uniline-transient
-  (:autoload uniline-mode)
-  (:autoload uniline-launch-interface)
-  (:when-loaded
-    (dolist (binding '(("h" . "<left>")
-                       ("j" . "<down>")
-                       ("k" . "<up>")
-                       ("l" . "<right>")))
-      (keymap-set meow-normal-state-keymap (car binding) (cdr binding)))
-    (keymap-set uniline-mode-map "M-i" #'uniline-launch-interface)))
 #+end_src
 ** Global popup menu(nowis-popup)
 #+begin_src elisp
@@ -2439,28 +2405,4 @@ ESUP - Emacs Start Up Profiler
 ** nethack
 #+begin_src elisp
 (setup nethack)
-#+end_src
-* system-specific-config
-** android
-#+begin_src elisp
-(when (eq system-type 'android)
-  (setq touch-screen-display-keyboard t
-        overriding-text-conversion-style nil))
-(defun android-toggle-keyboard ()
-  (interactive)
-  (if touch-screen-display-keyboard
-      (progn
-        (setopt touch-screen-display-keyboard nil)
-        (tool-bar-add-item
-         "keyboard-off" 'android-toggle-keyboard
-         'android-toggle-keyboard
-         :help "Toggle keyboard")
-        (message "Disable virtual keyboard"))
-    (progn
-      (setopt touch-screen-display-keyboard t)
-      (tool-bar-add-item
-       "keyboard" 'android-toggle-keyboard
-       'android-toggle-keyboard
-       :help "Toggle keyboard")
-      (message "Enable virtual keyboard"))))
 #+end_src
