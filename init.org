@@ -535,11 +535,9 @@ Maybe I should add a new state.
 ** font
 #+begin_src elisp
 (defun font-installed-p (font-name)
-  "Check if font with FONT-NAME is available."
   (find-font (font-spec :name font-name)))
 
 (defun nowis/first-available-font (fonts)
-  "Return the first available font from FONTS list."
   (cl-find-if #'font-installed-p fonts))
 
 ;; font size
@@ -554,12 +552,8 @@ Maybe I should add a new state.
                                     "JetBrains Maple Mono"
                                     "Maple Mono SC NF"
                                     "Unifont"
-                                    ;; "InconsolataGo QiHei NF"
-                                    ;; "yaheiInconsolata"
                                     "JetBrainsMono Nerd Font"
                                     "JetBrains Mono"
-                                    "Sarasa Mono SC Nerd"
-                                    "Monaco"
                                     "Consolas")))
 ;; variable font
 (setq lewis-variable-font
@@ -567,31 +561,27 @@ Maybe I should add a new state.
                                     "Noto Sans CJK SC"
                                     "WenQuanYi Micro Hei"
                                     "LXGW WenKai"
-                                    "PingFang SC"
                                     "Times"
                                     "Helvetica"
                                     "Maple UI"
-                                    ;; "Source Han Sans SC VF"
                                     "Arial"
                                     "Times New Roman")))
 ;; symbol font
 (setq lewis-symbol-font
       (nowis/first-available-font '("Symbols Nerd Font Mono"
-                                    "Symbola"
-                                    "Symbol")))
+                                    "Symbola")))
 
 ;; mayby I should remove all this font-seting and use only default font
 (defun nowis/setup-fonts()
   "Setup fonts."
   (when (display-graphic-p)
     (if lewis-fixed-font
-          (set-face-attribute 'default nil :family lewis-fixed-font :height lewis-font-size))
+        (set-face-attribute 'default nil :family lewis-fixed-font :height lewis-font-size))
     (if lewis-variable-font
         (set-face-attribute 'variable-pitch nil :family lewis-variable-font :height 1.0))
     (if lewis-symbol-font
         (set-fontset-font t 'unicode lewis-symbol-font nil 'prepend))
     ))
-
 (nowis/setup-fonts)
 #+end_src
 
@@ -2108,11 +2098,10 @@ Borrowed from https://github.com/rougier/emacs-GTD
 (setup org-sm
   (:hook-into org-mode)
   (:autoload org-sm-read-mode)
-  (:when-loaded
-    (setq org-sm--files
-          (let ((dir (expand-file-name "incremental/" org-directory)))
-            (when (file-directory-p dir)
-              (directory-files-recursively dir "\\.org$")))))
+  (setq org-sm--files
+        (let ((dir (expand-file-name "incremental/" org-directory)))
+          (when (file-directory-p dir)
+            (directory-files-recursively dir "\\.org$"))))
   (nowis/smart-bind "M-z" #'region-active-p #'org-sm-item-extract)
   (:when-loaded
     (require 'org-sm-gptel)
