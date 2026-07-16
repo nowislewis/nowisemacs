@@ -800,6 +800,22 @@ diff-hl-mode highlights uncommitted changes on the left side of the window
 #+begin_src elisp
 (setup consult
   (keymap-global-set "C-x b" #'consult-buffer)
+  ;; 选 buffer 时自动跳到它所在的 tab（替代 tabspaces-switch-buffer-and-tab）
+  (with-eval-after-load 'consult
+    ;; 选 buffer 时：若它属于别的 tab，先把当前窗口(被 preview 污染)切回
+    ;; 原来的 buffer，再跳到目标 tab 显示。这样当前 tab 不残留该 buffer。
+    (plist-put
+     consult-source-buffer :action
+     (lambda (buf)
+       (if-let* ((tab (tab-bar-get-buffer-tab buf nil t))
+                 (name (alist-get 'name tab)))
+           (progn
+             ;; 恢复当前窗口：切回 preview 之前显示的 buffer
+             (when-let* ((prev (caar (window-prev-buffers))))
+               (switch-to-buffer prev 'norecord))
+             (tab-bar-switch-to-tab name)
+             (switch-to-buffer buf))
+         (consult--buffer-action buf)))))
   (setq register-preview-function #'consult-register-format)
   (setopt register-preview-delay 0.1
         xref-show-xrefs-function #'consult-xref
@@ -1099,7 +1115,7 @@ Jump anywhere in the world
 #+begin_src elisp
 (setup tab-bar
   (setopt tab-bar-format '(tab-bar-format-history tab-bar-format-tabs tab-bar-separator)
-          tab-bar-close-button "")
+          tab-bar-close-button-show nil)
   (transient-define-prefix tab-leader-map ()
     "Tab workspace operations"
     [["Tab"
@@ -1117,6 +1133,21 @@ Jump anywhere in the world
   (setq tab-line-new-button-show nil
         tab-line-close-button-show nil)
   )
+#+end_src
+** desktop (tmux style attach)
+#+begin_src elisp
+(setup desktop
+  (setopt desktop-dirname user-emacs-directory)
+  (add-hook 'delete-frame-functions
+            (lambda (frame)
+              (when (display-graphic-p frame)
+                (ignore-errors (desktop-save desktop-dirname t)))))
+  ;; attach: restore the full layout onto the new graphical frame.
+  ;; (add-hook 'server-after-make-frame-hook
+  ;;           (lambda ()
+  ;;             (when (display-graphic-p)
+  ;;               (ignore-errors (desktop-read desktop-dirname)))))
+)
 #+end_src
 ** project
 #+begin_src elisp
@@ -1198,32 +1229,17 @@ Jump anywhere in the world
   (get-window-with-predicate
    (lambda (w) (buffer-match-p '(derived-mode . ghostel-mode) (window-buffer w)))))
 
-(defun ghostel--ago (time)
-  (if time (format "%ds ago" (floor (float-time (time-subtract nil time)))) "-"))
-
-(defun ghostel--annotate (name)
-  (when-let* ((buf (get-buffer (substring-no-properties name))))
-    (with-current-buffer buf
-      (concat "  "
-              (propertize (abbreviate-file-name default-directory)
-                          'face 'font-lock-comment-face)
-              (propertize (format "  active %s" (ghostel--ago ghostel--last-output-time))
-                          'face 'shadow)))))
-
-(defvar ghostel-consult-source
-  (list :name "ghostel" :narrow ?g :category 'ghostel
-        :face 'consult-buffer :history 'buffer-name-history
-        :annotate #'ghostel--annotate :state #'consult--buffer-state
-        :new (lambda (name)
-               (let ((ghostel-buffer-name (format "*%s*" (string-trim name "*"))))
-                 (ghostel)))
-        :items (lambda () (mapcar #'buffer-name (ghostel--buffers)))))
-
 (defun ghostel-toggle-window (&optional choose-buffer)
-  "Toggle ghostel; C-u to pick via consult."
+  "Toggle ghostel; C-u to create a new buffer or switch to an existing one."
   (interactive "P")
   (cond
-   (choose-buffer (consult-buffer (list ghostel-consult-source)))
+   (choose-buffer
+    (let* ((names (mapcar #'buffer-name (ghostel--buffers)))
+           (name (completing-read "Ghostel buffer (new name to create): " names)))
+      (if (member name names)
+          (pop-to-buffer name)
+        (let ((ghostel-buffer-name (format "*%s*" (string-trim name "*"))))
+          (ghostel)))))
    ((ghostel--window) (delete-window (ghostel--window)))
    ((car (ghostel--buffers)) (pop-to-buffer (car (ghostel--buffers))))
    (t (ghostel))))
