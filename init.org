@@ -448,13 +448,15 @@ Maybe I should add a new state.
     ("t" "capture topic from input" org-sm-capture-topic-from-input)
     ]
    ["voice"
-    ("s d" "sherpa-dictate" emacs-sherpa-dictate)
-    ("s r" "sherpa-only-record" emacs-sherpa-only-record)
-    ("s f" "sherpa-dictate-file" emacs-sherpa-dictate-file)
-    ("s k" "kokoro-read" emacs-kokoro-read)
+    ("v d" "sherpa-dictate" emacs-sherpa-dictate)
+    ("v r" "sherpa-only-record" emacs-sherpa-only-record)
+    ("v f" "sherpa-dictate-file" emacs-sherpa-dictate-file)
+    ("v k" "kokoro-read" emacs-kokoro-read)
     ]
    ["others"
     ("r" "restart emacs" restart-emacs)
+    ("s" "desktop save" desktop-save)
+    ("l" "desktop read" desktop-read)
     ]
    ])
 #+end_src
@@ -1137,16 +1139,27 @@ Jump anywhere in the world
 ** desktop (tmux style attach)
 #+begin_src elisp
 (setup desktop
-  (setopt desktop-dirname user-emacs-directory)
-  (add-hook 'delete-frame-functions
-            (lambda (frame)
-              (when (display-graphic-p frame)
-                (ignore-errors (desktop-save desktop-dirname t)))))
-  ;; attach: restore the full layout onto the new graphical frame.
-  ;; (add-hook 'server-after-make-frame-hook
-  ;;           (lambda ()
-  ;;             (when (display-graphic-p)
-  ;;               (ignore-errors (desktop-read desktop-dirname)))))
+  (setopt desktop-dirname user-emacs-directory
+          desktop-restore-eager 8                 ; 立即只恢复 8 个可见 buffer,其余等切到时才读
+          desktop-lazy-idle-delay 5               ; 空闲 5s 再后台补齐剩余 buffer
+          desktop-lazy-verbose nil                ; 后台恢复别刷屏
+          desktop-files-not-to-save "\\(^/[^/:]*:\\|(ftp)$\\)"   ; 不碰远程
+          desktop-modes-not-to-save '(eshell-mode term-mode ghostel-mode comint-mode
+                                                  tags-table-mode dired-mode magit-status-mode
+                                                  magit-status-mode
+                                                  magit-revision-mode
+                                                  magit-diff-mode
+                                                  magit-process-mode)
+          )
+(add-hook 'delete-frame-functions
+          (lambda (frame)
+            (when (display-graphic-p frame)
+              (ignore-errors (desktop-save desktop-dirname t)))))
+;; attach: restore the full layout onto the new graphical frame.
+;; (add-hook 'server-after-make-frame-hook
+;;           (lambda ()
+;;             (when (display-graphic-p)
+;;               (ignore-errors (desktop-read desktop-dirname)))))
 )
 #+end_src
 ** project
