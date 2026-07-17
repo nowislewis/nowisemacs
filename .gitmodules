@@ -259,3 +259,6 @@
 [submodule "lib/nethack"]
 	path = lib/nethack
 	url = https://github.com/Feyorsh/nethack-el.git
+[submodule "lib/simple-httpd"]
+	path = lib/simple-httpd
+	url = https://github.com/skeeto/emacs-web-server.git

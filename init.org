@@ -2124,6 +2124,7 @@ Borrowed from https://github.com/rougier/emacs-GTD
 #+end_src
 ** org-sm
 #+begin_src elisp
+(setup simple-httpd)
 (setup org-sm
   (:hook-into org-mode)
   (:autoload org-sm-read-mode)
@@ -2156,8 +2157,7 @@ Borrowed from https://github.com/rougier/emacs-GTD
       ("?" "explain" org-sm-gptel-explain)
       ]
      ]
-    )
-  )
+    ))
 #+end_src
 ** insert from clipboard
 #+begin_src elisp
