@@ -150,14 +150,6 @@ Maybe I should add a new state.
                           )
 
   ;; normal keys
-  (setq wrap-keymap
-        (let ((map (make-keymap)))
-          (suppress-keymap map)
-          (dolist (k '("(" "[" "{" "<" "\"" "*"))
-            (define-key map k #'insert-pair))
-          map
-          ))
-
   (meow-normal-define-key '("0" . meow-expand-0)
                           '("9" . meow-expand-9)
                           '("8" . meow-expand-8)
@@ -232,7 +224,6 @@ Maybe I should add a new state.
                           '(")" . forward-sentence)
                           '("{" . backward-paragraph)
                           '("}" . forward-paragraph)
-                          (cons "\\" wrap-keymap)
                           '(";" . meow-expand-1)
                           '("'" . consult-register-load)
                           '("\"" . consult-register)
@@ -244,7 +235,6 @@ Maybe I should add a new state.
                           '("@" . meow-end-or-call-kmacro)
                           '("#" . embark-toggle-highlight)
                           '("^" . meow-join)
-                          '("*" . surround-region-with-char)
                           '("/" . isearch-forward))
   (defun meow-vim-append ()
     "Like vim, move to the end of selection, switch to INSERT state."
@@ -269,17 +259,14 @@ Maybe I should add a new state.
     (if meow-motion-mode (meow-normal-mode) (meow-motion-mode)))
   (keymap-global-set "M-\\" #'toggle-between-meow-normal-motion)
 
-  (defun surround-region-with-char (char)
-    "用指定字符包围选中区域"
-    (interactive "c输入包围字符: ")
-    (when (use-region-p)
-      (let ((start (region-beginning))
-            (end (region-end)))
-        (save-excursion
-          (goto-char end)
-          (insert char)
-          (goto-char start)
-          (insert char)))))
+  (defun nowis/surround (char)
+    "读一个 CHAR, 用它包围选区。复用 `insert-pair' 的全部能力。"
+    (interactive "c包围字符: ")
+    (unless (assq char insert-pair-alist)
+      (setq-local insert-pair-alist (cons (list char char) insert-pair-alist)))
+    (let ((last-command-event char))
+      (call-interactively #'insert-pair)))
+  (keymap-global-set "M-[" #'nowis/surround)
   )
 #+end_src
 
@@ -1773,12 +1760,6 @@ borrowed from citre, now you can always jump-back use "M-," after any jump in th
                                        (match-beginning 2) (match-end 2)
                                        (aref stars (min (1- level) 10)))))))))
     ))
-;; heading-1
-(setopt org-fontify-whole-heading-line t)
-(with-eval-after-load 'org
-  (custom-set-faces
-   '(org-level-1 ((t (:overline "#555555" :extend t))))))
-
 ;; ┌───────────────┐
 ;; │ prettify-mode │
 ;; └───────────────┘
