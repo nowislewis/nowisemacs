@@ -2109,10 +2109,7 @@ Borrowed from https://github.com/rougier/emacs-GTD
 (setup org-sm
   (:hook-into org-mode)
   (:autoload org-sm-read-mode)
-  (setq org-sm--files
-        (let ((dir (expand-file-name "incremental/" org-directory)))
-          (when (file-directory-p dir)
-            (directory-files-recursively dir "\\.org$"))))
+  (setq org-sm-directory (expand-file-name "incremental/" org-directory))
   (nowis/smart-bind "M-z" #'region-active-p #'org-sm-item-extract)
   (:when-loaded
     (require 'org-sm-gptel)
@@ -2155,7 +2152,7 @@ Borrowed from https://github.com/rougier/emacs-GTD
           (let ((gtd-dir (expand-file-name "gtd" org-directory)))
             (when (file-directory-p gtd-dir)
               (directory-files-recursively gtd-dir ".*"))))
-    (setq org-ladder-sm-files org-sm--files
+    (setq org-ladder-sm-files #'org-sm-files
           org-ladder-art-directory (concat nowis/doc-emacs-dir "67-org-ladder-arts"))
     (require 'org-ladder-sm)))
 #+end_src
