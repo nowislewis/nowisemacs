@@ -442,7 +442,7 @@ Maybe I should add a new state.
     ]
    ["others"
     ("r" "restart emacs" restart-emacs)
-    ("s" "desktop save" desktop-save)
+    ("s" "desktop save" desktop-save-in-desktop-dir)
     ("l" "desktop read" desktop-read)
     ]
    ])
@@ -1123,7 +1123,7 @@ Jump anywhere in the world
         tab-line-close-button-show nil)
   )
 #+end_src
-** desktop (tmux style attach)
+** desktop
 #+begin_src elisp
 (setup desktop
   (setopt desktop-dirname user-emacs-directory
@@ -1137,17 +1137,7 @@ Jump anywhere in the world
                                                   magit-revision-mode
                                                   magit-diff-mode
                                                   magit-process-mode)
-          )
-(add-hook 'delete-frame-functions
-          (lambda (frame)
-            (when (display-graphic-p frame)
-              (ignore-errors (desktop-save desktop-dirname t)))))
-;; attach: restore the full layout onto the new graphical frame.
-;; (add-hook 'server-after-make-frame-hook
-;;           (lambda ()
-;;             (when (display-graphic-p)
-;;               (ignore-errors (desktop-read desktop-dirname)))))
-)
+          ))
 #+end_src
 ** project
 #+begin_src elisp
@@ -2051,15 +2041,23 @@ Borrowed from https://github.com/rougier/emacs-GTD
 
 ;; ── 按完整 oldpath 层级浏览近期完成 ──
 (defun nowis/review--entry ()
-  "当前 DONE 条目 → (路径段列表 . 显示行)，不符合返回 nil。"
+  "当前 DONE 条目 → (路径段列表 . 显示行)，不符合返回 nil。
+跳转链接优先用精确的 file+行号+文本搜索，保证归档条目也能点回原处；
+id 仅作兜底。"
   (when-let* ((closed (org-entry-get nil "CLOSED"))
               (title (org-get-heading t t t t)))
     (let* ((olp (org-entry-get nil "ARCHIVE_OLPATH"))
            (segs (if olp (split-string olp "/" t "[ \t]+") (org-get-outline-path)))
            (segs (or segs (list "其他")))
            (date (substring closed 1 11))
+           (file (buffer-file-name (buffer-base-buffer)))
            (id (org-id-get))
-           (link (if id (format "[[id:%s][%s]]" id title) title)))
+           ;; 优先 file+标题搜索（datetree 归档也能命中），id 兵底
+           (link (cond
+                  (file (format "[[file:%s::%s][%s]]"
+                                file (org-link-heading-search-string title) title))
+                  (id   (format "[[id:%s][%s]]" id title))
+                  (t    title))))
       (cons segs (format "- [%s] %s" date link)))))
 
 (defun nowis/review-done-by-project (days)
@@ -2093,7 +2091,6 @@ Borrowed from https://github.com/rougier/emacs-GTD
       (goto-char (point-min))
       (org-fold-show-all)
       (setq buffer-read-only t)
-      (view-mode 1)
       (pop-to-buffer (current-buffer)))))
 #+end_src
 *** nowis-gantt
