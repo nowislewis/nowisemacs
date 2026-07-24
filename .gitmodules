@@ -262,3 +262,6 @@
 [submodule "lib/simple-httpd"]
 	path = lib/simple-httpd
 	url = https://github.com/skeeto/emacs-web-server.git
+[submodule "lib/grip-mode"]
+	path = lib/grip-mode
+	url = https://github.com/seagle0128/grip-mode.git

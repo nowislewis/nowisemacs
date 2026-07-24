@@ -1169,11 +1169,9 @@ Jump anywhere in the world
 #+end_src
 ** ghostel
 #+begin_src elisp
-;; meow insert -> char-mode (live terminal); ESC -> line-mode (meow editing).
 (defun ghostel--meow-to-line ()
   (when ghostel--term (ghostel-line-mode)))
 (defun ghostel--meow-setup ()
-  ;; terminal isn't created until after ghostel-mode-hook; just register hooks.
   (add-hook 'meow-insert-enter-hook #'ghostel-char-mode nil t)
   (add-hook 'meow-insert-exit-hook  #'ghostel--meow-to-line nil t))
 
@@ -1191,11 +1189,20 @@ Jump anywhere in the world
 (with-eval-after-load 'meow
   (add-hook 'ghostel-mode-hook #'ghostel--meow-setup))
 
+;; 终端里的 `ff'(= ghostel_cmd find-file-other-window)在 tramp 会话下
+;; 收到的是裸远程路径;这里把它 tramp 化,让本地/tramp-rpc 两种情况统一。
+(defun ghostel-find-file-other-window (path)
+  (find-file-other-window (concat (or (file-remote-p default-directory) "") path)))
+
 (setup ghostel
   (setq ghostel-ignore-cursor-change t
-        ghostel-shell "zsh")
+        ghostel-shell "zsh"
+        ghostel-tramp-shell-integration t
+)
   (keymap-global-set "M-`" #'ghostel-toggle-window)
   (:when-loaded
+    (setf (alist-get "find-file-other-window" ghostel-eval-cmds nil nil #'equal)
+          '(ghostel-find-file-other-window))
     (define-key ghostel-char-mode-map (kbd "<escape>") #'ghostel-char-escape)
     (define-key ghostel-char-mode-map (kbd "M-q") #'ghostel-char-send-escape)
     (define-key ghostel-char-mode-map (kbd "M-`") #'ghostel-toggle-window)
@@ -1333,6 +1340,10 @@ Emacs major-mode to work with Beancount ledger files
 *** csv-mode
 #+begin_src elisp
 (setup csv-mode)
+#+end_src
+*** grip-mode
+#+begin_src elisp
+(setup grip-mode)
 #+end_src
 ** Useful programing tools
 *** xref related
