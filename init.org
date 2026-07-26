@@ -2373,7 +2373,7 @@ ESUP - Emacs Start Up Profiler
    ["org-sm"
     ("r" "review confirm" org-sm-review-confirm :transient t)
     ("s" "start-review" org-sm-review-start)
-    ("D" "dashboard" org-sm-dashboard)
+    ("l" "tree" org-sm-tree)
     ("e" "topic from clipboard" org-sm-capture-topic)
     ("E" "change target"
      (lambda () (interactive) (org-sm-capture-topic '(-1))))]
