@@ -140,8 +140,6 @@ Maybe I should add a new state.
                           '("H" . meow-left-expand)
                           '("l" . meow-right)
                           '("L" . meow-right-expand)
-                          '("v i" . meow-inner-of-thing)
-                          '("v a" . meow-bounds-of-thing)
                           '("y" . meow-save)
                           '("<escape>" . ignore)
                           '("." . repeat)
@@ -2130,13 +2128,17 @@ id 仅作兜底。"
       ("r" "review confirm" org-sm-review-confirm :transient t)
       ("s" "start-review" org-sm-review-start)
       ("a" "abort" org-sm-review-abort)
-      ("l" "list" org-sm-review-list)
+      ("l" "tree" org-sm-tree)
       ]
      ["item"
       ("m" "mark" org-sm-item-mark)
       ("d" "dismiss" org-sm-item-dismiss :transient t)
       ("u" "undismiss" org-sm-item-undismiss)
       ("z" "extract" org-sm-item-extract)
+      ]
+     ["read-point"
+      ("p" "set read point" org-sm-set-readpoint)
+      ("o" "goto source" org-sm-goto-source)
       ]
      ["gpt"
       ("f" "refine" org-sm-gptel-refine)
@@ -2371,6 +2373,7 @@ ESUP - Emacs Start Up Profiler
    ["org-sm"
     ("r" "review confirm" org-sm-review-confirm :transient t)
     ("s" "start-review" org-sm-review-start)
+    ("D" "dashboard" org-sm-dashboard)
     ("e" "topic from clipboard" org-sm-capture-topic)
     ("E" "change target"
      (lambda () (interactive) (org-sm-capture-topic '(-1))))]
