@@ -218,6 +218,8 @@ Maybe I should add a new state.
 
                           '("-" . negative-argument)
                           '("=" . indent-region)
+                          '(">" . indent-rigidly-right-to-tab-stop)
+                          '("<" . indent-rigidly-left-to-tab-stop)
                           '("(" . backward-sentence)
                           '(")" . forward-sentence)
                           '("{" . backward-paragraph)
@@ -250,6 +252,7 @@ Maybe I should add a new state.
         (meow--direction-forward)
         (meow--cancel-selection))
       (meow--switch-state 'insert)))
+
   (meow-global-mode 1)
 
   (defun toggle-between-meow-normal-motion()
