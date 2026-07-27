@@ -1167,77 +1167,15 @@ Jump anywhere in the world
 #+end_src
 ** ghostel
 #+begin_src elisp
-(defun ghostel--meow-to-line ()
-  (when ghostel--term (ghostel-line-mode)))
-(defun ghostel--meow-setup ()
-  (add-hook 'meow-insert-enter-hook #'ghostel-char-mode nil t)
-  (add-hook 'meow-insert-exit-hook  #'ghostel--meow-to-line nil t))
-
-;; In char-mode ESC exits to line-mode; M-q sends a literal ESC to the terminal.
-(defun ghostel-char-escape ()
-  (interactive)
-  (if (bound-and-true-p meow-insert-mode)
-      (meow-insert-exit)
-    (ghostel--meow-to-line)))
-
-(defun ghostel-char-send-escape ()
-  (interactive)
-  (ghostel-send-key "escape"))
-
-(with-eval-after-load 'meow
-  (add-hook 'ghostel-mode-hook #'ghostel--meow-setup))
-
-;; 终端里的 `ff'(= ghostel_cmd find-file-other-window)在 tramp 会话下
-;; 收到的是裸远程路径;这里把它 tramp 化,让本地/tramp-rpc 两种情况统一。
-(defun ghostel-find-file-other-window (path)
-  (find-file-other-window (concat (or (file-remote-p default-directory) "") path)))
-
 (setup ghostel
   (setq ghostel-ignore-cursor-change t
         ghostel-shell "zsh"
-        ghostel-tramp-shell-integration t
-)
-  (keymap-global-set "M-`" #'ghostel-toggle-window)
+        ghostel-tramp-shell-integration t)
+  (autoload 'nowis-ghostel-toggle-window "nowis-ghostel" nil t)
+  (keymap-global-set "M-`" #'nowis-ghostel-toggle-window)
   (:when-loaded
-    (setf (alist-get "find-file-other-window" ghostel-eval-cmds nil nil #'equal)
-          '(ghostel-find-file-other-window))
-    (define-key ghostel-char-mode-map (kbd "<escape>") #'ghostel-char-escape)
-    (define-key ghostel-char-mode-map (kbd "M-q") #'ghostel-char-send-escape)
-    (define-key ghostel-char-mode-map (kbd "M-`") #'ghostel-toggle-window)
-    (define-key ghostel-char-mode-map (kbd "C-\\") #'toggle-input-method)
-    ;; keep point after a jump instead of snapping back to the prompt
-    (with-eval-after-load 'avy
-      (advice-add 'avy-action-goto :after #'ghostel-maybe-leave-input))
-    (add-to-list 'display-buffer-alist
-                 '((lambda (buffer-or-name _)
-                     (with-current-buffer buffer-or-name
-                       (derived-mode-p 'ghostel-mode)))
-                   (display-buffer-reuse-window display-buffer-at-bottom)
-                   (reusable-frames . visible)
-                   (window-height . 0.3)))))
-
-;; match-buffers/buffer-list are already MRU-ordered, so car = most recent.
-(defun ghostel--buffers ()
-  (match-buffers '(derived-mode . ghostel-mode)))
-
-(defun ghostel--window ()
-  (get-window-with-predicate
-   (lambda (w) (buffer-match-p '(derived-mode . ghostel-mode) (window-buffer w)))))
-
-(defun ghostel-toggle-window (&optional choose-buffer)
-  "Toggle ghostel; C-u to create a new buffer or switch to an existing one."
-  (interactive "P")
-  (cond
-   (choose-buffer
-    (let* ((names (mapcar #'buffer-name (ghostel--buffers)))
-           (name (completing-read "Ghostel buffer (new name to create): " names)))
-      (if (member name names)
-          (pop-to-buffer name)
-        (let ((ghostel-buffer-name (format "*%s*" (string-trim name "*"))))
-          (ghostel)))))
-   ((ghostel--window) (delete-window (ghostel--window)))
-   ((car (ghostel--buffers)) (pop-to-buffer (car (ghostel--buffers))))
-   (t (ghostel))))
+    (require 'nowis-ghostel)
+    (nowis-ghostel-setup)))
 #+end_src
 * git
 ** magit
