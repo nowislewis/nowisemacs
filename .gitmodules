@@ -265,3 +265,6 @@
 [submodule "lib/grip-mode"]
 	path = lib/grip-mode
 	url = https://github.com/seagle0128/grip-mode.git
+[submodule "lib/dired-rsync"]
+	path = lib/dired-rsync
+	url = https://github.com/stsquad/dired-rsync.git

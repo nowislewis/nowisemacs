@@ -89,6 +89,7 @@
                 " "
                 (:propertize ("%I") face nowis-ml-dim)
                 "  "
+                (dired-rsync-modeline-status dired-rsync-modeline-status)
                 (vc-mode vc-mode)
                 " "
                 (:propertize mode-name face bold)

@@ -1081,6 +1081,13 @@ Jump anywhere in the world
     (setq dired-preview-delay 0.1)
     (:autoload dired-preview-mode))
 #+end_src
+*** dired-rsync
+#+begin_src elisp
+(setup dired-rsync)
+(setup dired
+  (:bind "C" dired-rsync
+         "C-c C-x" dired-rsync-transient))
+#+end_src
 ** structure browsing
 *** imenu-list
 #+begin_src elisp
