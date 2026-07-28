@@ -1511,12 +1511,6 @@ borrowed from citre, now you can always jump-back use "M-," after any jump in th
 
           ;; habit
           org-habit-following-days 2
-          ;; todo keywords
-          org-todo-keyword-faces '(("TODO"    :foreground "red"    :weight bold)
-                                   ("WAIT"    :foreground "goldenrod"     :weight bold)
-                                   ("SMDY"    :foreground "medium purple" :weight bold)
-                                   ("DONE"    :foreground "forest green"  :weight bold)
-                                   ("AXED"    :foreground "gray55"        :weight bold))
           ;; save state changes into logbook
           org-log-state-notes-into-drawer t
           ;; plain list
@@ -1663,13 +1657,7 @@ borrowed from citre, now you can always jump-back use "M-," after any jump in th
             org-ellipsis " "
             org-hide-emphasis-markers t
             org-habit-graph-column 50
-            org-agenda-tags-column 0
-            org-emphasis-alist '(("*" help-key-binding)
-                                 ("/" italic)
-                                 ("_" underline)
-                                 ("=" org-verbatim verbatim)
-                                 ("~" org-code verbatim)
-                                 ("+" (:strike-through t))))))
+            org-agenda-tags-column 0)))
 #+end_src
 *** org beauty
 #+begin_src elisp
