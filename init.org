@@ -2278,7 +2278,11 @@ Simple distraction-free editing. I use darkroom instead of writeroom because it'
 ** tui
 #+begin_src elisp
 (unless (display-graphic-p)
-  (xterm-mouse-mode))
+  (xterm-mouse-mode)
+  (require 'term/screen)
+  (add-to-list 'xterm-screen-extra-capabilities 'setSelection)
+  (setq xterm-max-cut-length 1000000)
+  (xterm--init-activate-set-selection))
 #+end_src
 ** macos-ocr
 #+begin_src elisp
