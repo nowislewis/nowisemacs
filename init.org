@@ -528,6 +528,7 @@ Maybe I should add a new state.
 ;; variable font
 (setq lewis-variable-font
       (nowis/first-available-font '("IBM Plex Sans"
+                                    "Noto Serif CJK SC"
                                     "Noto Sans CJK SC"
                                     "WenQuanYi Micro Hei"
                                     "LXGW WenKai"
@@ -1267,10 +1268,6 @@ Emacs major-mode to work with Beancount ledger files
 #+begin_src elisp
 (setup csv-mode)
 #+end_src
-*** grip-mode
-#+begin_src elisp
-(setup grip-mode)
-#+end_src
 ** Useful programing tools
 *** xref related
 **** xref
@@ -1491,47 +1488,48 @@ borrowed from citre, now you can always jump-back use "M-," after any jump in th
 (setup org
   (setq system-time-locale "C") ;; ensure time format is always english
   (setq org-startup-folded nil)
-  (setopt org-startup-indented t
-        org-startup-with-inline-images nil
-        org-hide-block-startup t
-        org-imenu-depth 8
-        org-return-follows-link t
-        org-id-link-to-org-use-id t ;; Create an ID if needed to make a link to the current entry.
+  (setopt org-startup-indented nil
+          org-startup-with-inline-images nil
+          org-startup-numerated nil
+          org-hide-block-startup t
+          org-imenu-depth 8
+          org-return-follows-link t
+          org-id-link-to-org-use-id t ;; Create an ID if needed to make a link to the current entry.
 
-        org-link-frame-setup '((vm . vm-visit-folder-other-frame)
-                               (vm-imap . vm-visit-imap-folder-other-frame)
-                               (gnus . org-gnus-no-new-news)
-                               (file . find-file)
-                               (wl . wl-other-frame))
+          org-link-frame-setup '((vm . vm-visit-folder-other-frame)
+                                 (vm-imap . vm-visit-imap-folder-other-frame)
+                                 (gnus . org-gnus-no-new-news)
+                                 (file . find-file)
+                                 (wl . wl-other-frame))
 
-        org-image-actual-width 800 ;; this will use 600 for width for all the images.
-        org-preview-latex-image-directory (expand-file-name "ltximg/" user-emacs-directory)
-        org-special-ctrl-a/e t
-        ;; org-id
-        org-id-method 'ts
-        org-id-ts-format "%Y%m%dT%H%M%S_%6N"
+          org-image-actual-width 800 ;; this will use 800 for width for all the images.
+          org-preview-latex-image-directory (expand-file-name "ltximg/" user-emacs-directory)
+          org-special-ctrl-a/e t
+          ;; org-id
+          org-id-method 'ts
+          org-id-ts-format "%Y%m%dT%H%M%S_%6N"
 
-        ;; habit
-        org-habit-following-days 2
-        ;; todo keywords
-        org-todo-keyword-faces '(("TODO"    :foreground "red"    :weight bold)
-                                 ("WAIT"    :foreground "goldenrod"     :weight bold)
-                                 ("SMDY"    :foreground "medium purple" :weight bold)
-                                 ("DONE"    :foreground "forest green"  :weight bold)
-                                 ("AXED"    :foreground "gray55"        :weight bold))
-        ;; save state changes into logbook
-        org-log-state-notes-into-drawer t
-        ;; plain list
-        org-list-demote-modify-bullet '(("+" . "-") ("-" . "+") ("*" . "+"))
-        ;; org-attach
-        org-attach-id-dir (concat nowis/doc-emacs-dir "02-binary-file/03-org_attachs")
-        ;; src
-        org-src-content-indentation 0
-        org-confirm-babel-evaluate nil
-        org-src-window-setup 'split-window-below
-        ;; export
-        org-use-sub-superscripts nil
-        org-export-with-sub-superscripts nil)
+          ;; habit
+          org-habit-following-days 2
+          ;; todo keywords
+          org-todo-keyword-faces '(("TODO"    :foreground "red"    :weight bold)
+                                   ("WAIT"    :foreground "goldenrod"     :weight bold)
+                                   ("SMDY"    :foreground "medium purple" :weight bold)
+                                   ("DONE"    :foreground "forest green"  :weight bold)
+                                   ("AXED"    :foreground "gray55"        :weight bold))
+          ;; save state changes into logbook
+          org-log-state-notes-into-drawer t
+          ;; plain list
+          org-list-demote-modify-bullet '(("+" . "-") ("-" . "+") ("*" . "+"))
+          ;; org-attach
+          org-attach-id-dir (concat nowis/doc-emacs-dir "02-binary-file/03-org_attachs")
+          ;; src
+          org-src-content-indentation 0
+          org-confirm-babel-evaluate nil
+          org-src-window-setup 'split-window-below
+          ;; export
+          org-use-sub-superscripts nil
+          org-export-with-sub-superscripts nil)
   (:when-loaded
     (require 'org-tempo) ;; so that <s is useful
     ))
@@ -1661,31 +1659,38 @@ borrowed from citre, now you can always jump-back use "M-," after any jump in th
 (setup org
   (:when-loaded
     (setopt org-auto-align-tags nil
-          org-tags-column 0
-          org-ellipsis " "
-          org-hide-emphasis-markers t
-          org-habit-graph-column 50
-          org-agenda-tags-column 0
-          org-emphasis-alist '(("*" help-key-binding)
-                               ("/" italic)
-                               ("_" underline)
-                               ("=" org-verbatim verbatim)
-                               ("~" org-code verbatim)
-                               ("+" (:strike-through t))))))
+            org-tags-column 0
+            org-ellipsis " "
+            org-hide-emphasis-markers t
+            org-habit-graph-column 50
+            org-agenda-tags-column 0
+            org-emphasis-alist '(("*" help-key-binding)
+                                 ("/" italic)
+                                 ("_" underline)
+                                 ("=" org-verbatim verbatim)
+                                 ("~" org-code verbatim)
+                                 ("+" (:strike-through t))))))
 #+end_src
 *** org beauty
 #+begin_src elisp
 (setup org
   (:when-loaded
-    (setopt org-hide-leading-stars t)
-    (font-lock-add-keywords 'org-mode
-                            `(("^\\(\\**\\)\\(\\*\\) "
-                               (2 (prog1 nil
-                                    (let* ((level (- (match-end 2) (match-beginning 1))) ; 当前标题的层级
-                                           (stars ["󰯬" "󰯯" "󰯲" "󰯵" "󰯸" "󰯻" "󰯾" "󰰁" "󰰄" "󰰇" "󰰊"]))
-                                      (compose-region
-                                       (match-beginning 2) (match-end 2)
-                                       (aref stars (min (1- level) 10)))))))))
+    (setopt org-hide-leading-stars t
+            org-fontify-whole-heading-line nil
+            org-level-color-stars-only t)
+    (defconst nowis/org-heading-stars
+      ["󰯬" "󰯯" "󰯲" "󰯵" "󰯸" "󰯻"
+       "󰯾" "󰰁" "󰰄" "󰰇" "󰰊"])
+
+    (font-lock-add-keywords
+     'org-mode
+     `(("^\\(\\*+\\) "
+        (1 (let ((end (match-end 1)))
+             (compose-region
+              (1- end) end
+              (aref nowis/org-heading-stars
+                    (min (1- (- end (match-beginning 1))) 10)))
+             nil)))))
     ))
 ;; ┌───────────────┐
 ;; │ prettify-mode │
@@ -1701,26 +1706,28 @@ Always allow composition for org-mode keywords, regardless of context."
 (defun nowis/org-setup-prettify ()
   "Set up prettify-symbols for org-mode."
   (setq-local prettify-symbols-alist
-              '(("#+begin_" . ?󰄾)
-                ("#+end_" . ?󰄽)
-                ("#+BEGIN_" . ?󰄾)
-                ("#+END_" . ?󰄽)
+              '(("#+begin_" . ?)
+                ("#+end_" . ?)
+                ("#+BEGIN_" . ?)
+                ("#+END_" . ?)
 	            ("[ ]" . 9744) ;; ☐
 	            ("[X]" . 9745) ;; ☑
 	            ("[-]" . 8863) ;; ⊟
                 (":PROPERTIES:" . ?)
                 (":LOGBOOK:" . ?)
-                (":END:" . ?󰄽)
+                (":END:" . ?)
                 ))
   (setq-local prettify-symbols-compose-predicate #'my/org-prettify-compose-p)
-  (prettify-symbols-mode))
+  (prettify-symbols-mode 1))
 
 (add-hook 'org-mode-hook #'nowis/org-setup-prettify)
 #+end_src
 *** org-appear
 #+begin_src elisp
 (setup org-appear
-(setopt org-appear-delay 0.05)
+  (setopt org-appear-delay 0.1
+          org-appear-trigger 'on-change
+          org-appear-autolinks t)
   (:hook-into org-mode))
 #+end_src
 ** ox-hugo
