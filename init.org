@@ -8,8 +8,6 @@ I fell in love with denote, so previous *org-roam* configs were refiled into [[f
 (setopt gc-cons-threshold 128000000
       gc-cons-percentage 0.2)
 (setopt package-enable-at-startup nil)
-
-;; Inhibit resizing frame
 (setopt frame-inhibit-implied-resize t)
 ;; disable warning
 (setopt byte-compile-warnings nil)
@@ -23,20 +21,12 @@ I fell in love with denote, so previous *org-roam* configs were refiled into [[f
 (setq package--init-file-ensured t)
 ;; speed font
 ;; (add-to-list 'default-frame-alist '(font . "Maple Mono SC NF"))
-
-;; add support for android port of emacs
-(if (eq system-type 'android)
-    (progn
-      (setenv "PATH" (format "%s:%s" "/data/data/com.termux/files/usr/bin"
-		                     (getenv "PATH")))
-      (push "/data/data/com.termux/files/usr/bin" exec-path)))
 #+end_src
 ** basic modes
 #+begin_src elisp
 ;;; -*- lexical-binding: t; -*-
 ;; basic modes
 (setopt gc-cons-threshold 128000000)
-
 ;; turn off native-comp on macos
 (if (eq system-type 'darwin)
     (setq native-comp-speed -1))
@@ -301,7 +291,6 @@ Maybe I should add a new state.
 (defun nowis/find-config-file   () (interactive) (find-file nowis/config-file))
 (defun nowis/find-doc-emacs-dir () (interactive) (find-file nowis/doc-emacs-dir))
 (defun nowis/find-dotfiles      () (interactive) (find-file "~/dotfiles"))
-
 (transient-define-prefix file-leader-map()
   "Define leader-key map for file-related functions"
   [["config"
@@ -2176,13 +2165,12 @@ Simple distraction-free editing. I use darkroom instead of writeroom because it'
 (setup gptel
   (setopt gptel-default-mode 'org-mode
           gptel-highlight-methods '(face)
-          gptel-model 'claude-opus-4.8
+          gptel-model 'gpt-5.6-sol
           gptel-cache t
           gptel-max-tokens 32768
           gptel-include-reasoning nil
           gptel-confirm-tool-calls nil
-          gptel-include-tool-results 'auto
-)
+          gptel-include-tool-results 'auto)
   (keymap-global-set "M-p" #'gptel-send)
   (keymap-global-set "M-r" #'gptel-rewrite)
   (keymap-global-set "M-P" #'gptel)
@@ -2194,7 +2182,7 @@ Simple distraction-free editing. I use darkroom instead of writeroom because it'
                     :host "llm-gateway.momenta.works"
                     :key 'gptel-api-key
                     :stream t
-                    :models '(claude-sonnet-5 claude-opus-4.8 gpt-5.6-terra gpt-5.6-luna)))
+                    :models '(claude-opus-4.8 gpt-5.6-sol gpt-5.6-terra gpt-5.6-luna)))
     (gptel-make-openai "chatanywhere"
       :host "api.chatanywhere.tech"
       :key 'gptel-api-key
