@@ -1664,8 +1664,8 @@ borrowed from citre, now you can always jump-back use "M-," after any jump in th
 (setup org
   (:when-loaded
     (setopt org-hide-leading-stars t
-            org-fontify-whole-heading-line nil
-            org-level-color-stars-only t)
+            org-fontify-whole-heading-line t
+            org-level-color-stars-only nil)
     (defconst nowis/org-heading-stars
       ["󰯬" "󰯯" "󰯲" "󰯵" "󰯸" "󰯻"
        "󰯾" "󰰁" "󰰄" "󰰇" "󰰊"])
