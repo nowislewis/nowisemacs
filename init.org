@@ -410,10 +410,7 @@ Maybe I should add a new state.
    ["capture"
     ("c" "capture" org-capture)
     ("d" "done works" nowis/gtd-log-time)
-    ("e" "capture topic" org-sm-capture-topic)
-    ("E" "capture topic (change target)"
-     (lambda () (interactive) (org-sm-capture-topic '(-1))))
-    ("t" "capture topic from input" org-sm-capture-topic-from-input)
+    ("e" "capture (org-sm)" org-sm-capture)
     ]
    ["voice"
     ("v d" "sherpa-dictate" emacs-sherpa-dictate)
@@ -1866,6 +1863,18 @@ Borrowed from https://github.com/rougier/emacs-GTD
                       ":END:"))))
     ))
 #+end_src
+
+#+RESULTS:
+| i | Inbox | entry | (file gtd/inbox.org) | * TODO [#C] %? |
+:PROPERTIES:
+:CREATED: %U
+:END:
+| d | Done | entry | (file+headline gtd/action.org Done) | * DONE %?  :%^{Area | misc | work | grow | health | family | life}: |
+CLOSED: %U
+:PROPERTIES:
+:EFFORT: %^{Effort|0:05|0:15|0:30|1:00|2:00|4:00}
+:END: |
+
 *** refile
 #+begin_src elisp
 (setup org
@@ -2042,7 +2051,6 @@ id 仅作兜底。"
   (nowis/smart-bind "M-z" #'region-active-p #'org-sm-item-extract)
   (:when-loaded
     (require 'org-sm-gptel)
-    (org-sm-setup-capture)
     )
   (transient-define-prefix org-sm-transient-map()
     "Define transient-key map for org-sm functions"
@@ -2052,6 +2060,7 @@ id 仅作兜底。"
       ("s" "start-review" org-sm-review-start)
       ("a" "abort" org-sm-review-abort)
       ("l" "tree" org-sm-tree)
+      ("c" "capture" org-sm-capture)
       ]
      ["item"
       ("m" "mark" org-sm-item-mark)
@@ -2066,6 +2075,7 @@ id 仅作兜底。"
      ["gpt"
       ("f" "refine" org-sm-gptel-refine)
       ("?" "explain" org-sm-gptel-explain)
+      ("A" "extract-split" org-sm-gptel-extract-split)
       ]
      ]
     ))
@@ -2262,6 +2272,8 @@ Simple distraction-free editing. I use darkroom instead of writeroom because it'
 #+begin_src elisp
 (unless (display-graphic-p)
   (xterm-mouse-mode)
+  (mouse-wheel-mode 1)
+  (setq mouse-wheel-scroll-amount '(10))
   (require 'term/screen)
   (add-to-list 'xterm-screen-extra-capabilities 'setSelection)
   (setq xterm-max-cut-length 1000000)
@@ -2300,16 +2312,14 @@ ESUP - Emacs Start Up Profiler
     ("r" "review confirm" org-sm-review-confirm :transient t)
     ("s" "start-review" org-sm-review-start)
     ("l" "tree" org-sm-tree)
-    ("e" "topic from clipboard" org-sm-capture-topic)
-    ("E" "change target"
-     (lambda () (interactive) (org-sm-capture-topic '(-1))))]
+    ("e" "capture (org-sm)" org-sm-capture)]
 
    ["Bookmarks"
     ("j" "open bookmark" nowis-popup-bookmark-jump)
     ("a" "add bookmark"  nowis-popup-bookmark-add)]
    ]
 [
-  ["Quit"
+ ["Quit"
    ("q" "quit" delete-frame)]
   ["macro"
    ("!" "kmacro-start" kmacro-start-macro-or-insert-counter :transient t)
