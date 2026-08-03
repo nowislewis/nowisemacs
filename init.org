@@ -2050,6 +2050,9 @@ id 仅作兜底。"
   (setq org-sm-directory (expand-file-name "incremental/" org-directory))
   (nowis/smart-bind "M-z" #'region-active-p #'org-sm-item-extract)
   (:when-loaded
+    ;; AI acts on existing cards only -- capture stays raw.  Inside the card
+    ;; workbench ("A" below): C-c C-a = AI refine + split off child cards,
+    ;; C-c C-i = AI refine the text at point, C-c C-c = commit.
     (require 'org-sm-gptel)
     )
   (transient-define-prefix org-sm-transient-map()
@@ -2072,10 +2075,9 @@ id 仅作兜底。"
       ("p" "set read point" org-sm-set-readpoint)
       ("o" "goto source" org-sm-goto-source)
       ]
-     ["gpt"
-      ("f" "refine" org-sm-gptel-refine)
+     ["ai"
       ("?" "explain" org-sm-gptel-explain)
-      ("A" "extract-split" org-sm-gptel-extract-split)
+      ("w" "workbench: refine/split" org-sm-card-workbench)
       ]
      ]
     ))
