@@ -832,40 +832,70 @@ diff-hl-mode highlights uncommitted changes on the left side of the window
     ))
 #+end_src
 * 补全
-** minibuffer 杂项
+** minibuffer basic
 #+begin_src elisp
 (setopt completions-detailed t            ;; C-h f/v 等带类型+文档说明
         enable-recursive-minibuffers t    ;; 允许嵌套 minibuffer
         ;; M-x 隐藏当前 mode 用不了的命令
         read-extended-command-predicate #'command-completion-default-include-p
         ;; 光标不进 prompt
-        minibuffer-prompt-properties '(read-only t cursor-intangible t face minibuffer-prompt))
-
-;; 递归 minibuffer 时显示嵌套层级
-(minibuffer-depth-indicate-mode 1)
+        minibuffer-prompt-properties '(read-only t cursor-intangible t face minibuffer-prompt)
+        minibuffer-depth-indicate-mode t
+        minibuffer-electric-default-mode t)
 #+end_src
-** vertico
+** complete-buffer
 #+begin_src elisp
-(setup vertico
-  (:also-load vertico-directory)
-  (vertico-mode)
-  (setopt vertico-cycle t
-          vertico-count 15)
-  (:with-map vertico-map
-    (:bind "RET"   vertico-directory-enter
-           "DEL"   vertico-directory-delete-char
-           "M-DEL" vertico-directory-delete-word))
-  ;; 整理 shadowed 文件名 (如 ~/foo//etc/)
-  (add-hook 'rfn-eshadow-update-overlay-hook #'vertico-directory-tidy))
-#+end_src
+  (add-hook 'completion-list-mode-hook (lambda () (setq-local truncate-lines t)))
+  (keymap-global-set "M-i" #'completion-help-at-point)
+  (use-package minibuffer
+    :ensure nil
+    :bind (:map minibuffer-visible-completions-up-down-map
+                ("C-n" . minibuffer-next-completion)
+                ("C-p" . minibuffer-previous-completion))
+    :hook ((minibuffer-setup . cursor-intangible-mode))
+    :custom
+    (completion-eager-display t)
+    (completion-eager-update t)
+    (minibuffer-visible-completions 'up-down)
+    (completion-auto-select t)
+    (completion-show-help nil)
+    (completion-ignore-case t)
+    (completions-format 'one-column)
+    (completions-max-height 15)
+    (completions-sort 'historical)
+    (read-buffer-completion-ignore-case t)
+    (read-file-name-completion-ignore-case t))
 
+  (setup completion-preview
+    (setq completion-preview-idle-delay 0.1
+          completion-preview-minimum-symbol-length 2
+          completion-preview-completion-styles '(basic))
+    (global-completion-preview-mode 1)
+    (:when-loaded
+      (keymap-set completion-preview-active-mode-map
+                  "M-i" #'completion-help-at-point)
+      )
+    )
+  (defun vertico-directory-tidy ()
+    "Tidy shadowed file name, see `rfn-eshadow-overlay'."
+    (when (eq this-command #'self-insert-command)
+      (dolist (ov '(tramp-rfn-eshadow-overlay rfn-eshadow-overlay))
+        (when (and (boundp ov)
+                   (setq ov (symbol-value ov))
+                   (overlay-buffer ov)
+                   (= (point) (point-max))
+                   (> (point) (overlay-end ov)))
+          (delete-region (overlay-start ov) (overlay-end ov))))))
+  (add-hook 'rfn-eshadow-update-overlay-hook #'vertico-directory-tidy)
+#+end_src
 ** Orderless and pinyinlib
 #+begin_src elisp
 (setup orderless
   (setq completion-category-defaults nil)
   (setopt completion-styles '(orderless basic)
-        completion-category-overrides '((file (styles partial-completion)))
-        completion-pcm-leading-wildcard t) ;; Emacs31: partial-completion 近似 substring
+          completion-category-overrides '((file (styles partial-completion)))
+          orderless-expand-substring nil
+          completion-pcm-leading-wildcard t)
   (:when-loaded
     (require 'pinyinlib)
     (defun completion--regex-pinyin (str)
@@ -1321,35 +1351,8 @@ borrowed from citre, now you can always jump-back use "M-," after any jump in th
 #+end_src
 *** Complete
 **** corfu related
-***** corfu
+***** cape
 #+begin_src elisp
-(setup corfu
-  (setopt corfu-cycle t
-        corfu-auto t
-        corfu-quit-no-match t        ;; Automatically quit if there is no match
-        corfu-preview-current nil
-        corfu-auto-prefix 2
-        corfu-scroll-margin 5
-        )
-  (:with-map corfu-map
-    (:bind "<escape>" my-corfu-quit
-           "C-SPC" corfu-insert-separator
-           "RET" corfu-send
-           ))
-
-  (defun my-corfu-quit()
-    "when in corfu-map, quit corfu-selection and return to meow normal mode"
-    (interactive)
-    (corfu-quit)
-    (meow-insert-exit))
-
-  (global-corfu-mode)
-  )
-(setup corfu-popupinfo
-  (setopt corfu-popupinfo-delay '(0.5 . 0.5))
-  (corfu-popupinfo-mode)
-  )
-
 (setup cape
 (setopt text-mode-ispell-word-completion nil)
   (setq cape-dict-file
@@ -1359,11 +1362,6 @@ borrowed from citre, now you can always jump-back use "M-," after any jump in th
   ;; (defalias 'cape-dabbrev-min-2 (cape-capf-prefix-length #'cape-dabbrev 2))
   (dolist (f '(cape-file cape-dict cape-elisp-block cape-dabbrev))
     (add-to-list 'completion-at-point-functions f)))
-#+end_src
-***** nerd-icons-corfu
-#+begin_src elisp
-(setup nerd-icons-corfu
-  (add-to-list 'corfu-margin-formatters #'nerd-icons-corfu-formatter))
 #+end_src
 **** lsp mode
 ***** eglot
@@ -1664,8 +1662,8 @@ borrowed from citre, now you can always jump-back use "M-," after any jump in th
             org-fontify-whole-heading-line t
             org-level-color-stars-only nil)
     (defconst nowis/org-heading-stars
-      ["󰯬" "󰯯" "󰯲" "󰯵" "󰯸" "󰯻"
-       "󰯾" "󰰁" "󰰄" "󰰇" "󰰊"])
+      ["󰯭" "󰯰" "󰯳" "󰯶" "󰯹" "󰯼"
+       "󰯿" "󰰂" "󰰅" "󰰈" "󰰋"])
 
     (font-lock-add-keywords
      'org-mode

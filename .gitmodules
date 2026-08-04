@@ -33,11 +33,6 @@
 [submodule "consult-dir"]
 	path = lib/consult-dir
 	url = https://github.com/karthink/consult-dir.git
-[submodule "corfu"]
-	path = lib/corfu
-	url = https://github.com/minad/corfu.git
-    load-path = .
-    load-path = extensions
 [submodule "csv-mode"]
 	path = lib/csv-mode
 	url = https://github.com/emacsmirror/csv-mode.git
@@ -136,9 +131,6 @@
 [submodule "nerd-icons-completion"]
 	path = lib/nerd-icons-completion
 	url = https://github.com/rainstormstudio/nerd-icons-completion.git
-[submodule "nerd-icons-corfu"]
-	path = lib/nerd-icons-corfu
-	url = https://github.com/LuigiPiucco/nerd-icons-corfu.git
 [submodule "nerd-icons-dired"]
 	path = lib/nerd-icons-dired
 	url = https://github.com/rainstormstudio/nerd-icons-dired.git
@@ -250,9 +242,6 @@
 [submodule "lib/emacs-sherpa-onnx"]
 	path = lib/emacs-sherpa-onnx
 	url = https://github.com/nowislewis/emacs-sherpa-onnx.git
-[submodule "lib/vertico"]
-	path = lib/vertico
-	url = https://github.com/minad/vertico.git
 [submodule "lib/nethack"]
 	path = lib/nethack
 	url = https://github.com/Feyorsh/nethack-el.git
