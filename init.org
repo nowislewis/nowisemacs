@@ -843,50 +843,53 @@ diff-hl-mode highlights uncommitted changes on the left side of the window
         minibuffer-depth-indicate-mode t
         minibuffer-electric-default-mode t)
 #+end_src
-** complete-buffer
+** completion buffer
 #+begin_src elisp
-  (add-hook 'completion-list-mode-hook (lambda () (setq-local truncate-lines t)))
-  (keymap-global-set "M-i" #'completion-help-at-point)
-  (use-package minibuffer
-    :ensure nil
-    :bind (:map minibuffer-visible-completions-up-down-map
-                ("C-n" . minibuffer-next-completion)
-                ("C-p" . minibuffer-previous-completion))
-    :hook ((minibuffer-setup . cursor-intangible-mode))
-    :custom
-    (completion-eager-display t)
-    (completion-eager-update t)
-    (minibuffer-visible-completions 'up-down)
-    (completion-auto-select t)
-    (completion-show-help nil)
-    (completion-ignore-case t)
-    (completions-format 'one-column)
-    (completions-max-height 15)
-    (completions-sort 'historical)
-    (read-buffer-completion-ignore-case t)
-    (read-file-name-completion-ignore-case t))
+(add-hook 'completion-list-mode-hook (lambda () (setq-local truncate-lines t)))
+(keymap-global-set "M-i" #'completion-help-at-point)
+(use-package minibuffer
+  :ensure nil
+    :bind ((:map minibuffer-visible-completions-up-down-map
+                  ("C-n" . minibuffer-next-completion)
+                  ("C-p" . minibuffer-previous-completion)
+                  ("TAB" . minibuffer-choose-completion))
+            (:map completion-list-mode-map
+                  ("TAB" . choose-completion)))
+  :hook ((minibuffer-setup . cursor-intangible-mode))
+  :custom
+  (completion-eager-display t)
+  (completion-eager-update t)
+  (minibuffer-visible-completions 'up-down)
+  (completion-auto-select nil)
+  (completion-show-help nil)
+  (completion-ignore-case t)
+  (completions-format 'one-column)
+  (completions-max-height 15)
+  (completions-sort 'historical)
+  (read-buffer-completion-ignore-case t)
+  (read-file-name-completion-ignore-case t))
 
-  (setup completion-preview
-    (setq completion-preview-idle-delay 0.1
-          completion-preview-minimum-symbol-length 2
-          completion-preview-completion-styles '(basic))
-    (global-completion-preview-mode 1)
-    (:when-loaded
-      (keymap-set completion-preview-active-mode-map
-                  "M-i" #'completion-help-at-point)
-      )
+(setup completion-preview
+  (setq completion-preview-idle-delay 0.1
+        completion-preview-minimum-symbol-length 2
+        completion-preview-completion-styles '(basic))
+  (global-completion-preview-mode 1)
+  (:when-loaded
+    (keymap-set completion-preview-active-mode-map
+                "M-i" #'completion-help-at-point)
     )
-  (defun vertico-directory-tidy ()
-    "Tidy shadowed file name, see `rfn-eshadow-overlay'."
-    (when (eq this-command #'self-insert-command)
-      (dolist (ov '(tramp-rfn-eshadow-overlay rfn-eshadow-overlay))
-        (when (and (boundp ov)
-                   (setq ov (symbol-value ov))
-                   (overlay-buffer ov)
-                   (= (point) (point-max))
-                   (> (point) (overlay-end ov)))
-          (delete-region (overlay-start ov) (overlay-end ov))))))
-  (add-hook 'rfn-eshadow-update-overlay-hook #'vertico-directory-tidy)
+  )
+(defun vertico-directory-tidy ()
+  "Tidy shadowed file name, see `rfn-eshadow-overlay'."
+  (when (eq this-command #'self-insert-command)
+    (dolist (ov '(tramp-rfn-eshadow-overlay rfn-eshadow-overlay))
+      (when (and (boundp ov)
+                 (setq ov (symbol-value ov))
+                 (overlay-buffer ov)
+                 (= (point) (point-max))
+                 (> (point) (overlay-end ov)))
+        (delete-region (overlay-start ov) (overlay-end ov))))))
+(add-hook 'rfn-eshadow-update-overlay-hook #'vertico-directory-tidy)
 #+end_src
 ** Orderless and pinyinlib
 #+begin_src elisp
