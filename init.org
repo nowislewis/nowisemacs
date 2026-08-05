@@ -849,12 +849,12 @@ diff-hl-mode highlights uncommitted changes on the left side of the window
 (keymap-global-set "M-i" #'completion-help-at-point)
 (use-package minibuffer
   :ensure nil
-    :bind ((:map minibuffer-visible-completions-up-down-map
-                  ("C-n" . minibuffer-next-completion)
-                  ("C-p" . minibuffer-previous-completion)
-                  ("TAB" . minibuffer-choose-completion))
-            (:map completion-list-mode-map
-                  ("TAB" . choose-completion)))
+  :bind ((:map minibuffer-visible-completions-up-down-map
+               ("C-n" . minibuffer-next-completion)
+               ("C-p" . minibuffer-previous-completion)
+               ("TAB" . minibuffer-choose-completion))
+         (:map completion-list-mode-map
+               ("TAB" . choose-completion)))
   :hook ((minibuffer-setup . cursor-intangible-mode))
   :custom
   (completion-eager-display t)
@@ -879,17 +879,17 @@ diff-hl-mode highlights uncommitted changes on the left side of the window
                 "M-i" #'completion-help-at-point)
     )
   )
-(defun vertico-directory-tidy ()
-  "Tidy shadowed file name, see `rfn-eshadow-overlay'."
-  (when (eq this-command #'self-insert-command)
-    (dolist (ov '(tramp-rfn-eshadow-overlay rfn-eshadow-overlay))
-      (when (and (boundp ov)
-                 (setq ov (symbol-value ov))
-                 (overlay-buffer ov)
-                 (= (point) (point-max))
-                 (> (point) (overlay-end ov)))
-        (delete-region (overlay-start ov) (overlay-end ov))))))
-(add-hook 'rfn-eshadow-update-overlay-hook #'vertico-directory-tidy)
+(add-hook 'eval-expression-minibuffer-setup-hook
+          (lambda ()
+            (setq-local completion-preview-overlay-priority 1200)
+            (completion-preview-mode)))
+
+;; shadow unused file path
+(setopt file-name-shadow-properties '(invisible t intangible t field shadow))
+;; Reuse fido-mode's own DEL-to-updir
+(require 'icomplete)
+(keymap-set minibuffer-local-filename-completion-map
+            "DEL" #'icomplete-fido-backward-updir)
 #+end_src
 ** Orderless and pinyinlib
 #+begin_src elisp
@@ -1353,17 +1353,17 @@ borrowed from citre, now you can always jump-back use "M-," after any jump in th
           treesit-enabled-modes t))
 #+end_src
 *** Complete
-**** corfu related
-***** cape
+**** cape
 #+begin_src elisp
 (setup cape
-(setopt text-mode-ispell-word-completion nil)
+  (setopt text-mode-ispell-word-completion nil)
   (setq cape-dict-file
         (let ((files (list (concat nowis/doc-emacs-dir "12-dictionary/en-words.txt")
                            "/usr/share/dict/words")))
           (seq-filter #'file-exists-p files)))
-  ;; (defalias 'cape-dabbrev-min-2 (cape-capf-prefix-length #'cape-dabbrev 2))
-  (dolist (f '(cape-file cape-dict cape-elisp-block cape-dabbrev))
+   (defalias 'my/cape-dabbrev-dict
+     (cape-capf-sort (cape-capf-super #'cape-dabbrev #'cape-dict)))
+  (dolist (f (list #'my/cape-dabbrev-dict #'cape-elisp-block #'cape-file))
     (add-to-list 'completion-at-point-functions f)))
 #+end_src
 **** lsp mode
@@ -1443,12 +1443,7 @@ borrowed from citre, now you can always jump-back use "M-," after any jump in th
 #+begin_src elisp
 (setup dape
   (setq dape-buffer-window-arrangment 'right)
-  (keymap-global-set "<f5>"  #'dape)
-  (:when-loaded
-    (add-hook 'dape-repl-mode-hook (lambda()
-                                     (corfu-mode -1)
-                                     )
-  )))
+  (keymap-global-set "<f5>"  #'dape))
 #+end_src
 **** edebug
 #+begin_src lisp
@@ -1707,14 +1702,6 @@ Always allow composition for org-mode keywords, regardless of context."
   (prettify-symbols-mode 1))
 
 (add-hook 'org-mode-hook #'nowis/org-setup-prettify)
-#+end_src
-*** org-appear
-#+begin_src elisp
-(setup org-appear
-  (setopt org-appear-delay 0.1
-          org-appear-trigger 'on-change
-          org-appear-autolinks t)
-  (:hook-into org-mode))
 #+end_src
 ** ox-hugo
 #+begin_src elisp
