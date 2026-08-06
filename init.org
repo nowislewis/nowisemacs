@@ -1421,17 +1421,16 @@ borrowed from citre, now you can always jump-back use "M-," after any jump in th
   )
 #+end_src
 *** spell-check
-**** jinx
+**** jit-spell
 #+begin_src elisp
-(setup jinx
-  (when (executable-find "enchant-2")
-    (dolist (hook '(text-mode-hook conf-mode-hook))
-      (add-hook hook #'jinx-mode)))
+(setup jit-spell
+  (setq ispell-program-name "aspell"
+        ispell-dictionary "en_US")
+  (add-hook 'text-mode-hook #'jit-spell-mode)
+  ;; (add-hook 'prog-mode-hook #'jit-spell-mode)
   (:when-loaded
-    (setq jinx-languages "en_US")
-    (add-to-list 'jinx-exclude-regexps '(t "\\cc"))
-    (keymap-global-set "M-$" #'jinx-correct)
-    (keymap-global-set "C-M-$" #'jinx-languages)))
+    (keymap-set jit-spell-mode-map "M-$" #'jit-spell-correct-word)
+    (keymap-global-set "C-M-$" #'jit-spell-change-dictionary)))
 #+end_src
 *** debug
 **** gdb
@@ -1851,18 +1850,6 @@ Borrowed from https://github.com/rougier/emacs-GTD
                       ":END:"))))
     ))
 #+end_src
-
-#+RESULTS:
-| i | Inbox | entry | (file gtd/inbox.org) | * TODO [#C] %? |
-:PROPERTIES:
-:CREATED: %U
-:END:
-| d | Done | entry | (file+headline gtd/action.org Done) | * DONE %?  :%^{Area | misc | work | grow | health | family | life}: |
-CLOSED: %U
-:PROPERTIES:
-:EFFORT: %^{Effort|0:05|0:15|0:30|1:00|2:00|4:00}
-:END: |
-
 *** refile
 #+begin_src elisp
 (setup org

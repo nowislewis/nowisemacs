@@ -103,9 +103,6 @@
 [submodule "indent-bars"]
 	path = lib/indent-bars
 	url = https://github.com/jdtsmith/indent-bars.git
-[submodule "jinx"]
-	path = lib/jinx
-	url = https://github.com/minad/jinx.git
 [submodule "lisp-fsrs"]
 	path = lib/lisp-fsrs
 	url = https://github.com/open-spaced-repetition/lisp-fsrs.git
@@ -251,3 +248,6 @@
 [submodule "lib/dired-rsync"]
 	path = lib/dired-rsync
 	url = https://github.com/stsquad/dired-rsync.git
+[submodule "lib/jit-spell"]
+	path = lib/jit-spell
+	url = https://github.com/astoff/jit-spell.git
