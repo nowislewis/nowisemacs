@@ -84,6 +84,7 @@
                 (:propertize "%p %l" face nowis-ml-dim)
                 mode-line-format-right-align
                 (dired-rsync-modeline-status dired-rsync-modeline-status)
+                " "
                 (:propertize ("" current-input-method-title) face font-lock-keyword-face)
                 " "
                 mode-line-misc-info

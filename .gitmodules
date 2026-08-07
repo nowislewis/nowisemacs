@@ -57,9 +57,6 @@
 [submodule "dired-hacks"]
 	path = lib/dired-hacks
 	url = https://github.com/Fuco1/dired-hacks.git
-[submodule "dired-sidebar"]
-	path = lib/dired-sidebar
-	url = https://github.com/jojojames/dired-sidebar.git
 [submodule "elisp-demos"]
 	path = lib/elisp-demos
 	url = https://github.com/xuchunyang/elisp-demos.git

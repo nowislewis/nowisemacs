@@ -1091,9 +1091,11 @@ Jump anywhere in the world
 (setup nerd-icons-dired)
 (add-hook 'dired-mode-hook #'nerd-icons-dired-mode)
 #+end_src
-*** dired-sidebar
+*** speedbar
 #+begin_src elisp
-(setup dired-sidebar)
+(setup speedbar
+  (:bind "TAB" speedbar-toggle-line-expansion)
+  (setq speedbar-prefer-window t))
 #+end_src
 *** dired-preview
 #+begin_src elisp
@@ -1919,7 +1921,7 @@ Borrowed from https://github.com/rougier/emacs-GTD
                       (org-agenda-skip-function
                        '(org-agenda-skip-entry-if 'scheduled))
                       (org-agenda-sorting-strategy
-                       '(category-up todo-state-up priority-down timestamp-up))))
+                       '(priority-down category-up todo-state-up timestamp-up))))
 
           (tags-todo "inbox"
                      ((org-agenda-overriding-header (nowis/center-header " Inbox"))
