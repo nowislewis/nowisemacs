@@ -1883,7 +1883,7 @@ Borrowed from https://github.com/rougier/emacs-GTD
 (with-eval-after-load 'org-agenda
   (keymap-set org-agenda-mode-map "P" #'nowis/agenda-goto-project))
 
-;;; ─── 显示格式 ───────────────────────────────────────────
+;;; ─── 显示格式 ───
 (defun nowis/center-header (text)
   "将 TEXT 在当前 agenda 窗口中居中。"
   (let* ((width (window-width (get-buffer-window)))
@@ -1891,16 +1891,16 @@ Borrowed from https://github.com/rougier/emacs-GTD
     (concat (make-string pad ?\s) text)))
 
 (setq org-agenda-prefix-format
-      ;; '((agenda . " %i %-12:c%?-12t% s[%-4e]")
-      '((agenda . "%-10c %i %?-12t% s[%-4e] ")
-      (todo   . "[%-4e]: ")
-      (tags   . "%-10c [%-4e] ")
-      (search . "%i %-12:c")))
-
+      '((agenda . "%-10c [%-4e] %?-12t% s")
+        (todo   . "[%-4e]: ")
+        (tags   . "%-10c [%-4e] ")
+        (search . "%i %-12:c")))
+(setq org-agenda-scheduled-leaders '("S:" "S.%2dx:"))
+(setq org-agenda-deadline-leaders  '("D:" "In %3d d.:" "%2d d. ago:"))
 (setq org-agenda-hide-tags-regexp
       "\\(inbox\\|action\\|journal\\|project\\|next\\|bib\\|srs\\|reading\\)")
 
-;;; ─── Agenda 视图构建 ────────────────────────────────────
+;;; ─── Agenda 视图构建 ────
 ;; blocked 任务在 agenda 中隐藏
 (setq org-agenda-dim-blocked-tasks 'invisible)
 
@@ -1921,20 +1921,19 @@ Borrowed from https://github.com/rougier/emacs-GTD
                       (org-agenda-skip-function
                        '(org-agenda-skip-entry-if 'scheduled))
                       (org-agenda-sorting-strategy
-                       '(priority-down category-up todo-state-up timestamp-up))))
+                       '(priority-down timestamp-up todo-state-up category-up))))
 
           (tags-todo "inbox"
                      ((org-agenda-overriding-header (nowis/center-header " Inbox"))
                       (org-agenda-sorting-strategy
-                       '(category-up todo-state-up priority-down timestamp-up))))
+                       '(priority-down timestamp-up todo-state-up category-up))))
 
           (tags-todo "reading"
                      ((org-agenda-overriding-header (nowis/center-header " Leisure & Reading"))
                       (org-agenda-sorting-strategy
-                       '(category-up todo-state-up priority-down timestamp-up))))))))
+                       '(priority-down timestamp-up todo-state-up category-up))))))))
 
-;;; ─── Clock 设置 ─────────────────────────────────────────
-
+;;; ─── Clock 设置 ─────────
 (setq org-agenda-clockreport-parameter-plist
       '(:link t :maxlevel 5 :properties ("Effort"))
       org-clock-out-remove-zero-time-clocks t)
