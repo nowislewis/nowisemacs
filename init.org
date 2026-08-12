@@ -11,7 +11,7 @@ I fell in love with denote, so previous *org-roam* configs were refiled into [[f
 (setopt frame-inhibit-implied-resize t)
 ;; disable warning
 (setopt byte-compile-warnings nil)
-(push '(alpha-background . 90) default-frame-alist)
+;; (push '(alpha-background . 90) default-frame-alist)
 (push '(menu-bar-lines . 0) default-frame-alist)
 (push '(tool-bar-lines . 0) default-frame-alist)
 (push '(vertical-scroll-bars) default-frame-alist)
@@ -1552,16 +1552,13 @@ borrowed from citre, now you can always jump-back use "M-," after any jump in th
 #+begin_src elisp
 (with-eval-after-load 'ox-latex
   (setopt org-latex-pdf-process '("tectonic %f")
-        org-latex-default-class "scrbook"
-        user-full-name "Lewis Liu"
-        org-latex-default-table-environment "longtable"
-        org-latex-src-block-backend 'engraved
-        org-latex-image-default-option "max size={\\textwidth}{\\textheight}" ;; use adjustbox
-        org-latex-image-default-width ""
-        org-preview-latex-default-process 'tectonic) ;; need to install tectonic and imagemagick
-  ;; if you want to add svg support:
-  ;;  1. install inkscape
-  ;;  2. \usepackage[inkscapeversion=1]{svg}
+          org-latex-default-class "scrbook"
+          user-full-name "Lewis Liu"
+          org-latex-default-table-environment "longtable"
+          org-latex-src-block-backend 'engraved
+          org-latex-image-default-option "max size={\\textwidth}{\\textheight}" ;; use adjustbox
+          org-latex-image-default-width ""
+          org-preview-latex-default-process 'tectonic) ;; need to install tectonic and imagemagick
   (add-to-list 'org-latex-classes
                '("scrbook"
                  "\\documentclass[openany,oneside]{scrbook}
@@ -1579,19 +1576,19 @@ borrowed from citre, now you can always jump-back use "M-," after any jump in th
                  ("\\subsubsection{%s}" . "\\subsubsection*{%s}"))))
 
 (with-eval-after-load 'org
-  ;; preview latex
-  (add-to-list 'org-preview-latex-process-alist
-               '(tectonic :programs ("tectonic" "convert")
-                          :description "pdf > png"
-                          :message "you need install the programs: tectonic and imagemagick."
-                          :image-input-type "pdf"
-                          :image-output-type "png"
-                          :image-size-adjust (1.0 . 1.0)
-                          :latex-compiler
-                          ("tectonic -Z shell-escape-cwd=%o --outfmt pdf --outdir %o %f")
-                          :image-converter
-                          ("convert -density %D -trim -antialias %f -quality 300 %O")))
-  (plist-put org-format-latex-options :scale 1.0) ;; use a large preview for latex
+  (setf (alist-get 'tectonic org-preview-latex-process-alist)
+        '(:programs ("tectonic" "convert")
+                    :description "pdf > transparent png"
+                    :message "you need install the programs: tectonic and imagemagick."
+                    :image-input-type "pdf"
+                    :image-output-type "png"
+                    :image-size-adjust (1.0 . 1.0)
+                    :latex-compiler
+                    ("tectonic -Z shell-escape-cwd=%o --outfmt pdf --outdir %o %f")
+                    :image-converter
+                    ("convert -density %D -background none -alpha on %f -trim +repage -quality 300 %O")))
+  (setopt org-preview-latex-default-process 'tectonic)
+  (plist-put org-format-latex-options :scale 1.0)
   ;; export and open word
   (add-to-list 'org-file-apps '("\\.docx\\'" . default)))
 #+end_src
