@@ -919,7 +919,10 @@ should be check after reading the embark.el manual
   (:also-load embark-consult)
   (:autoload embark-toggle-highlight)
   (setq prefix-help-command #'embark-prefix-help-command)
-  (keymap-global-set "C-S-a" #'embark-act))
+  (keymap-global-set "C-S-a" #'embark-act)
+  (:when-loaded
+    ;; fix completion buffer embark-act insert, rm end of work
+    (setf (alist-get 'embark-insert embark-pre-action-hooks) nil)))
 
 ;; open pdf with zathura
 (defun nowis/open-with-zathura (file)
