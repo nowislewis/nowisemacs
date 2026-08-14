@@ -2325,5 +2325,7 @@ ESUP - Emacs Start Up Profiler
 #+end_src
 ** nethack
 #+begin_src elisp
-(setup nethack)
+(setup nethack
+  (setq nethack-use-tiles "nethack500")
+  )
 #+end_src
