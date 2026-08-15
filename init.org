@@ -2224,6 +2224,12 @@ Simple distraction-free editing. I use darkroom instead of writeroom because it'
 (setup emacs-sherpa-onnx)
 (setup emacs-kokoro-onnx)
 #+end_src
+*** agent-shell
+#+begin_src elisp
+(setup acp)
+(setup shell-maker)
+(setup agent-shell)
+#+end_src
 ** webjump
 #+begin_src elisp
 (setup webjump
