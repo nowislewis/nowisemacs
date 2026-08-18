@@ -17,6 +17,9 @@
 (require 'transient)
 (require 'cl-lib)
 
+(declare-function org-sm--capture "org-sm")
+(declare-function notifications-notify "notifications")
+
 (defcustom nowis-popup-frame-title "emacs-popup"
   "Title given to popup frames; match it in your WM to float them."
   :type 'string :group 'convenience)
@@ -38,6 +41,27 @@
   "Major mode for the nowis-popup backdrop buffer.
 Binds `q' to `delete-frame' so the floating popup frame is closed with a
 single keypress.")
+
+;;;###autoload
+(defun nowis-popup-org-sm-capture-clipboard ()
+  "Create an org-sm topic card directly from the system clipboard.
+This command is intended for the popup menu: it saves immediately, skips the
+editable capture buffer, and confirms the exact captured text by notification."
+  (interactive)
+  (require 'org-sm)
+  (require 'notifications)
+  (let ((content (string-trim
+                  (or (ignore-errors
+                        (gui-get-selection 'CLIPBOARD 'UTF8_STRING))
+                      (current-kill 0 t)))))
+    (when (string-empty-p content)
+      (user-error "Clipboard is empty"))
+    (org-sm--capture 'topic content)
+    (let ((coding-system-for-write 'utf-8-unix))
+      (save-buffer))
+    (notifications-notify :title "org-sm 已摘录" :body content :urgency 'normal)
+    (message "org-sm: captured clipboard")
+    (delete-frame)))
 
 ;;;###autoload
 (defun nowis-popup-menu ()

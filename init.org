@@ -2274,7 +2274,8 @@ ESUP - Emacs Start Up Profiler
     ("r" "review confirm" org-sm-review-confirm :transient t)
     ("s" "start-review" org-sm-review-start)
     ("l" "tree" org-sm-tree)
-    ("e" "capture (org-sm)" org-sm-capture)]
+    ("e" "capture clipboard" nowis-popup-org-sm-capture-clipboard)
+    ("E" "capture (org-sm)" org-sm-capture)]
 
    ["Bookmarks"
     ("j" "open bookmark" nowis-popup-bookmark-jump)
