@@ -188,9 +188,6 @@
 [submodule "lib/denote-org"]
 	path = lib/denote-org
 	url = https://github.com/protesilaos/denote-org.git
-[submodule "lib/kdl-mode"]
-	path = lib/kdl-mode
-	url = https://github.com/taquangtrung/emacs-kdl-mode.git
 [submodule "lib/nov"]
 	path = lib/nov
 	url = https://github.com/emacs-pe/nov.el.git

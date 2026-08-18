@@ -2088,28 +2088,6 @@ id 仅作兜底。"
  (:hook-into org-mode))
 #+end_src
 * 阅读
-** reader
-#+begin_src elisp :tangle no
-(setup reader)
-(with-eval-after-load 'org
-  (org-link-set-parameters
-   "reader"
-   :follow (lambda (path)
-             (when (string-match "^\\(.*\\)::\\([0-9]+\\)$" path)
-               (find-file (match-string 1 path))
-               (reader-goto-page
-                (string-to-number (match-string 2 path)))))
-   :store  (lambda ()
-             (when (derived-mode-p 'reader-mode)
-               (org-link-store-props
-                :type "reader"
-                :link (format "reader:%s::%d"
-                              buffer-file-name
-                              (reader-current-doc-pagenumber))
-                :description (format "%s p.%d"
-                                     (file-name-base buffer-file-name)
-                                     (reader-current-doc-pagenumber)))))))
-#+end_src
 ** newsticker
 #+begin_src elisp
 (setq newsticker-url-list '(("Planet Emacslife" "https://planet.emacslife.com/atom.xml")
@@ -2148,7 +2126,7 @@ Simple distraction-free editing. I use darkroom instead of writeroom because it'
 (setup gptel
   (setopt gptel-default-mode 'org-mode
           gptel-highlight-methods '(face)
-          gptel-model 'claude-opus-5
+          gptel-model 'claude-sonnet-5
           gptel-cache t
           gptel-max-tokens 32768
           gptel-include-reasoning nil
