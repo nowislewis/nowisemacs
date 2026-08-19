@@ -254,3 +254,6 @@
 [submodule "lib/shell-maker"]
 	path = lib/shell-maker
 	url = https://github.com/xenodium/shell-maker.git
+[submodule "lib/ebib"]
+	path = lib/ebib
+	url = https://github.com/joostkremers/ebib.git

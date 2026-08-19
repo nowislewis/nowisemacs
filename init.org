@@ -1749,12 +1749,10 @@ Always allow composition for org-mode keywords, regardless of context."
         citar-bibliography org-cite-global-bibliography
         citar-library-paths (list nowis/bib-pdf-dir)
         citar-library-paths-recursive t
-        citar-select-multiple nil
-        )
+        citar-select-multiple nil)
   (:when-loaded
     (citar-embark-mode)
-    )
-  )
+    ))
 #+end_src
 *** citar-denote
 #+begin_src elisp
@@ -1763,6 +1761,10 @@ Always allow composition for org-mode keywords, regardless of context."
   (with-eval-after-load 'citar
     (citar-denote-mode))
   )
+#+end_src
+*** ebib
+#+begin_src elisp
+(setup ebib)
 #+end_src
 ** denote and related
 *** denote
