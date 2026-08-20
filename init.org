@@ -1478,6 +1478,11 @@ borrowed from citre, now you can always jump-back use "M-," after any jump in th
 (setup compile
   (setopt compile-command "cd build && make && ./test"))
 #+end_src
+*** flymake
+#+begin_src elisp
+(setup flymake
+(setq flymake-inline-diagnostics 'short))
+#+end_src
 * Org Mode
 ** org-mode
 #+begin_src elisp
@@ -2086,6 +2091,7 @@ id 仅作兜底。"
 ** org-mindmap
 #+begin_src elisp
 (setup org-mindmap
+(setq org-mindmap-default-max-width nil)
  (:autoload org-mindmap-mode)
  (:hook-into org-mode))
 #+end_src
@@ -2127,7 +2133,7 @@ Simple distraction-free editing. I use darkroom instead of writeroom because it'
 #+begin_src elisp
 (setup gptel
   (setopt gptel-default-mode 'org-mode
-          gptel-highlight-methods '(face)
+          gptel-highlight-methods '(face margin)
           gptel-model 'claude-sonnet-5
           gptel-cache t
           gptel-max-tokens 32768
@@ -2145,7 +2151,12 @@ Simple distraction-free editing. I use darkroom instead of writeroom because it'
                     :host "llm-gateway.momenta.works"
                     :key 'gptel-api-key
                     :stream t
-                    :models '(claude-opus-5 claude-sonnet-5 gpt-5.6-sol gpt-5.6-terra gpt-5.6-luna)))
+                    :models '(claude-opus-5 claude-sonnet-5 gpt-5.6-sol gpt-5.6-terra deepseek-v4-flash)))
+    (gptel-make-openai "momenta2"
+      :host "llm-gateway.momenta.works"
+      :key 'gptel-api-key
+      :stream t
+      :models '(gpt-5.6-sol gpt-5.6-terra gpt-5.6-luna))
     (gptel-make-openai "chatanywhere"
       :host "api.chatanywhere.tech"
       :key 'gptel-api-key
@@ -2153,11 +2164,15 @@ Simple distraction-free editing. I use darkroom instead of writeroom because it'
       :models '(claude-opus-4-8 claude-sonnet-5 claude-haiku-4-5-20251001))
     (gptel-make-gemini "Gemini" :key 'gptel-api-key :stream t)
     (gptel-make-deepseek "DeepSeek"
+      :key 'gptel-api-key
       :stream t
-      :key 'gptel-api-key)
+      )
     (gptel-make-gh-copilot "Copilot")
     (custom-set-faces
      '(gptel-response-highlight ((((background dark) (min-colors 88)) :background "gray15" :extend t))))
+    (dolist (model '(claude-opus-5 claude-sonnet-5 claude-fable-5
+                                   claude-opus-4-8 claude-haiku-4-5-20251001))
+      (put model :capabilities '(media tool-use cache)))
     )
   )
 #+end_src
@@ -2180,6 +2195,13 @@ Simple distraction-free editing. I use darkroom instead of writeroom because it'
     (gptel-agent-update)
     (when-let* ((plist (assoc-default "gptel-simple-agent" gptel-agent--agents nil nil)))
       (apply #'gptel-make-preset 'gptel-simple-agent plist))))
+#+end_src
+*** gptel-preset-collection
+#+begin_src elisp
+(setup gptel-preset-collection
+  (with-eval-after-load 'gptel
+    (require 'gptel-preset-collection))
+  )
 #+end_src
 *** gptel-local-org-prompts
 #+begin_src elisp

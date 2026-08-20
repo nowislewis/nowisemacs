@@ -1,0 +1,10 @@
+# -*- mode: snippet -*-
+# name: open_issue
+# key: rop
+# --
+** 当前结论
+- `(format-time-string (org-time-stamp-format nil t))` $0
+
+** 当前依据/思考
+** 执行链接
+** 事件记录

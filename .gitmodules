@@ -257,3 +257,6 @@
 [submodule "lib/ebib"]
 	path = lib/ebib
 	url = https://github.com/joostkremers/ebib.git
+[submodule "lib/gptel-preset-collection"]
+	path = lib/gptel-preset-collection
+	url = https://github.com/karthink/gptel-preset-collection.git
