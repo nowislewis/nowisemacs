@@ -2212,14 +2212,16 @@ Simple distraction-free editing. I use darkroom instead of writeroom because it'
         gptel-local-org-prompts-preview-length 100)
   )
 #+end_src
-*** gptel-quick-with-prompt
+*** gptel-inline
 #+begin_src elisp
-(setup gptel-quick-with-prompt
-  (:autoload gptel-quick-with-prompt)
-  (keymap-global-set "M-l" #'gptel-quick-with-prompt)
-  (with-eval-after-load 'embark
-    (keymap-set embark-general-map "?" #'gptel-quick-with-prompt))
-  )
+(setup gptel-inline
+  (keymap-global-set "M-l" #'gptel-inline)
+  (:when-loaded
+    (define-advice gptel-inline--response-overlay-append-chunk
+        (:around (fn ov chunk) inhibit-read-only)
+      (let ((inhibit-read-only t))
+        (funcall fn ov chunk)))
+    ))
 #+end_src
 *** read & speek
 #+begin_src elisp

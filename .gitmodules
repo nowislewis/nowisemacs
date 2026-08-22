@@ -260,3 +260,6 @@
 [submodule "lib/gptel-preset-collection"]
 	path = lib/gptel-preset-collection
 	url = https://github.com/karthink/gptel-preset-collection.git
+[submodule "lib/gptel-inline"]
+	path = lib/gptel-inline
+	url = https://github.com/karthink/gptel-inline.git
