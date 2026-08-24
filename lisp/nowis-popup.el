@@ -15,10 +15,8 @@
 ;;; Code:
 
 (require 'transient)
-(require 'cl-lib)
 
-(declare-function org-sm--capture "org-sm")
-(declare-function notifications-notify "notifications")
+(declare-function org-sm-capture-clipboard-notify "org-sm")
 
 (defcustom nowis-popup-frame-title "emacs-popup"
   "Title given to popup frames; match it in your WM to float them."
@@ -31,8 +29,7 @@
 
 (defvar nowis-popup-buffer-mode-map
   (let ((map (make-sparse-keymap)))
-    ;; `q' closes the floating frame in any state: after a sync command, or
-    ;; after finishing/aborting an org-capture launched from the menu.
+    ;; `q' closes the floating frame from any popup state.
     (keymap-set map "q" #'delete-frame)
     map)
   "Keymap for `nowis-popup-buffer-mode'.")
@@ -44,24 +41,14 @@ single keypress.")
 
 ;;;###autoload
 (defun nowis-popup-org-sm-capture-clipboard ()
-  "Create an org-sm topic card directly from the system clipboard.
-This command is intended for the popup menu: it saves immediately, skips the
-editable capture buffer, and confirms the exact captured text by notification."
+  "Capture the clipboard through org-sm, then close the popup frame.
+The capture and notification behavior belongs to
+`org-sm-capture-clipboard-notify'; this command only adapts it to the popup
+UI lifecycle."
   (interactive)
   (require 'org-sm)
-  (require 'notifications)
-  (let ((content (string-trim
-                  (or (ignore-errors
-                        (gui-get-selection 'CLIPBOARD 'UTF8_STRING))
-                      (current-kill 0 t)))))
-    (when (string-empty-p content)
-      (user-error "Clipboard is empty"))
-    (org-sm--capture 'topic content)
-    (let ((coding-system-for-write 'utf-8-unix))
-      (save-buffer))
-    (notifications-notify :title "org-sm 已摘录" :body content :urgency 'normal)
-    (message "org-sm: captured clipboard")
-    (delete-frame)))
+  (org-sm-capture-clipboard-notify)
+  (delete-frame))
 
 ;;;###autoload
 (defun nowis-popup-menu ()
@@ -72,7 +59,6 @@ Define the menu yourself as a native `transient-define-prefix' named
   (unless (fboundp 'nowis-popup--transient)
     (user-error "nowis-popup: define a transient named `nowis-popup--transient' first"))
   (let ((frame (selected-frame)))
-    (set-frame-parameter frame 'nowis-popup t)
     (set-frame-parameter frame 'title nowis-popup-frame-title)
     (select-frame-set-input-focus frame)
     ;; Blank backdrop so the popup never reveals the current buffer.

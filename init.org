@@ -462,7 +462,7 @@ Maybe I should add a new state.
  ;;w workspace
  '("TAB" . tab-leader-map)
  '("t" . toggle-leader-map)
- ;; org-sm review
+ ;; org-sm: direct review start and discoverable command menu
  '("r" . org-sm-transient-map)
  )
 #+end_src
@@ -1843,8 +1843,6 @@ Borrowed from https://github.com/rougier/emacs-GTD
 #+end_src
 *** capture
 #+begin_src elisp
-(setopt org-sm-capture-file
-      (concat nowis/doc-emacs-dir "01-orgmode/xnotes/incremental/20260331T230205--incremental-reading-materials.org"))
 (setup org
   (:when-loaded
     (setq org-capture-templates
@@ -2026,44 +2024,41 @@ id 仅作兜底。"
 #+end_src
 ** org-sm
 #+begin_src elisp
-(setup simple-httpd)
 (setup org-sm
   (:hook-into org-mode)
   (:autoload org-sm-read-mode)
-  (setq org-sm-directory (expand-file-name "incremental/" org-directory))
+  (setq org-sm-directory (expand-file-name "incremental/" org-directory)
+        org-sm-capture-file
+        (concat nowis/doc-emacs-dir
+                "01-orgmode/xnotes/incremental/"
+                "20260331T230205--incremental-reading-materials.org"))
+  ;; Extract selected text; otherwise preserve M-z as the global capture key.
   (nowis/smart-bind "M-z" #'region-active-p #'org-sm-item-extract)
   (:when-loaded
-    ;; AI acts on existing cards only -- capture stays raw.  Inside the card
-    ;; workbench ("A" below): C-c C-a = AI refine + split off child cards,
-    ;; C-c C-i = AI refine the text at point, C-c C-c = commit.
-    (require 'org-sm-gptel)
-    )
-  (transient-define-prefix org-sm-transient-map()
-    "Define transient-key map for org-sm functions"
-    [
-     ["review"
-      ("r" "review confirm" org-sm-review-confirm :transient t)
-      ("s" "start-review" org-sm-review-start)
-      ("a" "abort" org-sm-review-abort)
+    ;; AI only refines existing cards in the workbench; capture stays raw.
+    (require 'org-sm-gptel))
+  (transient-define-prefix org-sm-transient-map ()
+    "Discover org-sm commands; review continuation uses the repeat map."
+    [["review"
+      ("r" "start review" org-sm-review-start)
+      ("a" "about" org-sm-review-abort)
       ("l" "tree" org-sm-tree)
       ("c" "capture" org-sm-capture)
-      ]
-     ["item"
+      ("e" "capture clipboard" org-sm-capture-clipboard-notify)]
+     ["card"
       ("m" "mark" org-sm-item-mark)
-      ("d" "dismiss" org-sm-item-dismiss :transient t)
+      ("z" "extract selection" org-sm-item-extract)
+      ("d" "dismiss" org-sm-item-dismiss)
       ("u" "undismiss" org-sm-item-undismiss)
-      ("z" "extract" org-sm-item-extract)
-      ]
-     ["read-point"
       ("p" "set read point" org-sm-set-readpoint)
-      ("o" "goto source" org-sm-goto-source)
-      ]
-     ["ai"
+      ("o" "goto source" org-sm-goto-source)]
+     ["read"
+      ("z" "extract selection" org-sm-item-extract)
+      ("p" "set read point" org-sm-set-readpoint)
+      ("o" "goto source" org-sm-goto-source)]
+     ["AI"
       ("?" "explain" org-sm-gptel-explain)
-      ("w" "workbench: refine/split" org-sm-card-workbench)
-      ]
-     ]
-    ))
+      ("w" "workbench" org-sm-card-workbench)]]))
 #+end_src
 ** insert from clipboard
 #+begin_src elisp
@@ -2297,11 +2292,9 @@ ESUP - Emacs Start Up Profiler
     ("d" "done works" nowis/gtd-log-time)
 ]
    ["org-sm"
-    ("r" "review confirm" org-sm-review-confirm :transient t)
-    ("s" "start-review" org-sm-review-start)
+    ("r" "start review" org-sm-review-start)
     ("l" "tree" org-sm-tree)
-    ("e" "capture clipboard" nowis-popup-org-sm-capture-clipboard)
-    ("E" "capture (org-sm)" org-sm-capture)]
+    ("e" "capture clipboard" nowis-popup-org-sm-capture-clipboard)]
 
    ["Bookmarks"
     ("j" "open bookmark" nowis-popup-bookmark-jump)
