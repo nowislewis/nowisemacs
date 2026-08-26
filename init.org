@@ -2040,7 +2040,8 @@ id 仅作兜底。"
   (transient-define-prefix org-sm-transient-map ()
     "Discover org-sm commands; review continuation uses the repeat map."
     [["review"
-      ("r" "start review" org-sm-review-start)
+      ("r" "review confirm" org-sm-review-confirm)
+      ("s" "start review" org-sm-review-start)
       ("a" "about" org-sm-review-abort)
       ("l" "tree" org-sm-tree)
       ("c" "capture" org-sm-capture)
