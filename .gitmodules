@@ -263,3 +263,6 @@
 [submodule "lib/gptel-inline"]
 	path = lib/gptel-inline
 	url = https://github.com/karthink/gptel-inline.git
+[submodule "lib/gptel-annotate"]
+	path = lib/gptel-annotate
+	url = https://github.com/karthink/gptel-annotate.git

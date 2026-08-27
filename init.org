@@ -2219,6 +2219,10 @@ Simple distraction-free editing. I use darkroom instead of writeroom because it'
         (funcall fn ov chunk)))
     ))
 #+end_src
+*** gptel-annotate
+#+begin_src elisp
+(setup gptel-annotate)
+#+end_src
 *** read & speek
 #+begin_src elisp
 (setup emacs-sherpa-onnx)
