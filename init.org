@@ -1836,10 +1836,9 @@ Borrowed from https://github.com/rougier/emacs-GTD
 *** todos
 #+begin_src elisp
 (setopt org-enforce-todo-dependencies t
-      org-enforce-todo-checkbox-dependencies t
-      org-log-done 'note
-      org-todo-keywords '((sequence "TODO(t)" "WAIT(w)" "SMDY(s)" "|" "AXED(a)" "DONE(d)"))
-      )
+        org-log-done 'note
+        org-todo-keywords '((sequence "TODO(t)" "WAIT(w)" "SMDY(s)" "|" "AXED(a)" "DONE(d)"))
+        )
 #+end_src
 *** capture
 #+begin_src elisp
