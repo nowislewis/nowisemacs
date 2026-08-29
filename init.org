@@ -1031,24 +1031,14 @@ Jump anywhere in the world
 #+begin_src elisp
 (setopt default-input-method "rime")
 (with-eval-after-load 'rime
-  (defun rime-predicate-after-pure-alphabet-char-p ()
-    "If the cursor is directly after an alphabet character (a-z, A-Z)"
-    (and (> (point) (save-excursion (back-to-indentation) (point)))
-         (let ((string (buffer-substring (point) (max (line-beginning-position) (- (point) 80)))))
-           (string-match-p "[a-zA-Z]$" string))))
-
-  ;; Override: use \cC (real CJK only); \cc wrongly includes Box Drawing (─ │ ┌ etc.)
-  (defun rime-predicate-space-after-cc-p ()
-    (string-match-p "\\cC +$"
-                    (buffer-substring (point) (max (line-beginning-position) (- (point) 80)))))
-
   (defun nowis/rime-disable-predicates ()
     (let ((common '(
                     rime-predicate-current-input-punctuation-p
                     rime-predicate-current-uppercase-letter-p
-                    rime-predicate-after-pure-alphabet-char-p
+                    rime-predicate-after-ascii-char-p
                     rime-predicate-space-after-cc-p
                     ;; special mode
+                    rime-predicate-ace-window-p
                     meow-normal-mode-p
                     meow-motion-mode-p
                     meow-keypad-mode-p
