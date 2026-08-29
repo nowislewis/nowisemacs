@@ -266,3 +266,6 @@
 [submodule "lib/gptel-annotate"]
 	path = lib/gptel-annotate
 	url = https://github.com/karthink/gptel-annotate.git
+[submodule "lib/ratex"]
+	path = lib/ratex
+	url = https://github.com/gongshangzheng/ratex.el.git

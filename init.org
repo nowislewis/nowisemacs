@@ -1266,6 +1266,14 @@ Emacs major-mode to work with Beancount ledger files
 ;;  (setup auctex)
 (setup cdlatex)
 #+end_src
+**** ratex
+#+begin_src elisp
+(setup ratex ;; emacs must be built with librsvg
+  (with-eval-after-load 'org
+    (require 'ratex)
+    (setq ratex-edit-preview 'posframe)
+    (global-ratex-mode 1)))
+#+end_src
 *** python
 **** python
 #+begin_src elisp
