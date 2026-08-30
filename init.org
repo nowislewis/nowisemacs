@@ -875,6 +875,12 @@ diff-hl-mode highlights uncommitted changes on the left side of the window
         completion-preview-completion-styles '(basic))
   (global-completion-preview-mode 1)
   (:when-loaded
+    ;; Org remaps ordinary insertion/deletion commands, so opt them into
+    ;; Completion Preview's otherwise conservative trigger list.
+    (dolist (command '(org-self-insert-command
+                       org-delete-backward-char
+                       org-delete-char))
+      (add-to-list 'completion-preview-commands command))
     (keymap-set completion-preview-active-mode-map
                 "M-i" #'completion-help-at-point)
     )
@@ -1031,6 +1037,10 @@ Jump anywhere in the world
 #+begin_src elisp
 (setopt default-input-method "rime")
 (with-eval-after-load 'rime
+  ;; Override: use \cC (real CJK only) to include ─ │ ┌ etc(mindmap)
+  (defun rime-predicate-space-after-cc-p ()
+    (string-match-p "\\cC +$"
+                    (buffer-substring (point) (max (line-beginning-position) (- (point) 80)))))
   (defun nowis/rime-disable-predicates ()
     (let ((common '(
                     rime-predicate-current-input-punctuation-p
@@ -1261,7 +1271,7 @@ Emacs major-mode to work with Beancount ledger files
 (setup ratex ;; emacs must be built with librsvg
   (with-eval-after-load 'org
     (require 'ratex)
-    (setq ratex-edit-preview 'posframe)
+    (setq ratex-edit-preview 'minibuffer)
     (global-ratex-mode 1)))
 #+end_src
 *** python
@@ -1366,8 +1376,10 @@ borrowed from citre, now you can always jump-back use "M-," after any jump in th
           (seq-filter #'file-exists-p files)))
    (defalias 'my/cape-dabbrev-dict
      (cape-capf-sort (cape-capf-super #'cape-dabbrev #'cape-dict)))
+  ;; `add-hook' without LOCAL updates the global default, which Org's
+  ;; buffer-local CAPF list inherits through its `t' marker.
   (dolist (f (list #'my/cape-dabbrev-dict #'cape-elisp-block #'cape-file))
-    (add-to-list 'completion-at-point-functions f)))
+    (add-hook 'completion-at-point-functions f)))
 #+end_src
 **** lsp mode
 ***** eglot
