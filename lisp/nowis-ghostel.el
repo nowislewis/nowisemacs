@@ -143,6 +143,11 @@ Clears the adopted prompt input first (C-a C-k) so it is not duplicated."
   (define-key ghostel-char-mode-map (kbd "M-`") #'nowis-ghostel-toggle-window)
   (define-key ghostel-char-mode-map (kbd "C-\\") #'toggle-input-method)
   (define-key ghostel-char-mode-map (kbd "M-'") #'nowis-ghostel-compose)
+  ;; char-mode forwards `C-y'/`M-w' raw to the shell (readline yank /
+  ;; nothing) by default; claim them back for Emacs paste/copy-all so
+  ;; clipboard use doesn't require dropping to semi-char-mode first.
+  (define-key ghostel-char-mode-map (kbd "C-y") #'ghostel-yank)
+  (define-key ghostel-char-mode-map (kbd "M-w") #'ghostel-copy-all)
   (define-key ghostel-mode-map (kbd "M-'") #'nowis-ghostel-compose)
   (with-eval-after-load 'avy
     (advice-add 'avy-action-goto :after #'ghostel-maybe-leave-input))

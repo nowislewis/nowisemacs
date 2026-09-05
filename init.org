@@ -875,14 +875,13 @@ diff-hl-mode highlights uncommitted changes on the left side of the window
         completion-preview-completion-styles '(basic))
   (global-completion-preview-mode 1)
   (:when-loaded
-    ;; Org remaps ordinary insertion/deletion commands, so opt them into
-    ;; Completion Preview's otherwise conservative trigger list.
+    ;; Org remaps ordinary insertion/deletion commands
     (dolist (command '(org-self-insert-command
                        org-delete-backward-char
                        org-delete-char))
       (add-to-list 'completion-preview-commands command))
-    (keymap-set completion-preview-active-mode-map
-                "M-i" #'completion-help-at-point)
+    ;; (keymap-set completion-preview-active-mode-map "M-i" #'completion-preview-insert-word)
+    (keymap-set completion-preview-active-mode-map "M-i" #'completion-preview-complete)
     )
   )
 (add-hook 'eval-expression-minibuffer-setup-hook
@@ -896,6 +895,15 @@ diff-hl-mode highlights uncommitted changes on the left side of the window
 (require 'icomplete)
 (keymap-set minibuffer-local-filename-completion-map
             "DEL" #'icomplete-fido-backward-updir)
+
+(defun nowis/minibuffer-kill-ring-save ()
+  "Copy the region if active, else the whole minibuffer input."
+  (interactive)
+  (if (use-region-p)
+      (kill-ring-save (region-beginning) (region-end))
+    (kill-new (minibuffer-contents))
+    (message "Copied: %s" (minibuffer-contents))))
+(keymap-set minibuffer-mode-map "M-w" #'nowis/minibuffer-kill-ring-save)
 #+end_src
 ** Orderless and pinyinlib
 #+begin_src elisp
