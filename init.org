@@ -2127,6 +2127,12 @@ id 仅作兜底。"
                    (insert "    ")))))
 (add-to-list 'auto-mode-alist '("\\.epub\\'" . nov-mode))
 #+end_src
+** reader
+#+begin_src elisp
+(setup reader
+  (:autoload reader-mode)
+  (add-to-list 'auto-mode-alist '("\\.pdf\\'" . reader-mode)))
+#+end_src
 ** darkroom
 Simple distraction-free editing. I use darkroom instead of writeroom because it's more simple
 #+begin_src elisp

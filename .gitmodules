@@ -269,3 +269,6 @@
 [submodule "lib/ratex"]
 	path = lib/ratex
 	url = https://github.com/gongshangzheng/ratex.el.git
+[submodule "lib/reader"]
+	path = lib/reader
+	url = https://codeberg.org/MonadicSheep/emacs-reader.git
