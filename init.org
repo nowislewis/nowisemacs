@@ -1508,7 +1508,7 @@ borrowed from citre, now you can always jump-back use "M-," after any jump in th
 (setup org
   (setq system-time-locale "C") ;; ensure time format is always english
   (setq org-startup-folded nil)
-  (setopt org-startup-indented nil
+  (setopt org-startup-indented t
           org-startup-with-inline-images nil
           org-startup-numerated nil
           org-hide-block-startup t
