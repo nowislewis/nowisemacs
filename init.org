@@ -1855,7 +1855,7 @@ Borrowed from https://github.com/rougier/emacs-GTD
 #+begin_src elisp
 (setopt org-enforce-todo-dependencies t
         org-log-done 'note
-        org-todo-keywords '((sequence "TODO(t)" "WAIT(w)" "SMDY(s)" "|" "AXED(a)" "DONE(d)"))
+        org-todo-keywords '((sequence "TODO(t)" "NEXT(n)" "WAIT(w)" "SMDY(s)" "|" "AXED(a)" "DONE(d)"))
         )
 #+end_src
 *** capture
@@ -1937,6 +1937,9 @@ Borrowed from https://github.com/rougier/emacs-GTD
                    (org-agenda-span 'day)
                    (org-agenda-skip-function
                     '(org-agenda-skip-if nil '(todo done)))))
+
+          (todo "NEXT"
+                     ((org-agenda-overriding-header (nowis/center-header " Next "))))
 
           (tags-todo "action"
                      ((org-agenda-overriding-header (nowis/center-header " Ready to Start"))
