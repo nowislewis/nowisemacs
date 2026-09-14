@@ -1933,7 +1933,7 @@ Borrowed from https://github.com/rougier/emacs-GTD
 
         ("g" "GTD"
          ((agenda ""
-                  ((org-agenda-overriding-header (nowis/center-header " Launch Pad"))
+                  ((org-agenda-overriding-header (nowis/center-header " Only One at A Time "))
                    (org-agenda-span 'day)
                    (org-agenda-skip-function
                     '(org-agenda-skip-if nil '(todo done)))))
