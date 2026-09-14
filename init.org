@@ -2365,3 +2365,31 @@ ESUP - Emacs Start Up Profiler
   (setq nethack-use-tiles "nethack500")
   )
 #+end_src
+* system-config
+** wslg
+#+begin_src elisp
+;; WSLg's Wayland clipboard exposes Windows text both as UTF-8 and the
+;; legacy STRING target.  Emacs 32's PGTK selection backend currently falls
+;; through to STRING, which decodes Chinese text as Latin-1.  Read the UTF-8
+;; MIME target through wl-paste instead, while leaving normal Linux desktops
+;; on Emacs's native clipboard path.
+(when (and (eq system-type 'gnu/linux)
+           (getenv "WSL_DISTRO_NAME")
+           (eq window-system 'pgtk)
+           (executable-find "wl-paste"))
+  (defun nowis/wslg-clipboard-paste ()
+    "Return newly copied WSLg UTF-8 text for `current-kill'.
+Return nil when the system clipboard still contains Emacs's latest kill, so
+that `current-kill' retains the local kill-ring entry instead of re-adding it."
+    (let ((clipboard
+           (with-temp-buffer
+             (let ((coding-system-for-read 'utf-8-unix))
+               (when (zerop (call-process "wl-paste" nil t nil
+                                          "--no-newline" "--type"
+                                          "text/plain;charset=utf-8"))
+                 (buffer-string))))))
+      (unless (or (string-empty-p clipboard)
+                  (equal clipboard (substring-no-properties (car kill-ring))))
+        clipboard)))
+  (setq interprogram-paste-function #'nowis/wslg-clipboard-paste))
+#+end_src
