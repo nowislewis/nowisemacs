@@ -1855,7 +1855,7 @@ Borrowed from https://github.com/rougier/emacs-GTD
 #+begin_src elisp
 (setopt org-enforce-todo-dependencies t
         org-log-done 'note
-        org-todo-keywords '((sequence "TODO(t)" "NEXT(n)" "WAIT(w)" "SMDY(s)" "|" "AXED(a)" "DONE(d)"))
+        org-todo-keywords '((sequence "TODO(t)" "NEXT(n)" "WAIT(w)" "▶(p@)" "|" "AXED(a)" "DONE(d)"))
         )
 #+end_src
 *** capture
@@ -2174,17 +2174,12 @@ Simple distraction-free editing. I use darkroom instead of writeroom because it'
                     :host "llm-gateway.momenta.works"
                     :key 'gptel-api-key
                     :stream t
-                    :models '(claude-opus-5 claude-sonnet-5 gpt-5.6-sol gpt-5.6-terra deepseek-v4-flash)))
-    (gptel-make-openai "momenta2"
-      :host "llm-gateway.momenta.works"
-      :key 'gptel-api-key
-      :stream t
-      :models '(gpt-5.6-sol gpt-5.6-terra gpt-5.6-luna))
+                    :models '(claude-6-astra gpt-5.6-sol gpt-5.6-terra claude-sonnet-5 deepseek-v4.1-flash)))
     (gptel-make-openai "chatanywhere"
       :host "api.chatanywhere.tech"
       :key 'gptel-api-key
       :stream t
-      :models '(claude-opus-4-8 claude-sonnet-5 claude-haiku-4-5-20251001))
+      :models '(claude-opus-5 claude-sonnet-5))
     (gptel-make-gemini "Gemini" :key 'gptel-api-key :stream t)
     (gptel-make-deepseek "DeepSeek"
       :key 'gptel-api-key
@@ -2193,8 +2188,7 @@ Simple distraction-free editing. I use darkroom instead of writeroom because it'
     (gptel-make-gh-copilot "Copilot")
     (custom-set-faces
      '(gptel-response-highlight ((((background dark) (min-colors 88)) :background "gray15" :extend t))))
-    (dolist (model '(claude-opus-5 claude-sonnet-5 claude-fable-5
-                                   claude-opus-4-8 claude-haiku-4-5-20251001))
+    (dolist (model '(claude-opus-5 claude-sonnet-5 claude-fable-5))
       (put model :capabilities '(media tool-use cache)))
     )
   )
@@ -2368,28 +2362,31 @@ ESUP - Emacs Start Up Profiler
 * system-config
 ** wslg
 #+begin_src elisp
-;; WSLg's Wayland clipboard exposes Windows text both as UTF-8 and the
-;; legacy STRING target.  Emacs 32's PGTK selection backend currently falls
-;; through to STRING, which decodes Chinese text as Latin-1.  Read the UTF-8
-;; MIME target through wl-paste instead, while leaving normal Linux desktops
-;; on Emacs's native clipboard path.
-(when (and (eq system-type 'gnu/linux)
-           (getenv "WSL_DISTRO_NAME")
+;; Work around Emacs 32 PGTK clipboard issues under WSLg.
+(when (and (getenv "WSL_DISTRO_NAME")
            (eq window-system 'pgtk)
+           (executable-find "wl-copy")
            (executable-find "wl-paste"))
+  (defun nowis/wslg-clipboard-copy (text)
+    "Copy TEXT to WSLg as UTF-8."
+    (let ((coding-system-for-write 'utf-8-unix))
+      (with-temp-buffer
+        (insert text)
+        (call-process-region (point-min) (point-max) "wl-copy" nil nil nil
+                             "-t" "text/plain;charset=utf-8"))))
+
   (defun nowis/wslg-clipboard-paste ()
-    "Return newly copied WSLg UTF-8 text for `current-kill'.
-Return nil when the system clipboard still contains Emacs's latest kill, so
-that `current-kill' retains the local kill-ring entry instead of re-adding it."
-    (let ((clipboard
-           (with-temp-buffer
-             (let ((coding-system-for-read 'utf-8-unix))
-               (when (zerop (call-process "wl-paste" nil t nil
-                                          "--no-newline" "--type"
-                                          "text/plain;charset=utf-8"))
-                 (buffer-string))))))
-      (unless (or (string-empty-p clipboard)
-                  (equal clipboard (substring-no-properties (car kill-ring))))
-        clipboard)))
-  (setq interprogram-paste-function #'nowis/wslg-clipboard-paste))
+    "Return new UTF-8 text from the WSLg clipboard."
+    (let ((text (with-temp-buffer
+                  (let ((coding-system-for-read 'utf-8-unix))
+                    (when (zerop (call-process "wl-paste" nil t nil "-n" "-t"
+                                               "text/plain;charset=utf-8"))
+                      (buffer-string))))))
+      (unless (or (string-empty-p (or text ""))
+                  (and kill-ring (equal text (substring-no-properties
+                                              (car kill-ring)))))
+        text)))
+
+  (setq interprogram-cut-function #'nowis/wslg-clipboard-copy
+        interprogram-paste-function #'nowis/wslg-clipboard-paste))
 #+end_src
