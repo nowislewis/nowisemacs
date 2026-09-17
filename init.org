@@ -1203,10 +1203,14 @@ Jump anywhere in the world
 #+begin_src elisp
 (setup ghostel
   (setq ghostel-ignore-cursor-change t
+        ghostel-initial-input-mode 'line
         ghostel-shell "zsh"
         ghostel-tramp-shell-integration t)
-  (autoload 'nowis-ghostel-toggle-window "nowis-ghostel" nil t)
-  (keymap-global-set "M-`" #'nowis-ghostel-toggle-window)
+  (add-to-list 'load-path
+               (expand-file-name "lib/ghostel/extensions/consult-ghostel"
+                                 user-emacs-directory))
+  (autoload 'nowis-ghostel-new-window "nowis-ghostel" nil t)
+  (keymap-global-set "M-`" #'nowis-ghostel-new-window)
   (:when-loaded
     (require 'nowis-ghostel)
     (nowis-ghostel-setup)))
@@ -2248,12 +2252,6 @@ Simple distraction-free editing. I use darkroom instead of writeroom because it'
 #+begin_src elisp
 (setup emacs-sherpa-onnx)
 (setup emacs-kokoro-onnx)
-#+end_src
-*** agent-shell
-#+begin_src elisp
-(setup acp)
-(setup shell-maker)
-(setup agent-shell)
 #+end_src
 ** webjump
 #+begin_src elisp
