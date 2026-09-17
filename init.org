@@ -543,8 +543,9 @@ Maybe I should add a new state.
 (defun nowis/setup-fonts()
   "Setup fonts."
   (when (display-graphic-p)
-    (if lewis-fixed-font
-        (set-face-attribute 'default nil :family lewis-fixed-font :height lewis-font-size))
+    (when lewis-fixed-font
+        (set-face-attribute 'default nil :family lewis-fixed-font :height lewis-font-size)
+        (set-face-attribute 'fixed-pitch nil :family lewis-fixed-font :height lewis-font-size))
     (if lewis-variable-font
         (set-face-attribute 'variable-pitch nil :family lewis-variable-font :height 1.0))
     (if lewis-symbol-font
