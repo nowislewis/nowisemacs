@@ -80,9 +80,14 @@ buffer name prefixed by the project name."
   "Drop the cached name; next redisplay rebuilds it."
   (setq nowis-ml--path-cache nil))
 
+(defconst nowis-ml--icon-modified
+  (propertize "󰆓" 'face 'nerd-icons-red))
+(defconst nowis-ml--icon-read-only
+  (propertize "" 'face 'nerd-icons-lyellow))
+
 (defun nowis-ml--modified ()
-  (cond ((buffer-modified-p) (propertize "󰆓" 'face 'nerd-icons-red))
-        (buffer-read-only    (propertize "" 'face 'nerd-icons-lyellow))))
+  (cond ((buffer-modified-p) nowis-ml--icon-modified)
+        (buffer-read-only    nowis-ml--icon-read-only)))
 
 (dolist (hook '(find-file-hook
                 after-save-hook
