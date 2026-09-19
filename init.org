@@ -2165,7 +2165,6 @@ Simple distraction-free editing. I use darkroom instead of writeroom because it'
           gptel-model 'gemini-3.8-flash
           gptel-cache t
           gptel-max-tokens 32768
-          gptel-include-reasoning nil
           gptel-confirm-tool-calls nil
           gptel-include-tool-results 'auto)
   (keymap-global-set "M-p" #'gptel-send)
@@ -2179,7 +2178,12 @@ Simple distraction-free editing. I use darkroom instead of writeroom because it'
                     :host "llm-gateway.momenta.works"
                     :key 'gptel-api-key
                     :stream t
-                    :models '(claude-6-astra gpt-5.6-sol gpt-5.6-terra claude-sonnet-5 gemini-3.8-flash)))
+                    :models '(gpt-6-astra claude-sonnet-5 gemini-3.8-flash)))
+    (gptel-make-openai "momenta-openai"
+      :host "llm-gateway.momenta.works"
+      :key 'gptel-api-key
+      :stream t
+      :models '(glm-5.3 qwen3.8-flash))
     (gptel-make-openai "chatanywhere"
       :host "api.chatanywhere.tech"
       :key 'gptel-api-key
@@ -2193,7 +2197,7 @@ Simple distraction-free editing. I use darkroom instead of writeroom because it'
     (gptel-make-gh-copilot "Copilot")
     (custom-set-faces
      '(gptel-response-highlight ((((background dark) (min-colors 88)) :background "gray15" :extend t))))
-    (dolist (model '(claude-opus-5 claude-sonnet-5 gemini-3.8-flash))
+    (dolist (model '(claude-opus-5 claude-sonnet-5 gemini-3.8-flash qwen3.8-flash))
       (put model :capabilities '(media tool-use cache)))
     )
   )
@@ -2210,13 +2214,14 @@ Simple distraction-free editing. I use darkroom instead of writeroom because it'
                  (project-root proj)
                default-directory))))
     (gptel-agent project-dir 'gptel-simple-agent))
-
   (:when-loaded
     (add-to-list 'gptel-agent-dirs
                  (expand-file-name "131-gptel-presets/" nowis/doc-emacs-dir))
     (gptel-agent-update)
     (when-let* ((plist (assoc-default "gptel-simple-agent" gptel-agent--agents nil nil)))
-      (apply #'gptel-make-preset 'gptel-simple-agent plist))))
+      (apply #'gptel-make-preset 'gptel-simple-agent plist))
+    (require 'gptel-robust)
+))
 #+end_src
 *** gptel-preset-collection
 #+begin_src elisp
@@ -2253,6 +2258,11 @@ Simple distraction-free editing. I use darkroom instead of writeroom because it'
 #+begin_src elisp
 (setup emacs-sherpa-onnx)
 (setup emacs-kokoro-onnx)
+#+end_src
+*** nowis-review
+#+begin_src elisp
+(setup nowis-review
+  (keymap-global-set "M-m" #'nowis-review-mark))
 #+end_src
 ** webjump
 #+begin_src elisp
