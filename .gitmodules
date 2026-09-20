@@ -263,3 +263,6 @@
 [submodule "lib/reader"]
 	path = lib/reader
 	url = https://codeberg.org/MonadicSheep/emacs-reader.git
+[submodule "lib/doom-themes"]
+	path = lib/doom-themes
+	url = https://github.com/doomemacs/themes.git

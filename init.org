@@ -562,17 +562,12 @@ Maybe I should add a new state.
 (advice-add 'variable-pitch-mode :after #'dynamic-change-line-spacing)
 #+end_src
 ** Theme
-*** modus-themes
 #+begin_src elisp
-  (setup modus-themes
-    (load-theme 'modus-vivendi-tritanopia t)
-    )
-#+end_src
-*** ef-themes
-#+begin_src elisp
+(setup modus-themes)
 (setup ef-themes)
-  ;; (ef-themes-take-over-modus-themes-mode 1)
-;; (load-theme 'ef-cherie t)
+(setup doom-themes)
+;; (load-theme 'modus-vivendi-tritanopia t)
+(load-theme 'doom-monokai-pro t)
 #+end_src
 ** line number
 #+begin_src elisp
@@ -668,7 +663,7 @@ diff-hl-mode highlights uncommitted changes on the left side of the window
         what-cursor-show-names t)
 
   ;; (global-visual-line-mode)
-  (dolist (hook '(prog-mode-hook org-mode-hook))
+  (dolist (hook '(prog-mode-hook))
     (add-hook hook #'visual-line-mode))
   )
 #+end_src
@@ -2116,6 +2111,9 @@ id 仅作兜底。"
 (setq org-mindmap-default-max-width nil)
  (:autoload org-mindmap-mode)
  (:hook-into org-mode))
+#+end_src
+** excalidraw
+#+begin_src elisp
 #+end_src
 * 阅读
 ** newsticker

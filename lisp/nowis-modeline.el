@@ -139,9 +139,9 @@ buffer name prefixed by the project name."
 (with-eval-after-load 'meow
   (advice-add 'meow-setup-mode-line :override #'ignore))
 
-(set-face-attribute 'mode-line          nil :height 0.88 :box nil)
-(set-face-attribute 'mode-line-active   nil :height 0.88 :box nil)
-(set-face-attribute 'mode-line-inactive nil :height 0.88 :box nil)
+;; (set-face-attribute 'mode-line          nil :height 0.88 :box nil)
+;; (set-face-attribute 'mode-line-active   nil :height 0.88 :box nil)
+;; (set-face-attribute 'mode-line-inactive nil :height 0.88 :box nil)
 
 (provide 'nowis-modeline)
 
