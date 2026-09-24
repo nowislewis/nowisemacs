@@ -1205,8 +1205,8 @@ Jump anywhere in the world
   (add-to-list 'load-path
                (expand-file-name "lib/ghostel/extensions/consult-ghostel"
                                  user-emacs-directory))
-  (autoload 'nowis-ghostel-new-window "nowis-ghostel" nil t)
-  (keymap-global-set "M-`" #'nowis-ghostel-new-window)
+  (autoload #'nowis-ghostel "nowis-ghostel" nil t)
+  (keymap-global-set "M-`" #'nowis-ghostel)
   (:when-loaded
     (require 'nowis-ghostel)
     (nowis-ghostel-setup)))
@@ -1449,7 +1449,7 @@ borrowed from citre, now you can always jump-back use "M-," after any jump in th
 (setup jit-spell
   (setq ispell-program-name "aspell"
         ispell-dictionary "en_US")
-  (add-hook 'text-mode-hook #'jit-spell-mode)
+  ;; (add-hook 'text-mode-hook #'jit-spell-mode)
   ;; (add-hook 'prog-mode-hook #'jit-spell-mode)
   (:when-loaded
     (keymap-set jit-spell-mode-map "M-$" #'jit-spell-correct-word)
@@ -2362,9 +2362,14 @@ ESUP - Emacs Start Up Profiler
 #+end_src
 ** nethack
 #+begin_src elisp
+(defun nowis-nethack-disable-meow ()
+  "Let NetHack own all input keys in its interactive buffers."
+  (meow-mode -1))
+
 (setup nethack
   (setq nethack-use-tiles "nethack500")
-  )
+  (add-hook 'nethack-map-mode-hook #'nowis-nethack-disable-meow)
+  (add-hook 'nethack-menu-mode-hook #'nowis-nethack-disable-meow))
 #+end_src
 * system-config
 ** wslg
