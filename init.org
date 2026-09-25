@@ -401,6 +401,7 @@ Maybe I should add a new state.
   "Define leader-key map for apps functions"
   [["agenda"
     ("a" "org-agenda" org-agenda)
+    ("g" "GTD workflow" nowis/gtd-workflow-menu)
     ("A" "archive" org-archive-subtree)
     ("b" "time blocks" nowis/time-blocks)
     ("o" "occur" (lambda ()
@@ -2114,6 +2115,11 @@ id 仅作兜底。"
 #+end_src
 ** excalidraw
 #+begin_src elisp
+#+end_src
+** ob-artist
+#+begin_src elisp
+(with-eval-after-load 'org
+  (require 'nowis-artist))
 #+end_src
 * 阅读
 ** newsticker
