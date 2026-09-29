@@ -266,3 +266,6 @@
 [submodule "lib/doom-themes"]
 	path = lib/doom-themes
 	url = https://github.com/doomemacs/themes.git
+[submodule "lib/code-cells"]
+	path = lib/code-cells
+	url = https://github.com/astoff/code-cells.el.git

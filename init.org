@@ -1160,7 +1160,7 @@ Jump anywhere in the world
           desktop-lazy-idle-delay 5               ; 空闲 5s 再后台补齐剩余 buffer
           desktop-lazy-verbose nil                ; 后台恢复别刷屏
           desktop-files-not-to-save "\\(^/[^/:]*:\\|(ftp)$\\)"   ; 不碰远程
-          desktop-modes-not-to-save '(eshell-mode term-mode ghostel-mode comint-mode
+          desktop-modes-not-to-save '(eshell-mode term-mode comint-mode
                                                   tags-table-mode dired-mode magit-status-mode
                                                   magit-status-mode
                                                   magit-revision-mode
@@ -1501,6 +1501,17 @@ borrowed from citre, now you can always jump-back use "M-," after any jump in th
 #+begin_src elisp
 (setup flymake
 (setq flymake-inline-diagnostics 'short))
+#+end_src
+*** code-cells
+#+begin_src elisp
+  (setup code-cells
+    (add-hook 'python-ts-mode-hook 'code-cells-mode-maybe)
+    (with-eval-after-load 'code-cells
+      (let ((map code-cells-mode-map))
+        (keymap-set map "M-p" 'code-cells-backward-cell)
+        (keymap-set map "M-n" 'code-cells-forward-cell)
+        (keymap-set map "C-c C-c" 'code-cells-eval)))
+    )
 #+end_src
 * Org Mode
 ** org-mode
@@ -2168,7 +2179,7 @@ Simple distraction-free editing. I use darkroom instead of writeroom because it'
           gptel-highlight-methods '(face margin)
           gptel-model 'gemini-3.8-flash
           gptel-cache t
-          gptel-max-tokens 32768
+          gptel-max-tokens nil
           gptel-confirm-tool-calls nil
           gptel-include-tool-results 'auto)
   (keymap-global-set "M-p" #'gptel-send)
@@ -2187,7 +2198,7 @@ Simple distraction-free editing. I use darkroom instead of writeroom because it'
       :host "llm-gateway.momenta.works"
       :key 'gptel-api-key
       :stream t
-      :models '(glm-5.3 qwen3.8-flash))
+      :models '(glm-5.3 qwen3.8-flash gpt-6-sol gpt-5.6-terra gpt-6-luna))
     (gptel-make-openai "chatanywhere"
       :host "api.chatanywhere.tech"
       :key 'gptel-api-key
