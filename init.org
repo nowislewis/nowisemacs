@@ -2177,28 +2177,30 @@ Simple distraction-free editing. I use darkroom instead of writeroom because it'
 (setup gptel
   (setopt gptel-default-mode 'org-mode
           gptel-highlight-methods '(face margin)
-          gptel-model 'gemini-3.8-flash
+          gptel-model 'gpt-6-luna
           gptel-cache t
           gptel-max-tokens nil
           gptel-confirm-tool-calls nil
-          gptel-include-tool-results 'auto)
+          gptel-include-tool-results 'auto
+          gptel-org-convert-response nil)
   (keymap-global-set "M-p" #'gptel-send)
   (keymap-global-set "M-r" #'gptel-rewrite)
   (keymap-global-set "M-P" #'gptel)
   (keymap-global-set "C-M-p" #'gptel-abort)
   (:hook gptel-highlight-mode)
   (:when-loaded
+    (require 'nowis-gptel-prompt)
     (setq-default gptel-backend
-                  (gptel-make-anthropic "momenta"
+                  (gptel-make-openai "momenta-openai"
                     :host "llm-gateway.momenta.works"
                     :key 'gptel-api-key
                     :stream t
-                    :models '(gpt-6-astra claude-sonnet-5 gemini-3.8-flash)))
-    (gptel-make-openai "momenta-openai"
+                    :models '(kimi-k3 qwen3.8-flash gpt-5.6-terra gpt-6-luna)))
+    (gptel-make-anthropic "momenta"
       :host "llm-gateway.momenta.works"
       :key 'gptel-api-key
       :stream t
-      :models '(glm-5.3 qwen3.8-flash gpt-6-sol gpt-5.6-terra gpt-6-luna))
+      :models '(gemini-3.8-flash))
     (gptel-make-openai "chatanywhere"
       :host "api.chatanywhere.tech"
       :key 'gptel-api-key
