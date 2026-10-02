@@ -251,9 +251,6 @@
 [submodule "lib/gptel-preset-collection"]
 	path = lib/gptel-preset-collection
 	url = https://github.com/karthink/gptel-preset-collection.git
-[submodule "lib/gptel-inline"]
-	path = lib/gptel-inline
-	url = https://github.com/karthink/gptel-inline.git
 [submodule "lib/gptel-annotate"]
 	path = lib/gptel-annotate
 	url = https://github.com/karthink/gptel-annotate.git
@@ -269,3 +266,6 @@
 [submodule "lib/code-cells"]
 	path = lib/code-cells
 	url = https://github.com/astoff/code-cells.el.git
+[submodule "lib/gptel-quick"]
+	path = lib/gptel-quick
+	url = https://github.com/karthink/gptel-quick.git

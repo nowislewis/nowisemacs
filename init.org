@@ -36,6 +36,7 @@ I fell in love with denote, so previous *org-roam* configs were refiled into [[f
 (setopt ring-bell-function 'ignore)
 (set-default-coding-systems 'utf-8)
 (setq-default indent-tabs-mode nil)
+(setq load-prefer-newer t)
 
 (setopt next-screen-context-lines 0) ;; scroll up/down lines
 (setq-default tab-width 4)
@@ -480,18 +481,18 @@ Maybe I should add a new state.
 #+end_src
 ** smart-bind
 #+begin_src elisp
-    (defun nowis/smart-bind (key condition-fn new-fn &optional keymap)
-      "Bind KEY to NEW-FN when CONDITION-FN is true, otherwise use original binding."
-      (let* ((map (or keymap global-map))
-             (original-binding (lookup-key map (kbd key))))
-        (define-key map (kbd key)
-                    (lambda ()
-                      (interactive)
-                      (if (funcall condition-fn)
-                          (call-interactively new-fn)
-                        (if original-binding
-                            (call-interactively original-binding)
-                          (message "No original binding for %s" key)))))))
+(defun nowis/smart-bind (key condition-fn new-fn &optional keymap)
+  "Bind KEY to NEW-FN when CONDITION-FN is true, otherwise use original binding."
+  (let* ((map (or keymap global-map))
+         (original-binding (lookup-key map (kbd key))))
+    (define-key map (kbd key)
+                (lambda ()
+                  (interactive)
+                  (if (funcall condition-fn)
+                      (call-interactively new-fn)
+                    (if original-binding
+                        (call-interactively original-binding)
+                      (message "No original binding for %s" key)))))))
 #+end_src
 * Package Library
 #+begin_src elisp
@@ -765,22 +766,6 @@ diff-hl-mode highlights uncommitted changes on the left side of the window
 #+begin_src elisp
 (setup consult
   (keymap-global-set "C-x b" #'consult-buffer)
-  ;; 选 buffer 时自动跳到它所在的 tab（替代 tabspaces-switch-buffer-and-tab）
-  (with-eval-after-load 'consult
-    ;; 选 buffer 时：若它属于别的 tab，先把当前窗口(被 preview 污染)切回
-    ;; 原来的 buffer，再跳到目标 tab 显示。这样当前 tab 不残留该 buffer。
-    (plist-put
-     consult-source-buffer :action
-     (lambda (buf)
-       (if-let* ((tab (tab-bar-get-buffer-tab buf nil t))
-                 (name (alist-get 'name tab)))
-           (progn
-             ;; 恢复当前窗口：切回 preview 之前显示的 buffer
-             (when-let* ((prev (caar (window-prev-buffers))))
-               (switch-to-buffer prev 'norecord))
-             (tab-bar-switch-to-tab name)
-             (switch-to-buffer buf))
-         (consult--buffer-action buf)))))
   (setq register-preview-function #'consult-register-format)
   (setopt register-preview-delay 0.1
         xref-show-xrefs-function #'consult-xref
@@ -1009,10 +994,12 @@ Jump anywhere in the world
 *** ace-window
 #+begin_src elisp
 (setup ace-window
-  (keymap-global-set "M-o" #'ace-window))
+  (keymap-global-set "M-o" #'ace-window)
+  (:when-loaded
+    (ace-window-posframe-mode 1))
+  )
 (setq aw-keys '(?a ?s ?d ?f ?g ?h ?j ?k ?l)
-      aw-scope 'frame
-      )
+      aw-scope 'frame)
 (defun ace-window-prefix ()
   (interactive)
   (display-buffer-override-next-command
@@ -1025,7 +1012,7 @@ Jump anywhere in the world
    nil "[ace-window]")
   (message "Use `ace-window' to display next command buffer..."))
 (keymap-global-set "C-x 4 o" 'ace-window-prefix)
-  ;; (keymap-global-set "M-O" #'ace-window-prefix)
+;; (keymap-global-set "M-O" #'ace-window-prefix)
 #+end_src
 * ibuffer
 ** ibuffer
@@ -1481,8 +1468,7 @@ borrowed from citre, now you can always jump-back use "M-," after any jump in th
 (setup hideshow
   (:with-hook prog-mode-hook
     (:hook hs-minor-mode))
-  (add-to-list 'hs-special-modes-alist '(verilog-mode "\\(\\<begin\\>\\|\\<case\\>\\|\\<module\\>\\|\\<class\\>\\|\\<function\\>\\|\\<task\\>\\)"
-                                                      )))
+  (add-to-list 'hs-special-modes-alist '(verilog-mode "\\(\\<begin\\>\\|\\<case\\>\\|\\<module\\>\\|\\<class\\>\\|\\<function\\>\\|\\<task\\>\\)")))
 #+end_src
 *** apheleia
 #+begin_src elisp
@@ -2047,13 +2033,6 @@ id 仅作兜底。"
       (setq buffer-read-only t)
       (pop-to-buffer (current-buffer)))))
 #+end_src
-*** nowis-gantt
-#+begin_src elisp
-(setup nowis-gantt
-  (:autoload nowis/gtd-gantt)
-  (setq nowis/gantt-timezone "Asia/Shanghai"
-        nowis/gantt-done-color "#a6e3a1"))
-#+end_src
 ** org-sm
 #+begin_src elisp
 (setup org-sm
@@ -2179,7 +2158,7 @@ Simple distraction-free editing. I use darkroom instead of writeroom because it'
           gptel-highlight-methods '(face margin)
           gptel-model 'gpt-6-luna
           gptel-cache t
-          gptel-max-tokens nil
+          gptel-max-tokens 16384
           gptel-confirm-tool-calls nil
           gptel-include-tool-results 'auto
           gptel-org-convert-response nil)
@@ -2195,7 +2174,7 @@ Simple distraction-free editing. I use darkroom instead of writeroom because it'
                     :host "llm-gateway.momenta.works"
                     :key 'gptel-api-key
                     :stream t
-                    :models '(kimi-k3 qwen3.8-flash gpt-5.6-terra gpt-6-luna)))
+                    :models '(kimi-k3 qwen3.8-flash gpt-5.6-terra gpt-6-luna gpt-6.1-sol)))
     (gptel-make-anthropic "momenta"
       :host "llm-gateway.momenta.works"
       :key 'gptel-api-key
@@ -2256,16 +2235,30 @@ Simple distraction-free editing. I use darkroom instead of writeroom because it'
         gptel-local-org-prompts-preview-length 100)
   )
 #+end_src
-*** gptel-inline
+*** gptel-quick
 #+begin_src elisp
-(setup gptel-inline
-  (keymap-global-set "M-l" #'gptel-inline)
+(setup gptel-quick
   (:when-loaded
-    (define-advice gptel-inline--response-overlay-append-chunk
-        (:around (fn ov chunk) inhibit-read-only)
-      (let ((inhibit-read-only t))
-        (funcall fn ov chunk)))
-    ))
+    (require 'nowis-gptel-prompt)
+    (setq gptel-quick-timeout 40
+          gptel-quick-system-message
+          (lambda (_count) (nowis-gptel-prompt--compose
+                            "用简明扼要的中文解释:")))
+    (define-advice gptel-quick--update-posframe (:after (&rest _) org-fontify)
+      "Render Org explicitly because the hidden buffer disables Font Lock."
+      (when (get-buffer " *gptel-quick*")
+        (with-current-buffer " *gptel-quick*"
+          (unless (derived-mode-p 'org-mode) (org-mode))
+          (visual-line-mode 1)
+          (font-lock-fontify-region (point-min) (point-max)))))
+    (define-advice gptel-quick (:around (fn &rest args) reasoning-budget)
+      "Reserve reasoning tokens without increasing the requested answer length."
+      (let ((gptel--request-params
+             (plist-put (copy-sequence gptel--request-params) :max_tokens 8192)))
+        (apply fn args))))
+  (keymap-global-set "M-l" #'gptel-quick)
+  (with-eval-after-load 'embark
+    (keymap-set embark-general-map "?" #'gptel-quick)))
 #+end_src
 *** gptel-annotate
 #+begin_src elisp
@@ -2381,14 +2374,38 @@ ESUP - Emacs Start Up Profiler
 #+end_src
 ** nethack
 #+begin_src elisp
-(defun nowis-nethack-disable-meow ()
-  "Let NetHack own all input keys in its interactive buffers."
-  (meow-mode -1))
+(defun nowis-nethack-confirm-kill-buffer ()
+  "Confirm killing a live game's core buffer, but allow normal exit cleanup."
+  (or (not (nethack-is-running))
+      (not (memq (current-buffer)
+                 (list nethack-map-buffer nethack-message-buffer
+                       nethack-status-buffer nethack-inventory-buffer)))
+      (yes-or-no-p "NetHack is running; killing this buffer can break its UI. Kill anyway? ")))
+
+(defun nowis-nethack-setup-buffer ()
+  "Protect game buffers; reserve game keys, but allow Meow in the message log."
+  (add-hook 'kill-buffer-query-functions
+            #'nowis-nethack-confirm-kill-buffer nil t)
+  (if (derived-mode-p 'nethack-message-mode)
+      (meow-mode 1)
+    (meow-mode -1))
+  (when (derived-mode-p 'nethack-map-mode)
+    (hl-line-mode -1)
+    (visual-line-mode -1)
+    (setq-local global-hl-line-mode nil
+                display-line-numbers nil
+                truncate-lines t
+                line-spacing nil)))
 
 (setup nethack
+  (add-to-list 'meow-mode-state-list '(nethack-message-mode . normal))
   (setq nethack-use-tiles "nethack500")
-  (add-hook 'nethack-map-mode-hook #'nowis-nethack-disable-meow)
-  (add-hook 'nethack-menu-mode-hook #'nowis-nethack-disable-meow))
+  (with-eval-after-load 'nethack-keys
+    (keymap-set nethack-map-mode-map "M-o" #'ace-window))
+  (dolist (hook '(nethack-map-mode-hook nethack-menu-mode-hook
+                                        nethack-message-mode-hook nethack-status-mode-hook))
+    (add-hook hook #'nowis-nethack-setup-buffer)))
+
 #+end_src
 * system-config
 ** wslg
