@@ -143,9 +143,6 @@
 [submodule "parsebib"]
 	path = lib/parsebib
 	url = https://github.com/joostkremers/parsebib.git
-[submodule "pinyinlib"]
-	path = lib/pinyinlib
-	url = https://github.com/nowislewis/pinyinlib.el.git
 [submodule "popper"]
 	path = lib/popper
 	url = https://github.com/karthink/popper.git
@@ -155,9 +152,6 @@
 [submodule "rainbow-delimiters"]
 	path = lib/rainbow-delimiters
 	url = https://github.com/Fanael/rainbow-delimiters.git
-[submodule "rime"]
-	path = lib/rime
-	url = https://github.com/DogLooksGood/emacs-rime.git
 [submodule "s"]
 	path = lib/s
 	url = https://github.com/magnars/s.el.git
@@ -251,9 +245,6 @@
 [submodule "lib/gptel-preset-collection"]
 	path = lib/gptel-preset-collection
 	url = https://github.com/karthink/gptel-preset-collection.git
-[submodule "lib/gptel-annotate"]
-	path = lib/gptel-annotate
-	url = https://github.com/karthink/gptel-annotate.git
 [submodule "lib/ratex"]
 	path = lib/ratex
 	url = https://github.com/gongshangzheng/ratex.el.git
@@ -269,3 +260,12 @@
 [submodule "lib/gptel-quick"]
 	path = lib/gptel-quick
 	url = https://github.com/karthink/gptel-quick.git
+[submodule "lib/rimel"]
+	path = lib/rimel
+	url = https://github.com/emacs-rime/rimel.git
+[submodule "lib/liberime"]
+	path = lib/liberime
+	url = https://github.com/emacs-rime/liberime.git
+[submodule "lib/excali-mode"]
+	path = lib/excali-mode
+	url = https://github.com/yibie/excali-mode.git

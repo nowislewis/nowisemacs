@@ -887,19 +887,14 @@ diff-hl-mode highlights uncommitted changes on the left side of the window
     (message "Copied: %s" (minibuffer-contents))))
 (keymap-set minibuffer-mode-map "M-w" #'nowis/minibuffer-kill-ring-save)
 #+end_src
-** Orderless and pinyinlib
+** Orderless
 #+begin_src elisp
 (setup orderless
   (setq completion-category-defaults nil)
   (setopt completion-styles '(orderless basic)
           completion-category-overrides '((file (styles partial-completion)))
           orderless-expand-substring nil
-          completion-pcm-leading-wildcard t)
-  (:when-loaded
-    (require 'pinyinlib)
-    (defun completion--regex-pinyin (str)
-      (orderless-regexp (pinyinlib-build-regexp-string str)))
-    (add-to-list 'orderless-matching-styles 'completion--regex-pinyin)))
+          completion-pcm-leading-wildcard t))
 #+end_src
 ** Marginalia
 #+begin_src elisp
@@ -1025,49 +1020,39 @@ Jump anywhere in the world
 #+begin_src elisp
 (setup posframe)
 #+end_src
-** rime
+** rimel
 #+begin_src elisp
-(setopt default-input-method "rime")
-(with-eval-after-load 'rime
-  ;; Override: use \cC (real CJK only) to include ─ │ ┌ etc(mindmap)
-  (defun rime-predicate-space-after-cc-p ()
-    (string-match-p "\\cC +$"
-                    (buffer-substring (point) (max (line-beginning-position) (- (point) 80)))))
-  (defun nowis/rime-disable-predicates ()
-    (let ((common '(
-                    rime-predicate-current-input-punctuation-p
-                    rime-predicate-current-uppercase-letter-p
-                    rime-predicate-after-ascii-char-p
-                    rime-predicate-space-after-cc-p
-                    ;; special mode
-                    rime-predicate-ace-window-p
-                    meow-normal-mode-p
-                    meow-motion-mode-p
-                    meow-keypad-mode-p
-                    rime-predicate-ace-window-p)))
-      (if (derived-mode-p 'eat-mode)
-          common
-        (append common '(rime-predicate-prog-in-code-p
-                         )))))
-  (add-hook 'rime-mode-hook
-            (lambda ()
-              (setq-local rime-disable-predicates
-                          (funcall #'nowis/rime-disable-predicates))))
+(setup liberime
+  (setq liberime-user-data-dir "~/Documents/rime/"
+        liberime-shared-data-dir "~/Documents/rime/"
+        liberime-auto-build t))
 
-  (setq rime-show-candidate 'posframe
-        rime-posframe-properties (list :internal-border-width 0
-                                       :font lewis-fixed-font)
-        rime-user-data-dir "~/Documents/rime/"
-        rime-share-data-dir "~/Documents/rime/"
-        rime-inline-ascii-trigger 'shift-r
+(setopt default-input-method "rimel")
+(defun nowis/rimel-space-after-chinese-p ()
+  "汉字后有空格时输入英文，排除框线等非汉字字符。"
+  (string-match-p
+   "\\cC +$"
+   (buffer-substring-no-properties
+    (max (line-beginning-position) (- (point) 80))
+    (point))))
+
+(setup rimel
+  (setq rimel-posframe-style 'horizontal
+        rimel-candidate-show-preedit nil
+        rimel-inline-preedit t
+        rimel-posframe-properties nil
         )
-  )
-(when (eq system-type 'darwin)
-  (setq rime-emacs-module-header-root "/Applications/Emacs.app/Contents/Resources/include/" ;; use build-emacs
-        rime-librime-root "/opt/homebrew/opt/librime/"
-        ))
+  (setq rimel-disable-predicates
+        '(rimel-predicate-prog-in-code-p
+          rimel-predicate-after-ascii-char-p
+          nowis/rimel-space-after-chinese-p
+          meow-normal-mode-p
+          meow-motion-mode-p
+          meow-keypad-mode-p))
+  (:when-loaded
+    (rimel-regexp-mode 1)
+    ))
 #+end_src
-
 * File and Browsing
 ** file browsing
 *** dired & dired-hacks
@@ -2103,8 +2088,9 @@ id 仅作兜底。"
  (:autoload org-mindmap-mode)
  (:hook-into org-mode))
 #+end_src
-** excalidraw
+** excali-mode
 #+begin_src elisp
+(setup excali-mode)
 #+end_src
 ** ob-artist
 #+begin_src elisp
@@ -2259,10 +2245,6 @@ Simple distraction-free editing. I use darkroom instead of writeroom because it'
   (keymap-global-set "M-l" #'gptel-quick)
   (with-eval-after-load 'embark
     (keymap-set embark-general-map "?" #'gptel-quick)))
-#+end_src
-*** gptel-annotate
-#+begin_src elisp
-(setup gptel-annotate)
 #+end_src
 *** read & speek
 #+begin_src elisp
