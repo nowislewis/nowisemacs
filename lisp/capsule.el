@@ -1,9 +1,10 @@
 ;;; capsule.el --- Minimal package manager -*- lexical-binding: t; -*-
 
 ;; A ultra-simplified replacement for borg.
-;; Only handles: autoload generation, byte compilation, and package activation.
+;; Git owns versions; Capsule prepares, compiles, and activates local packages.
 
 (require 'cl-lib)
+(require 'subr-x)
 
 (defvar capsule-drones-directory
   (expand-file-name "lib/" user-emacs-directory)
@@ -16,38 +17,35 @@
   "List of package names to skip when generating autoloads.
 Each element should be a package name (string) as it appears in lib/ directory.")
 
+(defvar capsule--config nil
+  "Configuration snapshot dynamically shared within one Capsule operation.")
+
 ;;; Runtime: Initialize packages
 
 ;;;###autoload
 (defun capsule-initialize ()
   "Initialize all packages in lib/ directory.
 Adds each package to load-path and loads each package's autoloads file."
-  (let ((count 0)
-        (new-load-path '()))
-    ;; Collect all directories and load autoloads
-    (dolist (pkg-dir (directory-files capsule-drones-directory t "^[^.]"))
-      (when (file-directory-p pkg-dir)
-        (let* ((pkg-name (file-name-nondirectory pkg-dir))
+  (let ((capsule--config (capsule--read-config)))
+    ;; Autoload forms may require other packages, so install all paths first.
+    (capsule--setup-load-path-all)
+    (let ((pkg-dirs (capsule--package-directories)))
+      (dolist (pkg-dir pkg-dirs)
+	(let* ((pkg-name (file-name-nondirectory pkg-dir))
                (autoloads-file (expand-file-name
-                               (format "%s-autoloads.el" pkg-name)
-                               pkg-dir)))
-          ;; Load autoloads if exists
+				(format "%s-autoloads.el" pkg-name) pkg-dir)))
           (when (file-exists-p autoloads-file)
-            (with-demoted-errors "Error loading %s: %%s" autoloads-file
-              (load autoloads-file nil t)))
-          ;; Collect package root directory
-          (push pkg-dir new-load-path)
-          ;; Collect whitelisted subdirectories
-          (dolist (subdir capsule-compile-directories)
-            (let ((subdir-path (expand-file-name subdir pkg-dir)))
-              (when (file-directory-p subdir-path)
-                (push subdir-path new-load-path))))
-          (cl-incf count))))
-    ;; Add all collected directories to load-path at once (in reverse order)
-    (setq load-path (nconc (nreverse new-load-path) load-path))
-    (message "Capsule: Initialized %d packages" count)))
+            (condition-case err
+		(load autoloads-file nil t)
+              (error (message "Error loading %s: %S" autoloads-file err))))))
+      (message "Capsule: Initialized %d packages" (length pkg-dirs)))))
 
 ;;; Build-time: Batch functions (called from Makefile)
+
+(defun capsule--package-directories ()
+  "Return package directories in stable order for both activation and builds."
+  (cl-remove-if-not #'file-directory-p
+                    (directory-files capsule-drones-directory t "^[^.]")))
 
 (defun capsule--should-compile-p (file)
   "Return non-nil if FILE should be compiled."
@@ -60,124 +58,234 @@ Adds each package to load-path and loads each package's autoloads file."
          (not (string-suffix-p "-tests.el" filename)))))
 
 (defun capsule--collect-el-files (dir)
-  "Collect .el files from DIR and whitelisted subdirectories."
-  (let ((files (directory-files dir t "^[^.].*\\.el\\'")))
-    ;; Collect files in whitelisted subdirectories
-    (dolist (subdir capsule-compile-directories)
-      (let ((subdir-path (expand-file-name subdir dir)))
-        (when (file-directory-p subdir-path)
-          (setq files (append files
-                             (directory-files-recursively subdir-path "^[^.].*\\.el\\'"))))))
-    ;; Filter files
-    (cl-remove-if-not #'capsule--should-compile-p files)))
+  "Collect .el files directly in selected directories, without recursion.
+Match the load-path and autoload scope; optional nested extensions stay opt-in."
+  (cl-remove-if-not
+   #'capsule--should-compile-p
+   (delete-dups
+    (cl-mapcan (lambda (directory)
+                 (directory-files directory t "^[^.].*\\.el\\'"))
+               (capsule--get-package-dirs dir)))))
 
 (defun capsule--get-package-dirs (package)
-  "Get scan directories for PACKAGE (root + whitelisted subdirs)."
-  (let* ((pkg-dir (if (file-name-absolute-p package)
-                      package
-                    (expand-file-name package capsule-drones-directory)))
+  "Get PACKAGE's root, default subdirectories and extra .gitmodules load-path.
+Explicit paths are additive and shared by activation, autoloads and compilation."
+  (let* ((pkg-dir (directory-file-name
+                   (expand-file-name package capsule-drones-directory)))
          (scan-dirs (list pkg-dir)))
     (dolist (subdir capsule-compile-directories)
-      (let ((subdir-path (expand-file-name subdir pkg-dir)))
-        (when (file-directory-p subdir-path)
-          (push subdir-path scan-dirs))))
-    (nreverse scan-dirs)))
+      (let ((path (directory-file-name (expand-file-name subdir pkg-dir))))
+        (when (file-directory-p path) (push path scan-dirs))))
+    (dolist (subdir (capsule--package-config-values pkg-dir "load-path"))
+      (let ((path (directory-file-name (expand-file-name subdir pkg-dir))))
+        (unless (and (file-directory-p path) (file-in-directory-p path pkg-dir))
+          (error "Capsule: Invalid load-path %S for %s (must be an existing directory inside the package)"
+                 subdir pkg-dir))
+        (push path scan-dirs)))
+    (delete-dups (nreverse scan-dirs))))
 
-(defun capsule--generate-autoloads (pkg-dir)
-  "Generate autoloads for package at PKG-DIR."
-  (let* ((pkg-name (file-name-nondirectory pkg-dir))
+(defun capsule--read-config ()
+  "Read .gitmodules once into path-to-prefix and key-to-values tables.
+Git handles quoting; NUL records preserve newlines in command values."
+  (let ((modules (expand-file-name ".gitmodules" user-emacs-directory))
+        (paths (make-hash-table :test #'equal))
+        (values (make-hash-table :test #'equal)))
+    (when (file-exists-p modules)
+      (with-temp-buffer
+        (let* ((default-directory user-emacs-directory)
+               (status (process-file "git" nil '(t t) nil "config" "--file"
+                                     modules "--null" "--list")))
+          (unless (equal status 0)
+            (error "Capsule: Cannot read %s (exit %s): %s"
+                   modules status (buffer-string))))
+        (dolist (record (split-string (buffer-string) "\0" t))
+          (when (string-match "\n" record)
+            (let ((key (substring record 0 (match-beginning 0)))
+                  (value (substring record (1+ (match-beginning 0)))))
+              (puthash key (cons value (gethash key values)) values))))
+        (maphash
+         (lambda (key entries)
+           (setq entries (nreverse entries))
+           (puthash key entries values)
+           (when (string-match "\\`submodule\\..+\\.path\\'" key)
+             (puthash (directory-file-name
+                       (expand-file-name (car (last entries)) user-emacs-directory))
+                      (substring key 0 -4) paths)))
+         values)))
+    (cons paths values)))
+
+(defun capsule--package-config-values (pkg-dir field)
+  "Return FIELD values for PKG-DIR from the current operation's snapshot."
+  (when-let* ((prefix (gethash (directory-file-name (expand-file-name pkg-dir))
+                               (car capsule--config))))
+    (gethash (concat prefix field) (cdr capsule--config))))
+
+(defun capsule--run-pre-build-command (pkg-dir)
+  "Run PKG-DIR's trusted .gitmodules Shell command before scanning sources.
+Only explicit builds call this; a failed command stops the package build.
+The command runs on every build, so it should be safe to repeat."
+  (let ((command (car (last (capsule--package-config-values
+                             pkg-dir "pre-build-command")))))
+    (when (and command (not (string-empty-p command)))
+      (let ((default-directory (file-name-as-directory pkg-dir)))
+        (message "Capsule: %s: %s" pkg-dir command)
+        (capsule--run-process shell-file-name shell-command-switch command)))))
+
+(defun capsule--prepare-package (pkg-dir)
+  "Run the pre-build command and generate autoloads using the operation's config."
+  (capsule--run-pre-build-command pkg-dir)
+  (require 'loaddefs-gen)
+  (let* ((pkg-name (file-name-nondirectory (directory-file-name pkg-dir)))
          (autoloads-file (expand-file-name (format "%s-autoloads.el" pkg-name) pkg-dir))
          (scan-dirs (capsule--get-package-dirs pkg-dir)))
     (message " Creating %s..." autoloads-file)
     (let ((default-directory pkg-dir))
-      (loaddefs-generate
-       scan-dirs
-       autoloads-file
-       nil  ; no excludes
-       nil)))) ; no extra-data
+      (loaddefs-generate scan-dirs autoloads-file nil
+                         ";; Generated by Capsule; safe for capsule-batch-clean.\n"))))
 
 (defvar capsule-use-native-compile nil
   "Whether to use native compilation instead of byte compilation.")
 
 (defun capsule--compile-package (pkg-dir)
-  "Compile all Elisp files in PKG-DIR."
+  "Compile Elisp files in PKG-DIR except .gitmodules no-byte-compile paths.
+Repeated entries are literal paths relative to the package root and exclude
+both byte and native compilation, but do not remove existing artifacts."
   (require 'bytecomp)
-  (let ((byte-compile-warnings '(not free-vars unresolved))
-        (files (capsule--collect-el-files pkg-dir)))
-    (if capsule-use-native-compile
-        (progn
-          (require 'comp)
-          (dolist (file files)
-            (native-compile file)))
-      (dolist (file files)
-        (byte-compile-file file)))))
+  (when capsule-use-native-compile (require 'comp))
+  (let* ((byte-compile-warnings '(not free-vars unresolved))
+         (excluded (mapcar (lambda (path) (expand-file-name path pkg-dir))
+                           (capsule--package-config-values pkg-dir "no-byte-compile")))
+         (files (cl-remove-if (lambda (file) (member file excluded))
+			      (capsule--collect-el-files pkg-dir))))
+    (dolist (file files)
+      ;; Native compilation signals failures but may return nil for skipped files.
+      (let ((result (funcall (if capsule-use-native-compile
+                                 #'native-compile #'byte-compile-file) file)))
+        (unless (or capsule-use-native-compile result)
+          (error "Capsule: Byte compilation failed: %s" file))))))
 
 (defun capsule--setup-load-path-all ()
   "Add all packages and their whitelisted subdirectories to load-path."
-  (let ((pkg-dirs (cl-remove-if-not #'file-directory-p
-                                    (directory-files capsule-drones-directory t "^[^.]"))))
-    (dolist (pkg-dir pkg-dirs)
-      (dolist (dir (capsule--get-package-dirs pkg-dir))
-        (add-to-list 'load-path dir)))))
+  (setq load-path
+        (delete-dups
+         (append (cl-mapcan #'capsule--get-package-dirs
+                            (capsule--package-directories))
+                 (cons (directory-file-name (expand-file-name "themes" data-directory))
+                       load-path)))))
 
-(defun capsule-batch-autoloads ()
-  "Generate autoloads for all packages.
+(defun capsule--check-native (native)
+  "Reject unsupported native compilation before any preparation or compilation."
+  (when (and native (not (and (fboundp 'native-comp-available-p)
+                             (native-comp-available-p))))
+    (error "Capsule: NATIVE=1 requires an Emacs built with native compilation")))
+
+(defun capsule-batch-prepare (&optional native)
+  "Run pre-build commands and generate autoloads for all packages.
 This function is meant to be called from Emacs --batch mode."
   (unless noninteractive
-    (error "capsule-batch-autoloads is only for batch mode"))
+    (error "capsule-batch-prepare is only for batch mode"))
 
-  (require 'loaddefs-gen)
-
-  (let ((pkg-dirs (cl-remove-if-not #'file-directory-p
-                                    (directory-files capsule-drones-directory t "^[^.]"))))
-    (dolist (pkg-dir pkg-dirs)
+  (capsule--check-native native)
+  (let ((capsule--config (capsule--read-config)))
+    (dolist (pkg-dir (capsule--package-directories))
       (let ((pkg-name (file-name-nondirectory pkg-dir)))
         (if (member pkg-name capsule-skip-autoloads-packages)
             (message "\n--- [%s] (skipped) ---\n" pkg-name)
           (message "\n--- [%s] ---\n" pkg-name)
-          (capsule--generate-autoloads pkg-dir))))))
+          (capsule--prepare-package pkg-dir))))))
 
-(defun capsule-batch-compile-single (package)
-  "Compile a single PACKAGE (used for parallel build).
+(defun capsule-batch-compile (directory &optional native)
+  "Compile DIRECTORY with dependency paths, optionally using NATIVE compilation.
+DIRECTORY is relative to the build working directory, or absolute.
 This function is meant to be called from Emacs --batch mode."
   (unless noninteractive
-    (error "capsule-batch-compile-single is only for batch mode"))
+    (error "capsule-batch-compile is only for batch mode"))
 
-  (let ((pkg-dir (expand-file-name package capsule-drones-directory)))
-    (unless (file-directory-p pkg-dir)
-      (error "Package directory not found: %s" pkg-dir))
+  (capsule--check-native native)
+  (let ((capsule--config (capsule--read-config))
+        (capsule-use-native-compile native))
+    (let ((pkg-dir (expand-file-name directory)))
+      (unless (file-directory-p pkg-dir)
+	(error "Package directory not found: %s" pkg-dir))
 
-    ;; Setup load-path for dependencies
-    (capsule--setup-load-path-all)
+      ;; Setup load-path for dependencies
+      (capsule--setup-load-path-all)
 
-    ;; Compile the package
-    (capsule--compile-package pkg-dir)))
+      ;; Compile the package
+      (capsule--compile-package pkg-dir))))
 
-(defun capsule-batch-build-single (package)
-  "Build a single PACKAGE: generate autoloads and compile its files.
+(defun capsule-batch-build-single (package &optional native)
+  "Prepare and compile PACKAGE, optionally using NATIVE compilation.
 This function is meant to be called from Emacs --batch mode."
   (unless noninteractive
     (error "capsule-batch-build-single is only for batch mode"))
 
-  (require 'loaddefs-gen)
+  (capsule--check-native native)
+  (let ((capsule-use-native-compile native))
+    (capsule--build-package (expand-file-name package capsule-drones-directory))))
 
-  (let ((pkg-dir (expand-file-name package capsule-drones-directory)))
-    (unless (file-directory-p pkg-dir)
-      (error "Package directory not found: %s" pkg-dir))
-
-    (message "\n--- [%s] ---\n" package)
-
-    ;; Generate autoloads, setup load-path, and compile
-    (capsule--generate-autoloads pkg-dir)
+(defun capsule--build-package (pkg-dir)
+  "Prepare and compile PKG-DIR, shared by batch builds and interactive adds.
+An explicit single-package build ignores the bulk autoload skip list."
+  (unless (file-directory-p pkg-dir)
+    (error "Package directory not found: %s" pkg-dir))
+  (let ((capsule--config (capsule--read-config)))
+    (message "\n--- [%s] ---\n" (file-name-nondirectory (directory-file-name pkg-dir)))
+    (capsule--prepare-package pkg-dir)
     (capsule--setup-load-path-all)
     (capsule--compile-package pkg-dir)))
 
+(defun capsule-batch-clean ()
+  "Remove selected sources' bytecode and Capsule-marked autoload files.
+Do not recurse into unselected extensions or touch the shared native cache."
+  (unless noninteractive (error "capsule-batch-clean is only for batch mode"))
+  (require 'bytecomp)
+  (let ((capsule--config (capsule--read-config)))
+    (dolist (dir (append (capsule--package-directories)
+                        (list (expand-file-name "lisp" user-emacs-directory))))
+      (when (file-directory-p dir)
+        (dolist (source (capsule--collect-el-files dir))
+          (let ((bytecode (byte-compile-dest-file source)))
+            (when (file-exists-p bytecode) (delete-file bytecode))))
+        (let ((autoloads (expand-file-name
+                          (format "%s-autoloads.el" (file-name-nondirectory dir)) dir)))
+          (when (and (file-exists-p autoloads)
+                     (with-temp-buffer
+                       (insert-file-contents autoloads)
+                       (search-forward ";; Generated by Capsule; safe for capsule-batch-clean." nil t)))
+            (delete-file autoloads)))))))
+
 ;;; Interactive package management
+
+(defun capsule--run-process (program &rest args)
+  "Run PROGRAM with literal ARGS in the caller's directory; report failures."
+  (with-temp-buffer
+    (let ((status (apply #'process-file program nil '(t t) nil args)))
+      (unless (zerop (buffer-size))
+        (message "%s" (buffer-string)))
+      (unless (equal status 0)
+        (error "Capsule: %s failed in %s (exit %s): %S"
+               program default-directory status args)))))
+
+(defun capsule--git (&rest args)
+  "Run Git in the configuration repository, stopping on failure."
+  (let ((default-directory user-emacs-directory))
+    (apply #'capsule--run-process "git" args)))
+
+(defun capsule--package-path (name)
+  "Return NAME's repository-relative path.
+Reject names that could address files outside the package directory."
+  (unless (and (not (string-empty-p name))
+               (not (member name '("." "..")))
+               (equal name (file-name-nondirectory name)))
+    (user-error "Invalid package name: %s" name))
+  (file-relative-name (expand-file-name name capsule-drones-directory)
+                      user-emacs-directory))
 
 ;;;###autoload
 (defun capsule-add-package (url &optional name)
   "Add a new package from git URL.
-NAME is optional package name (defaults to git repo name).
+NAME defaults to the repository basename.  Only interactive calls prompt.
 Adds as git submodule, generates autoloads, and compiles."
   (interactive "sPackage git URL: ")
   (let* ((default-directory user-emacs-directory)
@@ -186,37 +294,33 @@ Adds as git submodule, generates autoloads, and compiles."
                                (match-string 1 url))
                           (and (string-match "/\\([^/]+\\)/?\\'" url)
                                (match-string 1 url))))
-         (pkg-name (if parsed-name
-                       (read-string (format "Package name (default %s): " parsed-name)
-                                    nil nil parsed-name)
-                     (read-string "Package name: ")))
-         (pkg-path (format "lib/%s" pkg-name)))
-    (unless (yes-or-no-p (format "Add package '%s' from %s? " pkg-name url))
+         (pkg-name (if (called-interactively-p 'interactive)
+                       (read-string "Package name: " nil nil parsed-name)
+                     (or parsed-name (user-error "Cannot infer package name from %s" url))))
+         (pkg-path (capsule--package-path pkg-name)))
+    (unless (or (not (called-interactively-p 'interactive))
+                (yes-or-no-p (format "Add package '%s' from %s? " pkg-name url)))
       (user-error "Cancelled"))
     ;; Add submodule
     (message "Adding git submodule...")
-    (shell-command (format "git submodule add --force %s %s" url pkg-path))
-    (shell-command "git submodule update --init --recursive")
+    (capsule--git "submodule" "add" "--force" "--" url pkg-path)
+    (capsule--git "submodule" "update" "--init" "--recursive" "--" pkg-path)
     ;; Build package
     (let ((pkg-dir (expand-file-name pkg-path user-emacs-directory)))
-      (when (file-directory-p pkg-dir)
-        (message "Generating autoloads...")
-        (capsule--generate-autoloads pkg-dir)
-        (message "Compiling package...")
-        (capsule--setup-load-path-all)
-        (capsule--compile-package pkg-dir)
-        (message "Package '%s' added successfully!" pkg-name)
-        (message "Don't forget to configure it in your init.el")))))
+      (capsule--build-package pkg-dir)
+      (message "Package '%s' added successfully; configure it in your init.el" pkg-name))))
 
 ;;;###autoload
 (defun capsule-remove-package (name)
   "Remove package NAME.
-Removes git submodule and cleans up files."
+Removes the submodule worktree and registration.
+Retains Git's module metadata so existing history is not discarded."
   (interactive
    (list (completing-read "Remove package: "
-                          (directory-files capsule-drones-directory nil "^[^.]"))))
+                          (mapcar #'file-name-nondirectory
+                                  (capsule--package-directories)))))
   (let* ((default-directory user-emacs-directory)
-         (pkg-path (format "lib/%s" name))
+         (pkg-path (capsule--package-path name))
          (pkg-dir (expand-file-name pkg-path user-emacs-directory)))
     (unless (file-directory-p pkg-dir)
       (user-error "Package '%s' not found" name))
@@ -224,9 +328,8 @@ Removes git submodule and cleans up files."
       (user-error "Cancelled"))
     ;; Remove submodule
     (message "Removing git submodule...")
-    (shell-command (format "git submodule deinit -f %s" pkg-path))
-    (shell-command (format "git rm -f %s" pkg-path))
-    (shell-command (format "rm -rf .git/modules/%s" pkg-path))
+    (capsule--git "submodule" "deinit" "-f" "--" pkg-path)
+    (capsule--git "rm" "-f" "--" pkg-path)
     (message "Package '%s' removed successfully!" name)
     (message "Don't forget to remove its configuration from init.el")))
 

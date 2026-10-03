@@ -23,7 +23,7 @@
 [submodule "citar-denote"]
 	path = lib/citar-denote
 	url = https://github.com/pprevos/citar-denote.git
-    no-byte-compile = minimum-config.el 
+    no-byte-compile = minimum-config.el
 [submodule "cond-let"]
 	path = lib/cond-let
 	url = https://github.com/tarsius/cond-let.git
@@ -57,6 +57,7 @@
 [submodule "dired-hacks"]
 	path = lib/dired-hacks
 	url = https://github.com/Fuco1/dired-hacks.git
+    no-byte-compile = dired-images.el
 [submodule "elisp-demos"]
 	path = lib/elisp-demos
 	url = https://github.com/xuchunyang/elisp-demos.git
@@ -103,7 +104,6 @@
 [submodule "lisp-fsrs"]
 	path = lib/lisp-fsrs
 	url = https://github.com/open-spaced-repetition/lisp-fsrs.git
-    build-step = borg-makeinfo
 [submodule "llama"]
 	path = lib/llama
 	url = https://github.com/tarsius/llama.git
@@ -188,6 +188,9 @@
 [submodule "lib/esxml"]
 	path = lib/esxml
 	url = https://github.com/tali713/esxml.git
+	no-byte-compile = css-lite.el
+	no-byte-compile = esxml-form.el
+	no-byte-compile = esxpath.el
 [submodule "lib/tramp-rpc"]
 	path = lib/tramp-rpc
 	url = https://github.com/ArthurHeymans/emacs-tramp-rpc.git
@@ -206,6 +209,7 @@
 [submodule "lib/ghostel"]
 	path = lib/ghostel
 	url = https://github.com/dakra/ghostel.git
+	load-path = extensions/consult-ghostel
 [submodule "lib/apheleia"]
 	path = lib/apheleia
 	url = https://github.com/radian-software/apheleia.git
@@ -269,3 +273,4 @@
 [submodule "lib/excali-mode"]
 	path = lib/excali-mode
 	url = https://github.com/yibie/excali-mode.git
+    pre-build-command = make

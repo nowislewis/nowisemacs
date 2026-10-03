@@ -72,10 +72,6 @@ emacs
 (defvar nowis/bib-pdf-dir (concat nowis/doc-emacs-dir "02-binary-file/02-searchable"))
 #+end_src
 * Package Management
-** capsule
-#+begin_src elisp
-(setq capsule-skip-autoloads-packages '("reader"))
-#+end_src
 ** setup
 #+begin_src elisp
 (require 'setup)
@@ -1175,9 +1171,6 @@ Jump anywhere in the world
         ghostel-initial-input-mode 'line
         ghostel-shell "zsh"
         ghostel-tramp-shell-integration t)
-  (add-to-list 'load-path
-               (expand-file-name "lib/ghostel/extensions/consult-ghostel"
-                                 user-emacs-directory))
   (autoload #'nowis-ghostel "nowis-ghostel" nil t)
   (keymap-global-set "M-`" #'nowis-ghostel)
   (:when-loaded
@@ -2254,6 +2247,7 @@ Simple distraction-free editing. I use darkroom instead of writeroom because it'
 *** nowis-review
 #+begin_src elisp
 (setup nowis-review
+  (:autoload nowis-review-mark)
   (keymap-global-set "M-m" #'nowis-review-mark))
 #+end_src
 ** webjump

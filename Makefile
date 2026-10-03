@@ -1,110 +1,89 @@
 ## Simplified Makefile for package management
 
 EMACS ?= emacs
+# -Q skips init files; --init-directory keeps all Capsule paths in this checkout.
+BATCH_EMACS = $(EMACS) --init-directory "$(CURDIR)" -Q --batch
+PYTHON ?= python3
+NATIVE ?= 0
+NATIVE_LISP := $(if $(filter 1,$(NATIVE)),t,nil)
 LIB_DIR := lib
 LISP_DIR := lisp
-PACKAGES := $(notdir $(wildcard $(LIB_DIR)/*))
+PACKAGES := $(notdir $(patsubst %/,%,$(wildcard $(LIB_DIR)/*/)))
+COMPILE_TARGETS := $(addprefix compile-,$(addprefix $(LIB_DIR)/,$(PACKAGES)) $(LISP_DIR))
 
-.PHONY: help build native autoloads compile init-build clean init update
+.PHONY: help build init-build clean init update test prepare .FORCE
 
 help:
 	@echo "Simple Package Manager"
 	@echo ""
 	@echo "Available targets:"
-	@echo "  make build            - Build all packages (byte-compile)"
-	@echo "  make -j8 build        - Parallel build with 8 jobs (byte-compile)"
-	@echo "  make native           - Native-compile all packages (slower)"
-	@echo "  make -j8 native       - Parallel native-compile (slower)"
+	@echo "  make build            - Build packages and local Lisp, then generate init"
+	@echo "                          Add -j8 for parallelism or NATIVE=1 for native compilation"
 	@echo "  make init-build       - Generate init.el from init.org"
 	@echo "  make lib/PACKAGE      - Build a single package"
 	@echo "  make clean            - Remove all .elc/.eln files and autoloads"
 	@echo "  make init             - Initialize/update git submodules"
 	@echo "  make update           - Update all submodules to latest commit"
+	@echo "  make test             - Run Capsule and Makefile regression tests"
 	@echo ""
 
-# Phase 1: Generate all autoloads (must be sequential)
-autoloads:
-	@echo "==== Generating all autoloads ===="
-	@$(EMACS) -Q --batch \
+# Internal preparation barrier: pre-build commands and autoload generation.
+prepare:
+	@echo "==== Preparing all packages ===="
+	@$(BATCH_EMACS) \
 		-L $(LISP_DIR) \
 		-l capsule \
-		--eval "(capsule-batch-autoloads)"
+		--eval "(capsule-batch-prepare $(NATIVE_LISP))"
 
-# Phase 2: Compile all packages (can be parallel with -j)
-compile: autoloads compile-lisp $(addprefix compile-, $(PACKAGES))
-
-compile-lisp:
-	@echo "==== Compiling lisp/ directory ===="
-	@$(EMACS) -Q --batch \
-		-L $(LISP_DIR) \
-		-l capsule \
-		--eval "(capsule--setup-load-path-all)" \
-		--eval "(capsule--compile-package (expand-file-name \"$(LISP_DIR)\"))"
-
-# Native compilation variant
-compile-native: autoloads $(addprefix native-, $(PACKAGES))
-
-# Native compilation rule (must be defined before compile-% to take precedence)
-native-%:
-	@$(EMACS) -Q --batch -L $(LISP_DIR) -l capsule \
-		--eval "(setq capsule-use-native-compile t)" --eval "(capsule-batch-compile-single \"$*\")"
-
-compile-%:
-	@$(EMACS) -Q --batch \
-		-L $(LISP_DIR) \
-		-l capsule \
-		--eval "(capsule-batch-compile-single \"$*\")"
+# The same compilation rule handles both packages and local Lisp.
+$(COMPILE_TARGETS): compile-%: .FORCE | prepare
+	@$(BATCH_EMACS) -L $(LISP_DIR) -l capsule \
+		--eval "(capsule-batch-compile \"$*\" $(NATIVE_LISP))"
 
 # Generate init.el from init.org
 init-build:
 	@if [ -f init.org ]; then \
 		echo "==== Generating init.el from init.org ===="; \
-		$(EMACS) --batch \
+		$(BATCH_EMACS) \
 			--eval "(require 'org)" \
-			--eval "(org-babel-tangle-file \"init.org\")"; \
+			--eval "(org-babel-tangle-file \"init.org\")" || exit $$?; \
 		echo "init.el generated!"; \
 	else \
 		echo "init.org not found, skipping..."; \
 	fi
 
-# Main build target (byte-compile)
-build: compile
+# Preparation precedes compilation; init generation waits for all compilers.
+build: $(COMPILE_TARGETS)
 	@echo ""
 	@$(MAKE) init-build
 	@echo ""
 	@echo "Build complete!"
 
-# Native compile target
-native: compile-native
-	@echo ""
-	@$(MAKE) init-build
-	@echo ""
-	@echo "Native compilation complete!"
-
 lib/%: .FORCE
 	@echo "Building package: $*"
-	@$(EMACS) -Q --batch \
+	@$(BATCH_EMACS) \
 		-L $(LISP_DIR) \
 		-l capsule \
-		--eval "(capsule-batch-build-single \"$*\")"
+		--eval "(capsule-batch-build-single \"$*\" $(NATIVE_LISP))"
 	@echo "Build complete for $*!"
 
 .FORCE:
 
+# Native compilation uses Emacs's cache; do not erase that shared cache here.
 clean:
-	@echo "Cleaning compiled files..."
-	@find $(LIB_DIR) -name "*.elc" -type f -delete -print
-	@find $(LIB_DIR) -name "*.eln" -type f -delete -print 2>/dev/null || true
-	@find $(LIB_DIR) -name "*-autoloads.el" -type f -delete -print
-	@find $(LISP_DIR) -name "*.elc" -type f -delete -print
-	@find $(LISP_DIR) -name "*.eln" -type f -delete -print 2>/dev/null || true
+	@echo "Cleaning compiled files in lib/ and lisp/ (native cache unchanged)..."
+	@$(BATCH_EMACS) -L $(LISP_DIR) -l capsule --eval "(capsule-batch-clean)"
 	@echo "Clean complete!"
 
 init:
 	@echo "Initializing git submodules..."
 	@git submodule update --init --jobs 16
-	@git submodule foreach git reset --hard
 	@echo "Init complete!"
 
 update:
 	./useful-tools/update_submodule.sh
+
+test:
+	@$(BATCH_EMACS) -L $(LISP_DIR) -l $(LISP_DIR)/capsule.el \
+		-l $(LISP_DIR)/tests/capsule-test.el -f ert-run-tests-batch-and-exit
+	@$(PYTHON) $(LISP_DIR)/tests/capsule-make-test.py
