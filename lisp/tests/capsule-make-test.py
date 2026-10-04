@@ -46,6 +46,37 @@ class CapsuleMakeTests(unittest.TestCase):
             text=True, capture_output=True,
         )
 
+    @unittest.skipUnless(shutil.which("emacs"), "Emacs is required for stale-bytecode coverage")
+    def test_build_and_clean_ignore_stale_capsule_bytecode(self):
+        # Exercise real loading: mocks cannot detect Emacs preferring old .elc files.
+        emacs = shutil.which("emacs")
+        lisp = self.cwd / "lisp"
+        lisp.mkdir()
+        source = lisp / "capsule.el"
+        source.write_text(";;; -*- lexical-binding: t; -*-\n(provide 'capsule)\n")
+        compiled = subprocess.run(
+            [emacs, "-Q", "--batch", "-f", "batch-byte-compile", str(source)],
+            text=True, capture_output=True,
+        )
+        self.assertEqual(compiled.returncode, 0, compiled.stderr)
+        source.write_text(
+            ";;; -*- lexical-binding: t; -*-\n"
+            "(defun capsule-batch-prepare (&optional native))\n"
+            "(defun capsule-batch-compile (directory &optional native))\n"
+            "(defun capsule-batch-build-single (package &optional native))\n"
+            "(defun capsule-batch-clean ())\n"
+            "(provide 'capsule)\n"
+        )
+        bytecode_time = source.with_suffix(".elc").stat().st_mtime
+        os.utime(source, (bytecode_time + 10, bytecode_time + 10))
+        for target in ("build", "clean", "lib/sample"):
+            with self.subTest(target=target):
+                result = subprocess.run(
+                    ["make", target, f"EMACS={emacs}"], cwd=self.cwd,
+                    text=True, capture_output=True,
+                )
+                self.assertEqual(result.returncode, 0, result.stderr)
+
     def test_parallel_compile_waits_for_autoloads(self):
         result = self.run_make("build")
         self.assertEqual(result.returncode, 0, result.stderr)

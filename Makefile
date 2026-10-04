@@ -27,17 +27,18 @@ help:
 	@echo "  make test             - Run Capsule and Makefile regression tests"
 	@echo ""
 
+# Load Capsule source explicitly so stale bytecode cannot break build or clean.
 # Internal preparation barrier: pre-build commands and autoload generation.
 prepare:
 	@echo "==== Preparing all packages ===="
 	@$(BATCH_EMACS) \
 		-L $(LISP_DIR) \
-		-l capsule \
+		-l $(LISP_DIR)/capsule.el \
 		--eval "(capsule-batch-prepare $(NATIVE_LISP))"
 
 # The same compilation rule handles both packages and local Lisp.
 $(COMPILE_TARGETS): compile-%: .FORCE | prepare
-	@$(BATCH_EMACS) -L $(LISP_DIR) -l capsule \
+	@$(BATCH_EMACS) -L $(LISP_DIR) -l $(LISP_DIR)/capsule.el \
 		--eval "(capsule-batch-compile \"$*\" $(NATIVE_LISP))"
 
 # Generate init.el from init.org
@@ -63,7 +64,7 @@ lib/%: .FORCE
 	@echo "Building package: $*"
 	@$(BATCH_EMACS) \
 		-L $(LISP_DIR) \
-		-l capsule \
+		-l $(LISP_DIR)/capsule.el \
 		--eval "(capsule-batch-build-single \"$*\" $(NATIVE_LISP))"
 	@echo "Build complete for $*!"
 
@@ -72,7 +73,7 @@ lib/%: .FORCE
 # Native compilation uses Emacs's cache; do not erase that shared cache here.
 clean:
 	@echo "Cleaning compiled files in lib/ and lisp/ (native cache unchanged)..."
-	@$(BATCH_EMACS) -L $(LISP_DIR) -l capsule --eval "(capsule-batch-clean)"
+	@$(BATCH_EMACS) -L $(LISP_DIR) -l $(LISP_DIR)/capsule.el --eval "(capsule-batch-clean)"
 	@echo "Clean complete!"
 
 init:
