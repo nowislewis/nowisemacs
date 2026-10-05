@@ -11,7 +11,7 @@ LISP_DIR := lisp
 PACKAGES := $(notdir $(patsubst %/,%,$(wildcard $(LIB_DIR)/*/)))
 COMPILE_TARGETS := $(addprefix compile-,$(addprefix $(LIB_DIR)/,$(PACKAGES)) $(LISP_DIR))
 
-.PHONY: help build init-build clean init update test prepare .FORCE
+.PHONY: help build init-build autoloads clean init update test prepare .FORCE
 
 help:
 	@echo "Simple Package Manager"
@@ -20,6 +20,7 @@ help:
 	@echo "  make build            - Build packages and local Lisp, then generate init"
 	@echo "                          Add -j8 for parallelism or NATIVE=1 for native compilation"
 	@echo "  make init-build       - Generate init.el from init.org"
+	@echo "  make autoloads        - Generate local Lisp autoloads without compiling"
 	@echo "  make lib/PACKAGE      - Build a single package"
 	@echo "  make clean            - Remove all .elc/.eln files and autoloads"
 	@echo "  make init             - Initialize/update git submodules"
@@ -35,6 +36,10 @@ prepare:
 		-L $(LISP_DIR) \
 		-l $(LISP_DIR)/capsule.el \
 		--eval "(capsule-batch-prepare $(NATIVE_LISP))"
+
+autoloads:
+	@$(BATCH_EMACS) -L $(LISP_DIR) -l $(LISP_DIR)/capsule.el \
+		--eval "(capsule-generate-local-autoloads)"
 
 # The same compilation rule handles both packages and local Lisp.
 $(COMPILE_TARGETS): compile-%: .FORCE | prepare
@@ -86,5 +91,7 @@ update:
 
 test:
 	@$(BATCH_EMACS) -L $(LISP_DIR) -l $(LISP_DIR)/capsule.el \
-		-l $(LISP_DIR)/tests/capsule-test.el -f ert-run-tests-batch-and-exit
+		-l $(LISP_DIR)/tests/capsule-test.el \
+		-l $(LISP_DIR)/tests/local-autoload-test.el \
+		-l $(LISP_DIR)/tests/leader-lazy-test.el -f ert-run-tests-batch-and-exit
 	@$(PYTHON) $(LISP_DIR)/tests/capsule-make-test.py

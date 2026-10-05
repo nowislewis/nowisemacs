@@ -11,44 +11,89 @@
 ;;; Code:
 
 (require 'org)
-(require 'transient)
+(require 'org-agenda)
 
-(defun nowis/gtd--visit (relative-path)
-  "Visit an existing workflow file at RELATIVE-PATH under `org-directory'."
-  (let ((file (expand-file-name relative-path org-directory)))
-    (unless (file-exists-p file)
-      (user-error "GTD file not found: %s" file))
-    (find-file file)
-    (when (and (string-suffix-p ".org0" file)
-               (not (derived-mode-p 'org-mode)))
-      (org-mode))))
+(declare-function nowis/gtd-files "init" (&optional include-archive))
+(declare-function denote-get-path-by-id "denote" (id))
+(defvar nowis/gtd-dir)
 
-(defun nowis/gtd-capture-inbox ()
-  "Capture a thought directly into the existing Inbox template."
+(defun nowis/gtd--prepare-agenda ()
+  "Refresh GTD files only when a command needs them, keeping menu setup inert."
+  (setopt org-agenda-files (nowis/gtd-files))
+  (setq org-refile-files
+        (list (expand-file-name "action.org" nowis/gtd-dir)
+              (expand-file-name "20251201T112101--incubate.org0" nowis/gtd-dir))))
+
+;;;###autoload
+(defun nowis/gtd-open-agenda ()
+  "Refresh GTD files and open the standard Agenda dispatcher."
   (interactive)
-  (org-capture nil "i"))
+  (nowis/gtd--prepare-agenda)
+  (call-interactively #'org-agenda))
+;;;###autoload
+(defun nowis/gtd-open-issues ()
+  "Open the issues note by its stable Denote identifier, independent of its title."
+  (interactive)
+  (require 'denote)
+  (let ((file (denote-get-path-by-id "20260818T204929")))
+    (unless file
+      (user-error "Issues note not found: Denote identifier 20260818T204929"))
+    (find-file file)))
 
+;;;###autoload
 (defun nowis/gtd-open-overview ()
   "Open the existing GTD agenda view."
   (interactive)
+  (nowis/gtd--prepare-agenda)
   (org-agenda nil "g"))
 
-(transient-define-prefix nowis/gtd-workflow-menu ()
-  "Navigate GTD by intent; capture first, classify only during review."
-  [["Capture"
-    ("c" "Capture to Inbox" nowis/gtd-capture-inbox)]
-   ["Clarify"
-    ("i" "Open Inbox" (lambda () (interactive) (nowis/gtd--visit "gtd/inbox.org")))
-    ("o" "Open issues" (lambda () (interactive) (nowis/gtd--visit "node/20260818T204929--当前开放议题.org")))]]
-  [["Do"
-    ("a" "Next actions" (lambda () (interactive) (nowis/gtd--visit "gtd/action.org")))
-    ("g" "GTD agenda" nowis/gtd-open-overview)
-    ("t" "Agenda file" (lambda () (interactive) (nowis/gtd--visit "gtd/agenda.org")))]
-   ["Reflect"
-    ("j" "Today's journal" denote-journal-new-or-existing-entry)]]
-  [["Later"
-    ("m" "Reading queue" (lambda () (interactive) (nowis/gtd--visit "incremental/20260331T230205--incremental-reading-materials.org")))
-    ("b" "Incubate" (lambda () (interactive) (nowis/gtd--visit "gtd/20251201T112101--incubate.org0")))]])
+;;;###autoload
+(defun nowis/gtd-open-next-actions ()
+  "Open today's commitments and NEXT candidates without the full backlog."
+  (interactive)
+  (nowis/gtd--prepare-agenda)
+  (org-agenda nil "n"))
+
+(defun nowis/gtd-focus-task ()
+  "Narrow to the selected Org task without changing its state or windows.
+From Agenda, visit the original entry first.  Use `widen' to leave focus."
+  (interactive)
+  (when (derived-mode-p 'org-agenda-mode)
+    (org-agenda-switch-to))
+  (unless (derived-mode-p 'org-mode)
+    (user-error "Select an Org task or an Agenda entry first"))
+  (org-back-to-heading t)
+  (org-narrow-to-subtree)
+  (save-excursion (org-show-subtree))
+  (message "Focused on this task; M-x widen to return"))
+
+;;;###autoload
+(defun nowis/gtd-resume-task ()
+  "Show the original STARTED subtree; ask which one if several are active.
+When none is active, open the candidate view instead of choosing for the user."
+  (interactive)
+  (nowis/gtd--prepare-agenda)
+  (let (tasks)
+    (org-map-entries
+     (lambda ()
+       (when (equal (org-get-todo-state) "STARTED")
+         (push (cons (format "%s — %s:%d"
+                             (org-get-heading t t t t)
+                             (file-name-nondirectory (buffer-file-name))
+                             (line-number-at-pos))
+                     (point-marker))
+               tasks)))
+     nil 'agenda)
+    (if (null tasks)
+        (nowis/gtd-open-next-actions)
+      (let ((marker (if (cdr tasks)
+                        (cdr (assoc (completing-read "继续哪件任务：" tasks nil t)
+                                    tasks))
+                      (cdar tasks))))
+        (switch-to-buffer (marker-buffer marker))
+        (widen)
+        (goto-char marker)
+        (nowis/gtd-focus-task)))))
 
 ;;;; ---- 快速时间录入 --------------------------------------------------------
 ;;

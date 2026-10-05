@@ -1,0 +1,9 @@
+# -*- mode: snippet -*-
+# name: Task checkpoint
+# key: stop
+# --
+- 停点 `(format-time-string "[%Y-%m-%d %a %H:%M]")`
+  - 停在：${1:当前进展}
+  - 下一步：${2:恢复时直接开始的动作}
+  - 阻塞／待确认：${3:无}
+$0

@@ -11,3 +11,4 @@ init-config.el
 !init-minimal.el
 !lisp
 *.elc
+/lisp/lisp-autoloads.el
