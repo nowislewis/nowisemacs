@@ -1171,8 +1171,8 @@ Jump anywhere in the world
         ghostel-initial-input-mode 'line
         ghostel-shell "zsh"
         ghostel-tramp-shell-integration t)
-  (autoload #'nowis-ghostel "nowis-ghostel" nil t)
-  (keymap-global-set "M-`" #'nowis-ghostel)
+  (autoload #'ghostel-project "ghostel" nil t)
+  (keymap-global-set "M-`" #'ghostel-project)
   (:when-loaded
     (require 'nowis-ghostel)
     (nowis-ghostel-setup)))

@@ -80,5 +80,15 @@
       (should (eq ghostel--input-mode 'emacs))
       (should (eq (key-binding (kbd "M-w")) #'ghostel-readonly-copy)))))
 
+(ert-deftest nowis-ghostel-setup-reuses-upstream-project-and-window-commands ()
+  (let ((ghostel-mode-map (copy-keymap ghostel-mode-map))
+        (ghostel-char-mode-map (copy-keymap ghostel-char-mode-map))
+        (ghostel-mode-hook nil)
+        (ghostel-eval-cmds (copy-tree ghostel-eval-cmds)))
+    (nowis-ghostel-setup)
+    (should (eq (lookup-key ghostel-mode-map (kbd "M-`")) #'ghostel-project))
+    (should (eq (lookup-key ghostel-char-mode-map (kbd "M-`")) #'ghostel-project))
+    (should (eq (lookup-key ghostel-char-mode-map (kbd "M-o")) #'ace-window))))
+
 (provide 'nowis-ghostel-test)
 ;;; nowis-ghostel-test.el ends here
