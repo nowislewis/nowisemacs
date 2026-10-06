@@ -426,6 +426,7 @@ Maybe I should add a new state.
     ("s" "save session" easysession-save)
     ("l" "restore session" easysession-load)
     ("S" "switch session" easysession-switch-to)
+    ("D" "delete session" easysession-delete)
     ]
    ])
 #+end_src
