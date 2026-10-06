@@ -319,7 +319,7 @@ Adds as git submodule, generates autoloads, and compiles."
                           (and (string-match "/\\([^/]+\\)/?\\'" url)
                                (match-string 1 url))))
          (pkg-name (if (called-interactively-p 'interactive)
-                       (read-string "Package name: " nil nil parsed-name)
+                       (read-string "Package name: " parsed-name nil parsed-name)
                      (or parsed-name (user-error "Cannot infer package name from %s" url))))
          (pkg-path (capsule--package-path pkg-name)))
     (unless (or (not (called-interactively-p 'interactive))

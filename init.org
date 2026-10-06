@@ -422,8 +422,9 @@ Maybe I should add a new state.
     ]
    ["others"
     ("r" "restart emacs" restart-emacs)
-    ("s" "desktop save" desktop-save-in-desktop-dir)
-    ("l" "desktop read" desktop-read)
+    ("s" "save session" easysession-save)
+    ("l" "restore session" easysession-load)
+    ("S" "switch session" easysession-switch-to)
     ]
    ])
 #+end_src
@@ -1132,6 +1133,19 @@ Jump anywhere in the world
                                                   magit-diff-mode
                                                   magit-process-mode)
           ))
+#+end_src
+** easysession
+#+begin_src elisp
+(setup easysession
+  (require 'easysession)
+  ;; 保存命令需要已有会话名；加载时的 main 后备值不会初始化它。
+  (unless (easysession-get-session-name)
+    (easysession-set-current-session-name "main"))
+  (setopt easysession-save-interval 60
+          easysession-setup-load-session-including-geometry nil
+          ;; daemon 重连时使用当前 display，避免连接保存时的旧 display。
+          easysession-frameset-restore-force-current-display (daemonp))
+  (easysession-setup))
 #+end_src
 ** project
 #+begin_src elisp

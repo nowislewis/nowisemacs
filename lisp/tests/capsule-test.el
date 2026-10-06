@@ -260,6 +260,24 @@
         (capsule-test--with-config (capsule--setup-load-path-all))
         (should (= calls 1))))))
 
+(ert-deftest capsule-interactive-add-prefills-editable-repository-name ()
+  (capsule-test--with-package
+    (dolist (url '("https://example.invalid/repo.git"
+                   "https://example.invalid/repo"
+                   "https://example.invalid/repo/"
+                   "git@example.invalid:owner/repo.git"))
+      (let (prompt-args built)
+        (cl-letf (((symbol-function 'called-interactively-p) (lambda (&rest _) t))
+                  ((symbol-function 'read-string)
+                   (lambda (&rest args) (setq prompt-args args) "chosen"))
+                  ((symbol-function 'yes-or-no-p) (lambda (&rest _) t))
+                  ((symbol-function 'capsule--git) (lambda (&rest _) nil))
+                  ((symbol-function 'capsule--build-package)
+                   (lambda (dir) (setq built dir))))
+          (capsule-add-package url)
+          (should (equal prompt-args '("Package name: " "repo" nil "repo")))
+          (should (equal built (expand-file-name "chosen" capsule-drones-directory))))))))
+
 (ert-deftest capsule-programmatic-add-does-not-prompt ()
   (capsule-test--with-package
     (let (calls built)

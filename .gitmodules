@@ -272,3 +272,6 @@
 	url = https://github.com/yibie/excali-mode.git
     pre-build-command = make
     skip-build = true
+[submodule "lib/easysession"]
+	path = lib/easysession
+	url = https://github.com/jamescherti/easysession.el.git
