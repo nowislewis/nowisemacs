@@ -67,6 +67,7 @@ emacs
 (defvar nowis/config-file (expand-file-name "init.org" user-emacs-directory))
 (defvar nowis/config-useful-tools (expand-file-name "useful-tools/" user-emacs-directory))
 (defvar nowis/doc-emacs-dir (file-truename "~/Documents/emacs/"))
+(setopt org-directory "~/Documents/emacs/01-orgmode/xnotes")
 (defvar nowis/gtd-dir (concat nowis/doc-emacs-dir "01-orgmode/xnotes/gtd/"))
 (defvar nowis/bib-dir (concat nowis/doc-emacs-dir "03-bibliography/"))
 (defvar nowis/bib-pdf-dir (concat nowis/doc-emacs-dir "02-binary-file/02-searchable"))
@@ -399,7 +400,6 @@ Maybe I should add a new state.
   "Define leader-key map for apps functions"
   [["Work"
     ("g" "Resume Task" (lambda () (interactive) (call-interactively #'nowis/gtd-resume-task)))
-    ("n" "Choose Next Action" (lambda () (interactive) (call-interactively #'nowis/gtd-open-next-actions)))
     ""
     "Context"
     ("i" "Open Issues" (lambda () (interactive) (call-interactively #'nowis/gtd-open-issues)))
@@ -407,12 +407,12 @@ Maybe I should add a new state.
     ""
     "Agenda"
     ("a" "Agenda" (lambda () (interactive) (call-interactively #'nowis/gtd-open-agenda)))
-    ("G" "Review Tasks" (lambda () (interactive) (call-interactively #'nowis/gtd-open-overview)))
     ("A" "Archive" (lambda () (interactive) (call-interactively #'org-archive-subtree)))]
    ["capture"
     ("c" "capture" (lambda () (interactive) (call-interactively #'org-capture)))
     ("d" "Done & log time" (lambda () (interactive) (call-interactively #'nowis/gtd-log-time)))
-    ("e" "capture (org-sm)" (lambda () (interactive) (call-interactively #'org-sm-capture)))
+    ("e" "capture org-sm" (lambda () (interactive) (call-interactively #'org-sm-capture)))
+    ("E" "capture org-sm notify" (lambda () (interactive) (call-interactively #'org-sm-capture-clipboard-notify)))
     ]
    ["voice"
     ("v d" "sherpa-dictate" (lambda () (interactive) (call-interactively #'emacs-sherpa-dictate)))
@@ -1809,20 +1809,13 @@ Borrowed from https://github.com/rougier/emacs-GTD
 *** file
 #+begin_src elisp
 ;; Files
-(setopt org-directory "~/Documents/emacs/01-orgmode/xnotes")
-
-(setup org
-  (defun nowis/gtd-files (&optional include-archive)
-    "Return daily GTD files; include the main archive only for historical review."
-    (unless (file-directory-p nowis/gtd-dir)
-      (user-error "GTD directory not found: %s; configure nowis/gtd-dir first"
-                  nowis/gtd-dir))
-    (cl-remove-if-not #'file-regular-p
-                      (mapcar (lambda (name) (expand-file-name name nowis/gtd-dir))
-                              (append '("action.org" "inbox.org" "agenda.org")
-                                      (when include-archive '("gtd_archive"))))))
-
-  )
+(setq org-agenda-files
+      (mapcar (lambda (name) (expand-file-name name nowis/gtd-dir))
+              '("action.org" "inbox.org" "agenda.org"
+                "20230403T125743--reading-lists.org")))
+(setq org-refile-files
+      (mapcar (lambda (name) (expand-file-name name nowis/gtd-dir))
+              '("action.org" "20251201T112101--incubate.org0")))
 #+end_src
 *** todos
 #+begin_src elisp
@@ -1895,15 +1888,17 @@ Borrowed from https://github.com/rougier/emacs-GTD
 ;; blocked 任务在 agenda 中隐藏
 (setq org-agenda-dim-blocked-tasks 'invisible)
 
-;;; 全局回顾（g）；选择下一步（n）；近期完成回顾（r）
+;;; Dispatcher：分组任务视图（g）；恢复当前任务（r）；完成回顾（d）
 (setq org-agenda-custom-commands
-      '(("r" "Review Completed Tasks"
+      '(("d" "Review Completed Tasks"
          (lambda (_) (call-interactively #'nowis/review-done-by-project)))
+        ("D" "Review All Completed Tasks"
+         (lambda (_) (nowis/review-done-by-project 'all)))
 
-        ("d" "Resume Task"
+        ("r" "Resume Task"
          (lambda (_) (nowis/gtd-resume-task)))
 
-        ("n" "Choose Next Action"
+        ("g" "Task Agenda"
          ((agenda ""
                   ((org-agenda-overriding-header (nowis/center-header "Today's Schedule"))
                    (org-agenda-span 'day)
@@ -1912,32 +1907,16 @@ Borrowed from https://github.com/rougier/emacs-GTD
           (todo "STARTED"
                 ((org-agenda-overriding-header (nowis/center-header "Current Task · Only One at a Time"))))
           (todo "NEXT"
-                ((org-agenda-overriding-header (nowis/center-header "Next Actions"))))))
-
-        ("g" "Review Tasks"
-         ((agenda ""
-                  ((org-agenda-overriding-header (nowis/center-header "Today's Schedule"))
-                   (org-agenda-span 'day)
-                   (org-agenda-skip-function
-                    '(org-agenda-skip-if nil '(todo done)))))
-
-          (todo "STARTED"
-                     ((org-agenda-overriding-header (nowis/center-header "Current Task · Only One at a Time"))))
-          (todo "NEXT"
-                     ((org-agenda-overriding-header (nowis/center-header "Next Actions"))))
-
+                ((org-agenda-overriding-header (nowis/center-header "Next Actions"))))
           (tags-todo "action"
                      ((org-agenda-overriding-header (nowis/center-header "Project Tasks"))
-                      (org-agenda-skip-function
-                       '(org-agenda-skip-entry-if 'scheduled))
+                      (org-agenda-skip-function '(org-agenda-skip-entry-if 'scheduled))
                       (org-agenda-sorting-strategy
                        '(priority-down timestamp-up todo-state-up category-up))))
-
           (tags-todo "inbox"
                      ((org-agenda-overriding-header (nowis/center-header "Inbox"))
                       (org-agenda-sorting-strategy
                        '(priority-down timestamp-up todo-state-up category-up))))
-
           (tags-todo "reading"
                      ((org-agenda-overriding-header (nowis/center-header "Reading Tasks"))
                       (org-agenda-sorting-strategy
@@ -1948,72 +1927,21 @@ Borrowed from https://github.com/rougier/emacs-GTD
       '(:link t :maxlevel 5 :properties ("Effort"))
       org-clock-out-remove-zero-time-clocks t)
 #+end_src
-*** clarify with AI
+*** Time logging
+New completed items are saved under "Done from capture" in Inbox
 #+begin_src elisp
-(with-eval-after-load 'org
-  (require 'nowis-gtd)
-  (setq nowis/gtd-log-time-target
-        (cons (expand-file-name "inbox.org" nowis/gtd-dir) "Done from capture"))
-  )
+(setq nowis/gtd-log-time-target
+      (cons (expand-file-name "inbox.org" nowis/gtd-dir) "Done from capture"))
 #+end_src
 *** archive
 #+begin_src elisp
 ;; ── Datetree archive ──
 (setq org-archive-location (concat nowis/gtd-dir "/gtd_archive::datetree/"))
+;; Historical archives are included in review, not in the daily Agenda.
+(setq nowis/gtd-extra-archive-files
+      (file-expand-wildcards
+       (expand-file-name "archive-old/gtd_archive_*" nowis/gtd-dir) t))
 
-;; ── 按完整 oldpath 层级浏览近期完成 ──
-(defun nowis/review--entry ()
-  "当前 DONE 条目 → (路径段列表 . 显示行)，不符合返回 nil。
-跳转链接优先用精确的 file+行号+文本搜索，保证归档条目也能点回原处；
-id 仅作兜底。"
-  (when-let* ((closed (org-entry-get nil "CLOSED"))
-              (title (org-get-heading t t t t)))
-    (let* ((olp (org-entry-get nil "ARCHIVE_OLPATH"))
-           (segs (if olp (split-string olp "/" t "[ \t]+") (org-get-outline-path)))
-           (segs (or segs (list "其他")))
-           (date (substring closed 1 11))
-           (file (buffer-file-name (buffer-base-buffer)))
-           (id (org-id-get))
-           ;; 优先 file+标题搜索（datetree 归档也能命中），id 兵底
-           (link (cond
-                  (file (format "[[file:%s::%s][%s]]"
-                                file (org-link-heading-search-string title) title))
-                  (id   (format "[[id:%s][%s]]" id title))
-                  (t    title))))
-      (cons segs (format "- [%s] %s" date link)))))
-
-(defun nowis/review-done-by-project (days)
-  "扫描近 DAYS 天所有 DONE，按完整 oldpath 层级建树，生成只读 org buffer。"
-  (interactive "nReview the last how many days: ")
-  (let* ((match (format "TODO=\"DONE\"+CLOSED>=\"<-%dd>\"" days))
-         (items (delq nil (org-map-entries #'nowis/review--entry match
-                                           (nowis/gtd-files t))))
-         ;; 按路径排序，使相同前缀相邻 → 能共享标题
-         (items (sort items (lambda (a b)
-                              (string< (mapconcat #'identity (car a) "/")
-                                       (mapconcat #'identity (car b) "/")))))
-         (last nil))
-    (with-current-buffer (get-buffer-create "*Review by Project*")
-      (let ((inhibit-read-only t))
-        (erase-buffer)
-        (org-mode)
-        (insert (format "#+title: Completed Tasks — Last %d Days (by Project)\n\n" days))
-        (dolist (item items)
-          (let* ((segs (car item))
-                 (common 0))
-            ;; 与上一条路径的公共前缀，只为新增层级插入标题
-            (while (and (< common (length segs)) (< common (length last))
-                        (equal (nth common segs) (nth common last)))
-              (setq common (1+ common)))
-            (cl-loop for d from common below (length segs) do
-                     (insert (make-string (1+ d) ?*) " " (nth d segs) "\n"))
-            (setq last segs))
-          ;; 完成行缩进到路径深度下一级
-          (insert (make-string (1+ (length (car item))) ?\s) (cdr item) "\n")))
-      (goto-char (point-min))
-      (org-fold-show-all)
-      (setq buffer-read-only t)
-      (pop-to-buffer (current-buffer)))))
 #+end_src
 ** org-sm
 #+begin_src elisp
@@ -2038,8 +1966,8 @@ id 仅作兜底。"
       ("S" "start review" org-sm-review-start)
       ("a" "about" org-sm-review-abort)
       ("l" "tree" org-sm-tree)
-      ("c" "capture" org-sm-capture)
-      ("e" "capture clipboard" org-sm-capture-clipboard-notify)]
+      ("e" "capture" org-sm-capture)
+      ("E" "capture clipboard" org-sm-capture-clipboard-notify)]
      ["card"
       ("m" "mark" org-sm-item-mark)
       ("z" "extract selection" org-sm-item-extract)
@@ -2314,8 +2242,7 @@ ESUP - Emacs Start Up Profiler
    ["Agenda"
     ("a" "org-agenda" org-agenda)
     ("c" "org-capture" org-capture)
-    ("d" "Log time" nowis/gtd-log-time)
-]
+    ("d" "Log time" nowis/gtd-log-time)]
    ["org-sm"
     ("r" "start review" org-sm-review-start)
     ("l" "tree" org-sm-tree)

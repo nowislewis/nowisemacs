@@ -13,23 +13,11 @@
 (require 'org)
 (require 'org-agenda)
 
-(declare-function nowis/gtd-files "init" (&optional include-archive))
+(defvar nowis/gtd-extra-archive-files nil
+  "Additional historical files to review, outside the current archive configuration.")
 (declare-function denote-get-path-by-id "denote" (id))
 (defvar nowis/gtd-dir)
 
-(defun nowis/gtd--prepare-agenda ()
-  "Refresh GTD files only when a command needs them, keeping menu setup inert."
-  (setopt org-agenda-files (nowis/gtd-files))
-  (setq org-refile-files
-        (list (expand-file-name "action.org" nowis/gtd-dir)
-              (expand-file-name "20251201T112101--incubate.org0" nowis/gtd-dir))))
-
-;;;###autoload
-(defun nowis/gtd-open-agenda ()
-  "Refresh GTD files and open the standard Agenda dispatcher."
-  (interactive)
-  (nowis/gtd--prepare-agenda)
-  (call-interactively #'org-agenda))
 ;;;###autoload
 (defun nowis/gtd-open-issues ()
   "Open the issues note by its stable Denote identifier, independent of its title."
@@ -41,18 +29,10 @@
     (find-file file)))
 
 ;;;###autoload
-(defun nowis/gtd-open-overview ()
-  "Open the existing GTD agenda view."
+(defun nowis/gtd-open-agenda ()
+  "Open the native Agenda dispatcher using the configured file list."
   (interactive)
-  (nowis/gtd--prepare-agenda)
-  (org-agenda nil "g"))
-
-;;;###autoload
-(defun nowis/gtd-open-next-actions ()
-  "Open today's commitments and NEXT candidates without the full backlog."
-  (interactive)
-  (nowis/gtd--prepare-agenda)
-  (org-agenda nil "n"))
+  (call-interactively #'org-agenda))
 
 (defun nowis/gtd-focus-task ()
   "Narrow to the selected Org task without changing its state or windows.
@@ -70,9 +50,8 @@ From Agenda, visit the original entry first.  Use `widen' to leave focus."
 ;;;###autoload
 (defun nowis/gtd-resume-task ()
   "Show the original STARTED subtree; ask which one if several are active.
-When none is active, open the candidate view instead of choosing for the user."
+When none is active, show the grouped task Agenda so the user can choose."
   (interactive)
-  (nowis/gtd--prepare-agenda)
   (let (tasks)
     (org-map-entries
      (lambda ()
@@ -85,7 +64,7 @@ When none is active, open the candidate view instead of choosing for the user."
                tasks)))
      nil 'agenda)
     (if (null tasks)
-        (nowis/gtd-open-next-actions)
+        (org-agenda nil "g")
       (let ((marker (if (cdr tasks)
                         (cdr (assoc (completing-read "继续哪件任务：" tasks nil t)
                                     tasks))
@@ -193,6 +172,100 @@ END 为结束时刻（Emacs time），nil 表示现在；CLOSED 也随之对齐�
         (message "已追加 %dmin%s 到当前任务" mins
                  (if end (concat "（结束 " endstr "）") "")))
        (t (user-error "光标不在 heading 上，纯数字无处追加；请补描述新建任务"))))))
+
+;; ── 按完整 oldpath 层级浏览近期完成 ──
+(defun nowis/review--entry ()
+  "当前 DONE 条目 → (路径段列表 . 显示行)，不符合返回 nil。
+跳转链接优先用精确的 file+行号+文本搜索，保证归档条目也能点回原处；
+id 仅作兜底。"
+  (when-let* ((title (org-get-heading t t t t)))
+    (let* ((olp (org-entry-get nil "ARCHIVE_OLPATH"))
+           (segs (if olp (split-string olp "/" t "[ \t]+") (org-get-outline-path)))
+           (segs (or segs (list "其他")))
+           (closed (org-entry-get nil "CLOSED"))
+           (date (if closed (substring closed 1 11) "Undated"))
+           (file (buffer-file-name (buffer-base-buffer)))
+           (id (org-id-get))
+           ;; 优先 file+标题搜索（datetree 归档也能命中），id 兵底
+           (link (cond
+                  (file (org-link-make-string
+                         (format "file:%s::%s" file (org-link-heading-search-string title))
+                         title))
+                  (id   (org-link-make-string (concat "id:" id) title))
+                  (t    title))))
+      (cons segs (format "- [%s] %s" date link)))))
+
+(defvar-local nowis/review-days nil "Date range retained for refreshing this report.")
+
+(defun nowis/review-refresh ()
+  "Rebuild the review with its previous date range."
+  (interactive)
+  (nowis/review-done-by-project nowis/review-days))
+
+;;;###autoload
+(defun nowis/review-done-by-project (days)
+  "Show clock totals and DONE tasks for DAYS calendar days, including today.
+DAYS can be `all' for all history, including undated DONE tasks.
+Interactively, a prefix argument selects all history."
+  (interactive (list (if current-prefix-arg 'all
+                       (read-number "Review the last how many days: "))))
+  (unless (or (eq days 'all) (and (integerp days) (> days 0)))
+    (user-error "Days must be positive or `all'"))
+  (require 'org-clock)
+  (let* ((today (org-today))
+         (start (unless (eq days 'all)
+                  (format-time-string "%Y-%m-%d" (org-time-from-absolute (- today (1- days))))))
+         (end (format-time-string "%Y-%m-%d" (org-time-from-absolute (1+ today))))
+         (files (delete-dups
+                 (append (org-add-archive-files (org-agenda-files t))
+                         nowis/gtd-extra-archive-files)))
+         (match (if (eq days 'all) "TODO=\"DONE\""
+                  (format "TODO=\"DONE\"+CLOSED>=\"<%s>\"+CLOSED<\"<%s>\"" start end)))
+         ;; The extensionless archive must be in Org mode for native queries.
+         (_ (dolist (file files)
+              (with-current-buffer (find-file-noselect file)
+                (unless (derived-mode-p 'org-mode) (org-mode)))))
+         (items (delq nil (org-map-entries #'nowis/review--entry match files)))
+         ;; 按路径排序，使相同前缀相邻 → 能共享标题
+         (items (sort items (lambda (a b)
+                              (string< (mapconcat #'identity (car a) "/")
+                                       (mapconcat #'identity (car b) "/")))))
+         (last nil))
+    (with-current-buffer (get-buffer-create "*Review by Project*")
+      (let ((inhibit-read-only t))
+        (erase-buffer)
+        (org-mode)
+        (setq-local nowis/review-days days)
+        (local-set-key (kbd "C-c C-r") #'nowis/review-refresh)
+        (insert (if (eq days 'all)
+                    "#+title: Task Review — All History\n"
+                  (format "#+title: Task Review — Last %d Days\nRange: %s to %s (end exclusive)\n" days start end)))
+        (insert "Refresh: C-c C-r\n\n* Time Spent\n")
+        (insert (format "#+begin: clocktable :scope %S%s :maxlevel 6 :link t :fileskip0 t\n#+end:\n"
+                        files (if start (format " :tstart %S :tend %S" start end) "")))
+        (goto-char (point-min))
+        (search-forward "#+begin: clocktable")
+        (beginning-of-line)
+        (org-update-dblock)
+        (goto-char (point-max))
+        (insert "\n* Completed Tasks\n")
+        (unless items (insert "No completed tasks in this range.\n"))
+        (dolist (item items)
+          (let* ((segs (car item))
+                 (common 0))
+            ;; 与上一条路径的公共前缀，只为新增层级插入标题
+            (while (and (< common (length segs)) (< common (length last))
+                        (equal (nth common segs) (nth common last)))
+              (setq common (1+ common)))
+            (cl-loop for d from common below (length segs) do
+                     (insert (make-string (+ 2 d) ?*) " " (nth d segs) "\n"))
+            (setq last segs))
+          ;; 完成行缩进到路径深度下一级
+          (insert (make-string (1+ (length (car item))) ?\s) (cdr item) "\n")))
+      (goto-char (point-min))
+      (org-fold-show-all)
+      (setq buffer-read-only t)
+      (pop-to-buffer (current-buffer)))))
 
 (provide 'nowis-gtd)
 ;;; nowis-gtd.el ends here

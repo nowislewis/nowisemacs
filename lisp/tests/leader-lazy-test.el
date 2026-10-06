@@ -13,16 +13,16 @@
   (plist-get (cdr (transient-get-suffix 'apps-leader-map key)) :command))
 
 (ert-deftest leader-lazy-menu-renders-without-loading-gtd ()
-  (autoload 'nowis/gtd-resume-task "nowis-gtd" nil t)
-  (should (autoloadp (symbol-function 'nowis/gtd-resume-task)))
-  (unwind-protect
+  (cl-letf (((symbol-function 'nowis/gtd-resume-task) '(autoload "nowis-gtd" nil t)))
+    (should (autoloadp (symbol-function 'nowis/gtd-resume-task)))
+    (unwind-protect
       (progn
         (transient-setup 'apps-leader-map)
         (should (autoloadp (symbol-function 'nowis/gtd-resume-task)))
         (with-current-buffer (get-buffer " *transient*")
-          (dolist (label '("Resume Task" "Context" "Agenda" "Choose Next Action" "Today's Journal"))
+          (dolist (label '("Resume Task" "Context" "Agenda" "Today's Journal"))
             (should (string-match-p label (buffer-string))))))
-    (when (get-buffer " *transient*") (kill-buffer " *transient*"))))
+      (when (get-buffer " *transient*") (kill-buffer " *transient*")))))
 
 (ert-deftest leader-lazy-command-preserves-interactive-prefix ()
   (let (received)

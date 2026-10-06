@@ -93,5 +93,6 @@ test:
 	@$(BATCH_EMACS) -L $(LISP_DIR) -l $(LISP_DIR)/capsule.el \
 		-l $(LISP_DIR)/tests/capsule-test.el \
 		-l $(LISP_DIR)/tests/local-autoload-test.el \
-		-l $(LISP_DIR)/tests/leader-lazy-test.el -f ert-run-tests-batch-and-exit
+		-l $(LISP_DIR)/tests/leader-lazy-test.el \
+		-l $(LISP_DIR)/tests/gtd-review-test.el -f ert-run-tests-batch-and-exit
 	@$(PYTHON) $(LISP_DIR)/tests/capsule-make-test.py
