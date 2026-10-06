@@ -305,6 +305,7 @@ Maybe I should add a new state.
   [
    ["Imenu"
     ("l" "Imenu list smart toggle" imenu-list-smart-toggle)
+    ("d" "dired-sidebar-toggle" dired-sidebar-toggle-sidebar)
     ]
    ["gptel"
     ("a" "gptel-agent" gptel-agent)
@@ -1065,6 +1066,10 @@ Jump anywhere in the world
 (setup speedbar
   (:bind "TAB" speedbar-toggle-line-expansion)
   (setq speedbar-prefer-window t))
+#+end_src
+*** dired-sidebar
+#+begin_src elisp
+(setup dired-sidebar)
 #+end_src
 *** dired-preview
 #+begin_src elisp

@@ -275,3 +275,6 @@
 [submodule "lib/easysession"]
 	path = lib/easysession
 	url = https://github.com/jamescherti/easysession.el.git
+[submodule "lib/dired-sidebar"]
+	path = lib/dired-sidebar
+	url = https://github.com/jojojames/dired-sidebar.git
