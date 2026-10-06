@@ -141,6 +141,25 @@
       (should (file-exists-p (expand-file-name "generated.elc" pkg-dir)))
       (should (file-exists-p (expand-file-name "package with spaces-autoloads.el" pkg-dir))))))
 
+(ert-deftest capsule-skip-build-only-affects-bulk-builds ()
+  (capsule-test--with-package
+    (process-lines "git" "config" "--file" modules
+                   "submodule.different-name.skip-build" "true")
+    (process-lines "git" "config" "--file" modules
+                   "submodule.different-name.pre-build-command" "touch prepared")
+    (with-temp-file (expand-file-name "generated.el" pkg-dir)
+      (insert ";;; -*- lexical-binding: t; -*-\n;;;###autoload\n(defun capsule-test-generated () t)\n"))
+    (let ((load-path (copy-sequence load-path)))
+      (capsule-batch-prepare)
+      (capsule-batch-compile pkg-dir)
+      (dolist (file '("prepared" "generated.elc" "package with spaces-autoloads.el"))
+        (should-not (file-exists-p (expand-file-name file pkg-dir))))
+      (capsule-batch-build-single "package with spaces")
+      (capsule-batch-prepare)
+      (capsule-batch-compile pkg-dir)
+      (dolist (file '("prepared" "generated.elc" "package with spaces-autoloads.el"))
+        (should (file-exists-p (expand-file-name file pkg-dir)))))))
+
 (ert-deftest capsule-compile-excludes-configured-paths ()
   (capsule-test--with-package
     (let* ((sub (expand-file-name "lisp" pkg-dir))

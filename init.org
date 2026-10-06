@@ -2067,7 +2067,7 @@ Simple distraction-free editing. I use darkroom instead of writeroom because it'
 (setup gptel
   (setopt gptel-default-mode 'org-mode
           gptel-highlight-methods '(face margin)
-          gptel-model 'gpt-6-luna
+          gptel-model 'gpt-6.1-sol
           gptel-cache t
           gptel-max-tokens 16384
           gptel-confirm-tool-calls nil

@@ -271,3 +271,4 @@
 	path = lib/excali-mode
 	url = https://github.com/yibie/excali-mode.git
     pre-build-command = make
+    skip-build = true

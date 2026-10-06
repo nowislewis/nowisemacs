@@ -137,6 +137,11 @@ Git handles quoting; NUL records preserve newlines in command values."
                                (car capsule--config))))
     (gethash (concat prefix field) (cdr capsule--config))))
 
+(defun capsule--skip-build-p (pkg-dir)
+  "Return non-nil when PKG-DIR opts out of bulk builds via skip-build = true."
+  (equal (car (last (capsule--package-config-values pkg-dir "skip-build")))
+         "true"))
+
 (defun capsule--run-pre-build-command (pkg-dir)
   "Run PKG-DIR's trusted .gitmodules Shell command before scanning sources.
 Only explicit builds call this; a failed command stops the package build.
@@ -206,14 +211,16 @@ This function is meant to be called from Emacs --batch mode."
   (let ((capsule--config (capsule--read-config)))
     (dolist (pkg-dir (capsule--package-directories))
       (let ((pkg-name (file-name-nondirectory pkg-dir)))
-        (if (member pkg-name capsule-skip-autoloads-packages)
+        (if (or (member pkg-name capsule-skip-autoloads-packages)
+                (capsule--skip-build-p pkg-dir))
             (message "\n--- [%s] (skipped) ---\n" pkg-name)
           (message "\n--- [%s] ---\n" pkg-name)
           (capsule--prepare-package pkg-dir)))))
   (capsule-generate-local-autoloads))
 
 (defun capsule-batch-compile (directory &optional native)
-  "Compile DIRECTORY with dependency paths, optionally using NATIVE compilation.
+  "Compile DIRECTORY for a bulk build unless configured with skip-build = true.
+Use `capsule-batch-build-single' to explicitly build skipped packages.
 DIRECTORY is relative to the build working directory, or absolute.
 This function is meant to be called from Emacs --batch mode."
   (unless noninteractive
@@ -226,11 +233,10 @@ This function is meant to be called from Emacs --batch mode."
       (unless (file-directory-p pkg-dir)
 	(error "Package directory not found: %s" pkg-dir))
 
-      ;; Setup load-path for dependencies
-      (capsule--setup-load-path-all)
-
-      ;; Compile the package
-      (capsule--compile-package pkg-dir))))
+      (if (capsule--skip-build-p pkg-dir)
+          (message "Capsule: %s (skipped)" directory)
+        (capsule--setup-load-path-all)
+        (capsule--compile-package pkg-dir)))))
 
 (defun capsule-batch-build-single (package &optional native)
   "Prepare and compile PACKAGE, optionally using NATIVE compilation.
