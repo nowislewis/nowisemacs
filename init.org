@@ -311,6 +311,9 @@ Maybe I should add a new state.
     ("a" "gptel-agent" gptel-agent)
     ("r" "gptel-rewrite" gptel-rewrite)
     ("f" "gptel-file-add" gptel-add-file)
+    ("t" "Translate region (C-u: lines)" gptel-translate-region)
+    ("c" "Clear translations" gptel-translate-clear)
+    ("L" "Toggle log translation" gptel-translate-log-mode)
     ]
    ])
 #+end_src
@@ -2105,12 +2108,12 @@ Simple distraction-free editing. I use darkroom instead of writeroom because it'
                     :host "llm-gateway.momenta.works"
                     :key 'gptel-api-key
                     :stream t
-                    :models '(kimi-k3 qwen3.8-flash gpt-5.6-terra gpt-6-luna gpt-6.1-sol)))
+                    :models '(kimi-k3 qwen3.8-flash gpt-5.6-terra gpt-6-luna gpt-6.1-sol deepseek-v4.1-flash)))
     (gptel-make-anthropic "momenta"
       :host "llm-gateway.momenta.works"
       :key 'gptel-api-key
       :stream t
-      :models '(gemini-3.8-flash))
+      :models '(gemini-3.8-flash claude-haiku-5-5))
     (gptel-make-openai "chatanywhere"
       :host "api.chatanywhere.tech"
       :key 'gptel-api-key
@@ -2325,6 +2328,7 @@ ESUP - Emacs Start Up Profiler
                 line-spacing nil)))
 
 (setup nethack
+  (add-hook 'nethack-message-mode-hook #'gptel-translate-log-mode)
   (add-to-list 'meow-mode-state-list '(nethack-message-mode . normal))
   (setq nethack-use-tiles "nethack500")
   (with-eval-after-load 'nethack-keys
