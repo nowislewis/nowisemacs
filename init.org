@@ -312,7 +312,7 @@ Maybe I should add a new state.
     ("r" "gptel-rewrite" gptel-rewrite)
     ("f" "gptel-file-add" gptel-add-file)
     ("t" "Translate region (C-u: lines)" gptel-translate-region)
-    ("c" "Clear translations" gptel-translate-clear)
+    ("c" "Clear translations (C-u: reset all)" gptel-translate-clear)
     ("L" "Toggle log translation" gptel-translate-log-mode)
     ]
    ])

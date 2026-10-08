@@ -30,6 +30,18 @@
   "Maximum source characters per batch, except for a single longer line."
   :type 'integer)
 
+(defvar gptel-translate--cache (make-hash-table :test #'equal)
+  "Successful translations keyed only by exact source text.
+Shared across buffers; clear explicitly after changing translation settings.")
+(defvar gptel-translate--cache-generation 0)
+
+(defun gptel-translate--show (ov translation)
+  "Display TRANSLATION after OV without modifying the source text."
+  (overlay-put ov 'after-string
+               (propertize (concat "\n  " translation)
+                           'face 'shadow
+                           'line-prefix "" 'wrap-prefix "  ")))
+
 (defvar-local gptel-translate--cursor nil)
 (defvar-local gptel-translate--queue nil)
 (defvar-local gptel-translate--overlays nil)
@@ -57,13 +69,10 @@
   (unless gptel-translate--generation
     (setq gptel-translate--generation (gensym "translation-")))
   (add-hook 'before-change-functions #'gptel-translate--before-change nil t)
-  (add-hook 'kill-buffer-hook #'gptel-translate-clear nil t))
+  (add-hook 'kill-buffer-hook #'gptel-translate--clear-buffer nil t))
 
-;;;###autoload
-(defun gptel-translate-clear ()
-  "Remove this buffer's translations and invalidate all pending requests.
-Automatic log translation, if enabled, continues for subsequently added text."
-  (interactive)
+(defun gptel-translate--clear-buffer ()
+  "Discard this buffer's display and tasks, retaining cache and log monitoring."
   (when (timerp gptel-translate--timer)
     (cancel-timer gptel-translate--timer))
   (mapc #'delete-overlay gptel-translate--overlays)
@@ -77,6 +86,26 @@ Automatic log translation, if enabled, continues for subsequently added text."
         gptel-translate--cursor
         (when gptel-translate-log-mode (copy-marker (point-max)))))
 
+;;;###autoload
+(defun gptel-translate-clear (&optional all)
+  "Clear this buffer's translations and pending tasks, retaining the cache.
+With a prefix argument ALL, reset translations and tasks in all buffers and
+clear the shared cache.  Late responses are ignored.  Neither operation sends
+requests or disables log monitoring; new log lines still translate normally."
+  (interactive "P")
+  (if all
+      (progn
+        (clrhash gptel-translate--cache)
+        (cl-incf gptel-translate--cache-generation)
+        (dolist (buffer (buffer-list))
+          (with-current-buffer buffer
+            (when (local-variable-p 'gptel-translate--generation)
+              (save-restriction
+                (widen)
+                (gptel-translate--clear-buffer)))))
+        (message "All translations and cache reset"))
+    (gptel-translate--clear-buffer)))
+
 (defun gptel-translate--enqueue (begin end)
   "Queue one exact source range, skipping blank or already queued ranges."
   (let ((text (buffer-substring-no-properties begin end)))
@@ -86,10 +115,13 @@ Automatic log translation, if enabled, continues for subsequently added text."
                                 (= begin (overlay-start ov))
                                 (= end (overlay-end ov))))
                          gptel-translate--overlays))
-      (let ((ov (make-overlay begin end)))
+      (let* ((ov (make-overlay begin end))
+             (translation (gethash text gptel-translate--cache)))
         (push ov gptel-translate--overlays)
-        (setq gptel-translate--queue
-              (nconc gptel-translate--queue (list (cons ov text))))))))
+        (if translation
+            (gptel-translate--show ov translation)
+          (setq gptel-translate--queue
+                (nconc gptel-translate--queue (list (cons ov text)))))))))
 
 (defun gptel-translate--collect (start end lines)
   "Split START..END by lines or blank-line paragraphs without extending it."
@@ -144,10 +176,11 @@ Automatic log translation, if enabled, continues for subsequently added text."
              do (if (and (stringp translation) (overlay-buffer ov)
                          (equal text (buffer-substring-no-properties
                                       (overlay-start ov) (overlay-end ov))))
-                    (overlay-put ov 'after-string
-                                 (propertize (concat "\n  " translation)
-                                             'face 'shadow
-                                             'line-prefix "" 'wrap-prefix "  "))
+                    (progn
+                      (gptel-translate--show ov translation)
+                      (when (eql (overlay-get ov 'gptel-translate-cache-generation)
+                                 gptel-translate--cache-generation)
+                        (puthash text translation gptel-translate--cache)))
                   (cl-incf missing)
                   (delete-overlay ov)
                   (setq gptel-translate--overlays
@@ -171,6 +204,10 @@ Automatic log translation, if enabled, continues for subsequently added text."
               (cl-incf size (length (cdr entry)))
               (push entry batch)))
           (when batch
+            ;; Prevent requests started before a cache clear from refilling it.
+            (dolist (entry batch)
+              (overlay-put (car entry) 'gptel-translate-cache-generation
+                           gptel-translate--cache-generation))
             (setq batch (nreverse batch)
                   gptel-translate--busy t)
             (let ((callback
@@ -218,7 +255,7 @@ Existing translations are skipped.  No automatic monitoring is enabled."
 New text is sent to your configured model service without confirmation.
 Existing history is not sent.  Disabling clears this buffer's translations."
   :lighter " LogTr"
-  (gptel-translate-clear)
+  (gptel-translate--clear-buffer)
   (if gptel-translate-log-mode
       (progn
         (gptel-translate--initialize)

@@ -4,9 +4,11 @@
 
 (defmacro gptel-translate-test--with-buffer (&rest body)
   (declare (indent 0))
-  `(with-temp-buffer
-     (unwind-protect (progn ,@body)
-       (gptel-translate-clear))))
+  `(let ((gptel-translate--cache (make-hash-table :test #'equal))
+         (gptel-translate--cache-generation 0))
+     (with-temp-buffer
+       (unwind-protect (progn ,@body)
+         (gptel-translate-clear)))))
 
 (defun gptel-translate-test--flush ()
   "Send queued text now instead of waiting for the test's timer."
@@ -145,5 +147,113 @@
         (should-not gptel-translate--busy)
         (should (equal "\n  一段" (overlay-get
                                  (car gptel-translate--overlays) 'after-string)))))))
+
+(ert-deftest gptel-translate-cache-hit-is-immediate-and-shared ()
+  (gptel-translate-test--with-buffer
+    (puthash "One" "一" gptel-translate--cache)
+    (insert "One\n")
+    (gptel-translate-log-mode 1)
+    (insert "One\n")
+    (should-not gptel-translate--queue)
+    (should-not gptel-translate--timer)
+    (should (equal "\n  一" (overlay-get
+                            (car gptel-translate--overlays) 'after-string)))
+    (gptel-translate-clear)
+    (should (= 1 (hash-table-count gptel-translate--cache)))
+    (with-temp-buffer
+      (unwind-protect
+          (progn
+            (insert "One")
+            (gptel-translate-region (point-min) (point-max))
+            (should-not gptel-translate--queue)
+            (should (overlay-get (car gptel-translate--overlays) 'after-string)))
+        (gptel-translate-clear)))))
+
+(ert-deftest gptel-translate-cache-reuses-source-across-settings ()
+  (let (callback)
+    (cl-letf (((symbol-function 'gptel-request)
+               (lambda (_prompt &rest args)
+                 (setq callback (plist-get args :callback)))))
+      (gptel-translate-test--with-buffer
+        (insert "One")
+        (gptel-translate-region (point-min) (point-max))
+        (gptel-translate-test--flush)
+        (funcall callback "1\t一" nil)
+        (gptel-translate-clear)
+        (let ((gptel-backend nil)
+              (gptel-model 'another-model)
+              (gptel-translate-language "French"))
+          (gptel-translate-region (point-min) (point-max))
+          (should-not gptel-translate--queue)
+          (should (equal "\n  一" (overlay-get
+                                  (car gptel-translate--overlays) 'after-string))))
+        (should-not (gethash "One " gptel-translate--cache))))))
+
+(ert-deftest gptel-translate-global-clear-rejects-in-flight-results ()
+  (let (callback)
+    (cl-letf (((symbol-function 'gptel-request)
+               (lambda (_prompt &rest args)
+                 (setq callback (plist-get args :callback)))))
+      (gptel-translate-test--with-buffer
+        (insert "One")
+        (gptel-translate-region (point-min) (point-max))
+        (gptel-translate-test--flush)
+        (gptel-translate-clear t)
+        (funcall callback "1\t一" nil)
+        (should (= 0 (hash-table-count gptel-translate--cache)))
+        (should-not gptel-translate--overlays)))))
+
+(ert-deftest gptel-translate-cache-does-not-store-failed-results ()
+  (let (callback)
+    (cl-letf (((symbol-function 'gptel-request)
+               (lambda (_prompt &rest args)
+                 (setq callback (plist-get args :callback)))))
+      (gptel-translate-test--with-buffer
+        (insert "One\nTwo\nThree")
+        (gptel-translate-region (point-min) (point-max) t)
+        (gptel-translate-test--flush)
+        (funcall callback "1\t一\n1\t重复\n2\t二" nil)
+        (should (= 1 (hash-table-count gptel-translate--cache)))
+        (should (equal "二" (gethash "Two" gptel-translate--cache)))
+        (gptel-translate-clear)
+        (gptel-translate-region (point-min) (point-max) t)
+        (gptel-translate-test--flush)
+        (funcall callback nil '(:status "test failure"))
+        (should (= 1 (hash-table-count gptel-translate--cache)))))))
+
+(ert-deftest gptel-translate-clear-scopes-and-log-lifecycle ()
+  (gptel-translate-test--with-buffer
+    (let ((first (current-buffer))
+          (second (generate-new-buffer " *translate-clear-test*")))
+      (unwind-protect
+          (progn
+            (puthash "One" "一" gptel-translate--cache)
+            (gptel-translate-log-mode 1)
+            (insert "One\n")
+            (with-current-buffer second
+              (insert "One")
+              (gptel-translate-region (point-min) (point-max)))
+            (gptel-translate-clear)
+            (should-not gptel-translate--overlays)
+            (should (= 1 (hash-table-count gptel-translate--cache)))
+            (should (buffer-local-value 'gptel-translate--overlays second))
+            (insert "One\n")
+            (should gptel-translate--overlays)
+            (gptel-translate-log-mode -1)
+            (should (= 1 (hash-table-count gptel-translate--cache)))
+            (gptel-translate-log-mode 1)
+            (insert "One\n")
+            (gptel-translate-clear t)
+            (should (eq first (current-buffer)))
+            (should (= 0 (hash-table-count gptel-translate--cache)))
+            (should-not gptel-translate--overlays)
+            (should-not (buffer-local-value 'gptel-translate--overlays second))
+            (should gptel-translate-log-mode)
+            (insert "New\n")
+            (should (equal '("New") (mapcar #'cdr gptel-translate--queue)))
+            (puthash "Saved" "保留" gptel-translate--cache)
+            (kill-buffer second)
+            (should (gethash "Saved" gptel-translate--cache)))
+        (when (buffer-live-p second) (kill-buffer second))))))
 
 (provide 'gptel-translate-test)
