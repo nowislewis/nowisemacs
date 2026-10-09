@@ -24,9 +24,21 @@ help:
 	@echo "  make lib/PACKAGE      - Build a single package"
 	@echo "  make clean            - Remove all .elc/.eln files and autoloads"
 	@echo "  make init             - Initialize/update git submodules"
-	@echo "  make update           - Update all submodules to latest commit"
+	@echo "  make update           - Update registered packages on their configured remote branches"
 	@echo "  make test             - Run Capsule and Makefile regression tests"
 	@echo ""
+	@echo ".gitmodules fields (inside each submodule section):"
+	@echo "  path                Git: package directory, e.g. lib/example"
+	@echo "  url                 Git: repository URL"
+	@echo "  branch              Git: update branch; defaults to remote HEAD"
+	@echo "  load-path           Capsule: extra package-relative directory (repeatable)"
+	@echo "  pre-build-command   Capsule: trusted Shell command run in package before autoloads"
+	@echo "  skip-build          Capsule: true skips bulk builds; make lib/PACKAGE still builds"
+	@echo "  no-byte-compile     Capsule: file excluded from byte/native compilation (repeatable)"
+	@echo "Defaults include package root, elisp/, lisp/, extensions/, sources/ when present."
+	@echo "Extra load-path directories must exist inside the package."
+	@echo "branch affects update only; init checks out pinned commits."
+	@echo "Update workflow: make update -> review/git add packages -> make init -> make build"
 
 # Load Capsule source explicitly so stale bytecode cannot break build or clean.
 # Internal preparation barrier: pre-build commands and autoload generation.
@@ -82,8 +94,8 @@ clean:
 	@echo "Clean complete!"
 
 init:
-	@echo "Initializing git submodules..."
-	@git submodule update --init --jobs 16
+	@echo "Initializing git submodules recursively..."
+	@git submodule update --init --recursive --jobs 16
 	@echo "Init complete!"
 
 update:
@@ -92,7 +104,6 @@ update:
 test:
 	@$(BATCH_EMACS) -L $(LISP_DIR) -l $(LISP_DIR)/capsule.el \
 		-l $(LISP_DIR)/tests/capsule-test.el \
-		-l $(LISP_DIR)/tests/local-autoload-test.el \
-		-l $(LISP_DIR)/tests/leader-lazy-test.el \
-		-l $(LISP_DIR)/tests/gtd-review-test.el -f ert-run-tests-batch-and-exit
+		-l $(LISP_DIR)/tests/local-autoload-test.el -f ert-run-tests-batch-and-exit
 	@$(PYTHON) $(LISP_DIR)/tests/capsule-make-test.py
+	@$(PYTHON) $(LISP_DIR)/tests/capsule-update-test.py

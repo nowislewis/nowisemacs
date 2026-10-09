@@ -89,13 +89,24 @@ generate =.el= configuration files before the first startup
 *** Build conventions
 Capsule uses the same package directory order for activation and compilation.
 Each operation reads one .gitmodules snapshot; it is discarded afterward, not
-cached persistently. Run =make test= for Capsule and Makefile regression tests.
+cached persistently. Run =make test= for Capsule, local autoload, Makefile and
+update-script regression tests. Feature-specific tests remain available under
+=lisp/tests/= but are not part of this package-manager test target.
 Use =NATIVE=1= with either =make build= or =make lib/package= for native compilation;
 =-j8= controls Make's parallelism. Preparation and compilation are internal stages.
 All Make commands use the current checkout as Emacs's configuration root,
 even outside =~/.emacs.d/=. Native compilation is checked before preparation.
 Explicit =load-path= entries must name existing directories inside the package.
-=make init= initializes submodules without resetting local changes.
+=make init= and =capsule-add-package= recursively initialize packages and their
+nested submodules at pinned commits, without forcing checkout or tracking
+upstream latest versions. Initialization prepares repositories; builds prepare
+and compile code.
+=make update= updates registered =lib/= packages with Git's =--remote --rebase=:
+=.gitmodules= =branch= selects the remote branch; otherwise Git uses the remote
+default branch. Detached HEAD is supported. Package failures are logged and make
+the command fail, while other packages continue. It does not stage changes or
+recursively upgrade dependencies: review and =git add= the new package commits,
+then run =make init= to synchronize nested dependencies and =make build=.
 =make init-build= tangles the configuration without loading the user's init files.
 
 A trusted Shell command can prepare a package before autoload generation:
@@ -130,8 +141,12 @@ scans only files directly in those directories, not their subtrees. Nested
 extensions must be explicitly listed; overlapping paths do not compile files twice.
 
 *** Update packages
-1. =make update= ;; get all packages update latest
-2. =make -j8 build= ;; build packages
+1. =make update= ;; update registered top-level packages; check the logs for failures
+2. =git diff --submodule=short= ;; review the new package commits
+3. =git add lib/PACKAGE ...= ;; stage only package versions you want to keep
+4. =make init= ;; synchronize nested dependencies at the staged package versions
+5. =make -j8 build= ;; rebuild packages and configuration
+Commit the staged package versions when ready to preserve them in the configuration repository.
 
 *** display icons correctly
 [nerd-icons](https://github.com/rainstormstudio/nerd-icons.el) are necessary.  Run `M-x nerd-icons-install-fonts` to
@@ -148,7 +163,7 @@ code), you should run =make init-build=. Use =make build= for a complete build; 
  *** Everyday use(a summary)
  That't to say, after installation, there are only things you need to remember for everyday use:
  1. =M-x capsule-add-package= / =M-x capsule-remove-package= for package management.
- 2. =make update= for updates. After update, run =make -j8 build= to recompile.
+ 2. For updates: =make update=, review and =git add= selected package versions, then =make init= and =make -j8 build=.
  3. =make init-build= if you only changed the =init.org= file.
  4. If you modify a local package under lib such as =foo=, run =make lib/foo= to recompile only that package.
 

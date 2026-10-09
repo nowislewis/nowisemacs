@@ -287,7 +287,9 @@
                 ((symbol-function 'capsule--build-package) (lambda (dir) (setq built dir))))
         (capsule-add-package "https://example.invalid/repo.git" "chosen")
         (should (equal built (expand-file-name "chosen" capsule-drones-directory)))
-        (should (= (length calls) 2))))))
+        (should (= (length calls) 2))
+        (should (equal (car calls)
+                       '("submodule" "update" "--init" "--recursive" "--" "lib/chosen")))))))
 
 (ert-deftest capsule-nested-extensions-are-opt-in ()
   (capsule-test--with-package

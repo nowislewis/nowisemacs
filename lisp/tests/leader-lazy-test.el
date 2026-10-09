@@ -2,6 +2,11 @@
 (require 'ert)
 (require 'transient)
 
+;; Transient inspects direct session commands; load that menu dependency only.
+(let ((load-path (cons (expand-file-name "lib/easysession" user-emacs-directory)
+                       load-path)))
+  (require 'easysession))
+
 (with-temp-buffer
   (insert-file-contents (expand-file-name "init.el" user-emacs-directory))
   (goto-char (point-min))

@@ -77,6 +77,13 @@ class CapsuleMakeTests(unittest.TestCase):
                 )
                 self.assertEqual(result.returncode, 0, result.stderr)
 
+    def test_init_recursively_initializes_pinned_submodules(self):
+        result = self.run_make("--dry-run", "init")
+        self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertIn("git submodule update --init --recursive --jobs 16", result.stdout)
+        self.assertNotIn("--remote", result.stdout)
+        self.assertNotIn("--force", result.stdout)
+
     def test_parallel_compile_waits_for_autoloads(self):
         result = self.run_make("build")
         self.assertEqual(result.returncode, 0, result.stderr)
