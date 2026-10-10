@@ -311,6 +311,9 @@ Maybe I should add a new state.
     ("a" "gptel-agent" gptel-agent)
     ("r" "gptel-rewrite" gptel-rewrite)
     ("f" "gptel-file-add" gptel-add-file)
+    ("s" "nowis-gptel-selection-mode" nowis-gptel-selection-mode)
+    ]
+   ["translate"
     ("t" "Translate region (C-u: lines)" gptel-translate-region)
     ("c" "Clear translations (C-u: reset all)" gptel-translate-clear)
     ("L" "Toggle log translation" gptel-translate-log-mode)
@@ -700,7 +703,7 @@ diff-hl-mode highlights uncommitted changes on the left side of the window
   (setopt auto-save-default nil
         create-lockfiles nil
         make-backup-files nil
-        auto-save-visited-interval 2)
+        auto-save-visited-interval 5)
   (auto-save-visited-mode)
   )
 #+end_src
@@ -2103,6 +2106,8 @@ Simple distraction-free editing. I use darkroom instead of writeroom because it'
   (:hook gptel-highlight-mode)
   (:when-loaded
     (require 'nowis-gptel-prompt)
+    (require 'nowis-gptel-selection)
+    (nowis-gptel-selection-mode 1)
     (setq-default gptel-backend
                   (gptel-make-openai "momenta-openai"
                     :host "llm-gateway.momenta.works"
