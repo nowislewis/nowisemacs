@@ -937,6 +937,10 @@ should be check after reading the embark.el manual
 (setup yasnippet
   (keymap-global-set "M-*" #'yas-insert-snippet)
   (setopt yas-snippet-dirs (list (concat nowis/config-useful-tools "snippets")))
+  (let ((sop-dir (expand-file-name (concat nowis/doc-emacs-dir "14-yas-templates"))))
+    (when (file-directory-p sop-dir)
+      (add-to-list 'yas-snippet-dirs sop-dir t)))
+
   (yas-global-mode))
 #+end_src
 * Window Management
@@ -1902,7 +1906,7 @@ Borrowed from https://github.com/rougier/emacs-GTD
 
 (setq org-agenda-prefix-format
       '((agenda . "%-10c [%-4e] %?-12t% s")
-        (todo   . "[%-4e]: ")
+        (todo   . "%-10c [%-4e]: ")
         (tags   . "%-10c [%-4e] ")
         (search . "%i %-12:c")))
 (setq org-agenda-scheduled-leaders '("S:" "S.%2dx:"))
@@ -1934,7 +1938,7 @@ Borrowed from https://github.com/rougier/emacs-GTD
                 ((org-agenda-overriding-header (nowis/center-header "Current Task · Only One at a Time"))))
           (todo "NEXT"
                 ((org-agenda-overriding-header (nowis/center-header "Next Actions"))))
-          (tags-todo "action"
+          (tags-todo "action/-NEXT"
                      ((org-agenda-overriding-header (nowis/center-header "Project Tasks"))
                       (org-agenda-skip-function '(org-agenda-skip-entry-if 'scheduled))
                       (org-agenda-sorting-strategy
