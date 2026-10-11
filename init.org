@@ -674,7 +674,7 @@ diff-hl-mode highlights uncommitted changes on the left side of the window
         what-cursor-show-names t)
 
   ;; (global-visual-line-mode)
-  (dolist (hook '(prog-mode-hook))
+  (dolist (hook '(prog-mode-hook org-mode-hook))
     (add-hook hook #'visual-line-mode))
   )
 #+end_src
@@ -2153,6 +2153,7 @@ Simple distraction-free editing. I use darkroom instead of writeroom because it'
                  (project-root proj)
                default-directory))))
     (gptel-agent project-dir 'gptel-simple-agent))
+  (keymap-global-set "C-c g" #'gptel-simple-agent)
   (:when-loaded
     (add-to-list 'gptel-agent-dirs
                  (expand-file-name "131-gptel-presets/" nowis/doc-emacs-dir))

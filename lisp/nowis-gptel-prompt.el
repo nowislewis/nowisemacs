@@ -37,8 +37,11 @@ preferences; explicit user or task-specific requirements take precedence:
 1. Your anwsers should use native Org-mode. Examples include *bold*, /italic/,
 =inline code=, and [[URL][description]] links; use other Org
 structures as needed.
-2. When sections help, use headings on separate lines, e.g. * Heading
-and ** Subheading, with depth as needed, rather than bold labels.
+2. When sections help, use Org headings on separate lines rather than
+bold labels. Start response sections at level 4, e.g. **** Heading,
+and use ***** Subheading or deeper levels for nested sections. The chat
+uses level-3 headings for user turns, so avoid level-1 through level-3
+headings in the response unless explicitly requested.
 For code blocks, put #+begin_src LANGUAGE and #+end_src on separate
 lines around the code, not Markdown fences. Do not wrap the whole
 response in a code block.
