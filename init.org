@@ -1160,7 +1160,9 @@ Jump anywhere in the world
   (setopt easysession-save-interval 60
           easysession-setup-load-session-including-geometry nil
           ;; daemon 重连时使用当前 display，避免连接保存时的旧 display。
-          easysession-frameset-restore-force-current-display (daemonp))
+          easysession-frameset-restore-force-current-display (daemonp)
+          easysession-setup-load-session nil
+          )
   (easysession-setup))
 #+end_src
 ** project
@@ -1477,9 +1479,10 @@ borrowed from citre, now you can always jump-back use "M-," after any jump in th
 #+end_src
 *** apheleia
 #+begin_src elisp
-  (setup apheleia
-    ;; (apheleia-global-mode)
-    (:when-loaded
+(setup apheleia
+  ;; (apheleia-global-mode)
+  (setq apheleia-remote-algorithm 'remote)
+  (:when-loaded
     (setf (alist-get 'python-ts-mode apheleia-mode-alist)
           '(isort yapf))))
 #+end_src
@@ -1935,10 +1938,13 @@ Borrowed from https://github.com/rougier/emacs-GTD
                    (org-agenda-skip-function
                     '(org-agenda-skip-if nil '(todo done)))))
           (todo "STARTED"
-                ((org-agenda-overriding-header (nowis/center-header "Current Task · Only One at a Time"))))
+                ((org-agenda-overriding-header
+                  (nowis/center-header "Current Task · Only One at a Time"))
+                 (org-agenda-dim-blocked-tasks t)
+                 ))
           (todo "NEXT"
                 ((org-agenda-overriding-header (nowis/center-header "Next Actions"))))
-          (tags-todo "action/-NEXT"
+          (tags-todo "action/-NEXT-STARTED"
                      ((org-agenda-overriding-header (nowis/center-header "Project Tasks"))
                       (org-agenda-skip-function '(org-agenda-skip-entry-if 'scheduled))
                       (org-agenda-sorting-strategy
@@ -2113,10 +2119,10 @@ Simple distraction-free editing. I use darkroom instead of writeroom because it'
     (require 'nowis-gptel-selection)
     (nowis-gptel-selection-mode 1)
     (setq-default gptel-backend
-                  (gptel-make-openai "momenta-openai"
+                  (gptel-make-openai-responses "momenta-openai"
                     :host "llm-gateway.momenta.works"
                     :key 'gptel-api-key
-                    :stream t
+                    :stream nil
                     :models '(kimi-k3 qwen3.8-flash gpt-5.6-terra gpt-6-luna gpt-6.1-sol deepseek-v4.1-flash)))
     (gptel-make-anthropic "momenta"
       :host "llm-gateway.momenta.works"

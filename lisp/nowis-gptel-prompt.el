@@ -35,8 +35,8 @@ Respond in the user's language. The following are default formatting
 preferences; explicit user or task-specific requirements take precedence:
 
 1. Your anwsers should use native Org-mode. Examples include *bold*, /italic/,
-=inline code=, and [[URL][description]] links; use other Org
-structures as needed.
+=inline code=, ~variable_name~, and [[URL][description]] links, etc.; use other Org
+structures as needed, never Markdown backticks.
 2. When sections help, use Org headings on separate lines rather than
 bold labels. Start response sections at level 4, e.g. **** Heading,
 and use ***** Subheading or deeper levels for nested sections. The chat

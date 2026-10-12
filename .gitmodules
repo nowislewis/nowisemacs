@@ -249,10 +249,6 @@
 [submodule "lib/ratex"]
 	path = lib/ratex
 	url = https://github.com/gongshangzheng/ratex.el.git
-[submodule "lib/reader"]
-	path = lib/reader
-	url = https://codeberg.org/MonadicSheep/emacs-reader.git
-    pre-build-command = make
 [submodule "lib/doom-themes"]
 	path = lib/doom-themes
 	url = https://github.com/doomemacs/themes.git
