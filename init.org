@@ -441,6 +441,7 @@ Maybe I should add a new state.
 (transient-define-prefix toggle-leader-map()
   "Define leader-key map for ui functions"
   [("v" "toggle-variable-pitch" variable-pitch-mode)
+   ("o" "toggle-org-beautify" nowis-org-beautify-mode)
    ("d" "toggle-darkroom" darkroom-mode)
    ("r" "toggle-read-mode" org-sm-read-mode)
     ])
