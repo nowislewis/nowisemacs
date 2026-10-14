@@ -2124,12 +2124,12 @@ Simple distraction-free editing. I use darkroom instead of writeroom because it'
                     :host "llm-gateway.momenta.works"
                     :key 'gptel-api-key
                     :stream nil
-                    :models '(kimi-k3 qwen3.8-flash gpt-5.6-terra gpt-6-luna gpt-6.1-sol deepseek-v4.1-flash)))
+                    :models '(qwen3.8-flash gpt-6-astra gpt-6-luna gpt-6.1-sol deepseek-v4.1-flash)))
     (gptel-make-anthropic "momenta"
       :host "llm-gateway.momenta.works"
       :key 'gptel-api-key
       :stream t
-      :models '(gemini-3.8-flash claude-haiku-5-5))
+      :models '(gemini-3.8-flash gemini-4-argon claude-haiku-5-5))
     (gptel-make-openai "chatanywhere"
       :host "api.chatanywhere.tech"
       :key 'gptel-api-key
