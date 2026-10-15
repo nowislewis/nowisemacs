@@ -675,7 +675,7 @@ diff-hl-mode highlights uncommitted changes on the left side of the window
         what-cursor-show-names t)
 
   ;; (global-visual-line-mode)
-  (dolist (hook '(prog-mode-hook org-mode-hook))
+  (dolist (hook '(prog-mode-hook org-mode-hook markdown-ts-mode-hook))
     (add-hook hook #'visual-line-mode))
   )
 #+end_src
@@ -1314,6 +1314,10 @@ Emacs major-mode to work with Beancount ledger files
 *** csv-mode
 #+begin_src elisp
 (setup csv-mode)
+#+end_src
+*** markdown-ts-mode
+#+begin_src elisp
+(setq markdown-ts-hide-markup t)
 #+end_src
 ** Useful programing tools
 *** xref related
@@ -2054,6 +2058,10 @@ New completed items are saved under "Done from capture" in Inbox
 #+begin_src elisp
 (setup excali-mode)
 #+end_src
+** netron-xwidgets
+#+begin_src elisp
+(add-hook 'dired-mode-hook #'netron-xwidgets-enable)
+#+end_src
 ** ob-artist
 #+begin_src elisp
 (with-eval-after-load 'org
@@ -2103,8 +2111,8 @@ Simple distraction-free editing. I use darkroom instead of writeroom because it'
 #+begin_src elisp
 (setup gptel
   (setopt gptel-default-mode 'org-mode
-          gptel-highlight-methods '(face margin)
-          gptel-model 'gpt-6.1-sol
+          gptel-highlight-methods '(margin)
+          gptel-model 'gemini-4-argon
           gptel-cache t
           gptel-max-tokens 16384
           gptel-confirm-tool-calls nil
@@ -2120,16 +2128,16 @@ Simple distraction-free editing. I use darkroom instead of writeroom because it'
     (require 'nowis-gptel-selection)
     (nowis-gptel-selection-mode 1)
     (setq-default gptel-backend
-                  (gptel-make-openai-responses "momenta-openai"
+                  (gptel-make-anthropic "momenta"
                     :host "llm-gateway.momenta.works"
                     :key 'gptel-api-key
-                    :stream nil
-                    :models '(qwen3.8-flash gpt-6-astra gpt-6-luna gpt-6.1-sol deepseek-v4.1-flash)))
-    (gptel-make-anthropic "momenta"
+                    :stream t
+                    :models '(gemini-3.8-flash gemini-4-argon claude-haiku-5-5)))
+    (gptel-make-openai-responses "momenta-openai"
       :host "llm-gateway.momenta.works"
       :key 'gptel-api-key
-      :stream t
-      :models '(gemini-3.8-flash gemini-4-argon claude-haiku-5-5))
+      :stream nil
+      :models '(qwen3.8-flash gpt-6-astra gpt-6-luna gpt-6.1-sol deepseek-v4.1-flash))
     (gptel-make-openai "chatanywhere"
       :host "api.chatanywhere.tech"
       :key 'gptel-api-key
@@ -2138,11 +2146,8 @@ Simple distraction-free editing. I use darkroom instead of writeroom because it'
     (gptel-make-gemini "Gemini" :key 'gptel-api-key :stream t)
     (gptel-make-deepseek "DeepSeek"
       :key 'gptel-api-key
-      :stream t
-      )
+      :stream t)
     (gptel-make-gh-copilot "Copilot")
-    (custom-set-faces
-     '(gptel-response-highlight ((((background dark) (min-colors 88)) :background "gray15" :extend t))))
     (dolist (model '(claude-opus-5 claude-sonnet-5 gemini-3.8-flash qwen3.8-flash))
       (put model :capabilities '(media tool-use cache)))
     )
@@ -2169,13 +2174,6 @@ Simple distraction-free editing. I use darkroom instead of writeroom because it'
       (apply #'gptel-make-preset 'gptel-simple-agent plist))
     (require 'gptel-robust)
 ))
-#+end_src
-*** gptel-preset-collection
-#+begin_src elisp
-(setup gptel-preset-collection
-  (with-eval-after-load 'gptel
-    (require 'gptel-preset-collection))
-  )
 #+end_src
 *** gptel-local-org-prompts
 #+begin_src elisp
@@ -2384,5 +2382,6 @@ ESUP - Emacs Start Up Profiler
         text)))
 
   (setq interprogram-cut-function #'nowis/wslg-clipboard-copy
-        interprogram-paste-function #'nowis/wslg-clipboard-paste))
+        interprogram-paste-function #'nowis/wslg-clipboard-paste
+        browse-url-browser-function #'browse-url-xdg-open))
 #+end_src
