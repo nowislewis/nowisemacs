@@ -1,23 +1,18 @@
-;;; netron-xwidgets.el --- View local and TRAMP models in Netron -*- lexical-binding: t; -*-
+;;; netron-xwidgets.el --- Open local and TRAMP models in Netron -*- lexical-binding: t; -*-
 
 ;;; Commentary:
-;; View local or remote (TRAMP / tramp-rpc) models (.onnx, .mlir, .tflite, .ort)
-;; in Netron via a single reused `netron' server process.
+;; Open local or remote (TRAMP / tramp-rpc) models (.onnx, .mlir, .tflite, .ort)
+;; in the system browser via a single reused `netron' server process.
 
 ;;; Code:
 
-(require 'cl-lib)
 (require 'dired)
 (require 'subr-x)
 
-(declare-function xwidget-at "xwidget" (pos))
-(declare-function xwidget-webkit--create-new-session-buffer "xwidget" (url &optional callback))
-(declare-function xwidget-webkit-goto-uri "xwidget" (xwidget uri))
-(defvar xwidget-webkit-buffer-name-format)
 (defvar mlir-mode-map)
 
 (defgroup netron-xwidgets nil
-  "View local and remote ML models in Netron."
+  "Open local and remote ML models in Netron."
   :group 'tools
   :prefix "netron-xwidgets-")
 
@@ -38,13 +33,8 @@
   "Minimum file size in bytes (1 MiB default) before slimming is applied."
   :type 'integer)
 
-(defcustom netron-xwidgets-use-xwidgets t
-  "When non-nil and xwidgets are available, open Netron inside Emacs."
-  :type 'boolean)
-
 (defvar netron-xwidgets--server-process nil)
 (defvar netron-xwidgets--server-url nil)
-(defvar-local netron-xwidgets--source-file nil)
 
 (defconst netron-xwidgets--python-slim-script
   "import base64, re, sys
@@ -108,7 +98,7 @@ sys.stdout.write(base64.b64encode(res).decode('ascii'))
 ")
 
 (defun netron-xwidgets--stage-file (file &optional force-full)
-  "Stage FILE locally (slimming if eligible) and return `(staged-path . slim-p)'."
+  "Stage FILE locally (slimming if eligible) and return local staged path."
   (let* ((file (expand-file-name file))
          (ext (downcase (or (file-name-extension file) "")))
          (kind (and (member ext '("onnx" "mlir")) ext))
@@ -116,7 +106,7 @@ sys.stdout.write(base64.b64encode(res).decode('ascii'))
          (slim-p (and (not force-full) netron-xwidgets-slim-models kind
                       (or (null size) (>= size netron-xwidgets-slim-threshold)))))
     (if (and (not (file-remote-p file)) (not slim-p))
-        (cons file nil)
+        file
       (let* ((dir (expand-file-name
                    (concat (substring (md5 (file-name-directory file)) 0 10)
                            (if slim-p "-slim" "-full"))
@@ -141,9 +131,8 @@ sys.stdout.write(base64.b64encode(res).decode('ascii'))
                                (let ((coding-system-for-write 'no-conversion))
                                  (write-region (point-min) (point-max) staged nil 'silent))
                                t)))))
-            (copy-file file staged t)
-            (setq slim-p nil)))
-        (cons staged slim-p)))))
+            (copy-file file staged t)))
+        staged))))
 
 ;;;###autoload
 (defun netron-xwidgets-start-server ()
@@ -186,71 +175,20 @@ sys.stdout.write(base64.b64encode(res).decode('ascii'))
         netron-xwidgets--server-url nil)
   (message "Netron server stopped."))
 
-(define-minor-mode netron-xwidgets-view-mode
-  "Minor mode in Netron buffers (`F' full weights, `E' external browser)."
-  :lighter " Netron"
-  :keymap (let ((map (make-sparse-keymap)))
-            (define-key map (kbd "F") #'netron-xwidgets-open-full)
-            (define-key map (kbd "E") #'netron-xwidgets-open-external)
-            map))
-
-;;;###autoload
-(defun netron-xwidgets-find-file-noselect (file &optional force-full)
-  "Serve FILE on the global Netron server and return the display buffer."
-  (pcase-let* ((source (expand-file-name file))
-               (`(,staged . ,slim-p) (netron-xwidgets--stage-file source force-full))
-               (url (netron-xwidgets-start-server))
-               (label (format "*netron: %s%s*"
-                              (file-name-nondirectory source)
-                              (if slim-p " [slim]" ""))))
-    (process-send-string netron-xwidgets--server-process (concat staged "\n"))
-    (accept-process-output netron-xwidgets--server-process 1.0)
-    (let ((buf (or (get-buffer "*netron*")
-                   (cl-find-if (lambda (b) (buffer-local-value 'netron-xwidgets--source-file b))
-                               (buffer-list)))))
-      (if (and netron-xwidgets-use-xwidgets (featurep 'xwidget-internal))
-          (progn
-            (require 'xwidget)
-            (unless (buffer-live-p buf)
-              (setq buf (xwidget-webkit--create-new-session-buffer url)))
-            (with-current-buffer buf
-              (setq-local xwidget-webkit-buffer-name-format label
-                          netron-xwidgets--source-file source)
-              (rename-buffer label t)
-              (netron-xwidgets-view-mode 1)
-              (xwidget-webkit-goto-uri (xwidget-at (point-min)) url))
-            buf)
-        (browse-url url)
-        (with-current-buffer (get-buffer-create label)
-          (setq-local netron-xwidgets--source-file source)
-          (current-buffer))))))
-
-(defun netron-xwidgets--target-file ()
-  "Resolve the model file from Dired, current Netron buffer, or visited file."
-  (cond ((derived-mode-p 'dired-mode) (dired-get-filename))
-        (netron-xwidgets--source-file netron-xwidgets--source-file)
-        (buffer-file-name buffer-file-name)
-        (t (read-file-name "Open model in Netron: " nil nil t))))
-
 ;;;###autoload
 (defun netron-xwidgets-open (&optional file force-full)
-  "Open FILE (from Dired, current buffer, or prompt) in Netron."
-  (interactive (list (netron-xwidgets--target-file) current-prefix-arg))
-  (pop-to-buffer-same-window
-   (netron-xwidgets-find-file-noselect (or file (netron-xwidgets--target-file)) force-full)))
-
-;;;###autoload
-(defun netron-xwidgets-open-full ()
-  "Reload current model with full unslimmed weights."
-  (interactive)
-  (netron-xwidgets-open (netron-xwidgets--target-file) t))
-
-;;;###autoload
-(defun netron-xwidgets-open-external ()
-  "Open the current model in the external browser."
-  (interactive)
-  (let ((netron-xwidgets-use-xwidgets nil))
-    (netron-xwidgets-find-file-noselect (netron-xwidgets--target-file) current-prefix-arg)))
+  "Open FILE (from Dired, current buffer, or prompt) in Netron via browser.
+With `C-u' (FORCE-FULL), disable weight slimming."
+  (interactive
+   (list (cond ((derived-mode-p 'dired-mode) (dired-get-filename))
+               (buffer-file-name buffer-file-name)
+               (t (read-file-name "Open model in Netron: " nil nil t)))
+         current-prefix-arg))
+  (let ((staged (netron-xwidgets--stage-file file force-full))
+        (url (netron-xwidgets-start-server)))
+    (process-send-string netron-xwidgets--server-process (concat staged "\n"))
+    (accept-process-output netron-xwidgets--server-process 1.0)
+    (browse-url url)))
 
 ;;;###autoload
 (defun netron-xwidgets-clear-cache ()
@@ -260,13 +198,13 @@ sys.stdout.write(base64.b64encode(res).decode('ascii'))
     (delete-directory netron-xwidgets-cache-directory t))
   (message "Netron: Cleared %s" netron-xwidgets-cache-directory))
 
-(defun netron-xwidgets--find-file-noselect-a (orig file &optional nowarn rawfile wildcards)
-  "Intercept binary model files before `find-file-noselect' reads them into RAM."
-  (if (and (not rawfile) (not non-essential) (stringp file)
+(defun netron-xwidgets--find-file-a (orig file &optional wildcards)
+  "Open `.onnx', `.ort', and `.tflite' files directly in Netron."
+  (if (and (stringp file)
            (string-match-p "\\.\\(?:onnx\\|ort\\|tflite\\)\\'" file)
            (file-exists-p file))
-      (netron-xwidgets-find-file-noselect file current-prefix-arg)
-    (funcall orig file nowarn rawfile wildcards)))
+      (netron-xwidgets-open file current-prefix-arg)
+    (funcall orig file wildcards)))
 
 ;;;###autoload
 (defun netron-xwidgets-enable ()
@@ -275,7 +213,7 @@ sys.stdout.write(base64.b64encode(res).decode('ascii'))
   (keymap-set dired-mode-map "C-c C-v" #'netron-xwidgets-open)
   (with-eval-after-load 'mlir-mode
     (keymap-set mlir-mode-map "C-c C-v" #'netron-xwidgets-open))
-  (advice-add 'find-file-noselect :around #'netron-xwidgets--find-file-noselect-a))
+  (advice-add 'find-file :around #'netron-xwidgets--find-file-a))
 
 (provide 'netron-xwidgets)
 ;;; netron-xwidgets.el ends here
