@@ -2310,6 +2310,23 @@ ESUP - Emacs Start Up Profiler
   (setq life-calendar-years 65)
   )
 #+end_src
+** simple-http
+#+begin_src elisp
+(setup simple-httpd
+  (setq httpd-port 8088)
+   (defun my/httpd-browse-current ()
+     "Serve current file/directory (local or TRAMP) via simple-httpd and open in browser."
+     (interactive)
+     (let* ((target (expand-file-name
+                     (or buffer-file-name
+                         (and (derived-mode-p 'dired-mode) (dired-get-filename nil t))
+                         default-directory))))
+       (setq httpd-root (concat (file-remote-p target) "/"))
+       (unless (httpd-running-p) (httpd-start))
+       (browse-url
+        (url-encode-url
+         (format "http://localhost:%d%s" httpd-port (file-local-name target))))))
+#+end_src
 * games
 ** minesweeper
 #+begin_src elisp
