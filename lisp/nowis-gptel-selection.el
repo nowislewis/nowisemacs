@@ -66,8 +66,9 @@
               (make-overlay (point-max) (point-max) nil t t)))
       (overlay-put nowis-gptel-selection--overlay 'after-string
                    (propertize
-                    (format "\n[待发送选区：%s · C-c C-x 忽略]\n"
-                            (nowis-gptel-selection--label))
+                    (substitute-command-keys
+                     (format "\n[待发送选区：%s · \\[nowis-gptel-selection-send] 发送 · \\[nowis-gptel-selection-ignore] 忽略]\n"
+                             (nowis-gptel-selection--label)))
                     'face 'shadow)))))
 
 (defun nowis-gptel-selection--refresh (&rest _)

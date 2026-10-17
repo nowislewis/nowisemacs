@@ -475,14 +475,15 @@ Maybe I should add a new state.
  '("TAB" . tab-leader-map)
  '("t" . toggle-leader-map)
  ;; org-sm: direct review start and discoverable command menu
- '("r" . org-sm-transient-map)
+ '("r" . org-sm-leader-map)
  )
 #+end_src
 ** which-key
 #+begin_src elisp
 (setup which-key
-  (setopt which-key-idle-delay 0.1)
-   (which-key-mode))
+  (setopt which-key-idle-delay 0.1
+          which-key-sort-order #'which-key-key-order-alpha)
+  (which-key-mode))
 #+end_src
 ** electric
 #+begin_src elisp
@@ -2003,31 +2004,25 @@ New completed items are saved under "Done from capture" in Inbox
   (:when-loaded
     ;; AI only refines existing cards in the workbench; capture stays raw.
     (require 'org-sm-gptel))
-  (transient-define-prefix org-sm-transient-map ()
-    "Discover org-sm commands; review continuation uses the repeat map."
-    [["review"
-      ("r" "review confirm" org-sm-review-confirm)
-      ("s" "start review light" org-sm-review-start-light)
-      ("S" "start review" org-sm-review-start)
-      ("a" "about" org-sm-review-abort)
-      ("l" "tree" org-sm-tree)
-      ("e" "capture" org-sm-capture)
-      ("E" "capture clipboard" org-sm-capture-clipboard-notify)
-      ("Z" "zotero import" org-sm-zotero-import)]
-     ["card"
-      ("m" "mark" org-sm-item-mark)
-      ("z" "extract selection" org-sm-item-extract)
-      ("d" "dismiss" org-sm-item-dismiss)
-      ("u" "undismiss" org-sm-item-undismiss)
-      ("p" "set read point" org-sm-set-readpoint)
-      ("o" "goto source" org-sm-goto-source)]
-     ["read"
-      ("z" "extract selection" org-sm-item-extract)
-      ("p" "set read point" org-sm-set-readpoint)
-      ("o" "goto source" org-sm-goto-source)]
-     ["AI"
-      ("?" "explain" org-sm-gptel-explain)
-      ("w" "workbench" org-sm-card-workbench)]]))
+  (defvar-keymap org-sm-leader-map
+    :doc "Prefix keymap for org-sm commands."
+    :prefix 'org-sm-leader-map
+    "r" #'org-sm-review-confirm
+    "s" #'org-sm-review-start-light
+    "S" #'org-sm-review-start
+    "a" #'org-sm-review-abort
+    "l" #'org-sm-tree
+    "e" #'org-sm-capture
+    "E" #'org-sm-capture-clipboard-notify
+    "Z" #'org-sm-zotero-import
+    "m" #'org-sm-item-mark
+    "z" #'org-sm-item-extract
+    "d" #'org-sm-item-dismiss
+    "u" #'org-sm-item-undismiss
+    "p" #'org-sm-set-readpoint
+    "o" #'org-sm-goto-source
+    "?" #'org-sm-gptel-explain
+    "w" #'org-sm-card-workbench))
 #+end_src
 ** insert from clipboard
 #+begin_src elisp

@@ -78,7 +78,10 @@
     (let ((map (make-sparse-keymap)))
       (keymap-set map "C-c d" #'meow-artist-draw-mode)
       (use-local-map (make-composed-keymap map (current-local-map))))
-    (meow-artist-draw-mode 1)))
+    (meow-artist-draw-mode 1)
+    (message "%s"
+             (substitute-command-keys
+              "Artist Draw: [r]ect [l]ine [a]rrow [i]nsert-text [?]ops | \\[meow-normal-mode] normal (\\[meow-artist-draw-mode] draw)"))))
 
 (add-hook 'org-src-mode-hook #'nowis-artist--src-enable-draw)
 

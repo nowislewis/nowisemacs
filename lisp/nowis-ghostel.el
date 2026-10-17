@@ -47,7 +47,10 @@
   (add-hook 'meow-insert-exit-hook #'nowis-ghostel--enter-emacs-mode nil t)
   ;; `ghostel-mode-hook' runs before the terminal exists; synchronize before
   ;; the first command, once initialization has installed its input keymap.
-  (add-hook 'pre-command-hook #'nowis-ghostel--sync-normal-mode nil t))
+  (add-hook 'pre-command-hook #'nowis-ghostel--sync-normal-mode nil t)
+  (message "%s"
+           (substitute-command-keys
+            "Ghostel: \\[meow-insert] input, \\<ghostel-char-mode-map>\\[nowis-ghostel-char-escape] browse, \\[nowis-ghostel-char-send-escape] send literal ESC")))
 
 (defun nowis-ghostel-char-escape ()
   "Leave Meow insert, or return to Ghostel read-only browsing."

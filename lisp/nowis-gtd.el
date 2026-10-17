@@ -44,8 +44,8 @@ From Agenda, visit the original entry first.  Use `widen' to leave focus."
     (user-error "Select an Org task or an Agenda entry first"))
   (org-back-to-heading t)
   (org-narrow-to-subtree)
-  (save-excursion (org-show-subtree))
-  (message "Focused on this task; M-x widen to return"))
+  (save-excursion (org-fold-show-subtree))
+  (message "%s" (substitute-command-keys "Focused on this task; \\[widen] to return")))
 
 ;;;###autoload
 (defun nowis/gtd-resume-task ()
