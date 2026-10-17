@@ -167,9 +167,6 @@
 [submodule "yasnippet"]
 	path = lib/yasnippet
 	url = https://github.com/joaotavora/yasnippet.git
-[submodule "ztree"]
-	path = lib/ztree
-	url = https://codeberg.org/fourier/ztree.git
 [submodule "lib/emacs-life-calendar"]
 	path = lib/emacs-life-calendar
 	url = https://github.com/vshender/emacs-life-calendar.git

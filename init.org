@@ -1216,7 +1216,11 @@ Jump anywhere in the world
 (setup magit)
 ;; we already have cape for git-commit
 (with-eval-after-load 'git-commit
-  (remove-hook 'git-commit-setup-hook #'git-commit-setup-capf))
+  (remove-hook 'git-commit-setup-hook #'git-commit-setup-capf)
+  (keymap-set git-commit-mode-map "C-c C-g" #'nowis-git-commit-generate)
+  (setq git-commit-usage-message
+        (concat git-commit-default-usage-message
+                ", or \\[nowis-git-commit-generate] to AI-generate")))
 #+end_src
 ** ediff
 #+begin_src elisp
@@ -2008,7 +2012,8 @@ New completed items are saved under "Done from capture" in Inbox
       ("a" "about" org-sm-review-abort)
       ("l" "tree" org-sm-tree)
       ("e" "capture" org-sm-capture)
-      ("E" "capture clipboard" org-sm-capture-clipboard-notify)]
+      ("E" "capture clipboard" org-sm-capture-clipboard-notify)
+      ("Z" "zotero import" org-sm-zotero-import)]
      ["card"
       ("m" "mark" org-sm-item-mark)
       ("z" "extract selection" org-sm-item-extract)
@@ -2039,8 +2044,7 @@ New completed items are saved under "Done from capture" in Inbox
           (let ((gtd-dir (expand-file-name "gtd" org-directory)))
             (when (file-directory-p gtd-dir)
               (directory-files-recursively gtd-dir ".*"))))
-    (setq org-ladder-sm-files #'org-sm-files
-          org-ladder-art-directory (concat nowis/doc-emacs-dir "67-org-ladder-arts"))
+    (setq org-ladder-sm-files #'org-sm-files)
     (require 'org-ladder-sm)))
 #+end_src
 ** org-graph
@@ -2314,7 +2318,7 @@ ESUP - Emacs Start Up Profiler
 #+begin_src elisp
 (setup simple-httpd
   (setq httpd-port 8088)
-   (defun my/httpd-browse-current ()
+   (defun nowis-httpd-browse-current ()
      "Serve current file/directory (local or TRAMP) via simple-httpd and open in browser."
      (interactive)
      (let* ((target (expand-file-name
@@ -2325,7 +2329,7 @@ ESUP - Emacs Start Up Profiler
        (unless (httpd-running-p) (httpd-start))
        (browse-url
         (url-encode-url
-         (format "http://localhost:%d%s" httpd-port (file-local-name target))))))
+         (format "http://localhost:%d%s" httpd-port (file-local-name target)))))))
 #+end_src
 * games
 ** minesweeper

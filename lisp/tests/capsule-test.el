@@ -365,5 +365,23 @@
       (capsule-batch-clean)
       (should-not (file-exists-p autoloads)))))
 
+(ert-deftest capsule-remove-cleans-orphaned-gitmodules-entry ()
+  (capsule-test--with-package
+    (let ((default-directory user-emacs-directory))
+      (process-lines "git" "init")
+      (process-lines "git" "config" "user.name" "Test")
+      (process-lines "git" "config" "user.email" "test@example.com")
+      (process-lines "git" "config" "--file" modules
+                     "submodule.ztree.path" "lib/ztree")
+      (process-lines "git" "config" "--file" modules
+                     "submodule.ztree.url" "https://example.invalid/ztree.git")
+      (process-lines "git" "config" "submodule.ztree.url"
+                     "https://example.invalid/ztree.git")
+      (should (member "ztree" (capsule--removable-package-names)))
+      (capsule-remove-package "ztree")
+      (should-not (member "ztree" (capsule--removable-package-names)))
+      (should-not (gethash (expand-file-name "ztree" capsule-drones-directory)
+                           (car (capsule--read-config)))))))
+
 (provide 'capsule-test)
 ;;; capsule-test.el ends here

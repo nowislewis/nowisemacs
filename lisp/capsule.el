@@ -334,26 +334,71 @@ Adds as git submodule, generates autoloads, and compiles."
       (capsule--build-package pkg-dir)
       (message "Package '%s' added successfully; configure it in your init.el" pkg-name))))
 
+(defun capsule--removable-package-names ()
+  "Return sorted package names present in `lib/' or registered in `.gitmodules'.
+Includes orphaned `.gitmodules' entries whose directories were already deleted."
+  (let* ((config (capsule--read-config))
+         (names (mapcar #'file-name-nondirectory (capsule--package-directories)))
+         (drones-dir (file-name-as-directory
+                      (expand-file-name capsule-drones-directory))))
+    (maphash (lambda (pkg-dir _prefix)
+               (when (file-in-directory-p pkg-dir drones-dir)
+                 (push (file-name-nondirectory pkg-dir) names)))
+             (car config))
+    (sort (delete-dups names) #'string<)))
+
+(defun capsule--git-tracked-p (pkg-path)
+  "Return non-nil when PKG-PATH is tracked in the Git index."
+  (let ((default-directory user-emacs-directory))
+    (with-temp-buffer
+      (and (equal 0 (process-file "git" nil '(t nil) nil "ls-files" "--stage" "--" pkg-path))
+           (> (buffer-size) 0)))))
+
+(defun capsule--remove-submodule-sections (section)
+  "Remove SECTION (e.g. `submodule.ztree') from `.gitmodules' and `.git/config'."
+  (let ((default-directory user-emacs-directory)
+        (modules (expand-file-name ".gitmodules" user-emacs-directory)))
+    (when (file-exists-p modules)
+      (capsule--git "config" "--file" modules "--remove-section" section)
+      (capsule--git "add" "--" ".gitmodules"))
+    ;; Ignore exit status when local .git/config has no matching section.
+    (process-file "git" nil nil nil "config" "--remove-section" section)))
+
 ;;;###autoload
 (defun capsule-remove-package (name)
   "Remove package NAME.
-Removes the submodule worktree and registration.
+Removes the submodule worktree, index entry, and `.gitmodules' registration.
+Also cleans up orphaned `.gitmodules' registrations when the directory or
+gitlink was already removed.
 Retains Git's module metadata so existing history is not discarded."
   (interactive
    (list (completing-read "Remove package: "
-                          (mapcar #'file-name-nondirectory
-                                  (capsule--package-directories)))))
+                          (capsule--removable-package-names) nil t)))
   (let* ((default-directory user-emacs-directory)
          (pkg-path (capsule--package-path name))
-         (pkg-dir (expand-file-name pkg-path user-emacs-directory)))
-    (unless (file-directory-p pkg-dir)
+         (pkg-dir (directory-file-name (expand-file-name pkg-path user-emacs-directory)))
+         (config (capsule--read-config))
+         (prefix (gethash pkg-dir (car config)))
+         (section (and prefix (substring prefix 0 -1)))
+         (dir-exists (file-directory-p pkg-dir))
+         (tracked (capsule--git-tracked-p pkg-path)))
+    (unless (or dir-exists tracked section)
       (user-error "Package '%s' not found" name))
-    (unless (yes-or-no-p (format "Remove package '%s'? " name))
+    (unless (or (not (called-interactively-p 'interactive))
+                (yes-or-no-p (format "Remove package '%s'? " name)))
       (user-error "Cancelled"))
-    ;; Remove submodule
     (message "Removing git submodule...")
-    (capsule--git "submodule" "deinit" "-f" "--" pkg-path)
-    (capsule--git "rm" "-f" "--" pkg-path)
+    (when (or tracked (and dir-exists section))
+      (capsule--git "submodule" "deinit" "-f" "--" pkg-path)
+      (capsule--git "rm" "-f" "--" pkg-path))
+    ;; Re-read .gitmodules in case `git rm' was skipped or left an orphan section.
+    (when-let* ((remaining-prefix (gethash pkg-dir (car (capsule--read-config)))))
+      (capsule--remove-submodule-sections (substring remaining-prefix 0 -1)))
+    (when (and section (not tracked))
+      (let ((default-directory user-emacs-directory))
+        (process-file "git" nil nil nil "config" "--remove-section" section)))
+    (when (file-directory-p pkg-dir)
+      (delete-directory pkg-dir t))
     (message "Package '%s' removed successfully!" name)
     (message "Don't forget to remove its configuration from init.el")))
 
