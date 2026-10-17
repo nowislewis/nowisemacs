@@ -438,13 +438,13 @@ Maybe I should add a new state.
 #+end_src
 *** ui
 #+begin_src elisp
-(transient-define-prefix toggle-leader-map()
-  "Define leader-key map for ui functions"
-  [("v" "toggle-variable-pitch" variable-pitch-mode)
-   ("o" "toggle-org-beautify" nowis-org-beautify-mode)
-   ("d" "toggle-darkroom" darkroom-mode)
-   ("r" "toggle-read-mode" org-sm-read-mode)
-    ])
+(defvar-keymap toggle-leader-map
+  :doc "Leader keymap for UI toggle functions."
+  :prefix 'toggle-leader-map
+  "v" #'variable-pitch-mode
+  "o" #'nowis-org-beautify-mode
+  "d" #'darkroom-mode
+  "r" #'org-sm-read-mode)
 #+end_src
 ** meow leader keybindings
 #+begin_src elisp
@@ -482,7 +482,8 @@ Maybe I should add a new state.
 #+begin_src elisp
 (setup which-key
   (setopt which-key-idle-delay 0.1
-          which-key-sort-order #'which-key-key-order-alpha)
+          which-key-sort-order #'which-key-key-order-alpha
+          which-key-sort-uppercase-first nil)
   (which-key-mode))
 #+end_src
 ** electric
@@ -925,6 +926,16 @@ should be check after reading the embark.el manual
   (:when-loaded
     ;; fix completion buffer embark-act insert, rm end of work
     (setf (alist-get 'embark-insert embark-pre-action-hooks) nil)))
+
+(defun nowis/meow-keypad-embark-help ()
+  "Search bindings in the current Meow keypad prefix map via Embark."
+  (interactive)
+  (when-let* ((km (meow--keypad-get-keymap-for-describe)))
+    (meow--keypad-quit)
+    (embark-bindings-in-keymap km))
+  t)
+
+(keymap-set meow-keypad-state-keymap "C-h" #'nowis/meow-keypad-embark-help)
 
 ;; open pdf with zathura
 (defun nowis/open-with-zathura (file)
