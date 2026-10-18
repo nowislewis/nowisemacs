@@ -407,6 +407,7 @@ Maybe I should add a new state.
   "Define leader-key map for apps functions"
   [["Work"
     ("g" "Resume Task" (lambda () (interactive) (call-interactively #'nowis/gtd-resume-task)))
+    ("p" "Pi Fleet" (lambda () (interactive) (call-interactively #'nowis-pi-fleet)))
     ""
     "Context"
     ("i" "Open Issues" (lambda () (interactive) (call-interactively #'nowis/gtd-open-issues)))
@@ -1217,7 +1218,9 @@ Jump anywhere in the world
   (keymap-global-set "M-`" #'ghostel-project)
   (:when-loaded
     (require 'nowis-ghostel)
-    (nowis-ghostel-setup)))
+    (nowis-ghostel-setup)
+    (require 'nowis-pi)
+    (nowis-pi-setup)))
 #+end_src
 * git
 ** magit
