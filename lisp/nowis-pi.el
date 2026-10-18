@@ -6,15 +6,25 @@
 ;;; Commentary:
 ;;
 ;; Minimalist, zero-worktree process fleet manager pairing `ghostel', `dtach',
-;; and `magit' for Pi.
+;; and `magit' for Pi (`SPC a p' -> `nowis-pi-fleet').
 ;;
-;; Design:
-;; - Single entry point: `M-x nowis-pi-fleet' (`C-c p').
-;; - Agents run in-place in their target directory (local or TRAMP remote),
-;;   persisted via `dtach' sockets (`~/.local/share/nowis-pi/sockets/').
-;; - All conversation and `pi-subagents' interaction happens natively inside
-;;   the Ghostel Pi terminal (`SIGWINCH' automatically replays full history on
-;;   reattach via `~/.pi/agent/extensions/ghostel-inspector/index.ts').
+;; Architecture & Non-Obvious Invariants:
+;; 1. Filesystem Socket Truth (`~/.local/share/nowis-pi/sockets/'):
+;;    Each session on a host (local or TRAMP remote) is a `<name>.sock' (`dtach'
+;;    Unix socket, detach key `C-]' / 0x1d) plus a 1-line `<name>.cwd' file.
+;;    No JSON database or worktrees are managed; stale sockets from power loss
+;;    are auto-detected (`! pgrep -f') and respawned with `pi --continue'.
+;; 2. Interactive Shell Bootstrap (`nowis-pi--outer-script'):
+;;    Spawns via `zsh -ic' (or `ZSH_VERSION=1 bash -ic') on the execution host
+;;    so user shell rc exports (`*_KEY', `VIRTUAL_ENV', `PATH') are loaded both
+;;    locally and over TRAMP before `dtach' starts `pi'.
+;; 3. OSC 7501 Telemetry & OSC 133;A Immunity (`ghostel-inspector/index.ts'):
+;;    Pi's `TuiMainScreen' emits `\e]133;A\e\\' on every user message, which
+;;    triggers Ghostel's `ghostel-status--drop-running' (wiping `:state working'
+;;    records).  The companion Pi extension therefore publishes `pi-activity'
+;;    and `pi-telemetry' with OSC `state=idle' (encoding the true phase in
+;;    `:title'), and hooks `process.on("SIGWINCH")' to nudge `stdout.columns'
+;;    so `dtach -r winch' reattach deterministically replays full history.
 
 ;;; Code:
 
