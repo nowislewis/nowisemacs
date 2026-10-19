@@ -1,0 +1,477 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Nowis Board</title>
+  <style>
+    html, body, #root {
+      margin: 0;
+      padding: 0;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Noto Sans SC", sans-serif;
+    }
+    #overlay-layer {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 4;
+      overflow: hidden;
+    }
+    .nowis-card {
+      position: absolute;
+      top: 0;
+      left: 0;
+      transform-origin: 0 0;
+      box-sizing: border-box;
+      pointer-events: none;
+      display: flex;
+      flex-direction: column;
+      border-radius: 6px;
+      overflow: hidden;
+    }
+    /* Inset by 10px so Excalidraw border drag & resize handles remain unobstructed */
+    .nowis-card-inner {
+      margin: 10px;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      background: var(--card-bg, #ffffff);
+      color: var(--card-fg, #1e293b);
+      border-radius: 4px;
+      overflow: hidden;
+      pointer-events: none;
+    }
+    .nowis-card.is-dark .nowis-card-inner {
+      background: var(--card-bg, #1e1e24);
+      color: var(--card-fg, #e2e8f0);
+    }
+    .nowis-card.is-selected .nowis-card-inner {
+      pointer-events: auto;
+      box-shadow: 0 0 0 1px rgba(59, 130, 246, 0.35);
+    }
+    .nowis-card-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 6px;
+      padding: 6px 10px;
+      border-bottom: 1px solid rgba(148, 163, 184, 0.25);
+      background: rgba(148, 163, 184, 0.08);
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      user-select: none;
+    }
+    .nowis-card-title {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      flex: 1;
+    }
+    .nowis-card-badge {
+      font-size: 11px;
+      font-weight: 500;
+      font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+      color: #64748b;
+      padding: 1px 5px;
+      border-radius: 3px;
+      background: rgba(148, 163, 184, 0.15);
+      flex-shrink: 0;
+    }
+    .nowis-card-body {
+      flex: 1;
+      padding: 8px 12px 12px;
+      overflow-y: auto;
+      overflow-x: auto;
+      font-size: 13.5px;
+      line-height: 1.55;
+      overscroll-behavior: contain;
+    }
+    .nowis-card-body h1,
+    .nowis-card-body h2,
+    .nowis-card-body h3,
+    .nowis-card-body h4 {
+      margin: 0.6em 0 0.3em;
+      font-size: 1.05em;
+      line-height: 1.35;
+    }
+    .nowis-card-body p {
+      margin: 0.4em 0;
+    }
+    .nowis-card-body ul,
+    .nowis-card-body ol {
+      margin: 0.4em 0;
+      padding-left: 1.4em;
+    }
+    .nowis-card-body pre {
+      margin: 0.5em 0;
+      padding: 8px 10px;
+      background: rgba(15, 23, 42, 0.06);
+      border-radius: 4px;
+      overflow-x: auto;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      font-size: 12px;
+    }
+    .nowis-card.is-dark .nowis-card-body pre {
+      background: rgba(255, 255, 255, 0.07);
+    }
+    .nowis-card-body code {
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      font-size: 0.9em;
+    }
+    .nowis-card-body table {
+      border-collapse: collapse;
+      width: 100%;
+      margin: 0.5em 0;
+      font-size: 12.5px;
+    }
+    .nowis-card-body th,
+    .nowis-card-body td {
+      border: 1px solid rgba(148, 163, 184, 0.35);
+      padding: 4px 8px;
+      text-align: left;
+    }
+    .nowis-card-body a {
+      color: #2563eb;
+      text-decoration: none;
+    }
+    .nowis-card-body a:hover {
+      text-decoration: underline;
+    }
+    .nowis-card-body img {
+      max-width: 100%;
+      height: auto;
+      border-radius: 4px;
+    }
+    #nowis-status {
+      position: fixed;
+      bottom: 12px;
+      right: 60px;
+      z-index: 10;
+      font-size: 12px;
+      padding: 4px 10px;
+      border-radius: 6px;
+      background: rgba(15, 23, 42, 0.72);
+      color: #f8fafc;
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 0.2s ease;
+    }
+    #nowis-status.visible {
+      opacity: 1;
+    }
+  </style>
+  <script>
+    window.EXCALIDRAW_ASSET_PATH = "https://cdn.jsdelivr.net/npm/@excalidraw/excalidraw@0.17.6/dist/";
+  </script>
+  <script src="https://cdn.jsdelivr.net/npm/react@18.3.1/umd/react.production.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/react-dom@18.3.1/umd/react-dom.production.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@excalidraw/excalidraw@0.17.6/dist/excalidraw.production.min.js"></script>
+</head>
+<body>
+  <div id="root"></div>
+  <div id="overlay-layer"></div>
+  <div id="nowis-status"></div>
+
+  <script>
+    const { useState, useEffect, useRef, useCallback } = React;
+    const { createRoot } = ReactDOM;
+    const {
+      Excalidraw,
+      convertToExcalidrawElements,
+      getSceneVersion,
+      restore,
+      serializeAsJSON,
+      exportToSvg
+    } = ExcalidrawLib;
+
+    const boardFile = new URLSearchParams(window.location.search).get("file") || "";
+    const statusEl = document.getElementById("nowis-status");
+    const overlayRoot = createRoot(document.getElementById("overlay-layer"));
+
+    let statusTimer = null;
+    function flashStatus(msg) {
+      statusEl.textContent = msg;
+      statusEl.classList.add("visible");
+      clearTimeout(statusTimer);
+      statusTimer = setTimeout(() => statusEl.classList.remove("visible"), 1600);
+    }
+
+    const isEmacsLink = (link) =>
+      typeof link === "string" && /^(?:denote|id|file):/.test(link);
+
+    const isDenoteCard = (el) =>
+      el && !el.isDeleted && el.type === "rectangle" &&
+      typeof el.link === "string" && el.link.startsWith("denote:");
+
+    async function visitInEmacs(link) {
+      if (!link) return;
+      await fetch(`/api/visit?link=${encodeURIComponent(link)}`);
+      flashStatus(`Emacs → ${link}`);
+    }
+
+    function CardOverlay({ elements, appState, cards }) {
+      if (!appState) return null;
+      const zoom = appState.zoom?.value || 1;
+      const { scrollX = 0, scrollY = 0, selectedElementIds = {}, theme } = appState;
+      const isDark = theme === "dark";
+
+      return React.createElement(
+        React.Fragment,
+        null,
+        (elements || []).filter(isDenoteCard).map((el) => {
+          const cardData = cards[el.link];
+          const isSelected = Boolean(selectedElementIds[el.id]);
+          const vx = (el.x + scrollX) * zoom;
+          const vy = (el.y + scrollY) * zoom;
+          const bg = el.backgroundColor && el.backgroundColor !== "transparent"
+            ? el.backgroundColor
+            : (isDark ? "#1e1e24" : "#ffffff");
+          const transform = `translate3d(${vx}px, ${vy}px, 0) scale(${zoom})${el.angle ? ` rotate(${el.angle}rad)` : ""}`;
+
+          return React.createElement(
+            "div",
+            {
+              key: el.id,
+              className: `nowis-card${isSelected ? " is-selected" : ""}${isDark ? " is-dark" : ""}`,
+              style: { width: `${el.width}px`, height: `${el.height}px`, transform, "--card-bg": bg },
+              onDoubleClick: (e) => { e.stopPropagation(); visitInEmacs(el.link); }
+            },
+            React.createElement(
+              "div",
+              { className: "nowis-card-inner" },
+              React.createElement(
+                "div",
+                {
+                  className: "nowis-card-header",
+                  title: "Click or double-click to locate in Emacs without stealing focus",
+                  onClick: (e) => { e.stopPropagation(); visitInEmacs(el.link); }
+                },
+                React.createElement("span", { className: "nowis-card-title" }, cardData?.title || el.link),
+                React.createElement("span", { className: "nowis-card-badge" }, cardData?.subtitle || "denote ↗")
+              ),
+              React.createElement("div", {
+                className: "nowis-card-body",
+                onWheel: (e) => e.stopPropagation(),
+                onPointerDown: (e) => e.stopPropagation(),
+                onClick: (e) => {
+                  const anchor = e.target.closest("a");
+                  const href = anchor && (anchor.getAttribute("data-emacs-link") || anchor.getAttribute("href"));
+                  if (href && isEmacsLink(href)) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    visitInEmacs(href);
+                  }
+                },
+                dangerouslySetInnerHTML: { __html: cardData?.html || "<em>Loading…</em>" }
+              })
+            )
+          );
+        })
+      );
+    }
+
+    function normalizeInitialScene(raw) {
+      const data = raw || {};
+      const restored = restore(
+        {
+          elements: Array.isArray(data.elements) ? data.elements : [],
+          appState: data.appState || { viewBackgroundColor: "#f8fafc" },
+          files: data.files || {}
+        },
+        null,
+        null
+      );
+      restored.appState.collaborators = new Map();
+      return restored;
+    }
+
+    function App() {
+      const apiRef = useRef(null);
+      const [initialData, setInitialData] = useState(null);
+      const cardsRef = useRef({});
+      const saveTimerRef = useRef(null);
+      const lastVersionRef = useRef(-1);
+      const pendingLinksRef = useRef(new Set());
+
+      const renderOverlay = useCallback(() => {
+        const api = apiRef.current;
+        if (!api) return;
+        overlayRoot.render(
+          React.createElement(CardOverlay, {
+            elements: api.getSceneElements(),
+            appState: api.getAppState(),
+            cards: cardsRef.current
+          })
+        );
+      }, []);
+
+      const ensureCardLoaded = useCallback(async (link) => {
+        if (!link || cardsRef.current[link] || pendingLinksRef.current.has(link)) return;
+        pendingLinksRef.current.add(link);
+        try {
+          const res = await fetch(`/api/card?link=${encodeURIComponent(link)}`);
+          if (res.ok) {
+            cardsRef.current = { ...cardsRef.current, [link]: await res.json() };
+            renderOverlay();
+          }
+        } finally {
+          pendingLinksRef.current.delete(link);
+        }
+      }, [renderOverlay]);
+
+      useEffect(() => {
+        fetch(`/api/board?file=${encodeURIComponent(boardFile)}`)
+          .then((r) => r.json())
+          .then((payload) => {
+            if (payload.title) document.title = `${payload.title} — Nowis Board`;
+            cardsRef.current = payload.cards || {};
+            const rawScene = payload.sceneJson ? JSON.parse(payload.sceneJson) : payload.scene;
+            const restored = normalizeInitialScene(rawScene);
+            lastVersionRef.current = `${getSceneVersion(restored.elements)}:`;
+            setInitialData(restored);
+          });
+      }, []);
+
+      useEffect(() => {
+        const es = new EventSource(`/api/events?file=${encodeURIComponent(boardFile)}`);
+        es.addEventListener("cards", (ev) => {
+          cardsRef.current = { ...cardsRef.current, ...JSON.parse(ev.data) };
+          renderOverlay();
+          flashStatus("Synced from Emacs");
+        });
+        es.addEventListener("insert-card", (ev) => {
+          const { link, card } = JSON.parse(ev.data);
+          const api = apiRef.current;
+          if (!api) return;
+          if (card) cardsRef.current = { ...cardsRef.current, [link]: card };
+          const appState = api.getAppState();
+          const zoom = appState.zoom?.value || 1;
+          const existing = api.getSceneElements();
+          const offset = (existing.filter(isDenoteCard).length % 5) * 28;
+          const [newRect] = convertToExcalidrawElements([{
+            type: "rectangle",
+            x: Math.round(-appState.scrollX + window.innerWidth / (2 * zoom) - 190 + offset),
+            y: Math.round(-appState.scrollY + window.innerHeight / (2 * zoom) - 130 + offset),
+            width: 380,
+            height: 260,
+            strokeColor: "#64748b",
+            backgroundColor: "#ffffff",
+            fillStyle: "solid",
+            strokeWidth: 1,
+            roughness: 0,
+            roundness: { type: 3 }
+          }]);
+          newRect.link = link;
+          api.updateScene({
+            elements: [...existing, newRect],
+            appState: { selectedElementIds: { [newRect.id]: true } }
+          });
+          renderOverlay();
+          flashStatus(`Added ${card?.title || link}`);
+        });
+        es.addEventListener("promote-selected", (ev) => {
+          const { elementId, link, card } = JSON.parse(ev.data);
+          const api = apiRef.current;
+          if (!api) return;
+          if (card) cardsRef.current = { ...cardsRef.current, [link]: card };
+          const elements = api.getSceneElements().map((el) => {
+            if (el.id === elementId) {
+              return {
+                ...el,
+                type: "rectangle",
+                width: Math.max(el.width || 0, 360),
+                height: Math.max(el.height || 0, 240),
+                roughness: 0,
+                fillStyle: "solid",
+                backgroundColor: el.backgroundColor === "transparent" ? "#ffffff" : el.backgroundColor,
+                link,
+                version: (el.version || 1) + 1,
+                updated: Date.now()
+              };
+            }
+            if (el.containerId === elementId) {
+              return { ...el, isDeleted: true, version: (el.version || 1) + 1 };
+            }
+            return el;
+          });
+          api.updateScene({ elements });
+          renderOverlay();
+          flashStatus(`Promoted → ${link}`);
+        });
+        return () => es.close();
+      }, [renderOverlay]);
+
+      const scheduleSave = useCallback((elements, appState, files) => {
+        const selectedIds = Object.keys(appState.selectedElementIds || {}).filter(
+          (id) => appState.selectedElementIds[id]
+        );
+        const version = getSceneVersion(elements);
+        const selectionKey = selectedIds.join(",");
+        const stateKey = `${version}:${selectionKey}`;
+        if (stateKey === lastVersionRef.current) return;
+        clearTimeout(saveTimerRef.current);
+        saveTimerRef.current = setTimeout(async () => {
+          const prevVersion = String(lastVersionRef.current).split(":")[0];
+          lastVersionRef.current = stateKey;
+          const sceneJson = serializeAsJSON(elements, appState, files || {}, "local");
+          let svg = null;
+          if (String(version) !== prevVersion) {
+            try {
+              const nonDeleted = elements.filter((e) => !e.isDeleted);
+              if (nonDeleted.length > 0) {
+                const svgEl = await exportToSvg({
+                  elements: nonDeleted,
+                  appState: { ...appState, exportBackground: true },
+                  files: files || {}
+                });
+                svg = svgEl.outerHTML;
+              }
+            } catch (_) {}
+          }
+          await fetch(`/api/save?file=${encodeURIComponent(boardFile)}`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ sceneJson, selectedIds, svg })
+          });
+        }, 500);
+      }, []);
+
+      if (!initialData) return null;
+
+      return React.createElement(Excalidraw, {
+        excalidrawAPI: (api) => {
+          apiRef.current = api;
+          setTimeout(() => {
+            const els = api.getSceneElements();
+            if (els && els.length > 0) {
+              api.scrollToContent(els, { fitToViewport: false });
+            }
+            renderOverlay();
+          }, 80);
+        },
+        initialData,
+        onChange: (elements, appState, files) => {
+          for (const el of elements) {
+            if (isDenoteCard(el) && !cardsRef.current[el.link]) ensureCardLoaded(el.link);
+          }
+          renderOverlay();
+          scheduleSave(elements, appState, files);
+        },
+        onScrollChange: renderOverlay,
+        onLinkOpen: (element, event) => {
+          if (element.link && isEmacsLink(element.link)) {
+            event.preventDefault();
+            visitInEmacs(element.link);
+          }
+        }
+      });
+    }
+
+    createRoot(document.getElementById("root")).render(React.createElement(App));
+  </script>
+</body>
+</html>

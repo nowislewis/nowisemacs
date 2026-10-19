@@ -364,6 +364,11 @@ Maybe I should add a new state.
     ("l a" "art gallery" org-ladder-art-gallery)
     ("l d" "show detailed" org-ladder-show-details)
     ]
+   ["board"
+    ("w o" "open board" nowis-board-open)
+    ("w a" "add heading/note" nowis-board-add-here)
+    ("w p" "promote draft" nowis-board-promote)
+    ]
    ["bib"
     ("a" "citar-add-file" citar-add-file-to-library)
     ("b" "citar-open" citar-open)
@@ -1212,7 +1217,6 @@ Jump anywhere in the world
         ghostel-initial-input-mode 'line
         ghostel-shell "zsh"
         ghostel-tramp-shell-integration t)
-  (autoload #'ghostel-project "ghostel" nil t)
   (keymap-global-set "M-`" #'ghostel-project)
   (:when-loaded
     (require 'nowis-ghostel)
@@ -1970,15 +1974,15 @@ Borrowed from https://github.com/rougier/emacs-GTD
                      ((org-agenda-overriding-header (nowis/center-header "Project Tasks"))
                       (org-agenda-skip-function '(org-agenda-skip-entry-if 'scheduled))
                       (org-agenda-sorting-strategy
-                       '(priority-down timestamp-up todo-state-up category-up))))
+                       '(category-keep priority-down timestamp-up todo-state-up))))
           (tags-todo "inbox"
                      ((org-agenda-overriding-header (nowis/center-header "Inbox"))
                       (org-agenda-sorting-strategy
-                       '(priority-down timestamp-up todo-state-up category-up))))
+                       '(category-keep priority-down timestamp-up todo-state-up))))
           (tags-todo "reading"
                      ((org-agenda-overriding-header (nowis/center-header "Reading Tasks"))
                       (org-agenda-sorting-strategy
-                       '(priority-down timestamp-up todo-state-up category-up))))))))
+                       '(category-keep priority-down timestamp-up todo-state-up))))))))
 
 ;;; ─── Clock 设置 ─────────
 (setq org-agenda-clockreport-parameter-plist
@@ -2065,9 +2069,9 @@ New completed items are saved under "Done from capture" in Inbox
  (:autoload org-mindmap-mode)
  (:hook-into org-mode))
 #+end_src
-** excali-mode
+** nowis-board
 #+begin_src elisp
-(setup excali-mode)
+(setup nowis-board)
 #+end_src
 ** netron-xwidgets
 #+begin_src elisp
