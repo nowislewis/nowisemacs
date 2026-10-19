@@ -361,10 +361,8 @@ Maybe I should add a new state.
     ("r g" "GTD files" project-find-gtd-dir-files)
     ]
    ["ladder"
-    ("l c" "display current" org-ladder-status)
+    ("l a" "art gallery" org-ladder-art-gallery)
     ("l d" "show detailed" org-ladder-show-details)
-    ("l f" "force update" org-ladder-force-refresh)
-    ("l r" "recent done" (lambda () (interactive) (org-agenda nil "R")))
     ]
    ["bib"
     ("a" "citar-add-file" citar-add-file-to-library)
@@ -2145,12 +2143,12 @@ Simple distraction-free editing. I use darkroom instead of writeroom because it'
                     :host "llm-gateway.momenta.works"
                     :key 'gptel-api-key
                     :stream t
-                    :models '(gemini-3.8-flash gemini-4-argon claude-haiku-5-5)))
+                    :models '(gemini-3.8-flash claude-haiku-5-5)))
     (gptel-make-openai-responses "momenta-openai"
       :host "llm-gateway.momenta.works"
       :key 'gptel-api-key
       :stream nil
-      :models '(qwen3.8-flash gpt-6-astra gpt-6-luna gpt-6.1-sol deepseek-v4.1-flash))
+      :models '(qwen3.8-flash gpt-6-astra gpt-6-luna gpt-6.1-sol deepseek-v4.1-flash gemini-4-argon))
     (gptel-make-openai "chatanywhere"
       :host "api.chatanywhere.tech"
       :key 'gptel-api-key

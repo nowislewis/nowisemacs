@@ -13,7 +13,8 @@
 ;;    Each session on a host (local or TRAMP remote) is a `<name>.sock' (`dtach'
 ;;    Unix socket, detach key `C-]' / 0x1d) plus a 1-line `<name>.cwd' file.
 ;;    No JSON database or worktrees are managed; stale sockets from power loss
-;;    are auto-detected (`! pgrep -f') and respawned with `pi --continue'.
+;;    are auto-detected (`! dtach -p <sock> </dev/null') and respawned with
+;;    `pi --continue'.
 ;; 2. Interactive Shell Bootstrap (`nowis-pi--outer-script'):
 ;;    Spawns via `zsh -ic' (or `ZSH_VERSION=1 bash -ic') on the execution host
 ;;    so user shell rc exports (`*_KEY', `VIRTUAL_ENV', `PATH') are loaded both
@@ -67,11 +68,6 @@ as \"/rpc:cloud:\" or \"/ssh:dev:\"."
                          (string :tag "TRAMP prefix (e.g. /rpc:cloud:)")))
   :group 'nowis-pi)
 
-(defcustom nowis-pi-use-dtach t
-  "When non-nil and `dtach' is installed, wrap Pi sessions in `dtach'."
-  :type 'boolean
-  :group 'nowis-pi)
-
 
 ;;;; Socket & Session Discovery (Zero Subprocesses)
 
@@ -99,21 +95,22 @@ as \"/rpc:cloud:\" or \"/ssh:dev:\"."
 
 (defun nowis-pi--socket-file (remote-prefix name)
   "Return the `.sock' path for session NAME on REMOTE-PREFIX."
-  (let ((dir (nowis-pi--host-socket-dir remote-prefix)))
-    (make-directory dir t)
-    (expand-file-name (concat name ".sock") dir)))
+  (expand-file-name (concat name ".sock")
+                    (nowis-pi--host-socket-dir remote-prefix)))
 
 (defun nowis-pi--cwd-file (remote-prefix name)
   "Return the `.cwd' metadata file path for session NAME on REMOTE-PREFIX."
   (expand-file-name (concat name ".cwd") (nowis-pi--host-socket-dir remote-prefix)))
 
-(defun nowis-pi--write-cwd (remote-prefix name cwd)
-  "Record CWD (as a host-local path) for session NAME on REMOTE-PREFIX."
-  (let ((file (nowis-pi--cwd-file remote-prefix name)))
+(defun nowis-pi--write-cwd (remote-prefix name cwd &optional argv-sock)
+  "Record CWD and initial ARGV-SOCK for session NAME on REMOTE-PREFIX."
+  (let ((file (nowis-pi--cwd-file remote-prefix name))
+        (sock (or argv-sock
+                  (file-local-name (nowis-pi--socket-file remote-prefix name)))))
     (make-directory (file-name-directory file) t)
     (with-temp-file file
       (insert (file-local-name (file-name-as-directory (expand-file-name cwd)))
-              "\n"))))
+              "\n" sock "\n"))))
 
 (defun nowis-pi--read-cwd (remote-prefix name)
   "Read the recorded working directory for session NAME on REMOTE-PREFIX."
@@ -121,11 +118,22 @@ as \"/rpc:cloud:\" or \"/ssh:dev:\"."
     (if (file-readable-p file)
         (with-temp-buffer
           (insert-file-contents file nil 0 1024)
-          (let ((raw (string-trim (buffer-string))))
-            (if (string-empty-p raw)
+          (let ((raw (car (split-string (buffer-string) "\n" t "[ \t\r]+"))))
+            (if (or (null raw) (string-empty-p raw))
                 (concat (or remote-prefix "") "~/")
               (file-name-as-directory (nowis-pi--with-remote remote-prefix raw)))))
       (concat (or remote-prefix "") "~/"))))
+
+(defun nowis-pi--read-argv-sock (remote-prefix name)
+  "Read the initial `dtach' socket path for session NAME on REMOTE-PREFIX."
+  (let ((file (nowis-pi--cwd-file remote-prefix name))
+        (fallback (file-local-name (nowis-pi--socket-file remote-prefix name))))
+    (if (file-readable-p file)
+        (with-temp-buffer
+          (insert-file-contents file nil 0 1024)
+          (or (cadr (split-string (buffer-string) "\n" t "[ \t\r]+"))
+              fallback))
+      fallback)))
 
 (defun nowis-pi--host-connected-p (host)
   "Return non-nil if HOST (nil for local, or TRAMP prefix) is connected."
@@ -183,8 +191,12 @@ When CONNECT-REMOTES is nil, offline TRAMP hosts are skipped."
                     (ignore-errors (delete-file file)))))))))))
     (sort (nreverse sessions)
           (lambda (a b)
-            (string< (concat (plist-get a :host) "/" (plist-get a :name))
-                     (concat (plist-get b :host) "/" (plist-get b :name)))))))
+            (string< (concat (plist-get a :host) "::"
+                             (plist-get a :cwd) "::"
+                             (plist-get a :name))
+                     (concat (plist-get b :host) "::"
+                             (plist-get b :cwd) "::"
+                             (plist-get b :name)))))))
 
 
 ;;;; Ghostel Buffer Identity & OSC 7501 Telemetry Layer
@@ -313,14 +325,15 @@ When CONNECT-REMOTES is nil, offline TRAMP hosts are skipped."
 
 ;;;; Spawning, Reattaching & Exit Cleanup
 
-(defun nowis-pi--dtach-pids (sock)
-  "Return all local system PIDs (master `dtach' and children) owning SOCK."
-  (let ((masters nil)
+(defun nowis-pi--dtach-pids (socks)
+  "Return local system PIDs (master `dtach' and children) matching SOCKS."
+  (let ((sock-list (delete-dups (ensure-list socks)))
+        (masters nil)
         (children nil))
     (dolist (pid (list-system-processes))
       (let* ((attrs (process-attributes pid))
              (args (alist-get 'args attrs)))
-        (when (and args (string-search sock args))
+        (when (and args (seq-some (lambda (s) (string-search s args)) sock-list))
           (push pid masters))))
     (when masters
       (dolist (pid (list-system-processes))
@@ -343,43 +356,34 @@ When CONNECT-REMOTES is nil, offline TRAMP hosts are skipped."
 
 (defconst nowis-pi--inner-script
   (concat
-   "use_dtach=\"$1\"; sock=\"$2\"; cwd=\"$3\"; shift 3; "
+   "sock=\"$1\"; cwd=\"$2\"; shift 2; "
    "cd \"$cwd\" || exit 1; "
+   "command -v dtach >/dev/null 2>&1 || { echo 'nowis-pi: dtach is not installed' >&2; exit 1; }; "
    "export PI_PROGRAM_STATUS=1 INSIDE_EMACS=ghostel; "
-   "if [ \"$use_dtach\" = 1 ] && command -v dtach >/dev/null 2>&1; then "
-   "  if [ -S \"$sock\" ] && ! pgrep -f \"$sock\" >/dev/null 2>&1; then "
-   "    rm -f \"$sock\"; "
-   "    set -- \"$@\" --continue; "
-   "  fi; "
-   "  dtach -A \"$sock\" -e \"$(printf '\\035')\" -r winch \"$@\"; "
-   "  rc=$?; "
-   "  [ ! -e \"$sock\" ] && rm -f \"${sock%.sock}.cwd\"; "
-   "  exit $rc; "
-   "else "
-   "  exec \"$@\"; "
-   "fi")
+   "if [ -S \"$sock\" ] && ! dtach -p \"$sock\" </dev/null >/dev/null 2>&1; then "
+   "  rm -f \"$sock\"; "
+   "  set -- \"$@\" --continue; "
+   "fi; "
+   "dtach -A \"$sock\" -e \"$(printf '\\035')\" -r winch \"$@\"; "
+   "rc=$?; "
+   "if ! dtach -p \"$sock\" </dev/null >/dev/null 2>&1; then "
+   "  rm -f \"$sock\" \"${sock%.sock}.cwd\"; "
+   "fi; "
+   "exit $rc")
   "Inner script that `cd's into CWD, handles stale sockets, and runs `dtach'.")
 
 (defun nowis-pi--on-buffer-exit (buf _event)
-  "Clean up renamed `.sock' / `.cwd' if the underlying `dtach' session exited."
-  (when (buffer-live-p buf)
-    (with-current-buffer buf
-      (when (eq (alist-get 'kind ghostel-identity) 'pi-task)
-        (let* ((name (alist-get 'task ghostel-identity))
-               (host (alist-get 'host ghostel-identity))
-               (remote (unless (equal host "local") host))
-               (sock (nowis-pi--socket-file remote name))
-               (cwd-file (nowis-pi--cwd-file remote name)))
-          (when (and (not remote)
-                     (null (nowis-pi--dtach-pids (file-local-name sock))))
-            (when (file-exists-p sock) (ignore-errors (delete-file sock)))
-            (when (file-exists-p cwd-file) (ignore-errors (delete-file cwd-file)))))
-        (nowis-pi--on-status-change "" nil nil)))))
+  "Refresh `*Pi Fleet*' when a `pi-task' Ghostel buffer exits."
+  (when (and (buffer-live-p buf)
+             (eq (alist-get 'kind (buffer-local-value 'ghostel-identity buf))
+                 'pi-task))
+    (nowis-pi--on-status-change "" nil nil)))
 
-(defun nowis-pi--open-session (name cwd &optional initial-prompt display-mode)
+(defun nowis-pi--open-session (name cwd &optional initial-prompt display-mode extra-args)
   "Open or spawn Ghostel Pi session NAME in directory CWD.
 When INITIAL-PROMPT is non-nil and a new session is created, pass it to Pi.
-DISPLAY-MODE is `switch' (default) or `background'."
+DISPLAY-MODE is `switch' (default) or `background'; EXTRA-ARGS is a list of
+additional CLI flags (such as `(\"-r\")') appended to `nowis-pi-command'."
   (require 'ghostel)
   (nowis-pi-setup)
   (let* ((mode (or display-mode 'switch))
@@ -388,17 +392,22 @@ DISPLAY-MODE is `switch' (default) or `background'."
          (existing (nowis-pi--find-task-buffer remote name))
          (live-p (and existing
                       (process-live-p (buffer-local-value 'ghostel--process existing))))
-         (buf (or existing (get-buffer-create (format "*pi:%s*" name)))))
+         (buf nil))
+    (unless live-p
+      (let ((default-directory full-cwd))
+        (unless (executable-find "dtach" t)
+          (user-error "`dtach' is not installed on %s" (or remote "local host")))))
+    (setq buf (or existing (get-buffer-create (format "*pi:%s*" name))))
     (when remote
       (cl-pushnew remote nowis-pi-hosts :test #'equal))
     (unless live-p
-      (nowis-pi--write-cwd remote name full-cwd)
       (let* ((identity (nowis-pi--task-identity remote name))
              (sock (nowis-pi--socket-file remote name))
              (local-sock (file-local-name sock))
              (local-cwd (file-local-name full-cwd))
              (pi-argv (append nowis-pi-command
                               (list "--name" name)
+                              extra-args
                               (and initial-prompt
                                    (not (string-blank-p initial-prompt))
                                    (list initial-prompt))))
@@ -406,14 +415,14 @@ DISPLAY-MODE is `switch' (default) or `background'."
                                  nowis-pi--outer-script
                                  "sh"
                                  nowis-pi--inner-script
-                                 (if nowis-pi-use-dtach "1" "0")
                                  local-sock
                                  local-cwd)
                            pi-argv)))
+        (unless (and (file-exists-p sock)
+                     (file-exists-p (nowis-pi--cwd-file remote name)))
+          (nowis-pi--write-cwd remote name full-cwd local-sock))
         (with-current-buffer buf
           (setq-local default-directory full-cwd))
-        (when (eq mode 'switch)
-          (pop-to-buffer buf))
         (ghostel-exec buf "sh" args identity)
         (with-current-buffer buf
           (setq-local default-directory full-cwd))))
@@ -491,6 +500,41 @@ DISPLAY-MODE is `switch' (default) or `background'."
              append (list (format "/rpc:%s:" h)
                           (format "/ssh:%s:" h)))))
 
+(defun nowis-pi--parse-new-input (raw-input default-name)
+  "Parse RAW-INPUT into `(NAME . EXTRA-ARGS)' with DEFAULT-NAME fallback.
+Leading `-flag' tokens keep DEFAULT-NAME and treat all tokens as EXTRA-ARGS."
+  (let* ((tokens (ignore-errors (split-string-shell-command raw-input)))
+         (flags-only (and tokens (string-prefix-p "-" (car tokens))))
+         (name (nowis-pi--slugify (if (or (null tokens) flags-only)
+                                      default-name
+                                    (car tokens))))
+         (extra-args (if flags-only tokens (cdr tokens))))
+    (cons name extra-args)))
+
+(defun nowis-pi--read-new-spec (default-name)
+  "Read `[name] [-args]' in the minibuffer with live preview before `:'."
+  (let ((raw
+         (minibuffer-with-setup-hook
+             (lambda ()
+               (let* ((pos (- (minibuffer-prompt-end) 2))
+                      (ov (make-overlay pos pos))
+                      (update
+                       (lambda (&rest _)
+                         (pcase-let ((`(,name . ,args)
+                                      (nowis-pi--parse-new-input
+                                       (minibuffer-contents-no-properties)
+                                       default-name)))
+                           (overlay-put
+                            ov 'before-string
+                            (if args
+                                (format " (name: %s, args: %s)"
+                                        name (string-join args " "))
+                              (format " (name: %s)" name)))))))
+                 (funcall update)
+                 (add-hook 'after-change-functions update nil t)))
+           (read-string "Agent [name] [-args]: " nil nil default-name))))
+    (nowis-pi--parse-new-input raw default-name)))
+
 ;;;###autoload
 (defun nowis-pi-new (&optional remote-host)
   "Prompt for a directory and name, then launch a `dtach + pi' agent session.
@@ -518,11 +562,9 @@ that session's directory (including its remote TRAMP host)."
                      (string-remove-prefix
                       "." (file-name-nondirectory (directory-file-name dir)))))
          (default-name (nowis-pi--next-free-name remote base-slug))
-         (raw-name (read-string (format "Agent name (default %s): " default-name)
-                                nil nil default-name))
-         (name (nowis-pi--slugify raw-name))
+         (spec (nowis-pi--read-new-spec default-name))
          (prompt (nowis-pi--initial-prompt-default)))
-    (nowis-pi--open-session name dir prompt 'switch)))
+    (nowis-pi--open-session (car spec) dir prompt 'switch (cdr spec))))
 
 ;;;###autoload
 (defun nowis-pi-rename (&optional session new-name)
@@ -594,34 +636,44 @@ that session's directory (including its remote TRAMP host)."
 
 ;;;###autoload
 (defun nowis-pi-kill (&optional session)
-  "Terminate SESSION's Pi process, remove its socket, and kill its buffer."
+  "Terminate SESSION's Pi process (or remove remote host at point in `*Pi Fleet*')."
   (interactive)
-  (let* ((s (or session (nowis-pi--current-session)))
-         (name (plist-get s :name))
-         (remote (plist-get s :remote))
-         (sock (plist-get s :sock))
-         (cwd-file (nowis-pi--cwd-file remote name))
-         (buf (nowis-pi--find-task-buffer remote name)))
-    (when (yes-or-no-p (format "Kill Pi agent session `%s'? " name))
-      (when (buffer-live-p buf)
-        (let ((kill-buffer-query-functions nil))
-          (when-let* ((proc (buffer-local-value 'ghostel--process buf)))
-            (ignore-errors (delete-process proc)))
-          (kill-buffer buf)))
-      (if remote
-          (let ((default-directory (nowis-pi--host-socket-dir remote)))
-            (ignore-errors
-              (process-file "sh" nil nil nil "-c"
-                            (format "pkill -TERM -f %s 2>/dev/null || true"
-                                    (shell-quote-argument (file-local-name sock))))))
-        (dolist (pid (nowis-pi--dtach-pids (file-local-name sock)))
-          (ignore-errors (signal-process (- pid) 'SIGTERM))
-          (ignore-errors (signal-process pid 'SIGTERM))))
-      (when (file-exists-p sock) (ignore-errors (delete-file sock)))
-      (when (file-exists-p cwd-file) (ignore-errors (delete-file cwd-file)))
-      (when (derived-mode-p 'nowis-pi-fleet-mode)
-        (nowis-pi-fleet--refresh-in-place))
-      (message "Killed Pi agent `%s'" name))))
+  (if-let* ((host (and (null session)
+                       (null (get-text-property (point) 'nowis-pi-session))
+                       (get-text-property (point) 'nowis-pi-host))))
+      (when (yes-or-no-p (format "Remove remote host `%s' from Pi Fleet? " host))
+        (setq nowis-pi-hosts (delete host nowis-pi-hosts))
+        (when (derived-mode-p 'nowis-pi-fleet-mode)
+          (nowis-pi-fleet--refresh-in-place))
+        (message "Removed remote host `%s'" host))
+    (let* ((s (or session (nowis-pi--current-session)))
+           (name (plist-get s :name))
+           (remote (plist-get s :remote))
+           (sock (plist-get s :sock))
+           (argv-sock (nowis-pi--read-argv-sock remote name))
+           (cwd-file (nowis-pi--cwd-file remote name))
+           (buf (nowis-pi--find-task-buffer remote name)))
+      (when (yes-or-no-p (format "Kill Pi agent session `%s'? " name))
+        (when (buffer-live-p buf)
+          (let ((kill-buffer-query-functions nil))
+            (when-let* ((proc (buffer-local-value 'ghostel--process buf)))
+              (ignore-errors (delete-process proc)))
+            (kill-buffer buf)))
+        (if remote
+            (let ((default-directory (nowis-pi--host-socket-dir remote)))
+              (ignore-errors
+                (process-file "sh" nil nil nil "-c"
+                              (format "pkill -TERM -f %s 2>/dev/null; pkill -TERM -f %s 2>/dev/null || true"
+                                      (shell-quote-argument argv-sock)
+                                      (shell-quote-argument (file-local-name sock))))))
+          (dolist (pid (nowis-pi--dtach-pids (list argv-sock (file-local-name sock))))
+            (ignore-errors (signal-process (- pid) 'SIGTERM))
+            (ignore-errors (signal-process pid 'SIGTERM))))
+        (when (file-exists-p sock) (ignore-errors (delete-file sock)))
+        (when (file-exists-p cwd-file) (ignore-errors (delete-file cwd-file)))
+        (when (derived-mode-p 'nowis-pi-fleet-mode)
+          (nowis-pi-fleet--refresh-in-place))
+        (message "Killed Pi agent `%s'" name)))))
 
 
 ;;;; Fleet Dashboard (`*Pi Fleet*')
@@ -708,17 +760,23 @@ that session's directory (including its remote TRAMP host)."
                                    collect h)))
         (when disconnected
           (dolist (h disconnected)
-            (insert (propertize
-                     (format "☁ %s (offline — press `R' to connect & scan agents)\n" h)
-                     'face 'shadow)))
+            (let ((start (point)))
+              (insert (propertize
+                       (format "☁ %s (offline — press `R' to connect, `D' to remove)\n" h)
+                       'face 'shadow))
+              (put-text-property start (point) 'nowis-pi-item 'host)
+              (put-text-property start (point) 'nowis-pi-host h)))
           (insert "\n"))
         (if (null sessions)
             (insert (propertize "  No active Pi agents. Press `c' to start one, or `R' to connect a remote host.\n"
                                 'face 'shadow))
           (dolist (group (seq-group-by (lambda (s) (plist-get s :host)) sessions))
             (pcase-let ((`(,host . ,host-sessions) group))
-              (insert (propertize (format "── Host: %s ──\n" host)
-                                  'face 'font-lock-keyword-face))
+              (let ((h-start (point)))
+                (insert (propertize (format "── Host: %s ──\n" host)
+                                    'face 'font-lock-keyword-face))
+                (unless (equal host "local")
+                  (put-text-property h-start (point) 'nowis-pi-host host)))
               (dolist (s host-sessions)
                 (let* ((name (plist-get s :name))
                        (cwd (plist-get s :cwd))
@@ -740,7 +798,7 @@ that session's directory (including its remote TRAMP host)."
                                   (if collapsed "▶" "▼")
                                   (propertize name 'face 'bold)
                                   badge
-                                  (propertize (abbreviate-file-name cwd) 'face 'shadow)
+                                  (abbreviate-file-name cwd)
                                   (if (and r-msg (not (equal r-msg name)))
                                       (propertize (concat "  — " r-msg) 'face 'font-lock-doc-face)
                                     "")))
@@ -801,12 +859,15 @@ that session's directory (including its remote TRAMP host)."
     (pop-to-buffer buf)))
 
 (defun nowis-pi-fleet-open-at-point ()
-  "Open the Pi terminal at point."
+  "Open the Pi terminal (or connect remote host) at point."
   (interactive)
-  (let ((s (nowis-pi-fleet--session-at-point)))
-    (nowis-pi--open-session (plist-get s :name)
-                            (plist-get s :cwd)
-                            nil 'switch)))
+  (if-let* ((host (and (null (get-text-property (point) 'nowis-pi-session))
+                       (get-text-property (point) 'nowis-pi-host))))
+      (nowis-pi-fleet-remote host)
+    (let ((s (nowis-pi-fleet--session-at-point)))
+      (nowis-pi--open-session (plist-get s :name)
+                              (plist-get s :cwd)
+                              nil 'switch))))
 
 (defun nowis-pi-fleet-attach-at-point ()
   "Attach the `⚡ detached' session at point in the background."
@@ -836,26 +897,48 @@ that session's directory (including its remote TRAMP host)."
     (nowis-pi-fleet--refresh-in-place)
     (message "Reattached %d background Pi agent(s)" count)))
 
-(defun nowis-pi-fleet-remote (tramp-prefix)
-  "Connect or add remote TRAMP-PREFIX (from `~/.ssh/config') and scan its agents."
+(defun nowis-pi-fleet-remote (tramp-prefix &optional remove)
+  "Connect or add remote TRAMP-PREFIX (from `~/.ssh/config') and scan its agents.
+With prefix argument REMOVE (`C-u R'), remove a tracked remote host instead."
   (interactive
-   (let* ((offline (cl-loop for h in nowis-pi-hosts
-                            when (and h (not (nowis-pi--host-connected-p h)))
-                            collect h))
-          (candidates (delete-dups (append offline (nowis-pi--ssh-host-candidates)))))
-     (list (completing-read "Connect remote TRAMP host (e.g. /rpc:cloud:): "
-                            candidates nil nil (car offline)))))
-  (let* ((trimmed (string-trim tramp-prefix))
-         (clean (cond
-                 ((string-empty-p trimmed) "")
-                 ((file-remote-p trimmed) trimmed)
-                 (t (format "/rpc:%s:" (string-remove-suffix ":" trimmed))))))
-    (unless (and (not (string-empty-p clean)) (file-remote-p clean))
-      (user-error "Invalid TRAMP prefix: %s (expected e.g. /rpc:host:)" clean))
-    (cl-pushnew clean nowis-pi-hosts :test #'equal)
-    (message "Scanning remote host %s..." clean)
-    (nowis-pi-fleet--refresh-in-place t)
-    (message "Connected %s" clean)))
+   (if current-prefix-arg
+       (let ((remotes (remq nil nowis-pi-hosts)))
+         (unless remotes
+           (user-error "No remote hosts in `nowis-pi-hosts'"))
+         (list (completing-read "Remove remote TRAMP host: " remotes nil t
+                                nil nil (get-text-property (point) 'nowis-pi-host))
+               t))
+     (let* ((offline (cl-loop for h in nowis-pi-hosts
+                              when (and h (not (nowis-pi--host-connected-p h)))
+                              collect h))
+            (at-pt (get-text-property (point) 'nowis-pi-host))
+            (def (or at-pt (car offline)))
+            (candidates (delete-dups (append offline (nowis-pi--ssh-host-candidates)))))
+       (list (completing-read
+              (if def
+                  (format "Connect remote TRAMP host (default %s): " def)
+                "Connect remote TRAMP host (e.g. /ssh:cloud:): ")
+              candidates nil nil nil nil def)
+             nil))))
+  (if remove
+      (progn
+        (setq nowis-pi-hosts (delete tramp-prefix nowis-pi-hosts))
+        (when (derived-mode-p 'nowis-pi-fleet-mode)
+          (nowis-pi-fleet--refresh-in-place))
+        (message "Removed remote host %s" tramp-prefix))
+    (let* ((trimmed (string-trim tramp-prefix))
+           (clean (cond
+                   ((string-empty-p trimmed) "")
+                   ((file-remote-p trimmed) trimmed)
+                   (t (format "/rpc:%s:" (string-remove-suffix ":" trimmed))))))
+      (unless (and (not (string-empty-p clean)) (file-remote-p clean))
+        (user-error "Invalid TRAMP prefix: %s (expected e.g. /ssh:host:)" clean))
+      (message "Connecting to %s..." clean)
+      (unless (file-directory-p (concat clean "~/"))
+        (user-error "Failed to connect to %s" clean))
+      (cl-pushnew clean nowis-pi-hosts :test #'equal)
+      (nowis-pi-fleet--refresh-in-place t)
+      (message "Connected %s" clean))))
 
 ;;;###autoload
 (defun nowis-pi-setup ()

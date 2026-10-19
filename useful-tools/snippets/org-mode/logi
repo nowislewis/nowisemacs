@@ -1,0 +1,14 @@
+# -*- mode: snippet -*-
+# name: logi
+# key: logi
+# --
+`(make-string
+  (save-excursion
+    (if (org-before-first-heading-p)
+        1
+      (org-back-to-heading t)
+      (if (looking-at-p "^\\*+ \\[")
+          (org-current-level)
+        (1+ (org-current-level)))))
+  ?*)` `(format-time-string "[%Y-%m-%d %a %H:%M]")`
+- $0
