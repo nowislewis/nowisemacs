@@ -473,6 +473,7 @@ Maybe I should add a new state.
  '("e" . lewis-leader-map)
  '("s" . search-leader-map)
  '("a" . apps-leader-map)
+ '("p" . nowis-pi-fleet)
  '("f" . file-leader-map)
  '("n" . notes-leader-map)
  ;;w workspace
@@ -1214,15 +1215,12 @@ Jump anywhere in the world
 #+begin_src elisp
 (setup ghostel
   (setq ghostel-ignore-cursor-change t
-        ghostel-initial-input-mode 'line
         ghostel-shell "zsh"
         ghostel-tramp-shell-integration t)
   (keymap-global-set "M-`" #'ghostel-project)
   (:when-loaded
     (require 'nowis-ghostel)
-    (nowis-ghostel-setup)
-    (require 'nowis-pi)
-    (nowis-pi-setup)))
+    (nowis-ghostel-setup)))
 #+end_src
 * git
 ** magit

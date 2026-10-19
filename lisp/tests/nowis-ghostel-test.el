@@ -8,7 +8,6 @@
   (with-temp-buffer
     (let ((ghostel--term t)
           (ghostel--input-mode 'char)
-          (ghostel--pending-initial-line-mode t)
           (calls 0))
       (cl-letf (((symbol-function 'ghostel-alt-screen-p) (lambda () t))
                 ((symbol-function 'ghostel-line-mode)
@@ -18,7 +17,6 @@
         (nowis-ghostel--enter-emacs-mode)
         (nowis-ghostel--enter-emacs-mode)
         (should (eq ghostel--input-mode 'emacs))
-        (should-not ghostel--pending-initial-line-mode)
         (should (= calls 1))))))
 
 (ert-deftest nowis-ghostel-normal-preserves-copy-mode ()
@@ -53,7 +51,7 @@
       (nowis-ghostel--set-up-meow)
       (should-not ghostel-readonly-fast-exit)
       (should (local-variable-p 'ghostel-readonly-fast-exit))
-      (should (memq #'ghostel-char-mode meow-insert-enter-hook))
+      (should (memq #'nowis-ghostel--enter-insert-mode meow-insert-enter-hook))
       (should (memq #'nowis-ghostel--enter-emacs-mode meow-insert-exit-hook))
       (should (memq #'nowis-ghostel--sync-normal-mode pre-command-hook)))))
 
@@ -81,14 +79,17 @@
       (should (eq (key-binding (kbd "M-w")) #'ghostel-readonly-copy)))))
 
 (ert-deftest nowis-ghostel-setup-reuses-upstream-project-and-window-commands ()
-  (let ((ghostel-mode-map (copy-keymap ghostel-mode-map))
-        (ghostel-char-mode-map (copy-keymap ghostel-char-mode-map))
+  (let ((ghostel-semi-char-mode-map (copy-keymap ghostel-semi-char-mode-map))
+        (ghostel-keymap-exceptions (copy-sequence ghostel-keymap-exceptions))
         (ghostel-mode-hook nil)
         (ghostel-eval-cmds (copy-tree ghostel-eval-cmds)))
     (nowis-ghostel-setup)
-    (should (eq (lookup-key ghostel-mode-map (kbd "M-`")) #'ghostel-project))
-    (should (eq (lookup-key ghostel-char-mode-map (kbd "M-`")) #'ghostel-project))
-    (should (eq (lookup-key ghostel-char-mode-map (kbd "M-o")) #'ace-window))))
+    (should-not (lookup-key ghostel-semi-char-mode-map (kbd "M-`")))
+    (should-not (lookup-key ghostel-semi-char-mode-map (kbd "M-o")))
+    (should (eq (lookup-key ghostel-semi-char-mode-map (kbd "M-q"))
+                #'nowis-ghostel-send-escape))
+    (should (keymapp (lookup-key ghostel-semi-char-mode-map (kbd "C-c"))))
+    (should (eq (lookup-key ghostel-semi-char-mode-map (kbd "C-c C-c")) #'ghostel-send-C-c))))
 
 (provide 'nowis-ghostel-test)
 ;;; nowis-ghostel-test.el ends here
