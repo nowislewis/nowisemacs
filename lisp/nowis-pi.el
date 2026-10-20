@@ -161,9 +161,10 @@ as \"/rpc:cloud:\" or \"/ssh:dev:\"."
 
 (defun nowis-pi--scan-host-disk (remote)
   "Scan socket directory on REMOTE (nil for local) and cache session plists."
-  (let ((dir (nowis-pi--host-socket-dir remote))
-        (host (or remote "local"))
-        (entries nil))
+  (let* ((dir (nowis-pi--host-socket-dir remote))
+         (host (or remote "local"))
+         (prev (gethash host nowis-pi--disk-cache))
+         (entries nil))
     (when (file-directory-p dir)
       (let* ((files (directory-files dir t directory-files-no-dot-files-regexp))
              (socks (cl-remove-if-not (lambda (f) (string-suffix-p ".sock" f))
@@ -171,10 +172,14 @@ as \"/rpc:cloud:\" or \"/ssh:dev:\"."
         (dolist (file socks)
           (let* ((name (file-name-sans-extension (file-name-nondirectory file)))
                  (live-buf (nowis-pi--find-task-buffer remote name))
-                 (cwd (if (buffer-live-p live-buf)
-                          (file-name-as-directory
-                           (buffer-local-value 'default-directory live-buf))
-                        (plist-get (nowis-pi--read-meta remote name) :cwd))))
+                 (cached (seq-find (lambda (s) (equal (plist-get s :name) name))
+                                   prev))
+                 (cwd (cond
+                       ((buffer-live-p live-buf)
+                        (file-name-as-directory
+                         (buffer-local-value 'default-directory live-buf)))
+                       (cached (plist-get cached :cwd))
+                       (t (plist-get (nowis-pi--read-meta remote name) :cwd)))))
             (push (list :name name
                         :cwd cwd
                         :remote remote
@@ -503,6 +508,17 @@ additional CLI flags (such as `(\"-r\")') appended to `nowis-pi-command'."
 
 ;;;; Contextual Session Resolution & Lifecycle Commands
 
+(defun nowis-pi--dir-in-session-p (dir session)
+  "Return non-nil if DIR is inside SESSION's `:cwd' without remote TRAMP I/O."
+  (let ((remote (file-remote-p dir))
+        (sess-remote (plist-get session :remote))
+        (sess-cwd (plist-get session :cwd)))
+    (and (equal remote sess-remote)
+         (if remote
+             (string-prefix-p (file-name-as-directory (expand-file-name sess-cwd))
+                              (file-name-as-directory (expand-file-name dir)))
+           (file-in-directory-p dir sess-cwd)))))
+
 (defun nowis-pi--current-session ()
   "Resolve the session plist at point in `*Pi Fleet*', or for current buffer."
   (or (get-text-property (point) 'nowis-pi-session)
@@ -520,7 +536,7 @@ additional CLI flags (such as `(\"-r\")') appended to `nowis-pi-command'."
               (unless exact-buf
                 (cl-remove-if-not
                  (lambda (s)
-                   (file-in-directory-p default-directory (plist-get s :cwd)))
+                   (nowis-pi--dir-in-session-p default-directory s))
                  sessions))))
         (cond
          (exact-buf exact-buf)

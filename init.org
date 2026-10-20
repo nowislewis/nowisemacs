@@ -2327,18 +2327,17 @@ ESUP - Emacs Start Up Profiler
 #+begin_src elisp
 (setup simple-httpd
   (setq httpd-port 8088)
-   (defun nowis-httpd-browse-current ()
-     "Serve current file/directory (local or TRAMP) via simple-httpd and open in browser."
-     (interactive)
-     (let* ((target (expand-file-name
-                     (or buffer-file-name
-                         (and (derived-mode-p 'dired-mode) (dired-get-filename nil t))
-                         default-directory))))
-       (setq httpd-root (concat (file-remote-p target) "/"))
-       (unless (httpd-running-p) (httpd-start))
-       (browse-url
-        (url-encode-url
-         (format "http://localhost:%d%s" httpd-port (file-local-name target)))))))
+  (defun nowis-httpd-browse (file)
+    "Serve FILE (local or TRAMP) via simple-httpd and open in browser."
+    (interactive "fServe file: ")
+    (let ((target (expand-file-name file)))
+      (setq httpd-root (concat (file-remote-p target) "/"))
+      (unless (httpd-running-p) (httpd-start))
+      (browse-url
+       (url-encode-url
+        (format "http://localhost:%d%s" httpd-port (file-local-name target))))))
+  (with-eval-after-load 'embark
+    (keymap-set embark-file-map "X" #'nowis-httpd-browse)))
 #+end_src
 * games
 ** minesweeper
