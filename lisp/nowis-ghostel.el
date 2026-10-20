@@ -15,7 +15,7 @@
 (require 'meow)
 
 
-;;;; Meow input modes & Alternate-screen paging
+;;;; Meow input modes
 
 (defun nowis-ghostel--enter-insert-mode ()
   "Enter `ghostel-semi-char-mode' and restore Meow's insert cursor."
@@ -66,38 +66,6 @@
       (ghostel-send-key "prior")
     (scroll-down-command arg)))
 
-(defun nowis-ghostel-beginning-of-buffer ()
-  "Move to buffer start, or send C-Home on the alternate screen."
-  (interactive "^")
-  (if (ghostel-alt-screen-p)
-      (ghostel-send-key "home" "ctrl")
-    (goto-char (point-min))))
-
-(defun nowis-ghostel-end-of-buffer ()
-  "Move to buffer end, or send C-End on the alternate screen."
-  (interactive)
-  (if (ghostel-alt-screen-p)
-      (ghostel-send-key "end" "ctrl")
-    (ghostel-readonly-end-of-buffer)))
-
-(defun nowis-ghostel--wheel (event fn)
-  "Forward wheel EVENT via FN in input or alternate-screen mode."
-  (with-current-buffer (window-buffer (ghostel--event-window event))
-    (let ((ghostel--input-mode (if (ghostel-alt-screen-p)
-                                   'semi-char
-                                 ghostel--input-mode)))
-      (funcall fn event))))
-
-(defun nowis-ghostel-wheel-up (event)
-  "Forward wheel-up EVENT to terminal in input or alternate-screen mode."
-  (interactive "e")
-  (nowis-ghostel--wheel event #'ghostel--scroll-intercept-up))
-
-(defun nowis-ghostel-wheel-down (event)
-  "Forward wheel-down EVENT to terminal in input or alternate-screen mode."
-  (interactive "e")
-  (nowis-ghostel--wheel event #'ghostel--scroll-intercept-down))
-
 
 ;;;; TRAMP-aware shell integration
 
@@ -119,15 +87,8 @@
         '(nowis-ghostel-find-file-other-window))
   (keymap-set ghostel-semi-char-mode-map "M-q" #'nowis-ghostel-send-escape)
   (define-keymap :keymap ghostel-readonly-mode-map
-    "<remap> <scroll-up-command>"              #'nowis-ghostel-scroll-up
-    "<remap> <scroll-down-command>"            #'nowis-ghostel-scroll-down
-    "<remap> <beginning-of-buffer>"            #'nowis-ghostel-beginning-of-buffer
-    "<remap> <ghostel-readonly-end-of-buffer>" #'nowis-ghostel-end-of-buffer)
-  (define-keymap :keymap ghostel--scroll-intercept-map
-    "<mouse-4>"    #'nowis-ghostel-wheel-up
-    "<wheel-up>"   #'nowis-ghostel-wheel-up
-    "<mouse-5>"    #'nowis-ghostel-wheel-down
-    "<wheel-down>" #'nowis-ghostel-wheel-down))
+    "<remap> <scroll-up-command>"   #'nowis-ghostel-scroll-up
+    "<remap> <scroll-down-command>" #'nowis-ghostel-scroll-down))
 
 (provide 'nowis-ghostel)
 ;;; nowis-ghostel.el ends here
