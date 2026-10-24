@@ -1084,11 +1084,20 @@ Jump anywhere in the world
 (add-hook 'dired-after-readin-hook #'dired-hide-details-mode)
 ;; for subtree icons
 (add-hook 'dired-subtree-after-insert-hook #'nerd-icons-dired--refresh)
+;; TRAMP `ls --dired' already indents lines by 2 spaces; strip duplicate indent from `dired-subtree--readin'.
+(with-eval-after-load 'dired-subtree
+  (advice-add 'dired-subtree--readin :filter-return
+              (lambda (s) (replace-regexp-in-string "^    " "  " s))))
 #+end_src
 *** nerd-icons-dired
 #+begin_src elisp
 (setup nerd-icons-dired)
 (add-hook 'dired-mode-hook #'nerd-icons-dired-mode)
+;; Guard `nerd-icons-dired--refresh' against buffers where `dired-subdir-alist'
+;; is not yet built (e.g., `dired-sidebar' cloning an active `dired' buffer).
+(with-eval-after-load 'nerd-icons-dired
+  (advice-add 'nerd-icons-dired--refresh :before-while
+              (lambda (&rest _) (bound-and-true-p dired-subdir-alist))))
 #+end_src
 *** speedbar
 #+begin_src elisp
