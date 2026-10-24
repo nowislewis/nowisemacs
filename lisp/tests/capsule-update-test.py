@@ -59,7 +59,8 @@ class CapsuleUpdateTests(unittest.TestCase):
             result = self.update()
             self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
             self.assertEqual(self.git(child, "rev-parse", "HEAD"), target)
-            self.assertEqual(self.git(child, "rev-parse", "--abbrev-ref", "HEAD"), "HEAD")
+            self.assertEqual(self.git(child, "rev-parse", "--abbrev-ref", "HEAD"),
+                             branch or "trunk")
 
     def test_failed_package_stops_but_other_package_updates(self):
         bad, before, _ = self.package("bad")

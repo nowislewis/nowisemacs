@@ -5,7 +5,8 @@ rm -rf $log_dir
 mkdir -p "$log_dir" || exit 1
 
 function pull() {
-    submodule_path="$1"
+    submodule_key="$1"
+    submodule_path="$2"
     log_file="$log_dir/$(basename "$submodule_path").log"
     (
         PN=$(basename "$submodule_path")
@@ -24,6 +25,15 @@ function pull() {
             echo "$pull_output"
             echo "Update failed: $submodule_path: submodule update --remote --rebase failed"
             exit 1
+        fi
+        branch=$(git config -f .gitmodules --get "${submodule_key%.path}.branch")
+        if [[ -z "$branch" ]]; then
+            remote_head=$(git -C "$submodule_path" symbolic-ref -q --short refs/remotes/origin/HEAD)
+            branch="${remote_head#origin/}"
+        fi
+        if [[ -n "$branch" ]]; then
+            git -C "$submodule_path" checkout -B "$branch" --quiet || exit 1
+            git -C "$submodule_path" branch --set-upstream-to="origin/$branch" "$branch" --quiet >/dev/null 2>&1 || true
         fi
         new_commit=$(git -C "$submodule_path" rev-parse HEAD) || exit 1
         if [[ "$pull_output" != "Already up to date." ]]; then
@@ -49,7 +59,7 @@ fi
 pids=()
 while read -r key path; do
     [[ -n "$key" && "$path" == lib/* ]] || continue
-    pull "$path" &
+    pull "$key" "$path" &
     pids+=("$!")
 done <<< "$submodule_paths"
 
