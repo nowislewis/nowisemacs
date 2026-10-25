@@ -754,8 +754,7 @@ diff-hl-mode highlights uncommitted changes on the left side of the window
 #+begin_src elisp
 (setup msgpack)
 (setup tramp-rpc
- (setopt tramp-rpc-deploy-git-build-policy 'release)
-)
+ (setopt tramp-rpc-deploy-git-build-policy 'release))
 #+end_src
 ** Automatically clean whitespace
 #+begin_src elisp
