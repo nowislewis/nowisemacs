@@ -79,6 +79,9 @@
 
 (defun nowis-ghostel-setup ()
   "Install the minimal Ghostel integration."
+  ;; Use fast line-count anchoring in GUI instead of per-frame
+  ;; `window-text-pixel-size' layout + pixel vscroll.
+  (setq ghostel--pixel-anchor-supported-p nil)
   (setopt ghostel-keymap-exceptions
           (delete-dups (append ghostel-keymap-exceptions '("M-`" "M-o"))))
   (add-hook 'ghostel-mode-hook #'nowis-ghostel--set-up-meow)

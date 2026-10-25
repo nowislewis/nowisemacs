@@ -568,7 +568,7 @@ Maybe I should add a new state.
     (if lewis-variable-font
         (set-face-attribute 'variable-pitch nil :family lewis-variable-font :height 1.0))
     (if lewis-symbol-font
-        (set-fontset-font t 'unicode lewis-symbol-font nil 'prepend))
+        (set-fontset-font t 'unicode lewis-symbol-font nil 'append))
     ))
 (nowis/setup-fonts)
 #+end_src
@@ -871,7 +871,13 @@ diff-hl-mode highlights uncommitted changes on the left side of the window
 (setup completion-preview
   (setq completion-preview-idle-delay 0.1
         completion-preview-minimum-symbol-length 2
-        completion-preview-completion-styles '(basic))
+        completion-preview-completion-styles '(basic)
+        global-completion-preview-modes
+        '((not archive-mode calc-mode compilation-mode diff-mode
+               dired-mode ghostel-mode image-mode minibuffer-mode
+               minibuffer-inactive-mode org-agenda-mode special-mode
+               wdired-mode)
+          t))
   (global-completion-preview-mode 1)
   (:when-loaded
     ;; Org remaps ordinary insertion/deletion commands
@@ -1224,6 +1230,7 @@ Jump anywhere in the world
 #+begin_src elisp
 (setup ghostel
   (setq ghostel-ignore-cursor-change t
+        ghostel-glyph-scale-floor 1.0
         ghostel-shell "zsh"
         ghostel-tramp-shell-integration t)
   (keymap-global-set "M-`" #'ghostel-project)
