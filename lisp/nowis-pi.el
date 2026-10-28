@@ -798,6 +798,59 @@ Include detail if SHOW-DETAIL is non-nil; strip remote prefix if LOCAL-CWD."
   (let ((s (or session (nowis-pi--current-session))))
     (dired (plist-get s :cwd))))
 
+(defun nowis-pi--terminate-session (s)
+  "Kill session S's buffer, dtach/Pi processes and `.sock'/`.cwd' files."
+  (let* ((name (plist-get s :name))
+         (remote (plist-get s :remote))
+         (argv-sock (plist-get (nowis-pi--read-meta remote name) :argv-sock))
+         (local-sock (file-local-name (plist-get s :sock)))
+         ;; `[/]...' still matches the path but not this `sh -c' command
+         ;; line itself, so `pkill -f' cannot kill its own cleanup shell.
+         (pattern (lambda (path)
+                    (shell-quote-argument (concat "[/]" (substring path 1)))))
+         (buf (nowis-pi--find-task-buffer remote name)))
+    (when (buffer-live-p buf)
+      (let ((kill-buffer-query-functions nil))
+        (when-let* ((proc (buffer-local-value 'ghostel--process buf)))
+          (ignore-errors (delete-process proc)))
+        (kill-buffer buf)))
+    ;; KILL (not TERM) skips dtach's atexit socket unlink, so the dying
+    ;; master can never delete a respawned session's socket of the same name;
+    ;; Pi still exits via SIGHUP when the master's pty closes.
+    (let ((default-directory (nowis-pi--host-socket-dir remote)))
+      (ignore-errors
+        (process-file
+         "sh" nil nil nil "-c"
+         (format "pkill -KILL -f %s; pkill -KILL -f %s; rm -f %s %s"
+                 (funcall pattern argv-sock) (funcall pattern local-sock)
+                 (shell-quote-argument (concat name ".sock"))
+                 (shell-quote-argument (concat name ".cwd"))))))
+    (nowis-pi--cache-remove remote name)))
+
+;;;###autoload
+(defun nowis-pi-restart (&optional session)
+  "Kill SESSION and start a fresh agent in its directory, like `nowis-pi-new'.
+The `[name] [-args]' prompt defaults to the old name (e.g. type `-r'); the
+new agent replaces the old buffer in its window."
+  (interactive)
+  (let* ((s (or session (nowis-pi--current-session)))
+         (old (plist-get s :name))
+         (remote (plist-get s :remote))
+         (spec (nowis-pi--read-new-spec old))
+         (prompt (nowis-pi--initial-prompt-default))
+         (win (when-let* ((buf (nowis-pi--find-task-buffer remote old)))
+                (get-buffer-window buf t))))
+    ;; Check before killing so a typo cannot cost the old session.
+    (unless (or (equal (car spec) old)
+                (equal (nowis-pi--next-free-name remote (car spec)) (car spec)))
+      (user-error "An agent named `%s' already exists" (car spec)))
+    (nowis-pi--terminate-session s)
+    (let ((buf (nowis-pi--open-session (car spec) (plist-get s :cwd) prompt
+                                       'background (cdr spec))))
+      (if (window-live-p win)
+          (progn (set-window-buffer win buf) (select-window win))
+        (pop-to-buffer buf)))))
+
 ;;;###autoload
 (defun nowis-pi-kill (&optional session)
   "Terminate SESSION's Pi process (or remove remote host at point in `*Pi Fleet*')."
@@ -812,27 +865,9 @@ Include detail if SHOW-DETAIL is non-nil; strip remote prefix if LOCAL-CWD."
           (nowis-pi-fleet--refresh-in-place))
         (message "Removed remote host `%s'" host))
     (let* ((s (or session (nowis-pi--current-session)))
-           (name (plist-get s :name))
-           (remote (plist-get s :remote))
-           (sock (plist-get s :sock))
-           (argv-sock (plist-get (nowis-pi--read-meta remote name) :argv-sock))
-           (cwd-file (nowis-pi--cwd-file remote name))
-           (buf (nowis-pi--find-task-buffer remote name)))
+           (name (plist-get s :name)))
       (when (yes-or-no-p (format "Kill Pi agent session `%s'? " name))
-        (when (buffer-live-p buf)
-          (let ((kill-buffer-query-functions nil))
-            (when-let* ((proc (buffer-local-value 'ghostel--process buf)))
-              (ignore-errors (delete-process proc)))
-            (kill-buffer buf)))
-        (let ((default-directory (nowis-pi--host-socket-dir remote)))
-          (ignore-errors
-            (process-file "sh" nil nil nil "-c"
-                          (format "pkill -TERM -f %s 2>/dev/null; pkill -TERM -f %s 2>/dev/null || true"
-                                  (shell-quote-argument argv-sock)
-                                  (shell-quote-argument (file-local-name sock))))))
-        (when (file-exists-p sock) (ignore-errors (delete-file sock)))
-        (when (file-exists-p cwd-file) (ignore-errors (delete-file cwd-file)))
-        (nowis-pi--cache-remove remote name)
+        (nowis-pi--terminate-session s)
         (when (derived-mode-p 'nowis-pi-fleet-mode)
           (nowis-pi-fleet--refresh-in-place))
         (message "Killed Pi agent `%s'" name)))))
@@ -858,6 +893,7 @@ Include detail if SHOW-DETAIL is non-nil; strip remote prefix if LOCAL-CWD."
   "A"   #'nowis-pi-fleet-attach-all
   "c"   #'nowis-pi-new
   "f"   #'nowis-pi-fork
+  "s"   #'nowis-pi-restart
   "r"   #'nowis-pi-rename
   "R"   #'nowis-pi-fleet-remote
   "d"   #'nowis-pi-dired
@@ -872,7 +908,7 @@ Include detail if SHOW-DETAIL is non-nil; strip remote prefix if LOCAL-CWD."
               truncate-lines t
               header-line-format
               (substitute-command-keys
-               "\\<nowis-pi-fleet-mode-map> Pi Fleet: \\[nowis-pi-fleet-open-at-point] open  \\[nowis-pi-fleet-attach-at-point]/\\[nowis-pi-fleet-attach-all] attach/all  \\[nowis-pi-new] new  \\[nowis-pi-fork] fork  \\[nowis-pi-rename] rename  \\[nowis-pi-fleet-remote] remote  \\[nowis-pi-dired] dired  \\[nowis-pi-review] magit  \\[nowis-pi-kill] delete  \\[revert-buffer] refresh")))
+               "\\<nowis-pi-fleet-mode-map> Pi Fleet: \\[nowis-pi-fleet-open-at-point] open  \\[nowis-pi-fleet-attach-at-point]/\\[nowis-pi-fleet-attach-all] attach/all  \\[nowis-pi-new] new  \\[nowis-pi-fork] fork  \\[nowis-pi-restart] restart  \\[nowis-pi-rename] rename  \\[nowis-pi-fleet-remote] remote  \\[nowis-pi-dired] dired  \\[nowis-pi-review] magit  \\[nowis-pi-kill] delete  \\[revert-buffer] refresh")))
 
 (defun nowis-pi-fleet--session-at-point ()
   "Return the session plist on the current dashboard line, or signal an error."
