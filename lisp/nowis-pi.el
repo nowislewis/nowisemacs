@@ -120,7 +120,7 @@ Never initiates a TRAMP connection when REMOTE-PREFIX is offline."
   (concat (nowis-pi--host-socket-dir remote-prefix) name ".cwd"))
 
 (defun nowis-pi--read-meta (remote-prefix name)
-  "Return `(:cwd CWD :argv-sock SOCK :session-id SID)' for NAME on REMOTE-PREFIX."
+  "Return `(:cwd CWD :argv-sock SOCK :session-id SID :cmd CMD)' for NAME."
   (let ((file (nowis-pi--cwd-file remote-prefix name))
         (fallback-cwd (concat (or remote-prefix "") "~/"))
         (fallback-sock (file-local-name (nowis-pi--socket-file remote-prefix name)))
@@ -131,26 +131,31 @@ Never initiates a TRAMP connection when REMOTE-PREFIX is offline."
         (setq lines (split-string (buffer-string) "\n" nil "[ \t\r]+"))))
     (let ((raw-cwd (car lines))
           (raw-sock (cadr lines))
-          (raw-sid (nth 2 lines)))
+          (raw-sid (nth 2 lines))
+          (raw-cmd (nth 3 lines)))
       (list :cwd (if (or (null raw-cwd) (string-empty-p raw-cwd))
                      fallback-cwd
                    (file-name-as-directory (nowis-pi--with-remote remote-prefix raw-cwd)))
             :argv-sock (if (or (null raw-sock) (string-empty-p raw-sock))
                            fallback-sock
                          raw-sock)
-            :session-id (and raw-sid (not (string-empty-p raw-sid)) raw-sid)))))
+            :session-id (and raw-sid (not (string-empty-p raw-sid)) raw-sid)
+            :cmd (and raw-cmd (not (string-empty-p raw-cmd)) raw-cmd)))))
 
 (defvar nowis-pi--disk-cache (make-hash-table :test #'equal)
   "Cached disk session plists per host key (`\"local\"' or TRAMP prefix).")
 
-(defun nowis-pi--cache-put (remote name cwd &optional sock)
+(defun nowis-pi--cache-put (remote name cwd &optional sock cmd)
   "Record session NAME in `nowis-pi--disk-cache' for REMOTE (nil for local)."
   (let* ((host (or remote "local"))
+         (prev (seq-find (lambda (s) (equal (plist-get s :name) name))
+                         (gethash host nowis-pi--disk-cache)))
          (entry (list :name name
                       :cwd (file-name-as-directory cwd)
                       :remote remote
                       :host host
                       :sock (or sock (nowis-pi--socket-file remote name))
+                      :cmd (or cmd (plist-get prev :cmd))
                       :sock-exists t))
          (cur (cl-remove-if (lambda (s) (equal (plist-get s :name) name))
                             (gethash host nowis-pi--disk-cache))))
@@ -184,17 +189,25 @@ Uses `non-essential' so scanning never triggers a TRAMP reconnect."
                          (live-buf (nowis-pi--find-task-buffer remote name))
                          (cached (seq-find (lambda (s) (equal (plist-get s :name) name))
                                            prev))
+                         (meta (unless (and (buffer-live-p live-buf) cached)
+                                 (nowis-pi--read-meta remote name)))
                          (cwd (cond
                                ((buffer-live-p live-buf)
                                 (file-name-as-directory
                                  (buffer-local-value 'default-directory live-buf)))
                                (cached (plist-get cached :cwd))
-                               (t (plist-get (nowis-pi--read-meta remote name) :cwd)))))
+                               (t (plist-get meta :cwd))))
+                         (cmd (or (and (buffer-live-p live-buf)
+                                       (alist-get 'cmd (buffer-local-value
+                                                        'ghostel-identity live-buf)))
+                                  (and cached (plist-get cached :cmd))
+                                  (plist-get meta :cmd))))
                     (push (list :name name
                                 :cwd cwd
                                 :remote remote
                                 :host host
                                 :sock file
+                                :cmd cmd
                                 :sock-exists t)
                           entries)))
                 (unless remote
@@ -228,25 +241,26 @@ SCAN-MODE controls filesystem/network probing:
     (dolist (buf (nowis-pi--all-task-buffers))
       (with-current-buffer buf
         (let* ((name (alist-get 'task ghostel-identity))
+               (cmd (alist-get 'cmd ghostel-identity))
                (cwd (file-name-as-directory default-directory))
                (remote (file-remote-p cwd))
                (host (or remote "local"))
                (key (concat host "::" name))
                (sock (nowis-pi--socket-file remote name))
+               (cached (seq-find (lambda (s) (equal (plist-get s :name) name))
+                                 (gethash host nowis-pi--disk-cache)))
                (sock-exists
                 (cond
                  ((nowis-pi--buffer-attached-p buf) t)
                  ((assoc "pi-exit" ghostel-program-status) nil)
-                 (t (and (seq-some (lambda (s)
-                                     (equal (plist-get s :name) name))
-                                   (gethash host nowis-pi--disk-cache))
-                         t)))))
+                 (t (and cached t)))))
           (puthash key t seen)
           (push (list :name name
                       :cwd cwd
                       :remote remote
                       :host host
                       :sock sock
+                      :cmd (or cmd (plist-get cached :cmd))
                       :sock-exists sock-exists
                       :buffer buf)
                 sessions))))
@@ -274,24 +288,24 @@ SCAN-MODE controls filesystem/network probing:
 
 ;;;; Ghostel Buffer Identity & OSC 7501 Telemetry Layer
 
-(defun nowis-pi--task-identity (remote-prefix name)
+(defun nowis-pi--task-identity (remote-prefix name &optional cmd)
   "Build the canonical `ghostel-identity' alist for session NAME on REMOTE-PREFIX."
   `((kind . pi-task)
     (host . ,(or remote-prefix "local"))
-    (task . ,name)))
-
-(defun nowis-pi--find-buffer-by-identity (identity)
-  "Return the first live `ghostel-mode' buffer whose identity equals IDENTITY."
-  (seq-find (lambda (b)
-              (and (buffer-live-p b)
-                   (with-current-buffer b
-                     (and (derived-mode-p 'ghostel-mode)
-                          (equal (bound-and-true-p ghostel-identity) identity)))))
-            (buffer-list)))
+    (task . ,name)
+    ,@(and cmd `((cmd . ,cmd)))))
 
 (defun nowis-pi--find-task-buffer (remote-prefix name)
   "Find the live Ghostel buffer for session NAME on REMOTE-PREFIX, if any."
-  (nowis-pi--find-buffer-by-identity (nowis-pi--task-identity remote-prefix name)))
+  (let ((host (or remote-prefix "local")))
+    (seq-find (lambda (b)
+                (and (buffer-live-p b)
+                     (with-current-buffer b
+                       (and (derived-mode-p 'ghostel-mode)
+                            (eq (alist-get 'kind ghostel-identity) 'pi-task)
+                            (equal (alist-get 'host ghostel-identity) host)
+                            (equal (alist-get 'task ghostel-identity) name)))))
+              (buffer-list))))
 
 (defun nowis-pi--buffer-attached-p (buf)
   "Return non-nil if BUF is a live Ghostel buffer with a running process."
@@ -423,45 +437,31 @@ SCAN-MODE controls filesystem/network probing:
 
 (defconst nowis-pi--outer-script
   (concat
-   "script=\"$1\"; shift; "
-   "[ -f \"$HOME/.profile\" ] && . \"$HOME/.profile\" >/dev/null 2>&1; "
-   "if command -v zsh >/dev/null 2>&1; then "
-   "  exec zsh -ic \"$script\" zsh \"$@\"; "
-   "elif command -v bash >/dev/null 2>&1; then "
-   "  ZSH_VERSION=1 exec bash -ic \"$script\" bash \"$@\"; "
-   "else "
-   "  exec sh -c \"$script\" sh \"$@\"; "
-   "fi")
+   "s=\"$1\";shift;[ -f ~/.profile ]&&. ~/.profile >/dev/null 2>&1;"
+   "if command -v zsh >/dev/null 2>&1;then exec zsh -ic \"$s\" zsh \"$@\";"
+   "elif command -v bash >/dev/null 2>&1;then ZSH_VERSION=1 exec bash -ic \"$s\" bash \"$@\";"
+   "else exec sh -c \"$s\" sh \"$@\";fi")
   "Outer `sh -c' wrapper that loads login/interactive shell environment.")
 
 (defconst nowis-pi--inner-script
   (concat
-   "sock=\"$1\"; cwd=\"$2\"; shift 2; "
-   "cd \"$cwd\" || exit 1; "
-   "command -v dtach >/dev/null 2>&1 || { echo 'nowis-pi: dtach is not installed' >&2; exit 1; }; "
-   "meta=\"${sock%.sock}.cwd\"; "
-   "mkdir -p \"${sock%/*}\"; "
-   "[ -f \"$meta\" ] || printf '%s\\n%s\\n' \"$cwd\" \"$sock\" > \"$meta\"; "
-   "export PI_PROGRAM_STATUS=1 INSIDE_EMACS=ghostel NOWIS_PI_META=\"$meta\"; "
-   "if [ -S \"$sock\" ] && ! dtach -p \"$sock\" </dev/null >/dev/null 2>&1; then "
-   "  rm -f \"$sock\"; "
-   "  sid=$(sed -n '3p' \"$meta\" 2>/dev/null); "
-   "  if [ -n \"$sid\" ]; then "
-   "    set -- \"$@\" --session \"$sid\"; "
-   "  else "
-   "    set -- \"$@\" --continue; "
-   "  fi; "
-   "fi; "
-   "dtach -A \"$sock\" -e \"$(printf '\\035')\" -r winch \"$@\"; "
-   "rc=$?; "
-   "if ! dtach -p \"$sock\" </dev/null >/dev/null 2>&1; then "
-   "  rm -f \"$sock\" \"$meta\"; "
-   "  for f in \"${sock%/*}\"/*.cwd; do "
-   "    [ -f \"$f\" ] && [ \"$(sed -n '2p' \"$f\")\" = \"$sock\" ] && rm -f \"$f\" \"${f%.cwd}.sock\"; "
-   "  done; "
-   "  printf '\\033]7501;state=idle:id=pi-exit:app=pi\\033\\\\'; "
-   "fi; "
-   "exit $rc")
+   "s=\"$1\";d=\"$2\";c=\"$3\";shift 3;cd \"$d\"||exit 1;"
+   "m=\"${s%.sock}.cwd\";mkdir -p \"${s%/*}\";"
+   "[ -f \"$m\" ]||printf '%s\\n%s\\n\\n%s\\n' \"$d\" \"$s\" \"$c\">\"$m\";"
+   "export PI_PROGRAM_STATUS=1 INSIDE_EMACS=ghostel NOWIS_PI_META=\"$m\";"
+   "if [ -S \"$s\" ]&&! dtach -p \"$s\"</dev/null >/dev/null 2>&1;then "
+   "rm -f \"$s\";"
+   "if [ -z \"$c\" ];then u=$(sed -n 3p \"$m\" 2>/dev/null);"
+   "if [ -n \"$u\" ];then set -- \"$@\" --session \"$u\";"
+   "else set -- \"$@\" --continue;fi;fi;fi;"
+   "dtach -A \"$s\" -e \"$(printf '\\035')\" -r winch \"$@\";r=$?;"
+   "if ! dtach -p \"$s\"</dev/null >/dev/null 2>&1;then "
+   "rm -f \"$s\" \"$m\";"
+   "for f in \"${s%/*}\"/*.cwd;do "
+   "[ -f \"$f\" ]&&[ \"$(sed -n 2p \"$f\")\" = \"$s\" ]&&rm -f \"$f\" \"${f%.cwd}.sock\";"
+   "done;"
+   "printf '\\033]7501;state=idle:id=pi-exit:app=pi\\033\\\\';"
+   "fi;exit $r")
   "Inner script that `cd's into CWD, handles stale sockets, and runs `dtach'.")
 
 (defun nowis-pi--on-buffer-exit (buf _event)
@@ -471,17 +471,28 @@ SCAN-MODE controls filesystem/network probing:
                  'pi-task))
     (nowis-pi--on-status-change "" nil nil)))
 
-(defun nowis-pi--open-session (name cwd &optional initial-prompt display-mode extra-args)
-  "Open or spawn Ghostel Pi session NAME in directory CWD.
-When INITIAL-PROMPT is non-nil and a new session is created, pass it to Pi.
-DISPLAY-MODE is `switch' (default) or `background'; EXTRA-ARGS is a list of
-additional CLI flags (such as `(\"-r\")') appended to `nowis-pi-command'."
+(defun nowis-pi--open-session (name cwd &optional initial-prompt display-mode extra-args cmd)
+  "Open or spawn Ghostel session NAME in directory CWD.
+When CMD is non-nil, run CMD inside `dtach' instead of `nowis-pi-command'.
+When INITIAL-PROMPT is non-nil and a new Pi session is created, pass it to Pi.
+DISPLAY-MODE is `switch' (default) or `background'; EXTRA-ARGS are additional
+CLI flags appended to `nowis-pi-command'."
   (require 'ghostel)
   (let* ((mode (or display-mode 'switch))
          (full-cwd (file-name-as-directory (expand-file-name cwd)))
          (remote (file-remote-p full-cwd))
+         (host (or remote "local"))
          (existing (nowis-pi--find-task-buffer remote name))
          (live-p (nowis-pi--buffer-attached-p existing))
+         (cached (seq-find (lambda (s) (equal (plist-get s :name) name))
+                           (gethash host nowis-pi--disk-cache)))
+         (resolved-cmd (or cmd
+                           (and (buffer-live-p existing)
+                                (alist-get 'cmd (buffer-local-value
+                                                 'ghostel-identity existing)))
+                           (and cached (plist-get cached :cmd))
+                           (and (not remote)
+                                (plist-get (nowis-pi--read-meta nil name) :cmd))))
          (buf nil))
     (unless (or live-p remote)
       (unless (executable-find "dtach")
@@ -489,25 +500,28 @@ additional CLI flags (such as `(\"-r\")') appended to `nowis-pi-command'."
     (setq buf (or existing (get-buffer-create (format "*pi:%s*" name))))
     (when remote
       (cl-pushnew remote nowis-pi-hosts :test #'equal))
-    (nowis-pi--cache-put remote name full-cwd)
+    (nowis-pi--cache-put remote name full-cwd nil resolved-cmd)
     (unless live-p
-      (let* ((identity (nowis-pi--task-identity remote name))
+      (let* ((identity (nowis-pi--task-identity remote name resolved-cmd))
              (sock (nowis-pi--socket-file remote name))
              (local-sock (file-local-name sock))
              (local-cwd (file-local-name full-cwd))
-             (pi-argv (append nowis-pi-command
-                              (list "--name" name)
-                              extra-args
-                              (and initial-prompt
-                                   (not (string-blank-p initial-prompt))
-                                   (list initial-prompt))))
+             (exec-argv (if resolved-cmd
+                            (list "sh" "-c" (concat "exec " resolved-cmd))
+                          (append nowis-pi-command
+                                  (list "--name" name)
+                                  extra-args
+                                  (and initial-prompt
+                                       (not (string-blank-p initial-prompt))
+                                       (list initial-prompt)))))
              (args (append (list "-c"
                                  nowis-pi--outer-script
                                  "sh"
                                  nowis-pi--inner-script
                                  local-sock
-                                 local-cwd)
-                           pi-argv)))
+                                 local-cwd
+                                 (or resolved-cmd ""))
+                           exec-argv)))
         (with-current-buffer buf
           (setq-local default-directory full-cwd))
         (ghostel-exec buf "sh" args identity)
@@ -603,19 +617,36 @@ additional CLI flags (such as `(\"-r\")') appended to `nowis-pi-command'."
              append (list (format "/rpc:%s:" h)
                           (format "/ssh:%s:" h)))))
 
-(defun nowis-pi--parse-new-input (raw-input default-name)
-  "Parse RAW-INPUT into `(NAME . EXTRA-ARGS)' with DEFAULT-NAME fallback.
-Leading `-flag' tokens keep DEFAULT-NAME and treat all tokens as EXTRA-ARGS."
-  (let* ((tokens (ignore-errors (split-string-shell-command raw-input)))
-         (flags-only (and tokens (string-prefix-p "-" (car tokens))))
-         (name (nowis-pi--slugify (if (or (null tokens) flags-only)
-                                      default-name
-                                    (car tokens))))
-         (extra-args (if flags-only tokens (cdr tokens))))
-    (cons name extra-args)))
+(defun nowis-pi--default-shell ()
+  "Return the default shell command for command sessions."
+  "bash")
 
-(defun nowis-pi--read-new-spec (default-name)
-  "Read `[name] [-args]' in the minibuffer with live preview before `:'."
+(defun nowis-pi--parse-new-input (raw-input default-name)
+  "Parse RAW-INPUT into `(:name NAME :args ARGS :cmd CMD)' with DEFAULT-NAME.
+Leading `-flag' tokens keep DEFAULT-NAME and treat all tokens as ARGS; a `!'
+delimiter (`[name] ! [cmd]') treats the remainder as a shell/CLI command
+\(defaulting empty `cmd' to `nowis-pi--default-shell')."
+  (let ((trimmed (string-trim (or raw-input ""))))
+    (if (string-match
+         "\\`\\(?:\\([^ \t!-][^ \t]*\\)[ \t]+\\)?![ \t]*\\(.*\\)\\'"
+         trimmed)
+        (let ((raw-name (match-string 1 trimmed))
+              (raw-cmd (string-trim (match-string 2 trimmed))))
+          (list :name (nowis-pi--slugify (or raw-name default-name))
+                :args nil
+                :cmd (if (string-empty-p raw-cmd)
+                         (nowis-pi--default-shell)
+                       raw-cmd)))
+      (let* ((tokens (ignore-errors (split-string-shell-command trimmed)))
+             (flags-only (and tokens (string-prefix-p "-" (car tokens))))
+             (name (nowis-pi--slugify (if (or (null tokens) flags-only)
+                                          default-name
+                                        (car tokens))))
+             (extra-args (if flags-only tokens (cdr tokens))))
+        (list :name name :args extra-args :cmd nil)))))
+
+(defun nowis-pi--read-new-spec (default-name &optional initial-input)
+  "Read `[name] [-args | ! cmd]' in the minibuffer with live preview."
   (let ((raw
          (minibuffer-with-setup-hook
              (lambda ()
@@ -623,28 +654,27 @@ Leading `-flag' tokens keep DEFAULT-NAME and treat all tokens as EXTRA-ARGS."
                       (ov (make-overlay pos pos))
                       (update
                        (lambda (&rest _)
-                         (pcase-let ((`(,name . ,args)
-                                      (nowis-pi--parse-new-input
+                         (let* ((spec (nowis-pi--parse-new-input
                                        (minibuffer-contents-no-properties)
-                                       default-name)))
+                                       default-name))
+                                (name (plist-get spec :name))
+                                (args (plist-get spec :args))
+                                (cmd (plist-get spec :cmd)))
                            (overlay-put
                             ov 'before-string
-                            (if args
-                                (format " (name: %s, args: %s)"
-                                        name (string-join args " "))
-                              (format " (name: %s)" name)))))))
+                            (cond
+                             (cmd (format " (name: %s, cmd: %s)" name cmd))
+                             (args (format " (name: %s, args: %s)"
+                                           name (string-join args " ")))
+                             (t (format " (name: %s)" name))))))))
                  (funcall update)
                  (add-hook 'after-change-functions update nil t)))
-           (read-string "Agent [name] [-args]: " nil nil default-name))))
+           (read-string "Session [name] [-args | ! cmd]: "
+                        initial-input nil default-name))))
     (nowis-pi--parse-new-input raw default-name)))
 
-;;;###autoload
-(defun nowis-pi-new (&optional remote-host)
-  "Prompt for a directory and name, then launch a `dtach + pi' agent session.
-With prefix argument REMOTE-HOST, first pick a remote TRAMP host from
-`~/.ssh/config'; when invoked on a session row in `*Pi Fleet*', default to
-that session's directory (including its remote TRAMP host)."
-  (interactive "P")
+(defun nowis-pi--prompt-target-dir (remote-host prompt)
+  "Read target directory with PROMPT, honoring REMOTE-HOST prefix or point."
   (let* ((at-pt (get-text-property (point) 'nowis-pi-session))
          (host-at-pt (get-text-property (point) 'nowis-pi-host))
          (host-prefix (cond
@@ -659,16 +689,37 @@ that session's directory (including its remote TRAMP host)."
                     (at-pt (plist-get at-pt :cwd))
                     (t (if-let* ((proj (project-current nil default-directory)))
                            (project-root proj)
-                         default-directory))))
-         (dir (read-directory-name "Run Pi in directory: " base-dir nil t))
+                         default-directory)))))
+    (read-directory-name prompt base-dir nil t)))
+
+;;;###autoload
+(defun nowis-pi-new (&optional remote-host initial-input)
+  "Prompt for a directory and spec, then launch a `dtach' Pi or command session.
+With prefix argument REMOTE-HOST, first pick a remote TRAMP host from
+`~/.ssh/config'; when invoked on a session row in `*Pi Fleet*', default to
+that session's directory.  Prefix input with `! [cmd]' to run a shell or
+arbitrary command instead of Pi (or use `\\[nowis-pi-run]')."
+  (interactive "P")
+  (let* ((dir (nowis-pi--prompt-target-dir remote-host "Run in directory: "))
          (remote (file-remote-p dir))
          (base-slug (nowis-pi--slugify
                      (string-remove-prefix
                       "." (file-name-nondirectory (directory-file-name dir)))))
          (default-name (nowis-pi--next-free-name remote base-slug))
-         (spec (nowis-pi--read-new-spec default-name))
-         (prompt (nowis-pi--initial-prompt-default)))
-    (nowis-pi--open-session (car spec) dir prompt 'switch (cdr spec))))
+         (spec (nowis-pi--read-new-spec default-name initial-input))
+         (prompt (nowis-pi--initial-prompt-default))
+         (new-cmd (plist-get spec :cmd))
+         (new-name (plist-get spec :name)))
+    (when (and new-cmd (not (plist-get spec :args)))
+      (nowis-pi--cache-put remote new-name dir nil new-cmd))
+    (nowis-pi--open-session new-name dir prompt 'switch
+                            (plist-get spec :args) new-cmd)))
+
+;;;###autoload
+(defun nowis-pi-run (&optional remote-host)
+  "Launch an interactive shell (`zsh'/`bash') or arbitrary CLI command in `dtach'."
+  (interactive "P")
+  (nowis-pi-new remote-host "! "))
 
 ;;;###autoload
 (defun nowis-pi-fork (&optional session)
@@ -686,8 +737,9 @@ that session's directory (including its remote TRAMP host)."
     (let* ((default-name (nowis-pi--next-free-name remote (concat parent-name "-fork")))
            (spec (nowis-pi--read-new-spec default-name))
            (prompt (nowis-pi--initial-prompt-default)))
-      (nowis-pi--open-session (car spec) cwd prompt 'switch
-                              (append (list "--fork" session-id) (cdr spec))))))
+      (nowis-pi--open-session (plist-get spec :name) cwd prompt 'switch
+                              (append (list "--fork" session-id)
+                                      (plist-get spec :args))))))
 
 ;;;###autoload
 (defun nowis-pi-rename (&optional session new-name)
@@ -697,6 +749,7 @@ that session's directory (including its remote TRAMP host)."
          (old-name (plist-get s :name))
          (remote (plist-get s :remote))
          (cwd (plist-get s :cwd))
+         (cmd (plist-get s :cmd))
          (raw-new (or new-name
                       (read-string (format "Rename `%s' to: " old-name) old-name)))
          (clean-new (nowis-pi--slugify raw-new)))
@@ -714,14 +767,24 @@ that session's directory (including its remote TRAMP host)."
       (when (file-exists-p old-cwd)
         (rename-file old-cwd new-cwd))
       (nowis-pi--cache-remove remote old-name)
-      (nowis-pi--cache-put remote clean-new cwd new-sock)
+      (nowis-pi--cache-put remote clean-new cwd new-sock cmd)
       (when (buffer-live-p buf)
         (with-current-buffer buf
-          (setq ghostel-identity (nowis-pi--task-identity remote clean-new))
+          (setq ghostel-identity (nowis-pi--task-identity remote clean-new cmd))
           (rename-buffer (format "*pi:%s*" clean-new) t)
           (force-mode-line-update t)))
       (nowis-pi--on-status-change "" nil nil)
       (message "Renamed agent `%s' -> `%s'" old-name clean-new))))
+
+(defun nowis-pi--session-detail (s root)
+  "Return the human-readable activity or command summary for session S and ROOT."
+  (let ((r-msg (and root (plist-get root :msg)))
+        (cmd (plist-get s :cmd))
+        (name (plist-get s :name)))
+    (cond
+     ((and r-msg (not (equal r-msg name))) r-msg)
+     (cmd (format "$ %s" cmd))
+     (t nil))))
 
 (defun nowis-pi--session-headline (s &optional show-detail local-cwd)
   "Format the single-line summary for session S.
@@ -741,8 +804,7 @@ Include detail if SHOW-DETAIL is non-nil; strip remote prefix if LOCAL-CWD."
          (badge (nowis-pi--state-badge (plist-get eff :state)
                                        (plist-get eff :kind)
                                        (and root (plist-get root :tag))))
-         (r-msg (and root (plist-get root :msg)))
-         (detail (and r-msg (not (equal r-msg name)) r-msg)))
+         (detail (nowis-pi--session-detail s root)))
     (format "%-18s %-20s %s%s"
             (propertize name 'face 'bold)
             badge
@@ -808,7 +870,11 @@ Include detail if SHOW-DETAIL is non-nil; strip remote prefix if LOCAL-CWD."
          ;; line itself, so `pkill -f' cannot kill its own cleanup shell.
          (pattern (lambda (path)
                     (shell-quote-argument (concat "[/]" (substring path 1)))))
-         (buf (nowis-pi--find-task-buffer remote name)))
+         (buf (nowis-pi--find-task-buffer remote name))
+         (files (ignore-errors
+                  (directory-files
+                   (nowis-pi--host-socket-dir remote) nil
+                   (format "\\`%s\\.cwd\\'" (regexp-quote name))))))
     (when (buffer-live-p buf)
       (let ((kill-buffer-query-functions nil))
         (when-let* ((proc (buffer-local-value 'ghostel--process buf)))
@@ -825,28 +891,36 @@ Include detail if SHOW-DETAIL is non-nil; strip remote prefix if LOCAL-CWD."
                  (funcall pattern argv-sock) (funcall pattern local-sock)
                  (shell-quote-argument (concat name ".sock"))
                  (shell-quote-argument (concat name ".cwd"))))))
+    ;; Exited buffers leave no socket; reap their orphan metadata immediately.
+    (unless (or files (plist-get s :sock-exists))
+      (ignore-errors (delete-file (nowis-pi--cwd-file remote name))))
     (nowis-pi--cache-remove remote name)))
 
 ;;;###autoload
 (defun nowis-pi-restart (&optional session)
-  "Kill SESSION and start a fresh agent in its directory, like `nowis-pi-new'.
-The `[name] [-args]' prompt defaults to the old name (e.g. type `-r'); the
-new agent replaces the old buffer in its window."
+  "Kill SESSION and start a fresh session in its directory, like `nowis-pi-new'.
+The `[name] [-args | ! cmd]' prompt defaults to the old name (or `! cmd' for
+command sessions); the new buffer replaces the old buffer in its window."
   (interactive)
   (let* ((s (or session (nowis-pi--current-session)))
          (old (plist-get s :name))
+         (old-cmd (plist-get s :cmd))
          (remote (plist-get s :remote))
-         (spec (nowis-pi--read-new-spec old))
+         (spec (nowis-pi--read-new-spec
+                old (and old-cmd (format "%s ! %s" old old-cmd))))
+         (new-name (plist-get spec :name))
          (prompt (nowis-pi--initial-prompt-default))
          (win (when-let* ((buf (nowis-pi--find-task-buffer remote old)))
                 (get-buffer-window buf t))))
     ;; Check before killing so a typo cannot cost the old session.
-    (unless (or (equal (car spec) old)
-                (equal (nowis-pi--next-free-name remote (car spec)) (car spec)))
-      (user-error "An agent named `%s' already exists" (car spec)))
+    (unless (or (equal new-name old)
+                (equal (nowis-pi--next-free-name remote new-name) new-name))
+      (user-error "An agent named `%s' already exists" new-name))
     (nowis-pi--terminate-session s)
-    (let ((buf (nowis-pi--open-session (car spec) (plist-get s :cwd) prompt
-                                       'background (cdr spec))))
+    (let ((buf (nowis-pi--open-session new-name (plist-get s :cwd) prompt
+                                       'background
+                                       (plist-get spec :args)
+                                       (plist-get spec :cmd))))
       (if (window-live-p win)
           (progn (set-window-buffer win buf) (select-window win))
         (pop-to-buffer buf)))))
@@ -892,6 +966,8 @@ new agent replaces the old buffer in its window."
   "a"   #'nowis-pi-fleet-attach-at-point
   "A"   #'nowis-pi-fleet-attach-all
   "c"   #'nowis-pi-new
+  "x"   #'nowis-pi-run
+  "M-!" #'nowis-pi-run
   "f"   #'nowis-pi-fork
   "s"   #'nowis-pi-restart
   "r"   #'nowis-pi-rename
@@ -908,7 +984,7 @@ new agent replaces the old buffer in its window."
               truncate-lines t
               header-line-format
               (substitute-command-keys
-               "\\<nowis-pi-fleet-mode-map> Pi Fleet: \\[nowis-pi-fleet-open-at-point] open  \\[nowis-pi-fleet-attach-at-point]/\\[nowis-pi-fleet-attach-all] attach/all  \\[nowis-pi-new] new  \\[nowis-pi-fork] fork  \\[nowis-pi-restart] restart  \\[nowis-pi-rename] rename  \\[nowis-pi-fleet-remote] remote  \\[nowis-pi-dired] dired  \\[nowis-pi-review] magit  \\[nowis-pi-kill] delete  \\[revert-buffer] refresh")))
+               "\\<nowis-pi-fleet-mode-map> Pi Fleet: \\[nowis-pi-fleet-open-at-point] open  \\[nowis-pi-fleet-attach-at-point]/\\[nowis-pi-fleet-attach-all] attach/all  \\[nowis-pi-new] new  \\[nowis-pi-run] run  \\[nowis-pi-fork] fork  \\[nowis-pi-restart] restart  \\[nowis-pi-rename] rename  \\[nowis-pi-fleet-remote] remote  \\[nowis-pi-dired] dired  \\[nowis-pi-review] magit  \\[nowis-pi-kill] delete  \\[revert-buffer] refresh")))
 
 (defun nowis-pi-fleet--session-at-point ()
   "Return the session plist on the current dashboard line, or signal an error."
@@ -987,8 +1063,7 @@ new agent replaces the old buffer in its window."
                        (subs (plist-get records :subagents))
                        (prompt (plist-get records :prompt))
                        (stats (plist-get records :stats))
-                       (r-msg (and root (plist-get root :msg)))
-                       (detail (and r-msg (not (equal r-msg name)) r-msg))
+                       (detail (nowis-pi--session-detail s root))
                        (start (point))
                        (head-end nil))
                   (insert (format "%s %s\n"
