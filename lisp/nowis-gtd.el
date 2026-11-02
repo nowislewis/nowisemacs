@@ -12,15 +12,81 @@
 
 (require 'org)
 (require 'org-agenda)
+(require 'seq)
+(require 'subr-x)
 
 (defvar nowis/gtd-extra-archive-files nil
-  "Additional historical files to review, outside the current archive configuration.")
+  "Additional historical files to review, outside current archive settings.")
 (declare-function denote-get-path-by-id "denote" (id))
 (defvar nowis/gtd-dir)
 
+;;;; ---- 战线导航与子标题进度展示 ---------------------------------------------
+
+;;;###autoload
+(defun nowis/center-header (text)
+  "Center TEXT in the Agenda window, falling back to the selected window."
+  (let* ((window (or (get-buffer-window) (selected-window)))
+         (padding (max 0 (/ (- (window-body-width window) (string-width text)) 2))))
+    (concat (make-string padding ?\s) text)))
+
+;;;###autoload
+(defun nowis/agenda-goto-project ()
+  "Jump from the current Agenda entry to its level-2 project heading."
+  (interactive)
+  (org-agenda-goto)
+  (while (> (org-current-level) 2)
+    (org-up-heading-safe))
+  (org-fold-show-children)
+  (recenter-top-bottom 2))
+
+(defun nowis/gtd--latest-subheading ()
+  "Return a one-line progress summary from the current task body.
+Prefer the first unchecked checkbox item; otherwise use the last body line."
+  (save-excursion
+    (org-back-to-heading t)
+    (let ((end (min (save-excursion (org-end-of-subtree t t))
+                    (save-excursion (or (outline-next-heading) (point-max)))))
+          unchecked
+          last)
+      (org-end-of-meta-data t)
+      (while (< (point) end)
+        (let ((line (string-trim (buffer-substring-no-properties
+                                  (line-beginning-position)
+                                  (line-end-position)))))
+          (unless (or (string-empty-p line) (string-prefix-p "#" line))
+            (if (and (null unchecked)
+                     (string-match "\\`[-+*][ \t]+\\[ \\][ \t]*\\(.*\\)" line))
+                (setq unchecked (string-trim (match-string 1 line)))
+              (setq last (string-trim
+                          (replace-regexp-in-string
+                           "\\`[-+*][ \t]+\\(?:\\[[X-]\\][ \t]*\\)?" "" line))))))
+        (forward-line 1))
+      (when-let* ((text (or unchecked last))
+                  ((not (string-empty-p text))))
+        (truncate-string-to-width text 88 nil nil "…")))))
+
+;;;###autoload
+(defun nowis/gtd-agenda-show-progress ()
+  "Display the latest subheading under STARTED and NEXT items in Agenda."
+  (remove-overlays (point-min) (point-max) 'nowis-gtd-progress t)
+  (save-excursion
+    (goto-char (point-min))
+    (while (not (eobp))
+      (when-let* ((marker (org-get-at-bol 'org-hd-marker))
+                  ((marker-buffer marker))
+                  ((equal (org-get-at-bol 'type) "todo"))
+                  ((member (org-get-at-bol 'todo-state) '("STARTED" "NEXT")))
+                  (prog (org-with-point-at marker (nowis/gtd--latest-subheading)))
+                  (ov (make-overlay (line-beginning-position) (line-end-position))))
+        (overlay-put ov 'evaporate t)
+        (overlay-put ov 'nowis-gtd-progress t)
+        (overlay-put ov 'after-string
+                     (propertize (concat "\n    ↳ " prog) 'face 'shadow)))
+      (forward-line 1))))
+
 ;;;###autoload
 (defun nowis/gtd-open-issues ()
-  "Open the issues note by its stable Denote identifier, independent of its title."
+  "Open the issues note by its stable Denote identifier."
   (interactive)
   (require 'denote)
   (let ((file (denote-get-path-by-id "20260818T204929")))
@@ -48,24 +114,29 @@ From Agenda, visit the original entry first.  Use `widen' to leave focus."
   (message "%s" (substitute-command-keys "Focused on this task; \\[widen] to return")))
 
 ;;;###autoload
-(defun nowis/gtd-resume-task ()
-  "Show the original STARTED subtree; ask which one if several are active.
-When none is active, show the grouped task Agenda so the user can choose."
-  (interactive)
+(defun nowis/gtd-resume-task (&optional arg)
+  "Switch to an active STARTED or NEXT task, showing its latest subheading.
+With prefix ARG or when multiple active tasks exist, prompt to choose.
+When no task is active, open the grouped task Agenda."
+  (interactive "P")
   (let (tasks)
     (org-map-entries
      (lambda ()
-       (when (equal (org-get-todo-state) "STARTED")
-         (push (cons (format "%s — %s:%d"
-                             (org-get-heading t t t t)
-                             (file-name-nondirectory (buffer-file-name))
-                             (line-number-at-pos))
-                     (point-marker))
-               tasks)))
+       (let ((state (org-get-todo-state)))
+         (when (member state '("STARTED" "NEXT"))
+           (let ((prog (nowis/gtd--latest-subheading)))
+             (push (cons (concat (format "%-7s [%s] %s"
+                                         state
+                                         (org-get-category)
+                                         (org-get-heading t t t t))
+                                 (if prog (format "  ↳ %s" prog) ""))
+                         (point-marker))
+                   tasks)))))
      nil 'agenda)
+    (setq tasks (nreverse tasks))
     (if (null tasks)
         (org-agenda nil "g")
-      (let ((marker (if (cdr tasks)
+      (let ((marker (if (or arg (cdr tasks))
                         (cdr (assoc (completing-read "继续哪件任务：" tasks nil t)
                                     tasks))
                       (cdar tasks))))
@@ -236,11 +307,11 @@ Interactively, a prefix argument selects all history."
         (erase-buffer)
         (org-mode)
         (setq-local nowis/review-days days)
-        (local-set-key (kbd "C-c C-r") #'nowis/review-refresh)
+        (keymap-local-set "C-c C-r" #'nowis/review-refresh)
         (insert (if (eq days 'all)
                     "#+title: Task Review — All History\n"
                   (format "#+title: Task Review — Last %d Days\nRange: %s to %s (end exclusive)\n" days start end)))
-        (insert "Refresh: C-c C-r\n\n* Time Spent\n")
+        (insert (substitute-command-keys "Refresh: \\[nowis/review-refresh]\n\n* Time Spent\n"))
         (insert (format "#+begin: clocktable :scope %S%s :maxlevel 6 :link t :fileskip0 t\n#+end:\n"
                         files (if start (format " :tstart %S :tend %S" start end) "")))
         (goto-char (point-min))

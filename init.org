@@ -1926,26 +1926,11 @@ Borrowed from https://github.com/rougier/emacs-GTD
 #+end_src
 *** agenda
 #+begin_src elisp
-;;; ─── 跳到任务所属 project（看 note）──────────────────────
-(defun nowis/agenda-goto-project ()
-  "从 agenda 当前任务跳到它所属的 project heading（level 2），看该战线的 note。"
-  (interactive)
-  (org-agenda-goto)                     ; 复用原生跳转（开窗、widen、展开都处理好）
-  (while (> (org-current-level) 2)      ; 上溯到 project 层
-    (org-up-heading-safe))
-  (org-fold-show-children)
-  (recenter-top-bottom 2))
-
 (with-eval-after-load 'org-agenda
-  (keymap-set org-agenda-mode-map "P" #'nowis/agenda-goto-project))
+  (keymap-set org-agenda-mode-map "P" #'nowis/agenda-goto-project)
+  (add-hook 'org-agenda-finalize-hook #'nowis/gtd-agenda-show-progress))
 
 ;;; ─── 显示格式 ───
-(defun nowis/center-header (text)
-  "Center TEXT in the Agenda window, falling back to the selected window."
-  (let* ((window (or (get-buffer-window) (selected-window)))
-         (padding (max 0 (/ (- (window-body-width window) (string-width text)) 2))))
-    (concat (make-string padding ?\s) text)))
-
 (setq org-agenda-prefix-format
       '((agenda . "%-10c [%-4e] %?-12t% s")
         (todo   . "%-10c [%-4e]: ")
@@ -1970,20 +1955,34 @@ Borrowed from https://github.com/rougier/emacs-GTD
         ("r" "Resume Task"
          (lambda (_) (nowis/gtd-resume-task)))
 
-        ("g" "Task Agenda"
+        ("g" "Focus Agenda (Today & Active)"
          ((agenda ""
                   ((org-agenda-overriding-header (nowis/center-header "Today's Schedule"))
                    (org-agenda-span 'day)
                    (org-agenda-skip-function
                     '(org-agenda-skip-if nil '(todo done)))))
-          (todo "STARTED"
+          (todo "STARTED|NEXT"
                 ((org-agenda-overriding-header
-                  (nowis/center-header "Current Task · Only One at a Time"))
+                  (nowis/center-header "Active Focus (STARTED & NEXT)"))
                  (org-agenda-dim-blocked-tasks t)
-                 ))
-          (todo "NEXT"
-                ((org-agenda-overriding-header (nowis/center-header "Next Actions"))))
-          (tags-todo "action/-NEXT-STARTED"
+                 (org-agenda-sorting-strategy
+                  '(category-keep todo-state-down priority-down))))))
+
+        ("G" "Panorama Agenda (All Projects / Inbox / Reading)"
+         ((agenda ""
+                  ((org-agenda-overriding-header (nowis/center-header "Today's Schedule"))
+                   (org-agenda-span 'day)
+                   (org-agenda-skip-function
+                    '(org-agenda-skip-if nil '(todo done)))))
+          (todo "STARTED|NEXT"
+                ((org-agenda-overriding-header
+                  (nowis/center-header "Active Focus (STARTED & NEXT)"))
+                 (org-agenda-dim-blocked-tasks t)
+                 (org-agenda-sorting-strategy
+                  '(category-keep todo-state-down priority-down))))
+          (todo "WAIT"
+                ((org-agenda-overriding-header (nowis/center-header "Waiting"))))
+          (tags-todo "action/-NEXT-STARTED-WAIT"
                      ((org-agenda-overriding-header (nowis/center-header "Project Tasks"))
                       (org-agenda-skip-function '(org-agenda-skip-entry-if 'scheduled))
                       (org-agenda-sorting-strategy

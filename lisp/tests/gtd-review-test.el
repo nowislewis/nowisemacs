@@ -92,3 +92,39 @@
       (when (get-file-buffer file) (kill-buffer (get-file-buffer file)))
       (when (get-buffer "*Review by Project*") (kill-buffer "*Review by Project*"))
       (delete-file file))))
+
+(ert-deftest gtd-active-focus-shows-latest-subheading-overlay ()
+  (let* ((file (make-temp-file "gtd-active-tree-" nil ".org"))
+         (org-todo-keywords '((sequence "TODO(t)" "NEXT(n)" "STARTED(s)" "WAIT(w)" "|" "AXED(a)" "DONE(d)")))
+         (org-agenda-files (list file))
+         (org-agenda-custom-commands
+          '(("g" "Task Agenda"
+             ((todo "STARTED|NEXT"
+                    ((org-agenda-overriding-header "Active Focus")
+                     (org-agenda-sorting-strategy
+                      '(category-keep todo-state-down priority-down)))))))))
+    (unwind-protect
+        (save-window-excursion
+          (with-temp-file file
+            (insert (concat
+                     "* Projects\n"
+                     "** x9 npu\n"
+                     "*** llm 支持\n"
+                     ":PROPERTIES:\n:CATEGORY: llm 支持\n:END:\n"
+                     "**** STARTED iree 开发\n"
+                     "- [2026-10-23 Fri 17:03] iree 应该大部分都可以了\n"
+                     "**** NEXT 交付一轮最新 isa 的 modelbin\n")))
+          (with-current-buffer (find-file-noselect file)
+            (org-mode))
+          (let ((org-agenda-finalize-hook (list #'nowis/gtd-agenda-show-progress)))
+            (org-agenda nil "g")
+            (with-current-buffer org-agenda-buffer
+              (let ((ovs (overlays-in (point-min) (point-max))))
+                (should (= (length ovs) 1))
+                (should (string-match-p
+                         "↳ \\[2026-10-23 Fri 17:03\\] iree 应该大部分都可以了"
+                         (overlay-get (car ovs) 'after-string)))))))
+      (when (get-file-buffer file) (kill-buffer (get-file-buffer file)))
+      (when (get-buffer "*Org Agenda*") (kill-buffer "*Org Agenda*"))
+      (delete-file file))))
+
