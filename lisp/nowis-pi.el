@@ -9,12 +9,13 @@
 ;; and `magit' for Pi (`SPC a p' -> `nowis-pi-fleet').
 ;;
 ;; Architecture & Non-Obvious Invariants:
-;; 1. Filesystem Socket Truth (`~/.local/share/nowis-pi/sockets/'):
-;;    Each session on a host (local or TRAMP remote) is a `<name>.sock' (`dtach'
-;;    Unix socket, detach key `C-]' / 0x1d) plus a `<name>.cwd' metadata file
-;;    (cwd, initial socket path, and Pi session UUID).  Stale sockets from power
-;;    loss are auto-detected (`! dtach -p <sock> </dev/null') and respawned with
-;;    `pi --session <uuid>' (or `pi --continue' fallback).
+;; 1. Filesystem Manifest Truth (`~/.local/share/nowis-pi/sockets/'):
+;;    Each session on a host (local or TRAMP remote) is defined by `<name>.cwd'
+;;    (cwd, initial socket path, Pi session UUID, and optional command) paired
+;;    with a live `<name>.sock' (`dtach' Unix socket, detach key `C-]' / 0x1d).
+;;    Interrupted sessions (from power loss, `SIGTERM' reboot, or container
+;;    restart) are auto-detected (`! dtach -p <sock> </dev/null') and respawned
+;;    from `<name>.cwd' with `pi --session <uuid>' (or `pi --continue' fallback).
 ;; 2. Interactive Shell Bootstrap (`nowis-pi--outer-script'):
 ;;    Spawns via `zsh -ic' (or `ZSH_VERSION=1 bash -ic') on the execution host
 ;;    so user shell rc exports (`*_KEY', `VIRTUAL_ENV', `PATH') are loaded both
@@ -35,6 +36,7 @@
 (require 'subr-x)
 
 (declare-function ghostel-exec "ghostel" (buffer program &optional args identity))
+(declare-function ghostel-mode "ghostel" ())
 (declare-function magit-status-setup-buffer "magit-status" (&optional directory))
 
 (defvar ghostel--process)
@@ -182,14 +184,15 @@ Uses `non-essential' so scanning never triggers a TRAMP reconnect."
           (progn
             (when (file-directory-p dir)
               (let* ((files (directory-files dir t directory-files-no-dot-files-regexp))
-                     (socks (cl-remove-if-not (lambda (f) (string-suffix-p ".sock" f))
-                                              files)))
-                (dolist (file socks)
+                     (cwds (cl-remove-if-not (lambda (f) (string-suffix-p ".cwd" f))
+                                             files)))
+                (dolist (file cwds)
                   (let* ((name (file-name-sans-extension (file-name-nondirectory file)))
+                         (sock (concat (file-name-sans-extension file) ".sock"))
                          (live-buf (nowis-pi--find-task-buffer remote name))
                          (cached (seq-find (lambda (s) (equal (plist-get s :name) name))
                                            prev))
-                         (meta (unless (and (buffer-live-p live-buf) cached)
+                         (meta (unless (or (buffer-live-p live-buf) cached)
                                  (nowis-pi--read-meta remote name)))
                          (cwd (cond
                                ((buffer-live-p live-buf)
@@ -206,18 +209,10 @@ Uses `non-essential' so scanning never triggers a TRAMP reconnect."
                                 :cwd cwd
                                 :remote remote
                                 :host host
-                                :sock file
+                                :sock sock
                                 :cmd cmd
                                 :sock-exists t)
-                          entries)))
-                (unless remote
-                  (dolist (file files)
-                    (when (string-suffix-p ".cwd" file)
-                      (let* ((name (file-name-sans-extension (file-name-nondirectory file)))
-                             (sock (concat dir name ".sock")))
-                        (unless (or (member sock socks)
-                                    (nowis-pi--find-task-buffer nil name))
-                          (ignore-errors (delete-file file)))))))))
+                          entries)))))
             (setq entries (nreverse entries))
             (puthash host entries nowis-pi--disk-cache)
             entries)
@@ -447,22 +442,28 @@ SCAN-MODE controls filesystem/network probing:
   (concat
    "s=\"$1\";d=\"$2\";c=\"$3\";shift 3;cd \"$d\"||exit 1;"
    "m=\"${s%.sock}.cwd\";mkdir -p \"${s%/*}\";"
-   "[ -f \"$m\" ]||printf '%s\\n%s\\n\\n%s\\n' \"$d\" \"$s\" \"$c\">\"$m\";"
    "export PI_PROGRAM_STATUS=1 INSIDE_EMACS=ghostel NOWIS_PI_META=\"$m\";"
-   "if [ -S \"$s\" ]&&! dtach -p \"$s\"</dev/null >/dev/null 2>&1;then "
+   "if [ -f \"$m\" ];then "
+   "a=$(sed -n 2p \"$m\" 2>/dev/null);"
+   "for p in $(pgrep -f \"dtach -A [/]${s#/}\" 2>/dev/null) "
+   "$([ -n \"$a\" ]&&[ \"$a\" != \"$s\" ]&&pgrep -f \"dtach -A [/]${a#/}\" 2>/dev/null);do "
+   "[ -d \"/proc/$p\" ]&&! [ \"/proc/$p/fd/0\" -ef /dev/null ]&&kill -KILL \"$p\" 2>/dev/null;"
+   "done;"
+   "if ! dtach -p \"$s\"</dev/null >/dev/null 2>&1;then "
    "rm -f \"$s\";"
    "if [ -z \"$c\" ];then u=$(sed -n 3p \"$m\" 2>/dev/null);"
    "if [ -n \"$u\" ];then set -- \"$@\" --session \"$u\";"
    "else set -- \"$@\" --continue;fi;fi;fi;"
+   "else rm -f \"$s\";printf '%s\\n%s\\n\\n%s\\n' \"$d\" \"$s\" \"$c\">\"$m\";fi;"
    "dtach -A \"$s\" -e \"$(printf '\\035')\" -r winch \"$@\";r=$?;"
-   "if ! dtach -p \"$s\"</dev/null >/dev/null 2>&1;then "
+   "if [ \"$r\" -eq 0 ]&&! dtach -p \"$s\"</dev/null >/dev/null 2>&1;then "
    "rm -f \"$s\" \"$m\";"
    "for f in \"${s%/*}\"/*.cwd;do "
    "[ -f \"$f\" ]&&[ \"$(sed -n 2p \"$f\")\" = \"$s\" ]&&rm -f \"$f\" \"${f%.cwd}.sock\";"
    "done;"
    "printf '\\033]7501;state=idle:id=pi-exit:app=pi\\033\\\\';"
    "fi;exit $r")
-  "Inner script that `cd's into CWD, handles stale sockets, and runs `dtach'.")
+  "Inner script that `cd's into CWD, resumes from `.cwd', and runs `dtach'.")
 
 (defun nowis-pi--on-buffer-exit (buf _event)
   "Refresh `*Pi Fleet*' when a `pi-task' Ghostel buffer exits."
@@ -501,6 +502,12 @@ CLI flags appended to `nowis-pi-command'."
     (when remote
       (cl-pushnew remote nowis-pi-hosts :test #'equal))
     (nowis-pi--cache-put remote name full-cwd nil resolved-cmd)
+    (when (eq mode 'switch)
+      (with-current-buffer buf
+        (setq-local default-directory full-cwd)
+        (unless (derived-mode-p 'ghostel-mode)
+          (ghostel-mode)))
+      (pop-to-buffer buf))
     (unless live-p
       (let* ((identity (nowis-pi--task-identity remote name resolved-cmd))
              (sock (nowis-pi--socket-file remote name))
@@ -527,8 +534,6 @@ CLI flags appended to `nowis-pi-command'."
         (ghostel-exec buf "sh" args identity)
         (with-current-buffer buf
           (setq-local default-directory full-cwd))))
-    (when (eq mode 'switch)
-      (pop-to-buffer buf))
     buf))
 
 
@@ -596,7 +601,7 @@ CLI flags appended to `nowis-pi-command'."
                (if remote
                    (seq-some (lambda (s) (equal (plist-get s :name) candidate))
                              cached)
-                 (file-exists-p (nowis-pi--socket-file nil candidate))))
+                 (file-exists-p (nowis-pi--cwd-file nil candidate))))
       (setq candidate (format "%s-%d" base-slug n)
             n (1+ n)))
     candidate))
@@ -760,7 +765,7 @@ arbitrary command instead of Pi (or use `\\[nowis-pi-run]')."
           (old-cwd  (nowis-pi--cwd-file remote old-name))
           (new-cwd  (nowis-pi--cwd-file remote clean-new))
           (buf      (nowis-pi--find-task-buffer remote old-name)))
-      (when (file-exists-p new-sock)
+      (when (or (file-exists-p new-cwd) (file-exists-p new-sock))
         (user-error "An agent named `%s' already exists" clean-new))
       (when (file-exists-p old-sock)
         (rename-file old-sock new-sock))
