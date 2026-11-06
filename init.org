@@ -844,6 +844,8 @@ diff-hl-mode highlights uncommitted changes on the left side of the window
 ** completion buffer
 #+begin_src elisp
 (add-hook 'completion-list-mode-hook (lambda () (setq-local truncate-lines t)))
+;; minibuffer 候选放进 child frame，避免挤压主窗口造成跳动
+(nowis-completions-frame-mode 1)
 (keymap-global-set "M-i" #'completion-help-at-point)
 (use-package minibuffer
   :ensure nil
