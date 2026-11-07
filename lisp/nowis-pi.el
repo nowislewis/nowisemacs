@@ -10,12 +10,14 @@
 ;;
 ;; Architecture & Non-Obvious Invariants:
 ;; 1. Filesystem Manifest Truth (`~/.local/share/nowis-pi/sockets/'):
-;;    Each session on a host (local or TRAMP remote) is defined by `<name>.cwd'
-;;    (cwd, initial socket path, Pi session UUID, and optional command) paired
-;;    with a live `<name>.sock' (`dtach' Unix socket, detach key `C-]' / 0x1d).
-;;    Interrupted sessions (from power loss, `SIGTERM' reboot, or container
-;;    restart) are auto-detected (`! dtach -p <sock> </dev/null') and respawned
-;;    from `<name>.cwd' with `pi --session <uuid>' (or `pi --continue' fallback).
+;;    Every session is a persistent shell (line 4 of `<name>.cwd', after cwd
+;;    and initial socket path) inside `dtach' (`<name>.sock', detach `C-]');
+;;    Pi is just a command run in it.  Line 3 is a resume command owned by
+;;    whatever program runs in the shell (via `$NOWIS_PI_META'): it writes
+;;    how to bring itself back (Pi's `ghostel-inspector' writes
+;;    `pi --session <uuid>') and clears it on a deliberate quit.  Interrupted
+;;    sessions (power loss, reboot) are detected (`! dtach -p <sock>') and
+;;    respawned as `<resume>; exec <shell>', so the script knows no program.
 ;; 2. Interactive Shell Bootstrap (`nowis-pi--outer-script'):
 ;;    Spawns via `zsh -ic' (or `ZSH_VERSION=1 bash -ic') on the execution host
 ;;    so user shell rc exports (`*_KEY', `VIRTUAL_ENV', `PATH') are loaded both
@@ -122,7 +124,7 @@ Never initiates a TRAMP connection when REMOTE-PREFIX is offline."
   (concat (nowis-pi--host-socket-dir remote-prefix) name ".cwd"))
 
 (defun nowis-pi--read-meta (remote-prefix name)
-  "Return `(:cwd CWD :argv-sock SOCK :session-id SID :cmd CMD)' for NAME."
+  "Return `(:cwd CWD :argv-sock SOCK :resume CMD :cmd SHELL)' for NAME."
   (let ((file (nowis-pi--cwd-file remote-prefix name))
         (fallback-cwd (concat (or remote-prefix "") "~/"))
         (fallback-sock (file-local-name (nowis-pi--socket-file remote-prefix name)))
@@ -141,7 +143,7 @@ Never initiates a TRAMP connection when REMOTE-PREFIX is offline."
             :argv-sock (if (or (null raw-sock) (string-empty-p raw-sock))
                            fallback-sock
                          raw-sock)
-            :session-id (and raw-sid (not (string-empty-p raw-sid)) raw-sid)
+            :resume (and raw-sid (not (string-empty-p raw-sid)) raw-sid)
             :cmd (and raw-cmd (not (string-empty-p raw-cmd)) raw-cmd)))))
 
 (defvar nowis-pi--disk-cache (make-hash-table :test #'equal)
@@ -450,11 +452,11 @@ SCAN-MODE controls filesystem/network probing:
    "[ -d \"/proc/$p\" ]&&! [ \"/proc/$p/fd/0\" -ef /dev/null ]&&kill -KILL \"$p\" 2>/dev/null;"
    "done;"
    "if ! dtach -p \"$s\"</dev/null >/dev/null 2>&1;then "
-   "rm -f \"$s\";"
-   "if [ -z \"$c\" ];then u=$(sed -n 3p \"$m\" 2>/dev/null);"
-   "if [ -n \"$u\" ];then set -- \"$@\" --session \"$u\";"
-   "else set -- \"$@\" --continue;fi;fi;fi;"
-   "else rm -f \"$s\";printf '%s\\n%s\\n\\n%s\\n' \"$d\" \"$s\" \"$c\">\"$m\";fi;"
+   "rm -f \"$s\";u=$(sed -n 3p \"$m\" 2>/dev/null);"
+   "set -- sh -c \"${u:+$u;}exec $c\";fi;"
+   "else rm -f \"$s\";printf '%s\\n%s\\n\\n%s\\n' \"$d\" \"$s\" \"$c\">\"$m\";"
+   "if [ $# -gt 0 ];then set -- sh -c '\"$@\";exec '\"$c\" sh \"$@\";"
+   "else set -- sh -c \"exec $c\";fi;fi;"
    "dtach -A \"$s\" -e \"$(printf '\\035')\" -r winch \"$@\";r=$?;"
    "if [ \"$r\" -eq 0 ]&&! dtach -p \"$s\"</dev/null >/dev/null 2>&1;then "
    "rm -f \"$s\" \"$m\";"
@@ -463,7 +465,10 @@ SCAN-MODE controls filesystem/network probing:
    "done;"
    "printf '\\033]7501;state=idle:id=pi-exit:app=pi\\033\\\\';"
    "fi;exit $r")
-  "Inner script that `cd's into CWD, resumes from `.cwd', and runs `dtach'.")
+  "Inner script that `cd's into CWD and runs shell CMD under `dtach'.
+Args: SOCK CWD CMD [FIRST-ARGV...].  A fresh session runs FIRST-ARGV (if any)
+before CMD; a respawned one runs the resume command in `.cwd' line 3 (if
+any) before CMD.  Programs own line 3 via `$NOWIS_PI_META'.")
 
 (defun nowis-pi--on-buffer-exit (buf _event)
   "Refresh `*Pi Fleet*' when a `pi-task' Ghostel buffer exits."
@@ -472,12 +477,17 @@ SCAN-MODE controls filesystem/network probing:
                  'pi-task))
     (nowis-pi--on-status-change "" nil nil)))
 
-(defun nowis-pi--open-session (name cwd &optional initial-prompt display-mode extra-args cmd)
+(defun nowis-pi--pi-argv (name &optional args prompt)
+  "Return the Pi argv for session NAME with extra ARGS and initial PROMPT."
+  (append nowis-pi-command (list "--name" name) args
+          (and prompt (not (string-blank-p prompt)) (list prompt))))
+
+(defun nowis-pi--open-session (name cwd &optional display-mode cmd first-argv)
   "Open or spawn Ghostel session NAME in directory CWD.
-When CMD is non-nil, run CMD inside `dtach' instead of `nowis-pi-command'.
-When INITIAL-PROMPT is non-nil and a new Pi session is created, pass it to Pi.
-DISPLAY-MODE is `switch' (default) or `background'; EXTRA-ARGS are additional
-CLI flags appended to `nowis-pi-command'."
+The session runs shell CMD (default: the recorded one, else
+`nowis-pi--default-shell') inside `dtach'.  When a fresh session is
+spawned and FIRST-ARGV is non-nil, run it first and fall back to CMD
+when it exits.  DISPLAY-MODE is `switch' (default) or `background'."
   (require 'ghostel)
   (let* ((mode (or display-mode 'switch))
          (full-cwd (file-name-as-directory (expand-file-name cwd)))
@@ -493,7 +503,8 @@ CLI flags appended to `nowis-pi-command'."
                                                  'ghostel-identity existing)))
                            (and cached (plist-get cached :cmd))
                            (and (not remote)
-                                (plist-get (nowis-pi--read-meta nil name) :cmd))))
+                                (plist-get (nowis-pi--read-meta nil name) :cmd))
+                           (nowis-pi--default-shell)))
          (buf nil))
     (unless (or live-p remote)
       (unless (executable-find "dtach")
@@ -513,22 +524,14 @@ CLI flags appended to `nowis-pi-command'."
              (sock (nowis-pi--socket-file remote name))
              (local-sock (file-local-name sock))
              (local-cwd (file-local-name full-cwd))
-             (exec-argv (if resolved-cmd
-                            (list "sh" "-c" (concat "exec " resolved-cmd))
-                          (append nowis-pi-command
-                                  (list "--name" name)
-                                  extra-args
-                                  (and initial-prompt
-                                       (not (string-blank-p initial-prompt))
-                                       (list initial-prompt)))))
              (args (append (list "-c"
                                  nowis-pi--outer-script
                                  "sh"
                                  nowis-pi--inner-script
                                  local-sock
                                  local-cwd
-                                 (or resolved-cmd ""))
-                           exec-argv)))
+                                 resolved-cmd)
+                           first-argv)))
         (with-current-buffer buf
           (setq-local default-directory full-cwd))
         (ghostel-exec buf "sh" args identity)
@@ -715,10 +718,10 @@ arbitrary command instead of Pi (or use `\\[nowis-pi-run]')."
          (prompt (nowis-pi--initial-prompt-default))
          (new-cmd (plist-get spec :cmd))
          (new-name (plist-get spec :name)))
-    (when (and new-cmd (not (plist-get spec :args)))
-      (nowis-pi--cache-put remote new-name dir nil new-cmd))
-    (nowis-pi--open-session new-name dir prompt 'switch
-                            (plist-get spec :args) new-cmd)))
+    (nowis-pi--open-session new-name dir 'switch new-cmd
+                            (unless new-cmd
+                              (nowis-pi--pi-argv new-name (plist-get spec :args)
+                                                 prompt)))))
 
 ;;;###autoload
 (defun nowis-pi-run (&optional remote-host)
@@ -726,25 +729,39 @@ arbitrary command instead of Pi (or use `\\[nowis-pi-run]')."
   (interactive "P")
   (nowis-pi-new remote-host "! "))
 
+(defun nowis-pi--session-id (s)
+  "Return the Pi conversation UUID live in session S, or nil.
+Prefer the live `pi-session' OSC record, else the `--session' argument of
+the recorded resume command."
+  (let* ((remote (plist-get s :remote))
+         (name (plist-get s :name))
+         (buf (nowis-pi--find-task-buffer remote name))
+         (resume (plist-get (nowis-pi--read-meta remote name) :resume)))
+    (or (and buf (plist-get (nowis-pi--buffer-records buf) :session-id))
+        (and resume (string-match "--session[ =]\\([^ ]+\\)" resume)
+             (match-string 1 resume)))))
+
 ;;;###autoload
 (defun nowis-pi-fork (&optional session)
-  "Fork SESSION into a new independent `dtach + pi' agent session."
+  "Fork SESSION's Pi conversation into a new shell session."
   (interactive)
   (let* ((s (or session (nowis-pi--current-session)))
          (parent-name (plist-get s :name))
          (remote (plist-get s :remote))
          (cwd (plist-get s :cwd))
-         (buf (nowis-pi--find-task-buffer remote parent-name))
-         (session-id (or (and buf (plist-get (nowis-pi--buffer-records buf) :session-id))
-                         (plist-get (nowis-pi--read-meta remote parent-name) :session-id))))
-    (unless (and session-id (not (string-empty-p session-id)))
+         (session-id (nowis-pi--session-id s)))
+    (unless session-id
       (user-error "Agent `%s' has no saved conversation to fork yet" parent-name))
     (let* ((default-name (nowis-pi--next-free-name remote (concat parent-name "-fork")))
            (spec (nowis-pi--read-new-spec default-name))
+           (name (plist-get spec :name))
            (prompt (nowis-pi--initial-prompt-default)))
-      (nowis-pi--open-session (plist-get spec :name) cwd prompt 'switch
-                              (append (list "--fork" session-id)
-                                      (plist-get spec :args))))))
+      (nowis-pi--open-session name cwd 'switch nil
+                              (nowis-pi--pi-argv
+                               name
+                               (append (list "--fork" session-id)
+                                       (plist-get spec :args))
+                               prompt)))))
 
 ;;;###autoload
 (defun nowis-pi-rename (&optional session new-name)
@@ -903,29 +920,20 @@ Include detail if SHOW-DETAIL is non-nil; strip remote prefix if LOCAL-CWD."
 
 ;;;###autoload
 (defun nowis-pi-restart (&optional session)
-  "Kill SESSION and start a fresh session in its directory, like `nowis-pi-new'.
-The `[name] [-args | ! cmd]' prompt defaults to the old name (or `! cmd' for
-command sessions); the new buffer replaces the old buffer in its window."
+  "Restart SESSION in place, e.g. to pick up an updated Pi.
+Keep its name, directory, shell and window, and rerun the resume command
+recorded in `.cwd' line 3 (if any) before the shell."
   (interactive)
   (let* ((s (or session (nowis-pi--current-session)))
-         (old (plist-get s :name))
-         (old-cmd (plist-get s :cmd))
+         (name (plist-get s :name))
          (remote (plist-get s :remote))
-         (spec (nowis-pi--read-new-spec
-                old (and old-cmd (format "%s ! %s" old old-cmd))))
-         (new-name (plist-get spec :name))
-         (prompt (nowis-pi--initial-prompt-default))
-         (win (when-let* ((buf (nowis-pi--find-task-buffer remote old)))
+         (resume (plist-get (nowis-pi--read-meta remote name) :resume))
+         (win (when-let* ((buf (nowis-pi--find-task-buffer remote name)))
                 (get-buffer-window buf t))))
-    ;; Check before killing so a typo cannot cost the old session.
-    (unless (or (equal new-name old)
-                (equal (nowis-pi--next-free-name remote new-name) new-name))
-      (user-error "An agent named `%s' already exists" new-name))
     (nowis-pi--terminate-session s)
-    (let ((buf (nowis-pi--open-session new-name (plist-get s :cwd) prompt
-                                       'background
-                                       (plist-get spec :args)
-                                       (plist-get spec :cmd))))
+    (let ((buf (nowis-pi--open-session
+                name (plist-get s :cwd) 'background (plist-get s :cmd)
+                (and resume (list "sh" "-c" resume)))))
       (if (window-live-p win)
           (progn (set-window-buffer win buf) (select-window win))
         (pop-to-buffer buf)))))
@@ -1144,7 +1152,7 @@ command sessions); the new buffer replaces the old buffer in its window."
     (let ((s (nowis-pi-fleet--session-at-point)))
       (nowis-pi--open-session (plist-get s :name)
                               (plist-get s :cwd)
-                              nil 'switch))))
+                              'switch))))
 
 (defun nowis-pi-fleet-attach-at-point ()
   "Attach the `⚡ detached' session at point in the background."
@@ -1154,7 +1162,7 @@ command sessions); the new buffer replaces the old buffer in its window."
          (buf (plist-get s :buffer)))
     (if (nowis-pi--buffer-attached-p buf)
         (message "Agent `%s' is already attached" name)
-      (nowis-pi--open-session name (plist-get s :cwd) nil 'background)
+      (nowis-pi--open-session name (plist-get s :cwd) 'background)
       (nowis-pi-fleet--refresh-in-place)
       (message "Attached Pi agent `%s'" name))))
 
@@ -1170,7 +1178,7 @@ command sessions); the new buffer replaces the old buffer in its window."
                    (not (nowis-pi--buffer-attached-p buf)))
           (nowis-pi--open-session (plist-get s :name)
                                   (plist-get s :cwd)
-                                  nil 'background)
+                                  'background)
           (cl-incf count))))
     (nowis-pi-fleet--refresh-in-place)
     (message "Reattached %d background Pi agent(s)" count)))
