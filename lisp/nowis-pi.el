@@ -442,7 +442,9 @@ SCAN-MODE controls filesystem/network probing:
 
 (defconst nowis-pi--inner-script
   (concat
-   "s=\"$1\";d=\"$2\";c=\"$3\";shift 3;cd \"$d\"||exit 1;"
+   "s=\"${1#\\~/}\";[ \"$s\" != \"$1\" ]&&s=\"$HOME/$s\";"
+   "d=\"${2#\\~/}\";[ \"$d\" != \"$2\" ]&&d=\"$HOME/$d\";"
+   "c=\"$3\";shift 3;cd \"$d\"||exit 1;"
    "m=\"${s%.sock}.cwd\";mkdir -p \"${s%/*}\";"
    "export PI_PROGRAM_STATUS=1 INSIDE_EMACS=ghostel NOWIS_PI_META=\"$m\";"
    "if [ -f \"$m\" ];then "
@@ -451,10 +453,11 @@ SCAN-MODE controls filesystem/network probing:
    "$([ -n \"$a\" ]&&[ \"$a\" != \"$s\" ]&&pgrep -f \"dtach -A [/]${a#/}\" 2>/dev/null);do "
    "[ -d \"/proc/$p\" ]&&! [ \"/proc/$p/fd/0\" -ef /dev/null ]&&kill -KILL \"$p\" 2>/dev/null;"
    "done;"
+   "u=$(sed -n 3p \"$m\" 2>/dev/null);"
    "if ! dtach -p \"$s\"</dev/null >/dev/null 2>&1;then "
-   "rm -f \"$s\";u=$(sed -n 3p \"$m\" 2>/dev/null);"
-   "set -- sh -c \"${u:+$u;}exec $c\";fi;"
-   "else rm -f \"$s\";printf '%s\\n%s\\n\\n%s\\n' \"$d\" \"$s\" \"$c\">\"$m\";"
+   "rm -f \"$s\";printf '%s\\n%s\\n%s\\n%s\\n' \"$d\" \"$s\" \"$u\" \"$c\">\"$m\";fi;"
+   "set -- sh -c \"${u:+$u;}exec $c\";"
+   "else rm -f \"$s\";printf '%s\\n%s\\n%s\\n%s\\n' \"$d\" \"$s\" \"${1:-}\" \"$c\">\"$m\";"
    "if [ $# -gt 0 ];then set -- sh -c '\"$@\";exec '\"$c\" sh \"$@\";"
    "else set -- sh -c \"exec $c\";fi;fi;"
    "dtach -A \"$s\" -e \"$(printf '\\035')\" -r winch \"$@\";r=$?;"
@@ -467,8 +470,8 @@ SCAN-MODE controls filesystem/network probing:
    "fi;exit $r")
   "Inner script that `cd's into CWD and runs shell CMD under `dtach'.
 Args: SOCK CWD CMD [FIRST-ARGV...].  A fresh session runs FIRST-ARGV (if any)
-before CMD; a respawned one runs the resume command in `.cwd' line 3 (if
-any) before CMD.  Programs own line 3 via `$NOWIS_PI_META'.")
+before CMD; an existing session attaches to SOCK or respawns the resume
+command in `.cwd' line 3 before CMD.  Programs own line 3 via `$NOWIS_PI_META'.")
 
 (defun nowis-pi--on-buffer-exit (buf _event)
   "Refresh `*Pi Fleet*' when a `pi-task' Ghostel buffer exits."
@@ -805,7 +808,8 @@ the recorded resume command."
         (name (plist-get s :name)))
     (cond
      ((and r-msg (not (equal r-msg name))) r-msg)
-     (cmd (format "$ %s" cmd))
+     ((and cmd (not (equal cmd (nowis-pi--default-shell))))
+      (format "$ %s" cmd))
      (t nil))))
 
 (defun nowis-pi--session-headline (s &optional show-detail local-cwd)
@@ -882,8 +886,9 @@ Include detail if SHOW-DETAIL is non-nil; strip remote prefix if LOCAL-CWD."
   (let ((s (or session (nowis-pi--current-session))))
     (dired (plist-get s :cwd))))
 
-(defun nowis-pi--terminate-session (s)
-  "Kill session S's buffer, dtach/Pi processes and `.sock'/`.cwd' files."
+(defun nowis-pi--terminate-session (s &optional keep-meta)
+  "Kill session S's buffer, dtach/Pi processes and `.sock' file.
+Unless KEEP-META is non-nil, also delete its `.cwd' manifest and cache entry."
   (let* ((name (plist-get s :name))
          (remote (plist-get s :remote))
          (argv-sock (plist-get (nowis-pi--read-meta remote name) :argv-sock))
@@ -909,31 +914,32 @@ Include detail if SHOW-DETAIL is non-nil; strip remote prefix if LOCAL-CWD."
       (ignore-errors
         (process-file
          "sh" nil nil nil "-c"
-         (format "pkill -KILL -f %s; pkill -KILL -f %s; rm -f %s %s"
+         (format "pkill -KILL -f %s; pkill -KILL -f %s; rm -f %s%s"
                  (funcall pattern argv-sock) (funcall pattern local-sock)
                  (shell-quote-argument (concat name ".sock"))
-                 (shell-quote-argument (concat name ".cwd"))))))
-    ;; Exited buffers leave no socket; reap their orphan metadata immediately.
-    (unless (or files (plist-get s :sock-exists))
-      (ignore-errors (delete-file (nowis-pi--cwd-file remote name))))
-    (nowis-pi--cache-remove remote name)))
+                 (if keep-meta
+                     ""
+                   (concat " " (shell-quote-argument (concat name ".cwd"))))))))
+    (unless keep-meta
+      ;; Exited buffers leave no socket; reap their orphan metadata immediately.
+      (unless (or files (plist-get s :sock-exists))
+        (ignore-errors (delete-file (nowis-pi--cwd-file remote name))))
+      (nowis-pi--cache-remove remote name))))
 
 ;;;###autoload
 (defun nowis-pi-restart (&optional session)
   "Restart SESSION in place, e.g. to pick up an updated Pi.
-Keep its name, directory, shell and window, and rerun the resume command
-recorded in `.cwd' line 3 (if any) before the shell."
+Kill its `dtach' process while keeping `.cwd', then reopen so the inner
+script respawns from `.cwd' line 3 through the standard recovery path."
   (interactive)
   (let* ((s (or session (nowis-pi--current-session)))
          (name (plist-get s :name))
          (remote (plist-get s :remote))
-         (resume (plist-get (nowis-pi--read-meta remote name) :resume))
          (win (when-let* ((buf (nowis-pi--find-task-buffer remote name)))
                 (get-buffer-window buf t))))
-    (nowis-pi--terminate-session s)
+    (nowis-pi--terminate-session s t)
     (let ((buf (nowis-pi--open-session
-                name (plist-get s :cwd) 'background (plist-get s :cmd)
-                (and resume (list "sh" "-c" resume)))))
+                name (plist-get s :cwd) 'background (plist-get s :cmd))))
       (if (window-live-p win)
           (progn (set-window-buffer win buf) (select-window win))
         (pop-to-buffer buf)))))
