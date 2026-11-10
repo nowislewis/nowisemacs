@@ -1022,7 +1022,8 @@ Jump anywhere in the world
 #+end_src
 *** bookmark
 #+begin_src elisp
-(setopt bookmark-default-file (concat nowis/doc-emacs-dir "bookmarks"))
+(setopt bookmark-default-file (concat nowis/doc-emacs-dir "bookmarks")
+        org-bookmark-names-plist nil)
 #+end_src
 *** ace-window
 #+begin_src elisp

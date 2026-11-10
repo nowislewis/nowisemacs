@@ -490,7 +490,8 @@ command in `.cwd' line 3 before CMD.  Programs own line 3 via `$NOWIS_PI_META'."
 The session runs shell CMD (default: the recorded one, else
 `nowis-pi--default-shell') inside `dtach'.  When a fresh session is
 spawned and FIRST-ARGV is non-nil, run it first and fall back to CMD
-when it exits.  DISPLAY-MODE is `switch' (default) or `background'."
+when it exits.  DISPLAY-MODE is `switch' (default), `other-window',
+or `background'."
   (require 'ghostel)
   (let* ((mode (or display-mode 'switch))
          (full-cwd (file-name-as-directory (expand-file-name cwd)))
@@ -516,12 +517,14 @@ when it exits.  DISPLAY-MODE is `switch' (default) or `background'."
     (when remote
       (cl-pushnew remote nowis-pi-hosts :test #'equal))
     (nowis-pi--cache-put remote name full-cwd nil resolved-cmd)
-    (when (eq mode 'switch)
+    (when (memq mode '(switch other-window))
       (with-current-buffer buf
         (setq-local default-directory full-cwd)
         (unless (derived-mode-p 'ghostel-mode)
           (ghostel-mode)))
-      (pop-to-buffer buf))
+      (if (eq mode 'other-window)
+          (switch-to-buffer-other-window buf)
+        (pop-to-buffer buf)))
     (unless live-p
       (let* ((identity (nowis-pi--task-identity remote name resolved-cmd))
              (sock (nowis-pi--socket-file remote name))
@@ -978,6 +981,7 @@ script respawns from `.cwd' line 3 through the standard recovery path."
   :doc "Keymap for `nowis-pi-fleet-mode'."
   :parent special-mode-map
   "RET" #'nowis-pi-fleet-open-at-point
+  "o"   #'nowis-pi-fleet-open-other-window
   "TAB" #'nowis-pi-fleet-toggle-section
   "n"   #'nowis-pi-fleet-next-item
   "p"   #'nowis-pi-fleet-prev-item
@@ -1003,7 +1007,7 @@ script respawns from `.cwd' line 3 through the standard recovery path."
               truncate-lines t
               header-line-format
               (substitute-command-keys
-               "\\<nowis-pi-fleet-mode-map> Pi Fleet: \\[nowis-pi-fleet-open-at-point] open  \\[nowis-pi-fleet-attach-at-point]/\\[nowis-pi-fleet-attach-all] attach/all  \\[nowis-pi-new] new  \\[nowis-pi-run] run  \\[nowis-pi-fork] fork  \\[nowis-pi-restart] restart  \\[nowis-pi-rename] rename  \\[nowis-pi-fleet-remote] remote  \\[nowis-pi-dired] dired  \\[nowis-pi-review] magit  \\[nowis-pi-kill] delete  \\[revert-buffer] refresh")))
+               "\\<nowis-pi-fleet-mode-map> Pi Fleet: \\[nowis-pi-fleet-open-at-point] open  \\[nowis-pi-fleet-open-other-window] other window  \\[nowis-pi-fleet-attach-at-point]/\\[nowis-pi-fleet-attach-all] attach/all  \\[nowis-pi-new] new  \\[nowis-pi-run] run  \\[nowis-pi-fork] fork  \\[nowis-pi-restart] restart  \\[nowis-pi-rename] rename  \\[nowis-pi-fleet-remote] remote  \\[nowis-pi-dired] dired  \\[nowis-pi-review] magit  \\[nowis-pi-kill] delete  \\[revert-buffer] refresh")))
 
 (defun nowis-pi-fleet--session-at-point ()
   "Return the session plist on the current dashboard line, or signal an error."
@@ -1149,8 +1153,9 @@ script respawns from `.cwd' line 3 through the standard recovery path."
       (nowis-pi-fleet--refresh-in-place 'local))
     (pop-to-buffer buf)))
 
-(defun nowis-pi-fleet-open-at-point ()
-  "Open the Pi terminal (or connect remote host) at point."
+(defun nowis-pi-fleet-open-at-point (&optional other-window)
+  "Open the Pi terminal (or connect remote host) at point.
+With OTHER-WINDOW non-nil, open the terminal in another window."
   (interactive)
   (if-let* ((host (and (null (get-text-property (point) 'nowis-pi-session))
                        (get-text-property (point) 'nowis-pi-host))))
@@ -1158,7 +1163,13 @@ script respawns from `.cwd' line 3 through the standard recovery path."
     (let ((s (nowis-pi-fleet--session-at-point)))
       (nowis-pi--open-session (plist-get s :name)
                               (plist-get s :cwd)
-                              'switch))))
+                              (if other-window 'other-window 'switch)))))
+
+;;;###autoload
+(defun nowis-pi-fleet-open-other-window ()
+  "Open the Pi terminal at point in another window, preserving Fleet."
+  (interactive)
+  (nowis-pi-fleet-open-at-point t))
 
 (defun nowis-pi-fleet-attach-at-point ()
   "Attach the `⚡ detached' session at point in the background."
