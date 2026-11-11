@@ -67,6 +67,37 @@
     (scroll-down-command arg)))
 
 
+;;;; Debounced resize
+
+(defvar nowis-ghostel-resize-delay 1.0
+  "Seconds a window size must stay stable before the terminal reflows.")
+
+(defvar-local nowis-ghostel--resize-timer nil
+  "Pending timer committing the latest window size to the terminal.")
+
+(defun nowis-ghostel--debounced-adjust-size (window)
+  "Keep WINDOW anchored now; resize the terminal once resizing settles.
+Each `SIGWINCH' makes TUIs clear and repaint the screen, so dragging a
+window edge flickers unless intermediate sizes are coalesced."
+  (with-current-buffer (window-buffer window)
+    (when (ghostel--window-anchored-p
+           window (window-old-body-pixel-height window))
+      (ghostel--anchor-window window))
+    (when nowis-ghostel--resize-timer
+      (cancel-timer nowis-ghostel--resize-timer))
+    (setq nowis-ghostel--resize-timer
+          (run-with-timer nowis-ghostel-resize-delay nil
+                          (lambda ()
+                            (when (window-live-p window)
+                              (ghostel--adjust-size window)))))))
+
+(defun nowis-ghostel--use-debounced-resize ()
+  "Replace Ghostel's immediate resize hook with the debounced one."
+  (remove-hook 'window-size-change-functions #'ghostel--adjust-size t)
+  (add-hook 'window-size-change-functions
+            #'nowis-ghostel--debounced-adjust-size nil t))
+
+
 ;;;; TRAMP-aware shell integration
 
 (defun nowis-ghostel-find-file-other-window (path)
@@ -86,6 +117,7 @@
           (delete-dups (append ghostel-keymap-exceptions '("M-`" "M-o"))))
   (add-hook 'ghostel-mode-hook #'nowis-ghostel--set-up-meow)
   (add-hook 'ghostel-mode-hook #'ghostel-ime-mode)
+  (add-hook 'ghostel-mode-hook #'nowis-ghostel--use-debounced-resize)
   (setf (alist-get "find-file-other-window" ghostel-eval-cmds nil nil #'equal)
         '(nowis-ghostel-find-file-other-window))
   (keymap-set ghostel-semi-char-mode-map "M-q" #'nowis-ghostel-send-escape)
