@@ -2041,6 +2041,10 @@ New completed items are saved under "Done from capture" in Inbox
   ;; Extract selected text; otherwise preserve M-z as the global capture key.
   ;; In a PDF buffer `org-sm-capture' delegates to `org-sm-capture-page'.
   (nowis/smart-bind "M-z" #'region-active-p #'org-sm-item-extract)
+  ;; Cards imported from Zotero keep `zotero://open-pdf' links; Zotero opens them.
+  (with-eval-after-load 'ol
+    (org-link-set-parameters
+     "zotero" :follow (lambda (path _) (browse-url (concat "zotero:" path)))))
   (:when-loaded
     ;; AI only refines existing cards in the workbench; capture stays raw.
     (require 'org-sm-gptel))
@@ -2050,6 +2054,7 @@ New completed items are saved under "Done from capture" in Inbox
     "r" #'org-sm-review-confirm
     "s" #'org-sm-review-start-light
     "S" #'org-sm-review-start
+    "b" #'org-sm-review-branch
     "a" #'org-sm-review-abort
     "l" #'org-sm-tree
     "n" #'org-sm-neural-start
