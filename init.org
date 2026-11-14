@@ -424,6 +424,9 @@ Maybe I should add a new state.
     ("d" "Done & log time" (lambda () (interactive) (call-interactively #'nowis/gtd-log-time)))
     ("e" "capture org-sm" (lambda () (interactive) (call-interactively #'org-sm-capture)))
     ("E" "capture org-sm notify" (lambda () (interactive) (call-interactively #'org-sm-capture-clipboard-notify)))
+    ("v" "capture org-sm page" (lambda () (interactive) (call-interactively #'org-sm-capture-page)))
+    ("i" "import file" (lambda () (interactive) (call-interactively #'org-sm-import-file)))
+    ("I" "import url" (lambda () (interactive) (call-interactively #'org-sm-import-url)))
     ]
    ["voice"
     ("v d" "sherpa-dictate" (lambda () (interactive) (call-interactively #'emacs-sherpa-dictate)))
@@ -2029,8 +2032,14 @@ New completed items are saved under "Done from capture" in Inbox
         org-sm-capture-file
         (concat nowis/doc-emacs-dir
                 "01-orgmode/xnotes/incremental/"
-                "20260331T230205--incremental-reading-materials.org"))
+                "20260331T230205--incremental-reading-materials.org")
+        ;; Cards link pictures kept outside the notes tree; let the web reader
+        ;; serve them without opening up the rest of the file system.
+        org-sm-web-image-roots
+        (list (concat nowis/doc-emacs-dir "02-binary-git/")
+              (concat nowis/doc-emacs-dir "02-binary-files/")))
   ;; Extract selected text; otherwise preserve M-z as the global capture key.
+  ;; In a PDF buffer `org-sm-capture' delegates to `org-sm-capture-page'.
   (nowis/smart-bind "M-z" #'region-active-p #'org-sm-item-extract)
   (:when-loaded
     ;; AI only refines existing cards in the workbench; capture stays raw.
@@ -2043,15 +2052,21 @@ New completed items are saved under "Done from capture" in Inbox
     "S" #'org-sm-review-start
     "a" #'org-sm-review-abort
     "l" #'org-sm-tree
+    "n" #'org-sm-neural-start
+    "c" #'org-sm-cycle-priority
     "e" #'org-sm-capture
     "E" #'org-sm-capture-clipboard-notify
-    "Z" #'org-sm-zotero-import
+    "v" #'org-sm-capture-page
+    "i" #'org-sm-import-file
+    "I" #'org-sm-import-url
+    "t" #'org-sm-sectionize-card
     "m" #'org-sm-item-mark
     "z" #'org-sm-item-extract
     "d" #'org-sm-item-dismiss
     "u" #'org-sm-item-undismiss
     "p" #'org-sm-set-readpoint
     "o" #'org-sm-goto-source
+    "x" #'org-sm-gptel-suggest
     "?" #'org-sm-gptel-explain
     "w" #'org-sm-card-workbench))
 #+end_src
@@ -2124,11 +2139,17 @@ New completed items are saved under "Done from capture" in Inbox
                    (insert "    ")))))
 (add-to-list 'auto-mode-alist '("\\.epub\\'" . nov-mode))
 #+end_src
-** reader
+** emureader
+PDF/EPUB viewer on a MuPDF dynamic module.  Pages are images, so text for
+extraction comes from `org-sm-capture-page' (mutool text layer, then OCR).
 #+begin_src elisp
-(setup reader
-  (:autoload reader-mode)
-  (add-to-list 'auto-mode-alist '("\\.pdf\\'" . reader-mode)))
+(setup emureader
+  (:autoload emureader-mode)
+  (add-to-list 'auto-mode-alist '("\\.pdf\\'" . emureader-mode))
+  (:when-loaded
+    (emureader-ensure-module)
+    (:with-map emureader-mode-map
+      (:bind "M-z" org-sm-capture-page))))
 #+end_src
 ** darkroom
 Simple distraction-free editing. I use darkroom instead of writeroom because it's more simple

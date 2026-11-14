@@ -13,7 +13,7 @@
 (defvar capsule-compile-directories '("elisp" "lisp" "extensions" "sources")
   "Whitelist of subdirectories to compile and load.")
 
-(defvar capsule-skip-autoloads-packages '("reader")
+(defvar capsule-skip-autoloads-packages '("emureader")
   "List of package names to skip when generating autoloads.
 Each element should be a package name (string) as it appears in lib/ directory.")
 

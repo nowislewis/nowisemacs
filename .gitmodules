@@ -269,3 +269,6 @@
 [submodule "lib/dired-sidebar"]
 	path = lib/dired-sidebar
 	url = https://github.com/jojojames/dired-sidebar.git
+[submodule "lib/emureader"]
+	path = lib/emureader
+	url = https://codeberg.org/MonadicSheep/emureader.git

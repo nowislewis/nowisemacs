@@ -8,7 +8,10 @@ NATIVE ?= 0
 NATIVE_LISP := $(if $(filter 1,$(NATIVE)),t,nil)
 LIB_DIR := lib
 LISP_DIR := lisp
-PACKAGES := $(notdir $(patsubst %/,%,$(wildcard $(LIB_DIR)/*/)))
+# `lib/*/.' matches only directories: GNU Make 3.81 (macOS default) does not
+# restrict `lib/*/' to directories, so a stray file there would become a bogus
+# package and an extra compile job.
+PACKAGES := $(notdir $(patsubst %/.,%,$(wildcard $(LIB_DIR)/*/.)))
 COMPILE_TARGETS := $(addprefix compile-,$(addprefix $(LIB_DIR)/,$(PACKAGES)) $(LISP_DIR))
 
 .PHONY: help build init-build autoloads clean init update test prepare .FORCE
