@@ -59,7 +59,13 @@ autoloads:
 # The same compilation rule handles both packages and local Lisp.
 $(COMPILE_TARGETS): compile-%: .FORCE | prepare
 	@$(BATCH_EMACS) -L $(LISP_DIR) -l $(LISP_DIR)/capsule.el \
-		--eval "(capsule-batch-compile \"$*\" $(NATIVE_LISP))"
+		--eval "(capsule-batch-compile \"$*\" $(NATIVE_LISP))" || { \
+		status=$$?; \
+		if [ -n "$(CAPSULE_FAIL_LOG)" ]; then \
+			printf '%s\n' "$*" >> "$(CAPSULE_FAIL_LOG)"; \
+		fi; \
+		exit $$status; \
+	}
 
 # Generate init.el from init.org
 init-build:
@@ -86,10 +92,21 @@ init-check:
 		echo "init.el not found, skipping..."; \
 	fi
 
-# Preparation precedes compilation; init generation waits for all compilers.
-build: $(COMPILE_TARGETS)
+# Preparation precedes compilation; keep going across independent packages and
+# summarize any failures at the bottom before attempting init generation.
+build:
+	@fail_log=$$(mktemp "$${TMPDIR:-/tmp}/capsule-build.XXXXXX"); \
+	trap 'rm -f "$$fail_log"' EXIT INT TERM; \
+	if ! $(MAKE) --no-print-directory -k $(COMPILE_TARGETS) CAPSULE_FAIL_LOG="$$fail_log"; then \
+		if [ -s "$$fail_log" ]; then \
+			echo ""; \
+			echo "==== Build failed for: ===="; \
+			sort "$$fail_log" | sed 's/^/  /'; \
+		fi; \
+		exit 1; \
+	fi
 	@echo ""
-	@$(MAKE) init-build
+	@$(MAKE) --no-print-directory init-build
 	@echo ""
 	@echo "Build complete!"
 

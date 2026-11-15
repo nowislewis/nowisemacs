@@ -33,7 +33,8 @@ class CapsuleMakeTests(unittest.TestCase):
             "with open(os.environ['CAPSULE_TEST_LOG'], 'a') as log:\n"
             "    log.write(kind + '-start\\n'); log.flush()\n"
             "    if kind == 'autoloads': time.sleep(0.05)\n"
-            "    if os.environ.get('CAPSULE_TEST_FAIL') == kind: sys.exit(7)\n"
+            "    fail = os.environ.get('CAPSULE_TEST_FAIL', '')\n"
+            "    if fail == kind or (fail and any(f'\"{fail}\"' in a for a in sys.argv)): sys.exit(7)\n"
             "    log.write(kind + '-end\\n')\n"
         )
         self.emacs.chmod(0o755)
@@ -136,6 +137,16 @@ class CapsuleMakeTests(unittest.TestCase):
         self.assertEqual(result.returncode, 0, result.stderr)
         self.assertIn('(capsule-batch-build-single "sample" t)', self.args_log.read_text())
         self.assertNotIn("autoloads-start", self.log.read_text())
+
+    def test_build_keeps_going_and_summarizes_failed_packages(self):
+        (self.cwd / "lib" / "broken").mkdir(parents=True)
+        result = self.run_make("build", fail="lib/broken")
+        self.assertNotEqual(result.returncode, 0)
+        events = self.log.read_text().splitlines()
+        self.assertEqual(events.count("compile-start"), 3)  # broken, sample, lisp
+        self.assertEqual(events.count("compile-end"), 2)    # sample and lisp still finish
+        self.assertNotIn("tangle-start", events)
+        self.assertIn("==== Build failed for: ====\n  lib/broken", result.stdout)
 
 
 if __name__ == "__main__":

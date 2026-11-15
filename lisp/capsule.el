@@ -179,12 +179,21 @@ both byte and native compilation, but do not remove existing artifacts."
                            (capsule--package-config-values pkg-dir "no-byte-compile")))
          (files (cl-remove-if (lambda (file) (member file excluded))
 			      (capsule--collect-el-files pkg-dir))))
-    (dolist (file files)
-      ;; Native compilation signals failures but may return nil for skipped files.
-      (let ((result (funcall (if capsule-use-native-compile
-                                 #'native-compile #'byte-compile-file) file)))
-        (unless (or capsule-use-native-compile result)
-          (error "Capsule: Byte compilation failed: %s" file))))))
+    (let (failed)
+      (dolist (file files)
+        ;; Native compilation signals failures; byte-compile-file returns nil.
+        (condition-case err
+            (let ((result (funcall (if capsule-use-native-compile
+                                       #'native-compile #'byte-compile-file)
+                                   file)))
+              (unless (or capsule-use-native-compile result)
+                (push file failed)))
+          (error
+           (message "%s: %s" file (error-message-string err))
+           (push file failed))))
+      (when failed
+        (error "Capsule: Byte compilation failed: %s"
+               (string-join (nreverse failed) ", "))))))
 
 (defun capsule--setup-load-path-all ()
   "Add all packages and their whitelisted subdirectories to load-path."
@@ -208,15 +217,29 @@ This function is meant to be called from Emacs --batch mode."
     (error "capsule-batch-prepare is only for batch mode"))
 
   (capsule--check-native native)
-  (let ((capsule--config (capsule--read-config)))
+  (let ((capsule--config (capsule--read-config))
+        failed)
     (dolist (pkg-dir (capsule--package-directories))
       (let ((pkg-name (file-name-nondirectory pkg-dir)))
         (if (or (member pkg-name capsule-skip-autoloads-packages)
                 (capsule--skip-build-p pkg-dir))
             (message "\n--- [%s] (skipped) ---\n" pkg-name)
           (message "\n--- [%s] ---\n" pkg-name)
-          (capsule--prepare-package pkg-dir)))))
-  (capsule-generate-local-autoloads))
+          (condition-case err
+              (capsule--prepare-package pkg-dir)
+            (error
+             (message "Capsule: Prepare failed for %s: %s"
+                      pkg-name (error-message-string err))
+             (push pkg-name failed))))))
+    (condition-case err
+        (capsule-generate-local-autoloads)
+      (error
+       (message "Capsule: Prepare failed for lisp: %s"
+                (error-message-string err))
+       (push "lisp" failed)))
+    (when failed
+      (error "Capsule: Prepare failed for: %s"
+             (string-join (nreverse failed) ", ")))))
 
 (defun capsule-batch-compile (directory &optional native)
   "Compile DIRECTORY for a bulk build unless configured with skip-build = true.

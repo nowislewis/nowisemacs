@@ -73,10 +73,27 @@
 
 (ert-deftest capsule-byte-compile-failure-signals ()
   (capsule-test--with-package
-    (with-temp-file (expand-file-name "broken.el" pkg-dir)
-      (insert ";;; -*- lexical-binding: t; -*-\n(defun broken (\n"))
-    (capsule-test--with-config
-      (should-error (capsule--compile-package pkg-dir)))))
+    (let ((broken (expand-file-name "a-broken.el" pkg-dir))
+          (good (expand-file-name "b-good.el" pkg-dir)))
+      (with-temp-file broken
+        (insert ";;; -*- lexical-binding: t; -*-\n(defun broken (\n"))
+      (with-temp-file good
+        (insert ";;; -*- lexical-binding: t; -*-\n(defun good () t)\n"))
+      (capsule-test--with-config
+        (should-error (capsule--compile-package pkg-dir)))
+      (should (file-exists-p (concat good "c"))))))
+
+(ert-deftest capsule-batch-prepare-continues-and-summarizes-failures ()
+  (capsule-test--with-package
+    (let ((good-dir (expand-file-name "z-good" capsule-drones-directory)))
+      (make-directory good-dir t)
+      (process-lines "git" "config" "--file" modules
+                     "submodule.different-name.pre-build-command" "exit 7")
+      (with-temp-file (expand-file-name "z-good.el" good-dir)
+        (insert ";;; -*- lexical-binding: t; -*-\n;;;###autoload\n(defun z-good-fn () t)\n"))
+      (let ((err (should-error (capsule-batch-prepare))))
+        (should (string-match-p "package with spaces" (error-message-string err))))
+      (should (file-exists-p (expand-file-name "z-good-autoloads.el" good-dir))))))
 
 (ert-deftest capsule-activation-path-order-and-idempotence ()
   (capsule-test--with-package
