@@ -14,7 +14,7 @@ LISP_DIR := lisp
 PACKAGES := $(notdir $(patsubst %/.,%,$(wildcard $(LIB_DIR)/*/.)))
 COMPILE_TARGETS := $(addprefix compile-,$(addprefix $(LIB_DIR)/,$(PACKAGES)) $(LISP_DIR))
 
-.PHONY: help build init-build autoloads clean init update test prepare .FORCE
+.PHONY: help build init-build init-check autoloads clean init update test prepare .FORCE
 
 help:
 	@echo "Simple Package Manager"
@@ -72,6 +72,19 @@ init-build:
 	else \
 		echo "init.org not found, skipping..."; \
 	fi
+	@$(MAKE) --no-print-directory init-check
+
+# Load init.el the way startup does.  Tangling cannot see errors that only
+# happen at load time, such as a `setup' body that reads a variable before its
+# package defines it, so `init-build' always runs this check last.
+init-check:
+	@if [ -f init.el ]; then \
+		echo "==== Loading init.el ===="; \
+		$(BATCH_EMACS) -l init.el \
+			--eval '(princ "init.el loads without errors\n")' || exit $$?; \
+	else \
+		echo "init.el not found, skipping..."; \
+	fi
 
 # Preparation precedes compilation; init generation waits for all compilers.
 build: $(COMPILE_TARGETS)
@@ -108,5 +121,10 @@ test:
 	@$(BATCH_EMACS) -L $(LISP_DIR) -l $(LISP_DIR)/capsule.el \
 		-l $(LISP_DIR)/tests/capsule-test.el \
 		-l $(LISP_DIR)/tests/local-autoload-test.el -f ert-run-tests-batch-and-exit
+	@# `nowis-pi' requires `ghostel'; prefer sources so a stale .elc cannot
+	@# hide a regression.
+	@$(BATCH_EMACS) -L $(LISP_DIR) -L $(LIB_DIR)/ghostel/lisp \
+		--eval '(setq load-prefer-newer t)' \
+		-l $(LISP_DIR)/tests/nowis-pi-test.el -f ert-run-tests-batch-and-exit
 	@$(PYTHON) $(LISP_DIR)/tests/capsule-make-test.py
 	@$(PYTHON) $(LISP_DIR)/tests/capsule-update-test.py

@@ -28,6 +28,7 @@ class CapsuleMakeTests(unittest.TestCase):
             "with open(os.environ['CAPSULE_TEST_ARGS'], 'a') as out: out.write(repr(sys.argv) + '\\n')\n"
             "kind = ('autoloads' if any('capsule-batch-prepare' in a for a in sys.argv)\n"
             "        else 'tangle' if any('org-babel-tangle-file' in a for a in sys.argv)\n"
+            "        else 'check' if 'init.el' in sys.argv\n"
             "        else 'compile')\n"
             "with open(os.environ['CAPSULE_TEST_LOG'], 'a') as log:\n"
             "    log.write(kind + '-start\\n'); log.flush()\n"
@@ -100,6 +101,20 @@ class CapsuleMakeTests(unittest.TestCase):
         result = self.run_make("init-build", fail="tangle")
         self.assertNotEqual(result.returncode, 0)
         self.assertNotIn("init.el generated!", result.stdout)
+
+    def test_init_build_loads_the_tangled_init(self):
+        # Tangling alone misses load-time errors, so a real init.el is loaded last.
+        (self.cwd / "init.el").write_text(";; tangled\n")
+        result = self.run_make("init-build")
+        self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertEqual(self.log.read_text().splitlines(),
+                         ["tangle-start", "tangle-end", "check-start", "check-end"])
+
+    def test_init_check_failure_is_not_success(self):
+        (self.cwd / "init.el").write_text(";; tangled\n")
+        result = self.run_make("init-build", fail="check")
+        self.assertNotEqual(result.returncode, 0)
+        self.assertNotIn("init.el loads without errors", result.stdout)
 
     def test_build_ignores_non_directory_entries(self):
         result = self.run_make("build")

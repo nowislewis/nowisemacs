@@ -721,6 +721,10 @@ diff-hl-mode highlights uncommitted changes on the left side of the window
   (setopt history-length 500
         history-delete-duplicates t
         savehist-autosave-interval 60)
+  ;; Register here, not in `nowis-pi': savehist drops variables that are
+  ;; unregistered at save time, and `nowis-pi' loads only on first use.
+  (:when-loaded
+    (add-to-list 'savehist-additional-variables 'nowis-pi-hosts))
   (savehist-mode))
 #+end_src
 ** recentf
@@ -1239,6 +1243,11 @@ Jump anywhere in the world
   (:when-loaded
     (require 'nowis-ghostel)
     (nowis-ghostel-setup)))
+#+end_src
+** pi fleet
+#+begin_src elisp
+(setup nowis-pi
+  (:when-loaded (nowis-pi-setup)))
 #+end_src
 * git
 ** magit
@@ -2060,18 +2069,20 @@ New completed items are saved under "Done from capture" in Inbox
     "a" #'org-sm-review-abort
     "l" #'org-sm-tree
     "n" #'org-sm-neural-start
-    "c" #'org-sm-cycle-priority
+    "p" #'org-sm-cycle-priority
     "e" #'org-sm-capture
     "E" #'org-sm-capture-clipboard-notify
     "v" #'org-sm-capture-page
     "i" #'org-sm-import-file
     "I" #'org-sm-import-url
+    "W" #'org-sm-weread-import
+    "Z" #'org-sm-zotero-import
     "t" #'org-sm-sectionize-card
     "m" #'org-sm-item-mark
     "z" #'org-sm-item-extract
     "d" #'org-sm-item-dismiss
     "u" #'org-sm-item-undismiss
-    "p" #'org-sm-set-readpoint
+    "." #'org-sm-set-readpoint
     "o" #'org-sm-goto-source
     "x" #'org-sm-gptel-suggest
     "?" #'org-sm-gptel-explain
@@ -2227,6 +2238,9 @@ Simple distraction-free editing. I use darkroom instead of writeroom because it'
   (:when-loaded
     (add-to-list 'gptel-agent-dirs
                  (expand-file-name "131-gptel-presets/" nowis/doc-emacs-dir))
+    ;; Skills: one exposure point.  Third-party skills that Pi installed are not
+    ;; linked in; `pi-installed-skills' looks them up on demand instead.
+    (setq gptel-agent-skill-dirs '("~/.agents/skills/"))
     (gptel-agent-update)
     (when-let* ((plist (assoc-default "gptel-simple-agent" gptel-agent--agents nil nil)))
       (apply #'gptel-make-preset 'gptel-simple-agent plist))
