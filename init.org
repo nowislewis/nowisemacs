@@ -2046,12 +2046,7 @@ New completed items are saved under "Done from capture" in Inbox
               (concat nowis/doc-emacs-dir "02-binary-files/")))
   ;; Extract selected text; otherwise preserve M-z as the global capture key.
   ;; In a PDF buffer `org-sm-capture' delegates to `org-sm-capture-page'.
-  (nowis/smart-bind "M-z"
-                    (lambda ()
-                      (or (region-active-p)
-                          (seq-some (lambda (ov) (overlay-get ov 'org-sm-pencil))
-                                    (overlays-at (point)))))
-                    #'org-sm-item-extract)
+  (nowis/smart-bind "M-z" #'region-active-p #'org-sm-item-extract)
   ;; Cards imported from Zotero keep `zotero://open-pdf' links; Zotero opens them.
   (with-eval-after-load 'ol
     (org-link-set-parameters
@@ -2084,7 +2079,6 @@ New completed items are saved under "Done from capture" in Inbox
     "u" #'org-sm-item-undismiss
     "." #'org-sm-set-readpoint
     "o" #'org-sm-goto-source
-    "x" #'org-sm-gptel-suggest
     "?" #'org-sm-gptel-explain
     "w" #'org-sm-card-workbench))
 #+end_src
@@ -2197,16 +2191,17 @@ Simple distraction-free editing. I use darkroom instead of writeroom because it'
     (require 'nowis-gptel-selection)
     (nowis-gptel-selection-mode 1)
     (setq-default gptel-backend
-                  (gptel-make-anthropic "momenta"
+                  (gptel-make-openai-responses "momenta-openai"
                     :host "llm-gateway.momenta.works"
                     :key 'gptel-api-key
-                    :stream t
-                    :models '(gemini-3.8-flash claude-haiku-5-5)))
-    (gptel-make-openai-responses "momenta-openai"
+                    :stream nil
+                    :models '(gpt-6-astra gpt-6.1-luna gpt-6.1-sol deepseek-v4.1-flash-codex gemini-4-argon))
+                  )
+    (gptel-make-anthropic "momenta"
       :host "llm-gateway.momenta.works"
       :key 'gptel-api-key
-      :stream nil
-      :models '(qwen3.8-flash gpt-6-astra gpt-6-luna gpt-6.1-sol deepseek-v4.1-flash gemini-4-argon))
+      :stream t
+      :models '(claude-opus-5-5-dct claude-haiku-5-5))
     (gptel-make-openai "chatanywhere"
       :host "api.chatanywhere.tech"
       :key 'gptel-api-key
