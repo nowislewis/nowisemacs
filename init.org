@@ -424,9 +424,6 @@ Maybe I should add a new state.
     ("d" "Done & log time" (lambda () (interactive) (call-interactively #'nowis/gtd-log-time)))
     ("e" "capture org-sm" (lambda () (interactive) (call-interactively #'org-sm-capture)))
     ("E" "capture org-sm notify" (lambda () (interactive) (call-interactively #'org-sm-capture-clipboard-notify)))
-    ("v" "capture org-sm page" (lambda () (interactive) (call-interactively #'org-sm-capture-page)))
-    ("i" "import file" (lambda () (interactive) (call-interactively #'org-sm-import-file)))
-    ("I" "import url" (lambda () (interactive) (call-interactively #'org-sm-import-url)))
     ]
    ["voice"
     ("v d" "sherpa-dictate" (lambda () (interactive) (call-interactively #'emacs-sherpa-dictate)))
