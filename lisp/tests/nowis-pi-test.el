@@ -4,7 +4,7 @@
 (require 'cl-lib)
 (require 'nowis-pi)
 
-(ert-deftest nowis-pi-fleet-open-keeps-default-and-other-window-distinct ()
+(ert-deftest nowis-pi-fleet-open-binds-ret-and-the-other-window-prefix ()
   (with-temp-buffer
     (let ((session '(:name "test" :cwd "/tmp/"))
           calls)
@@ -12,50 +12,107 @@
       (goto-char (point-min))
       (cl-letf (((symbol-function 'nowis-pi--open-session)
                  (lambda (&rest args) (push args calls))))
-        (call-interactively #'nowis-pi-fleet-open-at-point)
-        (call-interactively #'nowis-pi-fleet-open-other-window))
-      (should (equal (nreverse calls)
-                     '(("test" "/tmp/" switch)
-                       ("test" "/tmp/" other-window))))
+        (call-interactively #'nowis-pi-fleet-open-at-point))
+      (should (equal calls '(("test" "/tmp/" switch))))
       (should (eq (keymap-lookup nowis-pi-fleet-mode-map "RET")
                   #'nowis-pi-fleet-open-at-point))
-      (should (eq (keymap-lookup nowis-pi-fleet-mode-map "o")
-                  #'nowis-pi-fleet-open-other-window)))))
+      (should (eq (keymap-lookup nowis-pi-fleet-mode-map "4")
+                  #'nowis-pi-fleet-other-window-next)))))
 
-(ert-deftest nowis-pi-open-other-window-preserves-fleet-and-live-session ()
-  (require 'ghostel)
-  (let ((fleet (generate-new-buffer " *Fleet display test*"))
-        (terminal (generate-new-buffer " *Pi display test*")))
-    (unwind-protect
-        (save-window-excursion
-          (delete-other-windows)
-          (switch-to-buffer fleet)
-          (with-current-buffer terminal
-            (setq major-mode 'ghostel-mode))
-          (let ((fleet-window (selected-window))
-                (display-buffer-alist nil)
-                (display-buffer-base-action nil)
-                (pop-up-windows t))
-            (cl-letf (((symbol-function 'nowis-pi--find-task-buffer)
-                       (lambda (&rest _) terminal))
-                      ((symbol-function 'nowis-pi--buffer-attached-p)
-                       (lambda (_) t))
-                      ((symbol-function 'nowis-pi--cache-put) #'ignore)
-                      ((symbol-function 'nowis-pi--read-meta) #'ignore)
-                      ((symbol-function 'ghostel-exec)
-                       (lambda (&rest _) (ert-fail "Do not respawn a live session"))))
-              (should (eq (nowis-pi--open-session "test" "/tmp/" 'other-window)
-                          terminal))
-              (should (eq (window-buffer fleet-window) fleet))
-              (should-not (eq (selected-window) fleet-window))
-              (should (eq (window-buffer (selected-window)) terminal))
-              ;; Reopening reuses the existing terminal window, not a third one.
-              (select-window fleet-window)
-              (nowis-pi--open-session "test" "/tmp/" 'other-window)
+(defmacro nowis-pi-test--with-fleet-layout (&rest body)
+  "Run BODY with Fleet beside a code window and a live session stub.
+Binds `fleet', `code', `terminal' and `code-window'; display actions are
+reset so assertions see stock `display-buffer' behavior."
+  (declare (indent 0))
+  `(let ((fleet (generate-new-buffer " *Fleet layout test*"))
+         (code (generate-new-buffer " *Code layout test*"))
+         (terminal (generate-new-buffer " *Pi layout test*")))
+     (unwind-protect
+         (save-window-excursion
+           (set-frame-size (selected-frame) 200 50)
+           (delete-other-windows)
+           (switch-to-buffer fleet)
+           (let ((code-window (split-window-right))
+                 (display-buffer-alist nil)
+                 (display-buffer-base-action nil)
+                 ;; Stock value is (nil); `display-buffer-override-next-command'
+                 ;; pushes into its car.
+                 (display-buffer-overriding-action '(nil))
+                 (pop-up-windows t))
+             (set-window-buffer code-window code)
+             (with-current-buffer terminal (setq major-mode 'ghostel-mode))
+             (cl-letf (((symbol-function 'nowis-pi--find-task-buffer)
+                        (lambda (&rest _) terminal))
+                       ((symbol-function 'nowis-pi--buffer-attached-p)
+                        (lambda (_) t))
+                       ((symbol-function 'nowis-pi--cache-put) #'ignore)
+                       ((symbol-function 'nowis-pi--read-meta) #'ignore)
+                       ((symbol-function 'ghostel-exec)
+                        (lambda (&rest _) (ert-fail "Do not respawn a live session"))))
+               ,@body)))
+       (kill-buffer terminal)
+       (kill-buffer code)
+       (kill-buffer fleet))))
+
+(ert-deftest nowis-pi-fleet-opens-in-the-current-window ()
+  "`nowis-pi-fleet' replaces the current window, never splits or steals."
+  (save-window-excursion
+    (set-frame-size (selected-frame) 200 50)
+    (delete-other-windows)
+    (let ((orig (get-buffer-create " *Fleet origin test*")))
+      (unwind-protect
+          (progn
+            (switch-to-buffer orig)
+            (let ((side (split-window-right)))
+              (select-window side)
+              (nowis-pi-fleet)
               (should (= (length (window-list)) 2))
-              (should (eq (window-buffer fleet-window) fleet)))))
-      (kill-buffer terminal)
-      (kill-buffer fleet))))
+              (should (eq (window-buffer side) (get-buffer "*Pi Fleet*")))
+              (should (eq (window-buffer (frame-first-window)) orig))))
+        (kill-buffer orig)))))
+
+(ert-deftest nowis-pi-open-switch-replaces-fleet-in-place ()
+  "RET replaces the Fleet window itself; neighbor windows stay untouched."
+  (require 'ghostel)
+  (nowis-pi-test--with-fleet-layout
+    (nowis-pi--open-session "test" "/tmp/" 'switch)
+    (should (= (length (window-list)) 2))
+    (should (eq (window-buffer (selected-window)) terminal))
+    (should (eq (window-buffer code-window) code))
+    (should-not (get-buffer-window fleet))))
+
+(ert-deftest nowis-pi-fleet-other-window-next-reuses-showing-window ()
+  "The `4' prefix reuses a window already showing the session."
+  (require 'ghostel)
+  (nowis-pi-test--with-fleet-layout
+    (set-window-buffer code-window terminal)
+    (call-interactively #'nowis-pi-fleet-other-window-next)
+    (should (eq (nowis-pi--open-session "test" "/tmp/" 'switch) terminal))
+    (should (= (length (window-list)) 2))
+    (should (eq (window-buffer code-window) terminal))
+    (should (eq (selected-window) code-window))
+    (should (eq (window-buffer (get-buffer-window fleet)) fleet))
+    ;; A second prefixed open reuses the same window, never a third one.
+    (select-window (get-buffer-window fleet))
+    (call-interactively #'nowis-pi-fleet-other-window-next)
+    (nowis-pi--open-session "test" "/tmp/" 'switch)
+    (should (= (length (window-list)) 2))))
+
+(ert-deftest nowis-pi-fleet-other-window-next-splits-for-next-command ()
+  "The `4' prefix splits for an unshown session, never hijacking code."
+  (require 'ghostel)
+  (nowis-pi-test--with-fleet-layout
+    (call-interactively #'nowis-pi-fleet-other-window-next)
+    (nowis-pi--open-session "test" "/tmp/" 'switch)
+    (should (= (length (window-list)) 3))
+    (should (get-buffer-window code))
+    (should (get-buffer-window fleet))
+    (should (eq (window-buffer (selected-window)) terminal))
+    ;; The override is one-shot: a later open replaces in place again.
+    (select-window (get-buffer-window fleet))
+    (nowis-pi--open-session "test" "/tmp/" 'switch)
+    (should (eq (window-buffer (selected-window)) terminal))
+    (should-not (get-buffer-window fleet))))
 
 (defmacro nowis-pi-test--with-socket-dir (dir &rest body)
   "Run BODY with an empty cache and a temporary socket directory DIR."

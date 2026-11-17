@@ -503,8 +503,9 @@ command in `.cwd' line 3 before CMD.  Programs own line 3 via
 The session runs shell CMD (default: the recorded one, else
 `nowis-pi--default-shell') inside `dtach'.  When a fresh session is
 spawned and FIRST-ARGV is non-nil, run it first and fall back to CMD
-when it exits.  DISPLAY-MODE is `switch' (default), `other-window',
-or `background'."
+when it exits.  DISPLAY-MODE is `switch' (default: replace the current
+window, dired-style) or `background'; the Fleet's other-window prefix
+(`nowis-pi-fleet-other-window-next') redirects `switch' to another window."
   (let* ((mode (or display-mode 'switch))
          (full-cwd (file-name-as-directory (expand-file-name cwd)))
          (remote (file-remote-p full-cwd))
@@ -530,13 +531,14 @@ or `background'."
     ;; `default-directory'; neither it nor `ghostel-mode' resets it.
     (with-current-buffer buf
       (setq-local default-directory full-cwd))
-    (when (memq mode '(switch other-window))
+    (when (eq mode 'switch)
       (with-current-buffer buf
         (unless (derived-mode-p 'ghostel-mode)
           (ghostel-mode)))
-      (if (eq mode 'other-window)
-          (switch-to-buffer-other-window buf)
-        (pop-to-buffer buf)))
+      ;; Same-window (not bare `pop-to-buffer'): deterministic in-place
+      ;; replace, and it obeys `display-buffer-overriding-action' so the
+      ;; Fleet's other-window prefix can redirect it.
+      (pop-to-buffer-same-window buf))
     (unless live-p
       (let* ((identity (nowis-pi--task-identity remote name resolved-cmd))
              (sock (nowis-pi--socket-file remote name))
@@ -1000,7 +1002,7 @@ Ask first when SESSION is working or blocked: the restart interrupts it."
   :doc "Keymap for `nowis-pi-fleet-mode'."
   :parent special-mode-map
   "RET" #'nowis-pi-fleet-open-at-point
-  "o"   #'nowis-pi-fleet-open-other-window
+  "4"   #'nowis-pi-fleet-other-window-next
   "TAB" #'nowis-pi-fleet-toggle-section
   "n"   #'nowis-pi-fleet-next-item
   "p"   #'nowis-pi-fleet-prev-item
@@ -1029,7 +1031,7 @@ Ask first when SESSION is working or blocked: the restart interrupts it."
                (concat
                 "\\<nowis-pi-fleet-mode-map> Pi Fleet: "
                 "\\[nowis-pi-fleet-open-at-point] open  "
-                "\\[nowis-pi-fleet-open-other-window] other window  "
+                "\\[nowis-pi-fleet-other-window-next]+\\[nowis-pi-fleet-open-at-point] open in other window  "
                 "\\[nowis-pi-fleet-next-item]/\\[nowis-pi-fleet-prev-item] move  "
                 "\\[nowis-pi-fleet-toggle-section] fold  "
                 "\\[nowis-pi-next-waiting] waiting  "
@@ -1186,11 +1188,12 @@ SCAN-MODE is passed to `nowis-pi--all-known-sessions'."
       (unless (derived-mode-p 'nowis-pi-fleet-mode)
         (nowis-pi-fleet-mode))
       (nowis-pi-fleet--refresh-in-place 'local))
-    (pop-to-buffer buf)))
+    ;; In-place (not bare `pop-to-buffer'): the dashboard replaces the
+    ;; current window deterministically, like RET opens a session.
+    (pop-to-buffer-same-window buf)))
 
-(defun nowis-pi-fleet-open-at-point (&optional other-window)
-  "Open the Pi terminal (or connect remote host) at point.
-With OTHER-WINDOW non-nil, open the terminal in another window."
+(defun nowis-pi-fleet-open-at-point ()
+  "Open the Pi terminal (or connect remote host) at point."
   (interactive)
   (if-let* ((host (and (null (get-text-property (point) 'nowis-pi-session))
                        (get-text-property (point) 'nowis-pi-host))))
@@ -1198,13 +1201,30 @@ With OTHER-WINDOW non-nil, open the terminal in another window."
     (let ((s (nowis-pi-fleet--session-at-point)))
       (nowis-pi--open-session (plist-get s :name)
                               (plist-get s :cwd)
-                              (if other-window 'other-window 'switch)))))
+                              'switch))))
 
 ;;;###autoload
-(defun nowis-pi-fleet-open-other-window ()
-  "Open the Pi terminal at point in another window, preserving Fleet."
+(defun nowis-pi-fleet-other-window-next ()
+  "Display the next Fleet command's session buffer in another window.
+A one-command prefix for RET, `c', `x', `f', ...: reuse a window already
+showing the session, else split a new one; never replace the Fleet
+window.  Reuse comes first because a terminal shown in two windows
+fights over SIGWINCH between the two sizes."
   (interactive)
-  (nowis-pi-fleet-open-at-point t))
+  (display-buffer-override-next-command
+   (lambda (buffer alist)
+     (let* ((alist (append '((inhibit-same-window . t)) alist))
+            ;; Zero height threshold: always split rather than let the
+            ;; fallback steal a neighbor window (`split-window-sensibly'
+            ;; otherwise gives up below its width/height thresholds).
+            (split-height-threshold 0)
+            (reuse (display-buffer-reuse-window buffer alist))
+            (window (or reuse (display-buffer-pop-up-window buffer alist)
+                        ;; Only reachable on a frame too small to split.
+                        (display-buffer-use-some-window buffer alist))))
+       (cons window (if reuse 'reuse 'window))))
+   nil "[other-window]")
+  (message "Next Fleet command opens its session in another window"))
 
 (defun nowis-pi-fleet-attach-at-point ()
   "Attach the `⚡ detached' session at point in the background."
